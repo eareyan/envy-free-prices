@@ -62,14 +62,14 @@ public class EfficientAllocationLP {
 			 */
 			IloLinearNumExpr obj = this.cplex.linearNumExpr();
 			for (int j=0; j<this.market.getNumberCampaigns(); j++){
-				obj.addTerm(this.market.campaigns[j].getReward(), indicatorVariable[j]);
+				obj.addTerm(this.market.getCampaign(j).getReward(), indicatorVariable[j]);
 			}
 			this.cplex.addMaximize(obj);
 			/*
 			 * Constraint (1). Allocation satisfies campaign. 
 			 */
 			for (int j=0; j<this.market.getNumberCampaigns(); j++){
-				double coeff = 1.0/(double)this.market.campaigns[j].getDemand();
+				double coeff = 1.0/(double)this.market.getCampaign(j).getDemand();
 				IloLinearNumExpr expr = cplex.linearNumExpr();
 				for (int i=0; i<this.market.getNumberUsers(); i++){
 					if(this.market.isConnected(i, j)){
@@ -91,7 +91,7 @@ public class EfficientAllocationLP {
 				for (int j=0; j<this.market.getNumberCampaigns(); j++){
 					expr.addTerm(1.0,allocationMatrixVariable[i][j]);
 				}
-				this.cplex.addLe(expr,this.market.users[i].getSupply());
+				this.cplex.addLe(expr,this.market.getUser(i).getSupply());
 			}
 			/*
 			 * Solve the problem and get many solutions:

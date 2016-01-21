@@ -9,11 +9,11 @@ public class Market {
     /*
      * Array of Users
      */    
-    public User[] users;	
+    protected User[] users;	
 	/*
 	 * Array of Campaigns
 	 */	
-    public Campaign[] campaigns;
+    protected Campaign[] campaigns;
     /*
      * Boolean matrix indicating which campaign is connected to which user.
      */
