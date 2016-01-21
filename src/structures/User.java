@@ -16,4 +16,10 @@ public class User {
 	public User(int supply){
 		this.supply = supply;
 	}
+	/*
+	 * Getters
+	 */
+	public int getSupply(){
+		return this.supply;
+	}
 }

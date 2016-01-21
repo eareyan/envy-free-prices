@@ -21,4 +21,13 @@ public class Campaign {
 		this.demand = demand;
 		this.reward = reward;
 	}
+	/*
+	 * Getters
+	 */
+	public int getDemand(){
+		return this.demand;
+	}
+	public double getReward(){
+		return this.reward;
+	}
 }
