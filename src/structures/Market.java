@@ -60,23 +60,23 @@ public class Market {
     	return this.connections[i][j];
     }
     /*
-     * Printers
+     * Printers. Representation of objects as strings.
      */
-    protected String printUsersInfo(){
+    protected String stringUsersInfo(){
     	String ret = "";
     	for(int i=0;i<this.getNumberUsers();i++){
     		ret += "\nN("+i+") = " + this.users[i].supply;
     	}
     	return ret;
     }    
-	protected String printCampaignsInfo(){
+	protected String stringCampaignsInfo(){
 		String ret = "";
 		for(int j=0;j<this.getNumberCampaigns();j++){
 			ret += "\nR("+j+") = "+ this.campaigns[j].reward + ";\t I("+j+") = " + this.campaigns[j].demand;
 		}
 		return ret;
 	}    
-	protected String printConnectionsMatrix(){
+	protected String stringConnectionsMatrix(){
 		if(this.connections != null){	   
 			String ret = "";
 			for(int i=0;i<this.getNumberUsers();i++){
@@ -98,9 +98,8 @@ public class Market {
     public String toString(){
     	return  "NbrCampaigns:\t"+this.getNumberCampaigns() + "\n" +
     			"NbrUsers:\t"+this.getNumberUsers() + "\n" +
-    			"Campaigns Rewards \t\t Campaigns Demand" + this.printCampaignsInfo() + "\n" +
-    			"Users Supply" + this.printUsersInfo() + "\n" +
-    			"Connections Matrix:\t"+this.printConnectionsMatrix() + "\n" ;
-    			//"Allocation Matrix:\t" + this.printAllocationMatrix();
+    			"Campaigns Rewards \t\t Campaigns Demand" + this.stringCampaignsInfo() + "\n" +
+    			"Users Supply" + this.stringUsersInfo() + "\n" +
+    			"Connections Matrix:\t"+this.stringConnectionsMatrix();
     }
 }

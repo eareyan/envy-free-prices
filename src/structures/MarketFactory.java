@@ -11,7 +11,7 @@ import java.util.Random;
 public class MarketFactory {
 	
 	/*
-	 * Creation of a fully parametrizable random market. 
+	 * Creation of a fully parameterisable random market. 
 	 */
 	public static Market randomMarket(int numberUsers, int minSupplyPerUser, int maxSupplyPerUser, int numberCampaigns, int minDemandPerCampaign, int maxDemandPerCampaign, double minReward, double maxReward, double probabilityConnection){
 		//Create Users
