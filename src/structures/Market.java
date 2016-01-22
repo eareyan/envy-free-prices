@@ -19,6 +19,10 @@ public class Market {
      */
     protected boolean[][] connections;
     /*
+     * Highest reward among all campaigns. Implemented as a singleton.
+     */
+    protected double highestReward = -1.0;    
+    /*
      * Constructors. The first constructor is the most fundamental one.
      * It receives campaigns, users and connections.
      */
@@ -52,6 +56,43 @@ public class Market {
     
     public int getNumberCampaigns(){
     	return this.campaigns.length;
+    }
+    /*
+     * Get highest reward among all campaigns. Implements a singleton
+     */
+    public double getHighestReward(){
+    	if(this.highestReward == -1.0){
+    		double temp = -1.0;
+    		for(int j=0;j<this.getNumberCampaigns();j++){
+    			if(this.getCampaign(j).getReward() > temp){
+    				temp = this.getCampaign(j).getReward();
+    			}
+    		}
+    		this.highestReward = temp;
+    	}
+    	return this.highestReward;
+    }
+    /*
+     * Does user i has any connections at all?
+     */
+    public boolean hasConnectionsUser(int i){
+    	for(int j=0;j<this.getNumberCampaigns();j++){
+    		if(this.isConnected(i, j)){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    /*
+     * Does campaign j has any connections at all?
+     */
+    public boolean hasConnectionsCampaign(int j){
+    	for(int i=0;i<this.getNumberCampaigns();i++){
+    		if(this.isConnected(i, j)){
+    			return true;
+    		}
+    	}
+    	return false;
     }
     /*
      * Is user i connected to campaign j?

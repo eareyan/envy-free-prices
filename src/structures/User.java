@@ -11,6 +11,10 @@ public class User {
 	 */
 	protected int supply;
 	/*
+	 * Reserve price.
+	 */
+	protected double reservePrice = 0.0; 
+	/*
 	 * Constructor
 	 */
 	public User(int supply){
@@ -21,5 +25,8 @@ public class User {
 	 */
 	public int getSupply(){
 		return this.supply;
+	}
+	public double getReservePrice(){
+		return this.reservePrice;
 	}
 }

@@ -81,7 +81,7 @@ public class EnvyFreePricesMatrix {
 	 * If x_ij=0, then there is no allocation from i to j, so the price P_ij is unbounded.
 	 * Instead, let us bounded by the reward of j. This is arbitrary, it can be any value we like.
 	 */
-	protected void  generateVoidConditions() throws IloException{
+	protected void  generateBoundConditions() throws IloException{
 		for(int i=0;i<this.allocatedMarket.getMarket().getNumberUsers();i++){
 			for(int j=0;j<this.allocatedMarket.getMarket().getNumberCampaigns();j++){
 				if(this.allocatedMarket.getAllocation()[i][j] == 0){
@@ -127,7 +127,7 @@ public class EnvyFreePricesMatrix {
 			 */
 		    this.generateCompactConditions();
 		    this.generateIndividualRationalityConditions();
-		    this.generateVoidConditions();
+		    this.generateBoundConditions();
 		    /*
 		     * Solve the LP.
 		     */

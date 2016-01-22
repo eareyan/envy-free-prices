@@ -10,6 +10,13 @@ import java.util.ArrayList;
 
 import structures.MarketAllocation;
 
+/*
+ * LP to find a single vector of envy-free prices.
+ * Implements Compact Condition and Individual Rationality.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
+
 public class EnvyFreePricesVector {
 	/*
 	 * Boolean to control whether or not to output.
@@ -82,6 +89,16 @@ public class EnvyFreePricesVector {
 				}
 			}
 		}
+	}
+	/*
+	 * This method implements conditions so that the vector of prices is not unbounded.
+	 * We will simply constrain the price of a market to be that of the highest reward of the market.
+	 */
+	protected void  generateBoundConditions() throws IloException{
+		double highestReward = this.allocatedMarket.getMarket().getHighestReward();
+		for(int i=0;i<this.allocatedMarket.getMarket().getNumberUsers();i++){
+			this.linearConstrains.add(this.cplex.addLe(this.prices[i],Math.ceil(highestReward)));
+		}
 	}	
 	/*
 	 * This method creates and solves the LP.
@@ -112,6 +129,7 @@ public class EnvyFreePricesVector {
 		    this.cplex.addMaximize(this.cplex.scalProd(this.prices, objvals));
 		    this.generateCompactConditions();
 		    this.generateIndividualRationalityConditions();
+		    this.generateBoundConditions();
 		    /*
 		     * Solve the LP.
 		     */
