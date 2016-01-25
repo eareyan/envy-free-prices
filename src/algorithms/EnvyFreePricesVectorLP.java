@@ -17,7 +17,7 @@ import structures.MarketAllocation;
  * @author Enrique Areyan Viqueira
  */
 
-public class EnvyFreePricesVector {
+public class EnvyFreePricesVectorLP {
 	/*
 	 * Boolean to control whether or not to output.
 	 */
@@ -38,7 +38,7 @@ public class EnvyFreePricesVector {
 	/*
 	 * Constructor receives an allocated market M.
 	 */
-	public EnvyFreePricesVector(MarketAllocation allocatedMarket){
+	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket){
 		this.allocatedMarket = allocatedMarket;
 	}
 	/*
@@ -103,9 +103,9 @@ public class EnvyFreePricesVector {
 	/*
 	 * This method creates and solves the LP.
 	 */
-	public EnvyFreePricesSolution Solve(){
+	public EnvyFreePricesSolutionLP Solve(){
 		double[] LP_Prices  = {};
-		EnvyFreePricesSolution Solution = new EnvyFreePricesSolution();
+		EnvyFreePricesSolutionLP Solution = new EnvyFreePricesSolutionLP();
 		try{
 			/*
 			 *  Create Cplex variables.
@@ -135,9 +135,9 @@ public class EnvyFreePricesVector {
 		     */
 		    if ( cplex.solve() ) {
 		    	LP_Prices = cplex.getValues(this.prices);
-		    	Solution  = new EnvyFreePricesSolution(this.allocatedMarket, LP_Prices, cplex.getStatus().toString());
+		    	Solution  = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, cplex.getStatus().toString());
 		    }else{
-		    	Solution = new EnvyFreePricesSolution(cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolutionLP(cplex.getStatus().toString());
 		    }
 	    	if(this.verbose){
 	    		System.out.println("Solution status = " + cplex.getStatus());

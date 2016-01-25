@@ -1,9 +1,9 @@
 package test;
 
 import algorithms.EfficientAllocationLP;
-import algorithms.EnvyFreePricesMatrix;
-import algorithms.EnvyFreePricesVector;
-import algorithms.EnvyFreePricesSolution;
+import algorithms.EnvyFreePricesMatrixLP;
+import algorithms.EnvyFreePricesVectorLP;
+import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.Waterfall;
 import structures.Market;
 import structures.MarketFactory;
@@ -38,8 +38,8 @@ public class Main {
 		MarketAllocation marketEfficientAllocation = new MarketAllocation(market, efficientAllocation);
 
 		//Find Envy-Free Prices, both matrix and vector
-		EnvyFreePricesSolution MatrixSol = new EnvyFreePricesMatrix(marketEfficientAllocation).Solve();
-		EnvyFreePricesSolution VectorSol = new EnvyFreePricesVector(marketEfficientAllocation).Solve();
+		EnvyFreePricesSolutionLP MatrixSol = new EnvyFreePricesMatrixLP(marketEfficientAllocation).Solve();
+		EnvyFreePricesSolutionLP VectorSol = new EnvyFreePricesVectorLP(marketEfficientAllocation).Solve();
 		
 		//Report Solutions for LP programs
 		if(MatrixSol.getStatus() == "Optimal"){

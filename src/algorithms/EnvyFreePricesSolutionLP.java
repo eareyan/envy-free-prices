@@ -7,24 +7,24 @@ import structures.MarketPrices;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class EnvyFreePricesSolution extends MarketPrices {
+public class EnvyFreePricesSolutionLP extends MarketPrices {
 	String Status;
 	
-	public EnvyFreePricesSolution(){
+	public EnvyFreePricesSolutionLP(){
 		super();
 		this.Status = "Empty";
 	}
-	public EnvyFreePricesSolution(String Status){
+	public EnvyFreePricesSolutionLP(String Status){
 		super();
 		this.Status = Status;
 	}
 	
-	public EnvyFreePricesSolution(MarketAllocation marketAllocation, double[] pricesVector, String Status){
+	public EnvyFreePricesSolutionLP(MarketAllocation marketAllocation, double[] pricesVector, String Status){
 		super(marketAllocation, pricesVector);
 		this.Status = Status;
 	}
 	
-	public EnvyFreePricesSolution(MarketAllocation marketAllocation, double[][] pricesMatrix, String Status){
+	public EnvyFreePricesSolutionLP(MarketAllocation marketAllocation, double[][] pricesMatrix, String Status){
 		super(marketAllocation, pricesMatrix);
 		this.Status = Status;
 	}

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import structures.MarketAllocation;
 
-public class EnvyFreePricesMatrix {
+public class EnvyFreePricesMatrixLP {
 	/*
 	 * Boolean to control whether or not to output.
 	 */
@@ -31,7 +31,7 @@ public class EnvyFreePricesMatrix {
 	/*
 	 * Constructor receives an allocated market M.
 	 */
-	public EnvyFreePricesMatrix(MarketAllocation m){
+	public EnvyFreePricesMatrixLP(MarketAllocation m){
 		this.allocatedMarket = m;
 	} 	
 	/*
@@ -93,8 +93,8 @@ public class EnvyFreePricesMatrix {
 	/*
 	 * This method creates and solves the LP.
 	 */	
-	public EnvyFreePricesSolution Solve(){
-		EnvyFreePricesSolution Solution = new EnvyFreePricesSolution();
+	public EnvyFreePricesSolutionLP Solve(){
+		EnvyFreePricesSolutionLP Solution = new EnvyFreePricesSolutionLP();
 		try{
 			/*
 			 * Create Cplex variables.
@@ -136,9 +136,9 @@ public class EnvyFreePricesMatrix {
 		    	for (int i=0; i<this.allocatedMarket.getMarket().getNumberUsers(); i++){
 		    		solDouble[i]     = cplex.getValues(this.prices[i]);
 		    	}
-		    	Solution = new EnvyFreePricesSolution(this.allocatedMarket, solDouble, cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket, solDouble, cplex.getStatus().toString());
 		    }else{
-		    	Solution = new EnvyFreePricesSolution(cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolutionLP(cplex.getStatus().toString());
 		    }
 	    	if(this.verbose){
 	    		System.out.println("Solution status = " + cplex.getStatus());
