@@ -87,7 +87,7 @@ public class Market {
      * Does campaign j has any connections at all?
      */
     public boolean hasConnectionsCampaign(int j){
-    	for(int i=0;i<this.getNumberCampaigns();i++){
+    	for(int i=0;i<this.getNumberUsers();i++){
     		if(this.isConnected(i, j)){
     			return true;
     		}

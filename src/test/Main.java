@@ -20,9 +20,8 @@ public class Main {
 		
 		System.out.println("Envy-free prices testing");
 		//Create Random Market
-		Market Market = MarketFactory.randomMarket(5, 5, 0.25);
+		Market Market = MarketFactory.randomMarket(2, 4, 0.75);
 		System.out.println(Market);
-		System.out.println("Highest reward: " + Market.getHighestReward());
 		
 		Waterfall Waterfall = new Waterfall(Market);
 		Waterfall.Solve();
