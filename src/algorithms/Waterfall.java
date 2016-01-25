@@ -128,7 +128,9 @@ public class Waterfall {
 			}
 		}
 		printMatrix(bids);
+		System.out.println("\n-");
 		printMatrix(allocation);
+		System.out.println("\n-");
 		printMatrix(prices);
 		return new MarketPrices(new MarketAllocation(this.market,allocation),prices);
 	}

@@ -22,31 +22,36 @@ public class Main {
 		System.out.println("Envy-free prices testing");
 		//Create Random Market
 		//Market Market = MarketFactory.randomMarket(2, 4, 0.75);
-		Market Market = MarketFactory.randomMarket(3, 3, 1.0);
-		System.out.println(Market);
+		Market market = MarketFactory.randomMarket(3, 5, 1.0);
+		System.out.println(market);
 		
-		MarketPrices waterFallAllocationPrices = new Waterfall(Market).Solve();
-		System.out.println("Waterfall Prices: " + waterFallAllocationPrices.valuePriceMatrix());
+		MarketPrices waterFallAllocationPrices = new Waterfall(market).Solve();
+		System.out.println("\n======Waterfall:======");
+		System.out.println("Value = " + waterFallAllocationPrices.valuePriceMatrix());
+		System.out.println(waterFallAllocationPrices.getMarketAllocation().stringAllocationMatrix());
+		waterFallAllocationPrices.printPricesMatrix();
 		
 		//System.exit(-1);
 		
 		//Find Efficient Allocation
-		int[][] EfficientAllocation = new EfficientAllocationLP(Market).Solve().get(0);
-		MarketAllocation MarketAllocation = new MarketAllocation(Market, EfficientAllocation);
-		System.out.println(MarketAllocation.stringAllocationMatrix());
+		int[][] efficientAllocation = new EfficientAllocationLP(market).Solve().get(0);
+		MarketAllocation marketEfficientAllocation = new MarketAllocation(market, efficientAllocation);
 
 		//Find Envy-Free Prices, both matrix and vector
-		EnvyFreePricesSolution MatrixSol = new EnvyFreePricesMatrix(MarketAllocation).Solve();
-		EnvyFreePricesSolution VectorSol = new EnvyFreePricesVector(MarketAllocation).Solve();
+		EnvyFreePricesSolution MatrixSol = new EnvyFreePricesMatrix(marketEfficientAllocation).Solve();
+		EnvyFreePricesSolution VectorSol = new EnvyFreePricesVector(marketEfficientAllocation).Solve();
 		
-		//Report Solutions
+		//Report Solutions for LP programs
 		if(MatrixSol.getStatus() == "Optimal"){
-			MatrixSol.printPricesMatrix();
+			System.out.print("======LP - Matrix:======");
 			System.out.println("\nMatrix Value = " + MatrixSol.valuePriceMatrix());
+			System.out.println(marketEfficientAllocation.stringAllocationMatrix());
+			MatrixSol.printPricesMatrix();
 		}
 		if(VectorSol.getStatus() == "Optimal"){
-			VectorSol.printPricesVector();
+			System.out.print("======LP - Vector:======");
 			System.out.println("\nVector Value = " + VectorSol.valuePriceVector());
+			VectorSol.printPricesVector();
 		}
 	}
 }

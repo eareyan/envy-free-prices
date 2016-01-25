@@ -33,6 +33,10 @@ public class MarketPrices {
 		this.marketAllocation = marketAllocation;
 		this.pricesVector = pricesVector;
 	}
+	
+	public MarketAllocation getMarketAllocation(){
+		return this.marketAllocation;
+	}
 
 	public double valuePriceMatrix(){
 		double value = 0;
@@ -59,7 +63,7 @@ public class MarketPrices {
 		System.out.println("Prices Matrix: ");
     	for(int i=0; i< this.pricesMatrix.length; i++){
     		for(int j=0; j<this.pricesMatrix[0].length; j++){
-    			System.out.print(df.format(this.pricesMatrix[i][j]) + "\t\t");
+    			System.out.print(df.format(this.pricesMatrix[i][j]) + "\t");
     		}
     		System.out.println("");
     	}
