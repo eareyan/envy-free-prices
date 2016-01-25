@@ -1,8 +1,11 @@
 package structures;
 
-
 /*
  * This class associates a Market with an Allocation.
+ * The idea is that an allocation is a feature associated 
+ * with a market and thus, it should be a separate object.
+ * 
+ * Also, an allocation is the result of some algorithm
  * 
  * @author Enrique Areyan Viqueira
  */

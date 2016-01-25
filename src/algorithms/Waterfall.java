@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import structures.Market;
+import structures.MarketAllocation;
+import structures.MarketPrices;
 
 /*
  * Implements waterfall algorithm.
@@ -20,7 +22,7 @@ public class Waterfall {
 		this.market = market;
 	}
 	
-	public void Solve(){
+	public MarketPrices Solve(){
 		/*
 		 * Initialize structures to return results
 		 */
@@ -128,6 +130,7 @@ public class Waterfall {
 		printMatrix(bids);
 		printMatrix(allocation);
 		printMatrix(prices);
+		return new MarketPrices(new MarketAllocation(this.market,allocation),prices);
 	}
 	/*
 	 * Get a bid by userindex from a list of bids

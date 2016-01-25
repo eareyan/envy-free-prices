@@ -8,6 +8,7 @@ import algorithms.Waterfall;
 import structures.Market;
 import structures.MarketFactory;
 import structures.MarketAllocation;
+import structures.MarketPrices;
 
 /*
  * Main class. Use for testing purposes.
@@ -20,13 +21,14 @@ public class Main {
 		
 		System.out.println("Envy-free prices testing");
 		//Create Random Market
-		Market Market = MarketFactory.randomMarket(2, 4, 0.75);
+		//Market Market = MarketFactory.randomMarket(2, 4, 0.75);
+		Market Market = MarketFactory.randomMarket(3, 3, 1.0);
 		System.out.println(Market);
 		
-		Waterfall Waterfall = new Waterfall(Market);
-		Waterfall.Solve();
+		MarketPrices waterFallAllocationPrices = new Waterfall(Market).Solve();
+		System.out.println("Waterfall Prices: " + waterFallAllocationPrices.valuePriceMatrix());
 		
-		System.exit(-1);
+		//System.exit(-1);
 		
 		//Find Efficient Allocation
 		int[][] EfficientAllocation = new EfficientAllocationLP(Market).Solve().get(0);
@@ -40,11 +42,11 @@ public class Main {
 		//Report Solutions
 		if(MatrixSol.getStatus() == "Optimal"){
 			MatrixSol.printPricesMatrix();
-			System.out.println("\nMatrix Value = " + MatrixSol.valuePriceMatrix(EfficientAllocation));
+			System.out.println("\nMatrix Value = " + MatrixSol.valuePriceMatrix());
 		}
 		if(VectorSol.getStatus() == "Optimal"){
 			VectorSol.printPricesVector();
-			System.out.println("\nVector Value = " + VectorSol.valuePriceVector(EfficientAllocation));
+			System.out.println("\nVector Value = " + VectorSol.valuePriceVector());
 		}
 	}
 }

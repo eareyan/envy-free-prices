@@ -136,7 +136,7 @@ public class EnvyFreePricesMatrix {
 		    	for (int i=0; i<this.allocatedMarket.getMarket().getNumberUsers(); i++){
 		    		solDouble[i]     = cplex.getValues(this.prices[i]);
 		    	}
-		    	Solution = new EnvyFreePricesSolution(solDouble,cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolution(this.allocatedMarket, solDouble, cplex.getStatus().toString());
 		    }else{
 		    	Solution = new EnvyFreePricesSolution(cplex.getStatus().toString());
 		    }
