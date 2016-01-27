@@ -7,7 +7,6 @@ import java.util.Comparator;
 
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketPrices;
 
 /*
  * Implements waterfall algorithm.
@@ -22,7 +21,7 @@ public class Waterfall {
 		this.market = market;
 	}
 	
-	public MarketPrices Solve(){
+	public WaterfallPrices Solve(){
 		/*
 		 * Initialize structures to return results
 		 */
@@ -54,7 +53,7 @@ public class Waterfall {
 				Campaigns.add(j);
 			}
 		}		
-		System.out.println("Campaigns: " + Campaigns);
+		//System.out.println("Campaigns: " + Campaigns);
 		
 		/*
 		 * Main loop of the algorithm.
@@ -75,8 +74,8 @@ public class Waterfall {
 					}
 				}
 			}
-			System.out.println("Users: " + Users);
-			System.out.println("feasibleCampaigns = " + feasibleCampaigns);
+			//System.out.println("Users: " + Users);
+			//System.out.println("feasibleCampaigns = " + feasibleCampaigns);
 			
 			if(!(feasibleCampaigns.size()>0)) break;
 			
@@ -96,28 +95,28 @@ public class Waterfall {
 				Collections.sort(bidVector, new BidComparator());
 				HighestBids.add(bidVector.get(0));
 				SecondHighestBids.add(bidVector.get(1));
-				System.out.println("bidvector ordered: " + bidVector);
+				//System.out.println("bidvector ordered: " + bidVector);
 			}
 			Collections.sort(SecondHighestBids, new BidComparator());
-			System.out.println("HighestBids \t  = " + HighestBids);		
-			System.out.println("SecondHighestBids = " + SecondHighestBids);
+			//System.out.println("HighestBids \t  = " + HighestBids);		
+			//System.out.println("SecondHighestBids = " + SecondHighestBids);
 			int cheapestUser = SecondHighestBids.get(SecondHighestBids.size()-1).getUserIndex();
 			double secondHighestCheapestMarket = SecondHighestBids.get(SecondHighestBids.size()-1).getValue();
 			Bid winningBid = this.getBid(cheapestUser, HighestBids);
 			double valueWinningBid = winningBid.getValue();
 			int indexCampaignWinningBid = winningBid.getCampaignIndex();
 			int alloc = Math.min(demand[indexCampaignWinningBid],supply[cheapestUser]);
-			System.out.println("k* = " + cheapestUser + ", p* = "+ secondHighestCheapestMarket + ", b* = " + valueWinningBid + ", l* = " + indexCampaignWinningBid + ", q* = " + alloc);
+			//System.out.println("k* = " + cheapestUser + ", p* = "+ secondHighestCheapestMarket + ", b* = " + valueWinningBid + ", l* = " + indexCampaignWinningBid + ", q* = " + alloc);
 			supply[cheapestUser] = Math.max(0, supply[cheapestUser] - alloc);
-			for(int i=0;i<this.market.getNumberUsers();i++){
-				System.out.println("supply["+i+"] = " + supply[i]);
-			}
+			//for(int i=0;i<this.market.getNumberUsers();i++){
+			//	System.out.println("supply["+i+"] = " + supply[i]);
+			//}
 			demand[indexCampaignWinningBid] = Math.max(0, demand[indexCampaignWinningBid] - alloc);
 			budget[indexCampaignWinningBid] = Math.max(0.0, budget[indexCampaignWinningBid] - secondHighestCheapestMarket*alloc);
-			for(int j=0;j<this.market.getNumberCampaigns();j++){
-				System.out.println("demand["+j+"] = " + demand[j]);
-				System.out.println("budget["+j+"] = " + budget[j]);
-			}
+			//for(int j=0;j<this.market.getNumberCampaigns();j++){
+			//	System.out.println("demand["+j+"] = " + demand[j]);
+			//	System.out.println("budget["+j+"] = " + budget[j]);
+			//}
 			
 			bids[cheapestUser][indexCampaignWinningBid] = valueWinningBid;
 			prices[cheapestUser][indexCampaignWinningBid] = secondHighestCheapestMarket;
@@ -127,12 +126,12 @@ public class Waterfall {
 				Campaigns.remove(new Integer(indexCampaignWinningBid));
 			}
 		}
-		printMatrix(bids);
-		System.out.println("\n-");
-		printMatrix(allocation);
-		System.out.println("\n-");
-		printMatrix(prices);
-		return new MarketPrices(new MarketAllocation(this.market,allocation),prices);
+		//printMatrix(bids);
+		//System.out.println("\n-");
+		//printMatrix(allocation);
+		//System.out.println("\n-");
+		//printMatrix(prices);
+		return new WaterfallPrices(new MarketAllocation(this.market,allocation),prices);
 	}
 	/*
 	 * Get a bid by userindex from a list of bids

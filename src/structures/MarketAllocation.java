@@ -27,7 +27,26 @@ public class MarketAllocation {
 	public int[][] getAllocation(){
 		return this.allocation;
 	}
-	
+	/*
+	 * Get value of allocation. The value of an allocation is defined as the
+	 * sum of all the campaigns that are fullfilled by the allocation.
+	 */
+	public double value(){
+		int allocation;
+		double totalReward = 0.0;
+		/* Loop through each campign to check if it is satisfied*/
+		for(int j=0;j<this.market.getNumberCampaigns();j++){
+			allocation = 0;
+			for(int i=0;i<this.market.getNumberUsers();i++){
+				allocation += this.allocation[i][j]; /* add allocation from each user*/
+			}
+			if(allocation >= this.market.getCampaign(j).getDemand()){
+				/* Campaign was satisfied, add this reward */
+				totalReward += this.market.getCampaign(j).getReward();
+			}
+		}
+		return totalReward;
+	}
     /*
      * Checks if a campaign is assign something at all
      */

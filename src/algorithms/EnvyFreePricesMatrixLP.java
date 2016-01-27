@@ -117,7 +117,7 @@ public class EnvyFreePricesMatrixLP {
 			IloLinearNumExpr objective = cplex.linearNumExpr();
 			for(int i=0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++){
 				for(int j=0; j<this.allocatedMarket.getMarket().getNumberCampaigns(); j++){
-					objective.addTerm(1.0,this.prices[i][j]);
+					objective.addTerm(this.allocatedMarket.getAllocation()[i][j],this.prices[i][j]);
 				}
 			}
 			//this.cplex.addMinimize(objective);
@@ -136,7 +136,7 @@ public class EnvyFreePricesMatrixLP {
 		    	for (int i=0; i<this.allocatedMarket.getMarket().getNumberUsers(); i++){
 		    		solDouble[i]     = cplex.getValues(this.prices[i]);
 		    	}
-		    	Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket, solDouble, cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket, solDouble, cplex.getStatus().toString(),this.cplex.getObjValue());
 		    }else{
 		    	Solution = new EnvyFreePricesSolutionLP(cplex.getStatus().toString());
 		    }

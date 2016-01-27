@@ -135,7 +135,7 @@ public class EnvyFreePricesVectorLP {
 		     */
 		    if ( cplex.solve() ) {
 		    	LP_Prices = cplex.getValues(this.prices);
-		    	Solution  = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, cplex.getStatus().toString());
+		    	Solution  = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, cplex.getStatus().toString(),this.cplex.getObjValue());
 		    }else{
 		    	Solution = new EnvyFreePricesSolutionLP(cplex.getStatus().toString());
 		    }

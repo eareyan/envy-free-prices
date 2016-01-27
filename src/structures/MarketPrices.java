@@ -38,7 +38,7 @@ public class MarketPrices {
 		return this.marketAllocation;
 	}
 
-	public double valuePriceMatrix(){
+	public double sellerRevenuePriceMatrix(){
 		double value = 0;
 		for(int i=0;i<this.marketAllocation.allocation.length;i++){
 			for(int j=0;j<this.marketAllocation.allocation[0].length;j++){
@@ -48,7 +48,7 @@ public class MarketPrices {
 		return value;
 	}
 
-	public double valuePriceVector(){
+	public double sellerRevenuePriceVector(){
 		double value = 0;
 		for(int i=0;i<this.marketAllocation.allocation.length;i++){
 			for(int j=0;j<this.marketAllocation.allocation[0].length;j++){
