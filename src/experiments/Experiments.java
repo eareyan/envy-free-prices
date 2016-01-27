@@ -24,12 +24,12 @@ public class Experiments {
 	
 	public static void main(String[] args){
 		
-		int numUsers = 20;
-		int numCampaigns = 20;
+		int numUsers = 30;
+		int numCampaigns = 30;
 		int numTrials = 100;
 		
-		for(int i=18;i<numUsers;i++){
-			for(int j=17;j<numCampaigns;j++){
+		for(int i=21;i<numUsers;i++){
+			for(int j=23;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
 					double WFallocationValue = 0.0, EfficientallocationValue = 0.0, WFsellerRevenue = 0.0, LPsellerRevenueMatrix = 0.0, LPsellerRevenueVector = 0.0, WFerror = 0.0, WFMaxError = 0.0;
 					double prob = 0.25 + p*(0.25);
