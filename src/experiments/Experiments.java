@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import algorithms.EfficientAllocationLP;
-import algorithms.EnvyFreePricesMatrixLP;
+//import algorithms.EnvyFreePricesMatrixLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.Waterfall;
@@ -24,14 +24,14 @@ import structures.MarketFactory;
  */
 public class Experiments {
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws InterruptedException{
 		
 		int numUsers = 30;
 		int numCampaigns = 30;
 		int numTrials = 100;
 				
 		for(int i=3;i<numUsers;i++){
-			for(int j=4;j<numCampaigns;j++){
+			for(int j=1;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
 					double prob = 0.25 + p*(0.25);
 					System.out.println(" n = " + i + ", m = " + j + ", prob = " + prob);
@@ -75,7 +75,7 @@ public class Experiments {
 					}catch (IOException e) {
 					    //exception handling left as an exercise for the reader
 					}
-					System.exit(-1);
+					//System.exit(-1); /* stop execution... for debugging purposes */
 				}
 			}
 		}
