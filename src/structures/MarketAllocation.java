@@ -17,7 +17,7 @@ public class MarketAllocation {
 		
 	public MarketAllocation(Market m, int[][] allocation){
 		this.market = m;
-		this.allocation = allocation;
+		this.allocation = this.cleanMatrix(allocation);
 	}
 	
 	public Market getMarket(){
@@ -57,7 +57,28 @@ public class MarketAllocation {
     		}
     	}
     	return true;
-    }	
+    }
+	/*
+	 * This method sets the columns of the matrix to zero if a campaign is not 
+	 * completely satisfied. This is in line with the way in which all the conditions
+	 * and the analysis has been done so far. This method avoids a matrix where a 
+	 * campaign might get some allocation when in fact it is not satisfied.
+	 */
+	protected int[][] cleanMatrix(int[][] efficientAllocation){
+		int totalAllocation = 0;
+		for(int j=0;j<this.market.getNumberCampaigns();j++){
+			for(int i=0;i<this.market.getNumberUsers();i++){
+				totalAllocation += efficientAllocation[i][j];
+			}
+			if(totalAllocation < this.market.getCampaign(j).getDemand()){//This campaign is not satisfied
+				for(int i=0;i<this.market.getNumberUsers();i++){
+					efficientAllocation[i][j] = 0;
+				}
+			}
+			totalAllocation = 0;
+		}
+		return efficientAllocation;
+	}    
     /*
      * Helper function to print the allocation matrix
      */

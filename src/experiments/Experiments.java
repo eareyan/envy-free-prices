@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesMatrixLP;
 import algorithms.EnvyFreePricesSolutionLP;
@@ -27,13 +29,17 @@ public class Experiments {
 		int numUsers = 30;
 		int numCampaigns = 30;
 		int numTrials = 100;
-		
-		for(int i=21;i<numUsers;i++){
-			for(int j=23;j<numCampaigns;j++){
+				
+		for(int i=3;i<numUsers;i++){
+			for(int j=4;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
-					double WFallocationValue = 0.0, EfficientallocationValue = 0.0, WFsellerRevenue = 0.0, LPsellerRevenueMatrix = 0.0, LPsellerRevenueVector = 0.0, WFerror = 0.0, WFMaxError = 0.0;
 					double prob = 0.25 + p*(0.25);
 					System.out.println(" n = " + i + ", m = " + j + ", prob = " + prob);
+					DescriptiveStatistics statRatioEfficiency = new DescriptiveStatistics();
+					DescriptiveStatistics statEffAllocValue = new DescriptiveStatistics();
+					DescriptiveStatistics statEfficientAlocationRevenueVector = new DescriptiveStatistics();
+					DescriptiveStatistics statWfAllocationValue = new DescriptiveStatistics();
+					DescriptiveStatistics statWfAllocationRevenue = new DescriptiveStatistics();
 					for(int t=0;t<numTrials;t++){
 						/* Create a random Market*/
 						Market randomMarket = MarketFactory.randomMarket(i, j, prob);
@@ -41,27 +47,35 @@ public class Experiments {
 						/* Find the efficient allocation*/
 						int[][] efficientAllocation = new EfficientAllocationLP(randomMarket).Solve().get(0);
 						MarketAllocation randomMarketEfficientAllocation = new MarketAllocation(randomMarket, efficientAllocation);
-						EfficientallocationValue += randomMarketEfficientAllocation.value();
+						double effAllocValue = randomMarketEfficientAllocation.value();
+						statEffAllocValue.addValue(effAllocValue);
+						//System.out.println("Efficient " + randomMarketEfficientAllocation.stringAllocationMatrix());
 						/* Run LP Programs*/
-						EnvyFreePricesSolutionLP MatrixSol = new EnvyFreePricesMatrixLP(randomMarketEfficientAllocation).Solve();
-						LPsellerRevenueMatrix += MatrixSol.sellerRevenuePriceMatrix();
-						EnvyFreePricesSolutionLP VectorSol = new EnvyFreePricesVectorLP(randomMarketEfficientAllocation).Solve();
-						LPsellerRevenueVector += VectorSol.sellerRevenuePriceVector();
+						EnvyFreePricesSolutionLP VectorSolEfficientAllocation = new EnvyFreePricesVectorLP(randomMarketEfficientAllocation).Solve();
+						statEfficientAlocationRevenueVector.addValue(VectorSolEfficientAllocation.sellerRevenuePriceVector());
+						/*System.out.println("Prices from efficient allocation");
+						VectorSolEfficientAllocation.printPricesVector();*/
 						/* Run Waterfall*/
 						WaterfallPrices waterFallAllocationPrices = new Waterfall(randomMarket).Solve();
-						WFsellerRevenue += waterFallAllocationPrices.sellerRevenuePriceMatrix();
-						//System.out.println(+ "\t" + MatrixSol.sellerRevenuePriceMatrix());
-						WFallocationValue += waterFallAllocationPrices.getMarketAllocation().value();
-						double violations = waterFallAllocationPrices.computeViolations();
-						WFerror += violations;
-						if(violations > WFMaxError) WFMaxError = violations;
+						//System.out.println("Waterfall " + waterFallAllocationPrices.getMarketAllocation().stringAllocationMatrix());
+						EnvyFreePricesSolutionLP VectorSolWaterfallAllocation = new EnvyFreePricesVectorLP(waterFallAllocationPrices.getMarketAllocation()).Solve();
+						/*System.out.println("Prices from waterfall");
+						VectorSolWaterfallAllocation.printPricesVector();*/
+						double wfAllocValue = VectorSolWaterfallAllocation.getMarketAllocation().value();
+						statWfAllocationValue.addValue(wfAllocValue);
+						statWfAllocationRevenue.addValue(VectorSolWaterfallAllocation.sellerRevenuePriceVector());
+						if(effAllocValue == 0.0 && wfAllocValue == 0.0){
+							statRatioEfficiency.addValue(1.0);
+						}else{
+							statRatioEfficiency.addValue(wfAllocValue/effAllocValue);
+						}
 					}
-					System.out.println(((WFallocationValue / numTrials) / (EfficientallocationValue / numTrials)) + "\t" + (WFsellerRevenue / numTrials) + "\t" + (LPsellerRevenueMatrix / numTrials) + "\t" + (LPsellerRevenueVector / numTrials) + "\t" + (WFerror/numTrials) + "\t" + WFMaxError);
 					try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/gpfs/main/home/eareyanv/workspace/envy-free-prices/results/results.csv", true)))) {
-					    out.println(i + "," + j + "," + prob + "," + ((WFallocationValue / numTrials) / (EfficientallocationValue / numTrials)) + "," + (WFsellerRevenue / numTrials) + "," + (LPsellerRevenueMatrix / numTrials) + "," + (LPsellerRevenueVector / numTrials) + "," + (WFerror/numTrials) + "," + WFMaxError);
+					    out.println(i + "," + j + "," + prob + "," + statRatioEfficiency.getMean() + "," + statRatioEfficiency.getStandardDeviation() + "," + statEfficientAlocationRevenueVector.getMean() + "," + statWfAllocationRevenue.getMean());
 					}catch (IOException e) {
 					    //exception handling left as an exercise for the reader
-					}					
+					}
+					System.exit(-1);
 				}
 			}
 		}
