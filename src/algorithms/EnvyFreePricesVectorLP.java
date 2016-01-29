@@ -118,15 +118,17 @@ public class EnvyFreePricesVectorLP {
 		     * Create the variables. Vector of prices.
 		     */
 		    this.prices  = this.cplex.numVarArray(this.allocatedMarket.getMarket().getNumberUsers(), 0.0, Double.MAX_VALUE);
+		    
 		    /*
-		     * Generate objective function: sum of prices.
-		     */
-		    double[] objvals = new double[this.allocatedMarket.getMarket().getNumberUsers()];
-		    for(int i=0;i<this.allocatedMarket.getMarket().getNumberUsers();i++){
-		 		objvals[i] = 1.0;
-		 	}
-		    //this.cplex.addMinimize(this.cplex.scalProd(this.prices, objvals));
-		    this.cplex.addMaximize(this.cplex.scalProd(this.prices, objvals));
+		     * Create the objective function, i.e., the sum of all the prices
+		     */			
+			IloLinearNumExpr objective = cplex.linearNumExpr();
+			for(int i=0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++){
+				for(int j=0; j<this.allocatedMarket.getMarket().getNumberCampaigns(); j++){
+					objective.addTerm(this.allocatedMarket.getAllocation()[i][j],this.prices[i]);
+				}
+			}		    
+		    this.cplex.addMaximize(objective);
 		    this.generateCompactConditions();
 		    this.generateIndividualRationalityConditions();
 		    this.generateBoundConditions();

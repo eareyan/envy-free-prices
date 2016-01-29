@@ -33,11 +33,16 @@ public class MarketPrices {
 		this.marketAllocation = marketAllocation;
 		this.pricesVector = pricesVector;
 	}
-	
+	/*
+	 * Getters
+	 */
 	public MarketAllocation getMarketAllocation(){
 		return this.marketAllocation;
 	}
 
+	public double getPriceVector(int i){
+		return this.pricesVector[i];
+	}
 	public double sellerRevenuePriceMatrix(){
 		double value = 0;
 		for(int i=0;i<this.marketAllocation.allocation.length;i++){

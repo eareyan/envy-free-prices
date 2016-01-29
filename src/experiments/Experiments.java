@@ -26,11 +26,11 @@ public class Experiments {
 	
 	public static void main(String[] args) throws InterruptedException{
 		
-		int numUsers = 30;
-		int numCampaigns = 30;
+		int numUsers = 26 , startUsers = 15;
+		int numCampaigns = 26;
 		int numTrials = 100;
 				
-		for(int i=3;i<numUsers;i++){
+		for(int i=startUsers;i<numUsers;i++){
 			for(int j=1;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
 					double prob = 0.25 + p*(0.25);

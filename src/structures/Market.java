@@ -57,6 +57,10 @@ public class Market {
     public int getNumberCampaigns(){
     	return this.campaigns.length;
     }
+    
+    public boolean[][] getConnections(){
+    	return this.connections;
+    }
     /*
      * Get highest reward among all campaigns. Implements a singleton
      */

@@ -44,4 +44,21 @@ public class MarketFactory {
 	public static Market randomMarket(int numberUsers, int numberCampaigns, double probabilityConnections){
 		return MarketFactory.randomMarket(numberUsers, 1 ,10,  numberCampaigns, 1 , 10, 1.0, 100.0,  probabilityConnections);		
 	}
+	
+	/*
+	 * Create a singleton market given all other parameters (connections matrix and rewards)
+	 */
+	public static Market singletonMarket(int numberUsers, int numberCampaigns, boolean[][] connections, double[] rewards){
+		//Create Users
+		User[] users = new User[numberUsers];
+		for(int i=0;i<numberUsers;i++){
+			users[i] = new User(1);
+		}
+		//Create Campaigns
+		Campaign[] campaigns = new Campaign[numberCampaigns];
+		for(int j=0;j<numberCampaigns;j++){
+			campaigns[j] = new Campaign(1,rewards[j]);
+		}
+		return new Market(users,campaigns,connections);
+	}
 }

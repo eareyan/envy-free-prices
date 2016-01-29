@@ -29,7 +29,7 @@ public class MarketAllocation {
 	}
 	/*
 	 * Get value of allocation. The value of an allocation is defined as the
-	 * sum of all the campaigns that are fullfilled by the allocation.
+	 * sum of all the campaigns that are fulfilled by the allocation.
 	 */
 	public double value(){
 		int allocation;
@@ -57,6 +57,16 @@ public class MarketAllocation {
     		}
     	}
     	return true;
+    }
+    /*
+     * Returns the number of impressions from user i that were allocated
+     */
+    public int allocationFromUser(int i){
+    	int totalAllocation = 0;
+    	for(int j=0;j<this.market.getNumberCampaigns();j++){
+    		totalAllocation += this.allocation[i][j];
+    	}
+    	return totalAllocation;
     }
 	/*
 	 * This method sets the columns of the matrix to zero if a campaign is not 
