@@ -1,0 +1,11 @@
+CREATE TABLE unit_demand (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	maxWEQRevenue double precision NOT NULL,
+	maxWEQTime double precision NOT NULL,
+	lpRevenue double precision NOT NULL,
+	lpTime double precision NOT NULL,
+	lpWEViolations double precision NOT NULL,
+	lpEFViolations double precision NOT NULL
+	);

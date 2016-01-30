@@ -4,10 +4,12 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.Random;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import postgresql.JdbcPostgresqlConnection;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
 import singletonmarket.EVPApproximation;
@@ -20,7 +22,7 @@ import structures.MarketFactory;
 import structures.MarketPrices;
 import util.Printer;
 
-public class SingletonMarketExperiments {
+public class UnitDemandExperiments {
 	
 	/*
 	 * Given a market, return a cost matrix to be input to the Hungarian algorithm. 
@@ -68,7 +70,7 @@ public class SingletonMarketExperiments {
         return new Matching(rewards,hungarianAllocationInteger);
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws SQLException{
 		/*
 		 * This method test the single demand case.
 		 * We test MaxWEQ, EVPApprox and LP.
@@ -76,35 +78,40 @@ public class SingletonMarketExperiments {
 		 * For the LP, we record the number of violations to the Walrasian Equilibirum
 		 * and the number of violations of the Envy Free condition in the general case.
 		 */
-		int numUsers = 21 , startUsers = 5;
+		int numUsers = 21;
 		int numCampaigns = 21;
 		int numTrials = 100;
-		
-		for(int i=startUsers;i<numUsers;i++){
+		JdbcPostgresqlConnection dbLogger = new JdbcPostgresqlConnection(args[0],args[1],args[2]);
+		for(int i=2;i<numUsers;i++){
 			for(int j=2;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
-					//double prob = 0.25 + p*(0.25);
-					double prob = 1.0;
+					double prob = 0.25 + p*(0.25);
 					System.out.println(" n = " + i + ", m = " + j + ", prob = " + prob);
+					if(dbLogger.checkIfUnitDemandRowExists("unit_demand",i, j, prob)) continue;
 					DescriptiveStatistics maxWEQRevenue = new DescriptiveStatistics();
-					DescriptiveStatistics evpAppRevenue = new DescriptiveStatistics();
+					//DescriptiveStatistics evpAppRevenue = new DescriptiveStatistics();
 					DescriptiveStatistics lpRevenue = new DescriptiveStatistics();
 					DescriptiveStatistics lpWEViolations = new DescriptiveStatistics();
 					DescriptiveStatistics lpEFViolations = new DescriptiveStatistics();
+					
+					DescriptiveStatistics maxWEQTime = new DescriptiveStatistics();
+					//DescriptiveStatistics evpAppTime = new DescriptiveStatistics();
+					DescriptiveStatistics lpTime = new DescriptiveStatistics();
+					long startTime , endTime ; 
 					for(int t=0;t<numTrials;t++){
 						/*
 						 * Create random market. Then get cost matrix for the market. 
 						 * Next, get the maximum matching allocation.
 						 */
 						Market market = MarketFactory.randomMarket(i, j, prob);
-						double [][] costMatrix = SingletonMarketExperiments.getCostMatrixFromMarket(market);
+						double [][] costMatrix = UnitDemandExperiments.getCostMatrixFromMarket(market);
 				        //Printer.printMatrix(costMatrix);
 				        Matching M = getMaximumMatchingFromCostMatrix(costMatrix);
 				        int[][] maximumMatchingAllocation = M.getMatching();
 				        double[] rewards = M.getPrices();
 				        //Printer.printMatrix(maximumMatchingAllocation);
 				        MaxWEQ maxWEQ = new MaxWEQ(costMatrix);
-				        EVPApproximation evpApp = new EVPApproximation(costMatrix);
+				        //EVPApproximation evpApp = new EVPApproximation(costMatrix);
 				        /* This new market is going to be used as input to our algorithm. */
 				        Market inputMarket = MarketFactory.singletonMarket(market.getNumberUsers(), market.getNumberCampaigns(), market.getConnections(), rewards);
 				        //System.out.println(inputMarket);
@@ -115,21 +122,44 @@ public class SingletonMarketExperiments {
 							//System.out.println("\nSeller Revenue = " + VectorSol.sellerRevenuePriceVector());
 							//VectorSol.printPricesVector();
 							//System.out.println("There were "+violations + " many violations");
+							/*
+							 * Measure maxEQ
+							 */
+							startTime = System.nanoTime();
 							maxWEQRevenue.addValue(maxWEQ.Solve().getSellerRevenue());
+							endTime = System.nanoTime();
+							maxWEQTime.addValue(endTime - startTime);
+							/*
+							 * Measure evpApp
+							 
+							startTime = System.nanoTime();
 							evpAppRevenue.addValue(evpApp.Solve().getSellerRevenue());
+							endTime = System.nanoTime();
+							evpAppTime.addValue(endTime - startTime);
+							/*
+							 * Measure lpApp
+							 */
+							startTime = System.nanoTime();
 							lpRevenue.addValue(VectorSol.sellerRevenuePriceVector());
+							endTime = System.nanoTime();
+							lpTime.addValue(endTime - startTime);
+							/*
+							 * Measure violations
+							 */
 							lpWEViolations.addValue(VectorSol.computeWalrasianEqViolations());
 							lpEFViolations.addValue(VectorSol.numberOfEnvyCampaigns());
 							//System.out.println(maxWEQ.MaxWEQSellerRevenue() + "," + VectorSol.sellerRevenuePriceVector() + "," + violations);
 						}
 					}
-					try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/gpfs/main/home/eareyanv/workspace/envy-free-prices/results/results-singleton.csv", true)))) {
-						//out.println(i + "," + j + "," + prob + "," + MaxWEQRevenue.getMean() + "," + LPRevenue.getMean() + "," + (LPRevenue.getMean() / MaxWEQRevenue.getMean()) + "," + LPViolations.getMean());
-						System.out.println(i + "," + j + "," + prob + "," + maxWEQRevenue.getMean() + "," +evpAppRevenue.getMean()+ "," + lpRevenue.getMean() + "," + lpWEViolations.getMean() + "," + lpEFViolations.getMean());
+					/* log results in database */
+					dbLogger.saveUnitDemandData(i, j, prob, maxWEQRevenue.getMean(), maxWEQTime.getMean() / 1000000, lpRevenue.getMean(), lpTime.getMean() / 1000000 , lpWEViolations.getMean(), lpEFViolations.getMean());
+					/*try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/gpfs/main/home/eareyanv/workspace/envy-free-prices/results/results-singleton.csv", true)))) {
+						//out.println(i + "," + j + "," + prob + "," + maxWEQRevenue.getMean() + "," +evpAppRevenue.getMean()+ "," + lpRevenue.getMean() + "," + lpWEViolations.getMean() + "," + lpEFViolations.getMean() + "," + maxWEQTime.getMean() / 1000000 + "," + evpAppTime.getMean() / 1000000 + "," + lpTime.getMean() / 1000000);
+						System.out.println(i + "," + j + "," + prob + "," + maxWEQRevenue.getMean() + "," + lpRevenue.getMean() + "," + lpWEViolations.getMean() + "," + lpEFViolations.getMean() + "," + maxWEQTime.getMean() / 1000000  + "," + lpTime.getMean() / 1000000);
 						//System.exit(-1);
 					}catch (IOException e) {
 					    //exception handling left as an exercise for the reader
-					}
+					}*/
 				}
 			}
 		}

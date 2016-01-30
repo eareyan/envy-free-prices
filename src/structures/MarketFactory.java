@@ -61,4 +61,35 @@ public class MarketFactory {
 		}
 		return new Market(users,campaigns,connections);
 	}
+	/*
+	 * Copies the given market without user i, deleting the corresponding row from connection matrix
+	 */
+	public static Market copyMarketWithoutUser(Market market, int userToDelete){
+		//Create Users
+		User[] users = new User[market.getNumberUsers()-1];
+		int k = 0;
+		for(int i=0;i<market.getNumberUsers();i++){
+			if(i != userToDelete){
+				users[k] = new User(market.getUser(i).getSupply());
+				k++;
+			}
+		}
+		//Create Campaigns
+		Campaign[] campaigns = new Campaign[market.getNumberCampaigns()];
+		for(int j=0;j<market.getNumberCampaigns();j++){
+			campaigns[j] = new Campaign(market.getCampaign(j).getDemand() , market.getCampaign(j).getReward());
+		}
+		//Create Connections
+		boolean[][] connections = new boolean[market.getNumberUsers()-1][market.getNumberCampaigns()];
+		int l = 0;
+		for(int i=0;i<market.getNumberUsers();i++){
+			if(i != userToDelete){
+				for(int j=0;j<market.getNumberCampaigns();j++){
+					connections[l][j] = market.isConnected(i, j);
+				}
+				l++;
+			}
+		}
+		return new Market(users,campaigns,connections);
+	}
 }
