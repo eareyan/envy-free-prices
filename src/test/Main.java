@@ -2,12 +2,14 @@ package test;
 
 import java.util.Random;
 
+import experiments.SingletonMarketExperiments;
 import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesMatrixLP;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.Waterfall;
 import algorithms.WaterfallPrices;
+import singletonmarket.EVPApproximation;
 import singletonmarket.HungarianAlgorithm;
 import singletonmarket.MaxWEQ;
 import structures.Market;
@@ -25,6 +27,17 @@ public class Main {
 	
 	public static void main(String[] args){
 		
+		Market market = MarketFactory.randomMarket(3, 3, 1.0);
+		double [][] costMatrix = SingletonMarketExperiments.getCostMatrixFromMarket(market);
+        Printer.printMatrix(costMatrix);
+        EVPApproximation EVPAppr = new EVPApproximation(costMatrix);
+        EVPAppr.Solve();
+        
+        MaxWEQ maxWEQ = new MaxWEQ(costMatrix);
+        maxWEQ.Solve();
+		
+		
+		/*
 		System.out.println("Envy-free prices testing");
 		//Create Random Market
 		//Market Market = MarketFactory.randomMarket(2, 4, 0.75);
@@ -93,7 +106,7 @@ public class Main {
         
         MarketPrices maxWEQPrices = new MarketPrices(new MarketAllocation(market,hungarianAllocation), maxWEQ.Solve());
         System.out.println("MaxEQ value = " + maxWEQPrices.sellerRevenuePriceVector());
-		
+		*/
 		
 	}
 }

@@ -68,6 +68,18 @@ public class MarketAllocation {
     	}
     	return totalAllocation;
     }
+    /*
+     * Get current bundle number for campaign j
+     */
+    public int getBundleNumber(int j){
+    	int totalAllocation = 0;
+    	for(int i=0;i<this.market.getNumberUsers();i++){
+    		if(this.allocation[i][j]>0){
+    			totalAllocation += this.allocation[i][j];
+    		}
+    	}
+    	return totalAllocation;
+    }     
 	/*
 	 * This method sets the columns of the matrix to zero if a campaign is not 
 	 * completely satisfied. This is in line with the way in which all the conditions

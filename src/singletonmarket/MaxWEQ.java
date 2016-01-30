@@ -8,27 +8,35 @@ import util.Printer;
  */
 public class MaxWEQ {
 	
+	/*
+	 * valuation matrix. Provides a valuation v_ij of user i by campaign j.
+	 */
 	double[][] valuationMatrix;
 	
 	public MaxWEQ(double[][] valuationMatrix){
 		this.valuationMatrix = valuationMatrix;
 	}
-
-	protected double computeMaximumWeightMatchingValue(double[][] matrix){
+	/*
+	 * Computes the maximum weight matching and its value for the argument matrix.
+	 */
+	protected Matching computeMaximumWeightMatchingValue(double[][] matrix){
 		HungarianAlgorithm H = new HungarianAlgorithm(matrix);
         int[] result = H.execute();
         double valueOfMatching = 0.0;
+        int[][] matching = new int[matrix.length][matrix[0].length];
         for(int i=0;i<result.length;i++){
         	//System.out.println("--" + result[i]);
         	//If the assignment is possible and the user is actually connected to the campaigns
         	if(result[i] > -1 && matrix[i][result[i]] < Double.MAX_VALUE){
         		valueOfMatching += matrix[i][result[i]];
+        		matching[i][result[i]] = 1;
         	}
         }
-        return -1.0*valueOfMatching;
-		
+        return new Matching(matching,-1.0*valueOfMatching);
 	}
-	
+	/*
+	 * Returns the valuation matrix without row indexItem.
+	 */
 	protected double[][] valuationMatrixWithNoi(int indexItem){
 		double[][] newValuationMatrix = new double[this.valuationMatrix.length-1][];
 		int k=0;
@@ -40,26 +48,20 @@ public class MaxWEQ {
 		}
 		return newValuationMatrix;
 	}
-	public double[] Solve(){
-		
+	/*
+	 * Implements MaxWEQ as stated in Guruswami et al.
+	 */
+	public Matching Solve(){
 		double[] prices = new double[this.valuationMatrix.length]; 
-		double maxWeightCompleteV = this.computeMaximumWeightMatchingValue(this.valuationMatrix);
+		Matching matchingCompleteV = this.computeMaximumWeightMatchingValue(this.valuationMatrix);
+		double maxWeightCompleteV = matchingCompleteV.getValueOfMatching();
 		//System.out.println("w(V) = " + maxWeightCompleteV);
 		for(int i=0;i<this.valuationMatrix.length;i++){
-			//Printer.printMatrix(this.valuationMatrixWithNoi(i));
-			//System.out.println("w(V_i) = " + this.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)));
-			prices[i] = maxWeightCompleteV - this.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i));
-			//System.out.println("price["+i+"] = " + prices[i]);
+			prices[i] = maxWeightCompleteV - this.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching();
+			/*Printer.printMatrix(this.valuationMatrixWithNoi(i));
+			System.out.println("w(V_i) = " + this.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)));
+			System.out.println("price["+i+"] = " + prices[i]);*/
 		}
-		return prices;
-	}
-	
-	public double MaxWEQSellerRevenue(){
-		double[] prices = this.Solve();
-		double sellerRevenue = 0.0;
-		for(int i=0;i<prices.length;i++){
-			sellerRevenue += prices[i]; 
-		}
-		return sellerRevenue;
+		return new Matching(prices,matchingCompleteV.getMatching());
 	}
 }
