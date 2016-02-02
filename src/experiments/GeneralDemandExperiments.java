@@ -72,8 +72,8 @@ public class GeneralDemandExperiments {
 						/* Run Waterfall*/
 						startTime = System.nanoTime();
 						WaterfallPrices waterFallAllocationPrices = new Waterfall(randomMarket).Solve();
-						endTime = System.nanoTime();
 						EnvyFreePricesSolutionLP VectorSolWaterfallAllocation = new EnvyFreePricesVectorLP(waterFallAllocationPrices.getMarketAllocation()).Solve();
+						endTime = System.nanoTime();
 						double wfAllocValue = VectorSolWaterfallAllocation.getMarketAllocation().value();
 						wfAllocationTime.addValue(endTime - startTime);
 
