@@ -1,6 +1,5 @@
 package experiments;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -112,51 +111,47 @@ public class UnitDemandExperiments {
 				        //Printer.printMatrix(maximumMatchingAllocation);
 				        MaxWEQ maxWEQ = new MaxWEQ(costMatrix);
 				        //EVPApproximation evpApp = new EVPApproximation(costMatrix);
-				        /* This new market is going to be used as input to our algorithm. */
+				        /* 
+				         * This new market is a unit-demand and supply market with rewards given
+				         * by the maximum matching allocation. This market is going to be used as input to our algorithm. 
+				         */
 				        Market inputMarket = MarketFactory.singletonMarket(market.getNumberUsers(), market.getNumberCampaigns(), market.getConnections(), rewards);
 				        //System.out.println(inputMarket);
 				        MarketAllocation marketMaxMatchingAllocation = new MarketAllocation(inputMarket, maximumMatchingAllocation);
+						/*
+						 * Measure lpApp
+						 */
+						startTime = System.nanoTime();
 				        EnvyFreePricesSolutionLP VectorSol = new EnvyFreePricesVectorLP(marketMaxMatchingAllocation).Solve();
-						if(VectorSol.getStatus() == "Optimal"){
-							//System.out.print("======LP - Vector:======");
-							//System.out.println("\nSeller Revenue = " + VectorSol.sellerRevenuePriceVector());
-							//VectorSol.printPricesVector();
-							//System.out.println("There were "+violations + " many violations");
-							/*
-							 * Measure maxEQ
-							 */
-							startTime = System.nanoTime();
-							maxWEQRevenue.addValue(maxWEQ.Solve().getSellerRevenue());
-							endTime = System.nanoTime();
-							maxWEQTime.addValue(endTime - startTime);
-							/*
-							 * Measure evpApp
-							 
-							startTime = System.nanoTime();
-							evpAppRevenue.addValue(evpApp.Solve().getSellerRevenue());
-							endTime = System.nanoTime();
-							evpAppTime.addValue(endTime - startTime);
-							/*
-							 * Measure lpApp
-							 */
-							startTime = System.nanoTime();
-							lpRevenue.addValue(VectorSol.sellerRevenuePriceVector());
-							endTime = System.nanoTime();
-							lpTime.addValue(endTime - startTime);
-							/*
-							 * Measure violations
-							 */
-							lpWEViolations.addValue(VectorSol.computeWalrasianEqViolations());
-							lpEFViolations.addValue(VectorSol.numberOfEnvyCampaigns());
-							//System.out.println(maxWEQ.MaxWEQSellerRevenue() + "," + VectorSol.sellerRevenuePriceVector() + "," + violations);
-						}
+						lpRevenue.addValue(VectorSol.sellerRevenuePriceVector());
+						endTime = System.nanoTime();
+						lpTime.addValue(endTime - startTime);
+						/*
+						 * Measure violations
+						 */
+						lpWEViolations.addValue(VectorSol.computeWalrasianEqViolations());
+						lpEFViolations.addValue(VectorSol.numberOfEnvyCampaigns());
+						/*
+						 * Measure maxEQ
+						 */
+						startTime = System.nanoTime();
+						maxWEQRevenue.addValue(maxWEQ.Solve().getSellerRevenue());
+						endTime = System.nanoTime();
+						maxWEQTime.addValue(endTime - startTime);
+						/*
+						 * Measure evpApp
+						 
+						startTime = System.nanoTime();
+						evpAppRevenue.addValue(evpApp.Solve().getSellerRevenue());
+						endTime = System.nanoTime();
+						evpAppTime.addValue(endTime - startTime);
+						 */
 					}
 					/* log results in database */
-					dbLogger.saveUnitDemandData(i, j, prob, maxWEQRevenue.getMean(), maxWEQTime.getMean() / 1000000, lpRevenue.getMean(), lpTime.getMean() / 1000000 , lpWEViolations.getMean(), lpEFViolations.getMean());
+					//dbLogger.saveUnitDemandData(i, j, prob, maxWEQRevenue.getMean(), maxWEQTime.getMean() / 1000000, lpRevenue.getMean(), lpTime.getMean() / 1000000 , lpWEViolations.getMean(), lpEFViolations.getMean());
 					/*try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/gpfs/main/home/eareyanv/workspace/envy-free-prices/results/results-singleton.csv", true)))) {
 						//out.println(i + "," + j + "," + prob + "," + maxWEQRevenue.getMean() + "," +evpAppRevenue.getMean()+ "," + lpRevenue.getMean() + "," + lpWEViolations.getMean() + "," + lpEFViolations.getMean() + "," + maxWEQTime.getMean() / 1000000 + "," + evpAppTime.getMean() / 1000000 + "," + lpTime.getMean() / 1000000);
 						System.out.println(i + "," + j + "," + prob + "," + maxWEQRevenue.getMean() + "," + lpRevenue.getMean() + "," + lpWEViolations.getMean() + "," + lpEFViolations.getMean() + "," + maxWEQTime.getMean() / 1000000  + "," + lpTime.getMean() / 1000000);
-						//System.exit(-1);
 					}catch (IOException e) {
 					    //exception handling left as an exercise for the reader
 					}*/

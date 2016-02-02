@@ -9,3 +9,22 @@ CREATE TABLE unit_demand (
 	lpWEViolations double precision NOT NULL,
 	lpEFViolations double precision NOT NULL
 	);
+
+CREATE TABLE general_demand (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	ratioEfficiency double precision NOT NULL,
+	effAllocationRevenue double precision NOT NULL,
+	effAllocationTime double precision NOT NULL,
+	effAllocWEViolation double precision NOT NULL,
+	effAllocEFViolation double precision NOT NULL,
+	wfAllocationRevenue double precision NOT NULL,
+	wfAllocationTime double precision NOT NULL,
+	wfAllocWEViolation double precision NOT NULL,
+	wfAllocEFViolation double precision NOT NULL,
+	wfMaxWEQRevenue double precision NOT NULL,
+	wfMaxWEQTime double precision NOT NULL
+	);
+
+\copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-demand.csv' csv header

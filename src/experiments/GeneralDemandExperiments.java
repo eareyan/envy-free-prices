@@ -1,6 +1,5 @@
 package experiments;
 
-import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;

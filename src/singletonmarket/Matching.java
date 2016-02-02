@@ -1,5 +1,13 @@
 package singletonmarket;
 
+/*
+ * This class stores a matching, defined here as a matrix of integers
+ * with a 1 at position (i,j) if user i is allocated to campaign j,
+ * and 0 otherwise. It also stores the prices of a matching and implements
+ * method to get the value of a matching. 
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class Matching {
 	protected double[] prices;
 	protected int[][] matching;
