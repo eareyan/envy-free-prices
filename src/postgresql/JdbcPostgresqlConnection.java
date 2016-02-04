@@ -17,8 +17,8 @@ public class JdbcPostgresqlConnection {
 	
     public JdbcPostgresqlConnection(String host, String user, String pass) throws SQLException{
 		this.conn = DriverManager.getConnection(host, user, pass);
-		if (this.conn != null) {
-		    System.out.println("Connected to database...");
+		if (this.conn == null) {
+		    System.out.println("NOT Connected to database...");
 		}
     }
     public void closeConnection(Connection conn) throws SQLException{
