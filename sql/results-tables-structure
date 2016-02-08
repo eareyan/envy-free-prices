@@ -4,6 +4,8 @@ CREATE TABLE unit_demand (
 	p double precision NOT NULL,
 	maxWEQRevenue double precision NOT NULL,
 	maxWEQTime double precision NOT NULL,
+	evpAppRevenue double precision NOT NULL,
+	evpAppTime double precision NOT NULL,
 	lpRevenue double precision NOT NULL,
 	lpTime double precision NOT NULL,
 	lpWEViolations double precision NOT NULL,

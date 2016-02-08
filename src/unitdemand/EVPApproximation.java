@@ -33,6 +33,8 @@ public class EVPApproximation {
         	if(result[i] > -1){
         		/* If an assignment is possible, then the valuation for item j is the weight of that assignment, otherwise is zero*/
         		valuations[i] = -1.0 * this.valuationMatrix[i][result[i]];
+        	}else{
+        		valuations[i] = 0.0;
         	}
         }
         Arrays.sort(valuations,Collections.reverseOrder());//Order valuations in descending order

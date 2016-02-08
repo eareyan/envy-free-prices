@@ -11,7 +11,7 @@ public class RunParameters{
 	public static final int totalNumUsers = 26;
 	public static final int totalNumCamp = 26;
 	public static final int totalProbabilities = 4;
-	public static final int numTrials = 500;
+	public static final int numTrials = 100;
 	
 	public int numUsers;
 	public int numCampaigns;

@@ -80,13 +80,13 @@ public class UnitDemandExperiments extends Experiments{
 		if(!dbLogger.checkIfUnitDemandRowExists("unit_demand",numUsers, numCampaigns, prob)){
 			System.out.println("Add data for -- n = " + numUsers + ", m = " + numCampaigns + ", prob = " + prob);
 			DescriptiveStatistics maxWEQRevenue = new DescriptiveStatistics();
-			//DescriptiveStatistics evpAppRevenue = new DescriptiveStatistics();
+			DescriptiveStatistics evpAppRevenue = new DescriptiveStatistics();
 			DescriptiveStatistics lpRevenue = new DescriptiveStatistics();
 			DescriptiveStatistics lpWEViolations = new DescriptiveStatistics();
 			DescriptiveStatistics lpEFViolations = new DescriptiveStatistics();
 			
 			DescriptiveStatistics maxWEQTime = new DescriptiveStatistics();
-			//DescriptiveStatistics evpAppTime = new DescriptiveStatistics();
+			DescriptiveStatistics evpAppTime = new DescriptiveStatistics();
 			DescriptiveStatistics lpTime = new DescriptiveStatistics();
 			long startTime , endTime ;
 			for(int t=0;t<RunParameters.numTrials;t++){
@@ -98,18 +98,18 @@ public class UnitDemandExperiments extends Experiments{
 				double [][] costMatrix = UnitDemandExperiments.getCostMatrixFromMarket(market);
 		        //Printer.printMatrix(costMatrix);
 		        Matching M = getMaximumMatchingFromCostMatrix(costMatrix);
-		        int[][] maximumMatchingAllocation = M.getMatching();
-		        double[] rewards = M.getPrices();
+		        //int[][] maximumMatchingAllocation = M.getMatching();
+		        //double[] rewards = M.getPrices();
 		        //Printer.printMatrix(maximumMatchingAllocation);
 		        MaxWEQ maxWEQ = new MaxWEQ(costMatrix);
-		        //EVPApproximation evpApp = new EVPApproximation(costMatrix);
+		        EVPApproximation evpApp = new EVPApproximation(costMatrix);
 		        /* 
 		         * This new market is a unit-demand and supply market with rewards given
 		         * by the maximum matching allocation. This market is going to be used as input to our algorithm. 
 		         */
-		        Market inputMarket = MarketFactory.singletonMarket(market.getNumberUsers(), market.getNumberCampaigns(), market.getConnections(), rewards);
+		        //Market inputMarket = MarketFactory.singletonMarket(market.getNumberUsers(), market.getNumberCampaigns(), market.getConnections(), rewards);
 		        //System.out.println(inputMarket);
-		        MarketAllocation marketMaxMatchingAllocation = new MarketAllocation(inputMarket, maximumMatchingAllocation);
+		        //MarketAllocation marketMaxMatchingAllocation = new MarketAllocation(inputMarket, maximumMatchingAllocation);
 				/*
 				 * Measure lpApp
 				 */
@@ -135,15 +135,14 @@ public class UnitDemandExperiments extends Experiments{
 				maxWEQTime.addValue(endTime - startTime);
 				/*
 				 * Measure evpApp
-				 
+				 */
 				startTime = System.nanoTime();
 				evpAppRevenue.addValue(evpApp.Solve().getSellerRevenue());
 				endTime = System.nanoTime();
 				evpAppTime.addValue(endTime - startTime);
-				 */
 			}
 			/* log results in database */
-			dbLogger.saveUnitDemandData(numUsers, numCampaigns, prob, maxWEQRevenue.getMean(), maxWEQTime.getMean() / 1000000, lpRevenue.getMean(), lpTime.getMean() / 1000000 , lpWEViolations.getMean(), lpEFViolations.getMean());
+			dbLogger.saveUnitDemandData(numUsers, numCampaigns, prob, maxWEQRevenue.getMean(), maxWEQTime.getMean() / 1000000,evpAppRevenue.getMean(),evpAppTime.getMean() / 1000000, lpRevenue.getMean(), lpTime.getMean() / 1000000 , lpWEViolations.getMean(), lpEFViolations.getMean());
 		}else{
 			System.out.println("Already have data for -- n = " + numUsers + ", m = " + numCampaigns + ", prob = " + prob);
 		}
