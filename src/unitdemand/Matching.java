@@ -1,4 +1,4 @@
-package singletonmarket;
+package unitdemand;
 
 /*
  * This class stores a matching, defined here as a matrix of integers

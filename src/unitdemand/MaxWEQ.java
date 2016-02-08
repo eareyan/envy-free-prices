@@ -1,4 +1,4 @@
-package singletonmarket;
+package unitdemand;
 
 import util.Printer;
 /*

@@ -1,4 +1,4 @@
-package postgresql;
+package log;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,16 +7,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
  
 /*
- * Saves results of experiments to postgresql databases.
+ * Saves results of experiments to a sql database.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class JdbcPostgresqlConnection {
+public class SqlDB {
 	
 	Connection conn;
 	
-    public JdbcPostgresqlConnection(String host, String user, String pass) throws SQLException{
-		this.conn = DriverManager.getConnection(host, user, pass);
+    public SqlDB(String provider,String host, int port, String dbName, String user, String pass) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException{
+    	/*
+    	 * Connect to the database. First determine the driver.
+    	 */
+    	if(provider.equals("postgresql")){
+    		Class.forName("org.postgresql.Driver");
+    	}else if(provider.equals("mysql")){
+    		Class.forName("com.mysql.jdbc.Driver");
+    	}
+		this.conn = DriverManager.getConnection("jdbc:"+provider+"://"+host+":"+port+"/"+dbName+"?user="+user+"&password="+pass);
 		if (this.conn == null) {
 		    System.out.println("NOT Connected to database...");
 		}

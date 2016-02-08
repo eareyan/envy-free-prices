@@ -5,16 +5,16 @@ import java.util.Random;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import postgresql.JdbcPostgresqlConnection;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
-import singletonmarket.EVPApproximation;
-import singletonmarket.HungarianAlgorithm;
-import singletonmarket.Matching;
-import singletonmarket.MaxWEQ;
+import log.SqlDB;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketFactory;
+import unitdemand.EVPApproximation;
+import unitdemand.HungarianAlgorithm;
+import unitdemand.Matching;
+import unitdemand.MaxWEQ;
 
 /*
  * This class implements experiments in the case of unit demand.
@@ -69,7 +69,7 @@ public class UnitDemandExperiments extends Experiments{
         return new Matching(rewards,hungarianAllocationInteger);
 	}
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, JdbcPostgresqlConnection dbLogger) throws SQLException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException{
 		/*
 		 * This method test the single demand case.
 		 * We test MaxWEQ, EVPApprox and LP.
@@ -114,15 +114,18 @@ public class UnitDemandExperiments extends Experiments{
 				 * Measure lpApp
 				 */
 				startTime = System.nanoTime();
-		        EnvyFreePricesSolutionLP VectorSol = new EnvyFreePricesVectorLP(marketMaxMatchingAllocation).Solve();
-				lpRevenue.addValue(VectorSol.sellerRevenuePriceVector());
+		        //EnvyFreePricesSolutionLP VectorSol = new EnvyFreePricesVectorLP(marketMaxMatchingAllocation).Solve();
+				//lpRevenue.addValue(VectorSol.sellerRevenuePriceVector());
+				lpRevenue.addValue(1);
 				endTime = System.nanoTime();
 				lpTime.addValue(endTime - startTime);
 				/*
 				 * Measure violations
 				 */
-				lpWEViolations.addValue(VectorSol.computeWalrasianEqViolations());
-				lpEFViolations.addValue(VectorSol.numberOfEnvyCampaigns());
+				//lpWEViolations.addValue(VectorSol.computeWalrasianEqViolations());
+				//lpEFViolations.addValue(VectorSol.numberOfEnvyCampaigns());
+				lpWEViolations.addValue(1);
+				lpEFViolations.addValue(1);
 				/*
 				 * Measure maxEQ
 				 */

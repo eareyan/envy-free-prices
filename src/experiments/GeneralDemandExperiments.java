@@ -4,13 +4,13 @@ import java.sql.SQLException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import postgresql.JdbcPostgresqlConnection;
 import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.Waterfall;
 import algorithms.WaterfallMAXWEQ;
 import algorithms.WaterfallPrices;
+import log.SqlDB;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketFactory;
@@ -22,7 +22,7 @@ import structures.MarketFactory;
  */
 public class GeneralDemandExperiments extends Experiments{
 
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, JdbcPostgresqlConnection dbLogger) throws SQLException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException{
 		if(!dbLogger.checkIfUnitDemandRowExists("general_demand",numUsers, numCampaigns, prob)){
 			System.out.println("Add data for -- n = " + numUsers + ", m = " + numCampaigns + ", prob = " + prob);
 			

@@ -2,6 +2,7 @@ package experiments;
 
 /*
  * This class implements operations common to experiments.
+ * It contains all the parameters needed for one batch of experiments.
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -16,19 +17,25 @@ public class RunParameters{
 	public int numCampaigns;
 	double prob;
 	public int id;
+	public String dbProvider;
 	public String dbHost;
+	public int dbPort;
+	public String dbName;
 	public String dbUsername;
 	public String dbPassword;
 	public Experiments experimentObject;
 	public String experimentName;
 	
 	public RunParameters(String[] args) throws Exception{
-		this.experimentObject = this.getExperimentObject(args[1]);
-		this.dbHost = args[2];
-		this.dbUsername = args[3];
-		this.dbPassword = args[4];
-		this.id = Integer.parseInt(args[5]);
 		this.experimentName = args[1];
+		this.experimentObject = this.getExperimentObject(this.experimentName);
+		this.dbProvider = args[2];
+		this.dbHost = args[3];
+		this.dbPort = Integer.parseInt(args[4]);
+		this.dbName = args[5];
+		this.dbUsername = args[6];
+		this.dbPassword = args[7];
+		this.id = Integer.parseInt(args[8]);
 		this.computeRangeOfWork();
 	}
 	/*

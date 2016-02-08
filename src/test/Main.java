@@ -10,13 +10,13 @@ import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.Waterfall;
 import algorithms.WaterfallMAXWEQ;
 import algorithms.WaterfallPrices;
-import singletonmarket.EVPApproximation;
-import singletonmarket.HungarianAlgorithm;
-import singletonmarket.MaxWEQ;
 import structures.Market;
 import structures.MarketFactory;
 import structures.MarketAllocation;
 import structures.MarketPrices;
+import unitdemand.EVPApproximation;
+import unitdemand.HungarianAlgorithm;
+import unitdemand.MaxWEQ;
 import util.Printer;
 
 /*

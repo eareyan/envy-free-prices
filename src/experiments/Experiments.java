@@ -2,15 +2,15 @@ package experiments;
 
 import java.sql.SQLException;
 
-import postgresql.JdbcPostgresqlConnection;
+import log.SqlDB;
 
 public class Experiments {
 
-	public void bulkTest(String[] args) throws SQLException{
+	public void bulkTest(String[] args) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException{
 		
 		int numUsers = 21;
 		int numCampaigns = 21;
-		JdbcPostgresqlConnection dbLogger = new JdbcPostgresqlConnection(args[0],args[1],args[2]);
+		SqlDB dbLogger = new SqlDB(null,args[0],0,args[1],args[2], null);
 		for(int i=2;i<numUsers;i++){
 			for(int j=2;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
@@ -27,7 +27,7 @@ public class Experiments {
 		 */
 		if(args[0].equals("grid")){
 			RunParameters Parameters = new RunParameters(args);
-			JdbcPostgresqlConnection dbLogger = new JdbcPostgresqlConnection(Parameters.dbHost,Parameters.dbUsername,Parameters.dbPassword);
+			SqlDB dbLogger = new SqlDB(Parameters.dbProvider,Parameters.dbHost,Parameters.dbPort,Parameters.dbName,Parameters.dbUsername,Parameters.dbPassword);
 			Parameters.experimentObject.runOneExperiment(Parameters.numUsers, Parameters.numCampaigns, Parameters.prob, dbLogger);
 		}else{
 			/*
@@ -39,7 +39,7 @@ public class Experiments {
 		}
 	}
 
-	public void runOneExperiment(int numUsers, int numCampaigns, double prob, JdbcPostgresqlConnection dbLogger)  throws SQLException{
+	public void runOneExperiment(int numUsers, int numCampaigns, double prob, SqlDB dbLogger)  throws SQLException{
 		/* 
 		 * This method is implemented by a particular type of experiment class.
 		 * This method receives the number of users, number of campaigns and probability
