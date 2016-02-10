@@ -46,6 +46,14 @@ public class MarketFactory {
 	}
 	
 	/*
+	 * Shortcut method to create a unit demand random market by just providing the number of users, campaigns, and
+	 * probability of connection.
+	 */
+	public static Market randomUnitDemandMarket(int numberUsers, int numberCampaigns, double probabilityConnections){
+		return MarketFactory.randomMarket(numberUsers, 1 ,1,  numberCampaigns, 1 , 1, 1.0, 100.0,  probabilityConnections);		
+	}	
+	
+	/*
 	 * Create a singleton market given all other parameters (connections matrix and rewards)
 	 */
 	public static Market singletonMarket(int numberUsers, int numberCampaigns, boolean[][] connections, double[] rewards){

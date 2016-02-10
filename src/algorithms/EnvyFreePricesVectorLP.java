@@ -103,14 +103,14 @@ public class EnvyFreePricesVectorLP {
 	/*
 	 * This method creates and solves the LP.
 	 */
-	public EnvyFreePricesSolutionLP Solve(){
+	public EnvyFreePricesSolutionLP Solve(IloCplex iloObject){
 		double[] LP_Prices  = {};
 		EnvyFreePricesSolutionLP Solution = new EnvyFreePricesSolutionLP();
 		try{
 			/*
 			 *  Create Cplex variables.
 			 */
-			this.cplex = new IloCplex();			
+			this.cplex = iloObject;			
 			if(!this.verbose) this.cplex.setOut(null);
 			this.linearConstrains = new ArrayList<IloRange>();
 		 	cplex.setParam(IloCplex.BooleanParam.PreInd, false);

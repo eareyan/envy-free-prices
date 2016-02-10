@@ -27,12 +27,12 @@ public class EVPApproximation {
 	 */
 	public Double[] getEdgeValuations(){
 		/* First, find a maximum weight matching */
-        int[] result = new HungarianAlgorithm(this.valuationMatrix).execute();
+        int[] result  = new MWBMatchingAlgorithm(this.valuationMatrix).getMatching();
         Double[] valuations = new Double[this.valuationMatrix.length];
         for(int i=0;i<result.length;i++){
         	if(result[i] > -1){
         		/* If an assignment is possible, then the valuation for item j is the weight of that assignment, otherwise is zero*/
-        		valuations[i] = -1.0 * this.valuationMatrix[i][result[i]];
+        		valuations[i] = this.valuationMatrix[i][result[i]];
         	}else{
         		valuations[i] = 0.0;
         	}

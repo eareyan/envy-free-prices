@@ -20,19 +20,18 @@ public class MaxWEQ {
 	 * Computes the maximum weight matching and its value for the argument matrix.
 	 */
 	protected Matching computeMaximumWeightMatchingValue(double[][] matrix){
-		HungarianAlgorithm H = new HungarianAlgorithm(matrix);
-        int[] result = H.execute();
+		int[] result  = new MWBMatchingAlgorithm(matrix).getMatching();
         double valueOfMatching = 0.0;
         int[][] matching = new int[matrix.length][matrix[0].length];
         for(int i=0;i<result.length;i++){
         	//System.out.println("--" + result[i]);
         	//If the assignment is possible and the user is actually connected to the campaigns
-        	if(result[i] > -1 && matrix[i][result[i]] < Double.MAX_VALUE){
+        	if(result[i] > -1 && matrix[i][result[i]] > Double.NEGATIVE_INFINITY){
         		valueOfMatching += matrix[i][result[i]];
         		matching[i][result[i]] = 1;
         	}
         }
-        return new Matching(matching,-1.0*valueOfMatching);
+        return new Matching(matching,valueOfMatching);
 	}
 	/*
 	 * Returns the valuation matrix without row indexItem.

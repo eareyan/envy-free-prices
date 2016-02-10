@@ -55,6 +55,10 @@ public class MarketPrices {
 		}
 		return value;
 	}
+	
+	public double[] getPriceVector(){
+		return this.pricesVector;
+	}
 
 	public double sellerRevenuePriceVector(){
 		double value = 0;
@@ -191,13 +195,53 @@ public class MarketPrices {
 	 * This method computes how many violations to the Walrasian equilibrium, there are.
 	 * A violation is one where an unallocated user has a price greater than zero.
 	 */
-	public int computeWalrasianEqViolations(){
+	public double[] computeWalrasianEqViolations(){
 		int violations = 0;
+		double totalPricesOfUsers = 0.0;
+		double totalPricesOfViolatingUsers = 0.0;
 		for(int i=0;i<this.marketAllocation.getMarket().getNumberUsers();i++){
+			totalPricesOfUsers += this.getPriceVectorComponent(i);
 			if(this.marketAllocation.allocationFromUser(i) == 0 && this.getPriceVectorComponent(i) > 0){
 				violations++;
+				totalPricesOfViolatingUsers += this.getPriceVectorComponent(i);
+			}
+		}
+		if(totalPricesOfUsers == 0){ //If the price of all users is zero, then the ratio should be zero
+			return new double[]{violations,0.0};
+		}else{
+			return new double[]{violations,totalPricesOfViolatingUsers / totalPricesOfUsers};
+		}
+	}
+	/*
+	 * This method computes how many campaigns are envy-free for the unit demand case
+	 */
+	public int computeEFViolationUnitDemand(){
+		int violations = 0;
+		double campaignCurrentProfit = 0.0;
+		outerloop:
+		for(int j=0;j<this.marketAllocation.getMarket().getNumberCampaigns();j++){
+			if(this.marketAllocation.isCampaignBundleZero(j)){
+				//System.out.println("\t" + j + " zero bundle");
+				campaignCurrentProfit = 0.0;
+			}else{
+				//System.out.println("\t" + j + " NOT zero bundle");
+				campaignCurrentProfit = this.marketAllocation.getMarket().getCampaign(j).getReward() -this.getBundleCost(j);
+			}
+			//System.out.println("Campaign #"+j+" profit = " + campaignCurrentProfit);
+			for(int i=0;i<this.marketAllocation.getMarket().getNumberUsers();i++){
+				if(this.marketAllocation.getMarket().isConnected(i, j)){
+					//System.out.println("Profit by user " + i + " = " + (this.marketAllocation.getMarket().getCampaign(j).getReward() - this.getPriceVectorComponent(i)));
+					if(this.marketAllocation.getMarket().getCampaign(j).getReward() - this.getPriceVectorComponent(i) > campaignCurrentProfit){
+						violations++;
+						//System.out.println("***** Campaign " + j + " is ENVY!, it would rather have one of " + i);
+						//System.out.println(this.marketAllocation.getMarket().getCampaign(j).getReward() - this.getPriceVectorComponent(i));
+						//System.out.println(campaignCurrentProfit);
+						//System.exit(-1);
+						break outerloop;
+					}
+				}
 			}
 		}
 		return violations;
-	}    
+	}
 }

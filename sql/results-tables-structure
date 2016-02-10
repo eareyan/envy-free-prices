@@ -9,6 +9,7 @@ CREATE TABLE unit_demand (
 	lpRevenue double precision NOT NULL,
 	lpTime double precision NOT NULL,
 	lpWEViolations double precision NOT NULL,
+	lpWERelativeViolations double precision NOT NULL,
 	lpEFViolations double precision NOT NULL
 	);
 

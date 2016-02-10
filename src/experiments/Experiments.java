@@ -14,7 +14,7 @@ public class Experiments {
 			for(int j=2;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
 					double prob = 0.25 + p*(0.25);
-					System.out.println(" n = " + i + ", m = " + j + ", prob = " + prob);
+					System.out.print(" n = " + i + ", m = " + j + ", prob = " + prob);
 					this.runOneExperiment(i, j, prob, dbLogger);
 				}
 			}

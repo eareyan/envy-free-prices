@@ -40,8 +40,8 @@ public class SqlDB {
         preparedStatement.setDouble(3, p);
         return ((ResultSet) preparedStatement.executeQuery()).next();
     }
-    public void saveUnitDemandData(int n, int m, double p, double maxWEQRevenue, double maxWEQTime, double evpAppRevenue, double evpAppTime, double lpRevenue, double lpTime, double lpWEViolations, double lpEFViolations) throws SQLException{
-        String sql = "INSERT INTO unit_demand(n,m,p,maxWEQRevenue,maxWEQTime,evpAppRevenue,evpAppTime,lpRevenue,lpTime,lpWEViolations,lpEFViolations) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+    public void saveUnitDemandData(int n, int m, double p, double maxWEQRevenue, double maxWEQTime, double evpAppRevenue, double evpAppTime, double lpRevenue, double lpTime, double lpWEViolations, double lpWERelativeViolations, double lpEFViolations) throws SQLException{
+        String sql = "INSERT INTO unit_demand(n,m,p,maxWEQRevenue,maxWEQTime,evpAppRevenue,evpAppTime,lpRevenue,lpTime,lpWEViolations,lpWERelativeViolations,lpEFViolations) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
         preparedStatement.setInt(1, n);
         preparedStatement.setInt(2, m);
@@ -53,7 +53,8 @@ public class SqlDB {
         preparedStatement.setDouble(8, lpRevenue);
         preparedStatement.setDouble(9, lpTime);
         preparedStatement.setDouble(10, lpWEViolations);
-        preparedStatement.setDouble(11, lpEFViolations);
+        preparedStatement.setDouble(11, lpWERelativeViolations);
+        preparedStatement.setDouble(12, lpEFViolations);
         preparedStatement.execute();
     }
     public void saveGeneralCaseData(int n, int m, double p, double ratioEfficiency, double effAllocationRevenue, double effAlocationTime, double effAllocWEViolation, double effAllocEFViolation, double wfAllocationRevenue, double wfAllocationTime, double wfAllocWEViolation, double wfAllocEFViolation, double wfMaxWEQRevenue, double wfMaxWEQTime) throws SQLException{
