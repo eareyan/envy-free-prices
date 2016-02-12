@@ -8,8 +8,8 @@ package experiments;
  */
 public class RunParameters{
 	
-	public static final int totalNumUsers = 21;
-	public static final int totalNumCamp = 21;
+	public static final int totalNumUsers = 19;
+	public static final int totalNumCamp = 19;
 	public static final int totalProbabilities = 4;
 	public static final int numTrials = 100;
 	

@@ -1,12 +1,14 @@
 package experiments;
 
+import ilog.concert.IloException;
+
 import java.sql.SQLException;
 
 import log.SqlDB;
 
 public class Experiments {
 
-	public void bulkTest(SqlDB dbLogger) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException{
+	public void bulkTest(SqlDB dbLogger) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IloException{
 		
 		int numUsers = 21;
 		int numCampaigns = 21;
@@ -38,7 +40,7 @@ public class Experiments {
 		}
 	}
 
-	public void runOneExperiment(int numUsers, int numCampaigns, double prob, SqlDB dbLogger)  throws SQLException{
+	public void runOneExperiment(int numUsers, int numCampaigns, double prob, SqlDB dbLogger)  throws SQLException, IloException{
 		/* 
 		 * This method is implemented by a particular type of experiment class.
 		 * This method receives the number of users, number of campaigns and probability

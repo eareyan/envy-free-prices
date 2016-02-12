@@ -57,8 +57,8 @@ public class SqlDB {
         preparedStatement.setDouble(12, lpEFViolations);
         preparedStatement.execute();
     }
-    public void saveGeneralCaseData(int n, int m, double p, double ratioEfficiency, double effAllocationRevenue, double effAlocationTime, double effAllocWEViolation, double effAllocEFViolation, double wfAllocationRevenue, double wfAllocationTime, double wfAllocWEViolation, double wfAllocEFViolation, double wfMaxWEQRevenue, double wfMaxWEQTime) throws SQLException{
-        String sql = "INSERT INTO general_demand(n,m,p,ratioEfficiency,effAllocationRevenue,effAllocationTime,effAllocWEViolation,effAllocEFViolation,wfAllocationRevenue,wfAllocationTime,wfAllocWEViolation,wfAllocEFViolation,wfMaxWEQRevenue,wfMaxWEQTime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    public void saveGeneralCaseData(int n, int m, double p, double ratioEfficiency, double effAllocationRevenue, double effAlocationTime, double effAllocWEViolation,double effAllocWERelativeViolations, double effAllocEFViolation, double wfAllocationRevenue, double wfAllocationTime, double wfAllocWEViolation,double wfAllocWERelativeViolations, double wfAllocEFViolation, double wfMaxWEQRevenue, double wfMaxWEQTime) throws SQLException{
+        String sql = "INSERT INTO general_demand(n,m,p,ratioEfficiency,effAllocationRevenue,effAllocationTime,effAllocWEViolation,effAllocWERelativeViolations,effAllocEFViolation,wfAllocationRevenue,wfAllocationTime,wfAllocWEViolation,wfAllocWERelativeViolations,wfAllocEFViolation,wfMaxWEQRevenue,wfMaxWEQTime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
         preparedStatement.setInt(1, n);
         preparedStatement.setInt(2, m);
@@ -67,13 +67,15 @@ public class SqlDB {
         preparedStatement.setDouble(5, effAllocationRevenue);
         preparedStatement.setDouble(6, effAlocationTime);
         preparedStatement.setDouble(7, effAllocWEViolation);
-        preparedStatement.setDouble(8, effAllocEFViolation);
-        preparedStatement.setDouble(9, wfAllocationRevenue);
-        preparedStatement.setDouble(10, wfAllocationTime);
-        preparedStatement.setDouble(11, wfAllocWEViolation);
-        preparedStatement.setDouble(12, wfAllocEFViolation);
-        preparedStatement.setDouble(13, wfMaxWEQRevenue);
-        preparedStatement.setDouble(14, wfMaxWEQTime);
+        preparedStatement.setDouble(8, effAllocWERelativeViolations);
+        preparedStatement.setDouble(9, effAllocEFViolation);
+        preparedStatement.setDouble(10, wfAllocationRevenue);
+        preparedStatement.setDouble(11, wfAllocationTime);
+        preparedStatement.setDouble(12, wfAllocWEViolation);
+        preparedStatement.setDouble(13, wfAllocWERelativeViolations);
+        preparedStatement.setDouble(14, wfAllocEFViolation);
+        preparedStatement.setDouble(15, wfMaxWEQRevenue);
+        preparedStatement.setDouble(16, wfMaxWEQTime);
         preparedStatement.execute();
     }
 }

@@ -35,8 +35,8 @@ public class MaxWEQReservePrices {
 		for(int i=0;i<this.valuationMatrix.length;i++){
 			/*Create dummy reserve demand */
 			double[] dummyReserveRow = new double[(this.valuationMatrix.length)*2];
-			dummyReserveRow[i*2] = -1.0 * this.reservePrices[i];
-			dummyReserveRow[(i*2)+1] = -1.0 * this.reservePrices[i];
+			dummyReserveRow[i*2] = this.reservePrices[i];
+			dummyReserveRow[(i*2)+1] = this.reservePrices[i];
 			/* copy original row*/
 			double[] originalrow = new double[this.valuationMatrix[0].length];
 			System.arraycopy(this.valuationMatrix[i], 0, originalrow, 0,this.valuationMatrix[i].length);
@@ -86,8 +86,8 @@ public class MaxWEQReservePrices {
 					}
 					if(!campaignAllocated){//campaign j is not allocated
 						//System.out.println("Campaign #"+j+", is not allocated anything");
-						if(-1.0*this.valuationMatrix[i][j] - prices[i] >= 0){//It makes sense to allocate this item.
-							//System.out.println("IT DOES MAKE SENSE!: " + "="+(-1.0*this.valuationMatrix[i][j]) + " - " + prices[i]);
+						if(this.valuationMatrix[i][j] - prices[i] >= 0){//It makes sense to allocate this item.
+							//System.out.println("IT DOES MAKE SENSE!: " + "="+(this.valuationMatrix[i][j]) + " - " + prices[i]);
 							matching[i][j] = 1;
 						}
 					}

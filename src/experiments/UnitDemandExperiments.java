@@ -69,7 +69,6 @@ public class UnitDemandExperiments extends Experiments{
 		 * For the LP, we record the number of violations to the Walrasian Equilibirum
 		 * and the number of violations of the Envy Free condition in the general case.
 		 */
-		
 		if(!dbLogger.checkIfUnitDemandRowExists("unit_demand",numUsers, numCampaigns, prob)){
 			System.out.println("\t Adding data ");
 			DescriptiveStatistics maxWEQRevenue = new DescriptiveStatistics();
@@ -127,8 +126,6 @@ public class UnitDemandExperiments extends Experiments{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				
 				/* Prints... for debugging purposes*/
 				//System.out.println(market);
 		        //Printer.printMatrix(valuationMatrix);

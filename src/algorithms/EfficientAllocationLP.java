@@ -38,9 +38,9 @@ public class EfficientAllocationLP {
 	 * Solver method. Returns an ArrayList of int[][] containing all the efficient allocations
 	 * found by the ILP.
 	 */
-	public ArrayList<int[][]> Solve(){
+	public ArrayList<int[][]> Solve(IloCplex iloObject){
 		try {
-			this.cplex = new IloCplex();
+			this.cplex = iloObject;
 			if(!this.verbose) cplex.setOut(null);
 			/*
 			 * These two next parameters controls how many solutions we want to get.
