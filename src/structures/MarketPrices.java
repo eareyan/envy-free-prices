@@ -237,7 +237,7 @@ public class MarketPrices {
 						//System.out.println(this.marketAllocation.getMarket().getCampaign(j).getReward() - this.getPriceVectorComponent(i));
 						//System.out.println(campaignCurrentProfit);
 						//System.exit(-1);
-						break outerloop;
+						continue outerloop;
 					}
 				}
 			}

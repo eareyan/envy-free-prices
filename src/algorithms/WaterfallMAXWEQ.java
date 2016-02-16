@@ -7,7 +7,7 @@ import structures.MarketPrices;
 import util.Printer;
 
 /*
- * Generalization of MaxWEQ to non-unit demand case, using Watefall 
+ * Generalization of MaxWEQ to non-unit demand case, using Waterfall 
  * 
  * @author Enrique Areyan Viqueira
  */

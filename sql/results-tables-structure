@@ -43,3 +43,4 @@ CREATE TABLE general_demand (
 	);
 
 \copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-demand.csv' csv header
+\copy unit_comparison to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-comparison.csv' csv header

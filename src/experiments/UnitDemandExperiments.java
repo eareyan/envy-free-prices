@@ -66,7 +66,7 @@ public class UnitDemandExperiments extends Experiments{
 		 * This method test the single demand case.
 		 * We test MaxWEQ, EVPApprox and LP.
 		 * We record revenue and execution time in each case.
-		 * For the LP, we record the number of violations to the Walrasian Equilibirum
+		 * For the LP, we record the number of violations to the Walrasian Equilibrium
 		 * and the number of violations of the Envy Free condition in the general case.
 		 */
 		if(!dbLogger.checkIfUnitDemandRowExists("unit_demand",numUsers, numCampaigns, prob)){
