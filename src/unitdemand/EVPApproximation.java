@@ -55,8 +55,8 @@ public class EVPApproximation {
 			Arrays.fill(reservePrices,valuations[i]);
 			setOfMatchings.add(new MaxWEQReservePrices(this.valuationMatrix,reservePrices).Solve());
 		}
-		/*Collections.sort(setOfMatchings,new MatchingComparatorBySellerRevenue());
-		System.out.println(setOfMatchings);
+		Collections.sort(setOfMatchings,new MatchingComparatorBySellerRevenue());
+		/*System.out.println(setOfMatchings);
 		Printer.printMatrix(this.valuationMatrix);
 		System.out.println("Prices for max revenue");
 		Printer.printVector(setOfMatchings.get(0).getPrices());

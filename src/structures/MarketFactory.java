@@ -100,4 +100,31 @@ public class MarketFactory {
 		}
 		return new Market(users,campaigns,connections);
 	}
+	
+	/*
+	 * Adds a dummy campaign per item that demands impressions from that item at the given value
+	 * and is not connected to any other item
+	 */
+	public static Market augmentMarketWithReserve(Market M, double reserveValue){
+		int totalNewCampaigns = M.getNumberCampaigns() + M.getNumberUsers();
+		Campaign[] campaigns = new Campaign[totalNewCampaigns];
+		for(int j=0;j<M.getNumberCampaigns();j++){
+			campaigns[j] = M.getCampaign(j);
+		}
+		for(int j=M.getNumberCampaigns();j<totalNewCampaigns;j++){
+			campaigns[j] = new Campaign(1 , reserveValue);
+		}
+		boolean[][] connections = new boolean[M.getNumberUsers()][totalNewCampaigns];
+		for(int i=0;i<M.getNumberUsers();i++){
+			for(int j=0;j<M.getNumberCampaigns();j++){
+				connections[i][j] = M.isConnected(i, j);
+			}
+		}
+		int i=0;
+		for(int j=M.getNumberCampaigns();j<totalNewCampaigns;j++){
+			connections[i][j] = (j-M.getNumberCampaigns() == i);
+			i++;
+		}
+		return new Market(M.users,campaigns,connections);
+	}
 }

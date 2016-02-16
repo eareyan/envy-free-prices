@@ -10,6 +10,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
+import algorithms.GeneralApproximation;
 import algorithms.Waterfall;
 import algorithms.WaterfallMAXWEQ;
 import algorithms.WaterfallPrices;
@@ -47,6 +48,9 @@ public class GeneralDemandExperiments extends Experiments{
 			
 			DescriptiveStatistics wfMaxWEQRevenue = new DescriptiveStatistics();
 			DescriptiveStatistics wfMaxWEQTime = new DescriptiveStatistics();
+
+			DescriptiveStatistics generalAppRevenue = new DescriptiveStatistics();
+			DescriptiveStatistics generalAppTime = new DescriptiveStatistics();
 			long startTime , endTime ;
 			IloCplex iloObject0,iloObject1,iloObject2;
 			for(int t=0;t<RunParameters.numTrials;t++){
@@ -99,6 +103,13 @@ public class GeneralDemandExperiments extends Experiments{
 				wfMaxWEQRevenue.addValue(wfMaxWEQ.Solve().sellerRevenuePriceVector());
 				endTime = System.nanoTime();
 				wfMaxWEQTime.addValue(endTime - startTime);
+				
+				/* Run GeneralApproximation... , i.e., WaterfallMAXWEQ with dummy campaigns*/
+				startTime = System.nanoTime();
+				GeneralApproximation generalApp = new GeneralApproximation(randomMarket,efficientAllocation);
+				generalAppRevenue.addValue(generalApp.Solve().sellerRevenuePriceVector());
+				endTime = System.nanoTime();
+				generalAppTime.addValue(endTime - startTime);
 			}
 			dbLogger.saveGeneralCaseData(numUsers, numCampaigns, prob, ratioEfficiency.getMean(), effAllocationRevenue.getMean(), effAllocationTime.getMean() / 1000000, effAllocWEViolation.getMean(),effAllocWERelativeViolations.getMean(), effAllocEFViolation.getMean(), wfAllocationRevenue.getMean(), wfAllocationTime.getMean() / 1000000, wfAllocWEViolation.getMean(),wfAllocWERelativeViolations.getMean(), wfAllocEFViolation.getMean(), wfMaxWEQRevenue.getMean(),wfMaxWEQTime.getMean() / 1000000);
 			//System.exit(-1); /* stop execution... for debugging purposes */		
