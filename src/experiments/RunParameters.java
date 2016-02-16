@@ -71,6 +71,8 @@ public class RunParameters{
 			return new UnitDemandExperiments();
 		}else if(type.equals("GeneralDemand")){
 			return new GeneralDemandExperiments();
+		}else if(type.equals("UnitComparison")){
+			return new UnitDemandComparison();
 		}else{
 			throw new Exception("Unknown demand type");
 		}

@@ -32,8 +32,7 @@ public class Experiments {
 			Parameters.experimentObject.runOneExperiment(Parameters.numUsers, Parameters.numCampaigns, Parameters.prob, dbLogger);
 		}else{
 			/*
-			 * Running local... no logic implemented yet...
-			 * It used to be bulk tests...
+			 * Running local bulk tests
 			 */
 			System.out.println("Running local...");
 			Parameters.experimentObject.bulkTest(dbLogger);
