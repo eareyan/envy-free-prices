@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import algorithms.Waterfall.Bid;
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import structures.Market;
@@ -26,24 +27,51 @@ public class GeneralApproximation {
 		/* Get a list with the users that were allocated */
 		ArrayList<Integer> usersAllocated = GeneralApproximation.getAllocatedUsers(this.efficientAllocation);
 		ArrayList<MarketPrices> solutions = new ArrayList<MarketPrices>();
+		ArrayList<ReserveBundle> reserveBundles = new ArrayList<ReserveBundle>();
 		/* For each Allocated User, compute WaterfallMAXWEQ with reserve prices*/
+		double reserveReward = 0.0;
 		for(int i=0;i<usersAllocated.size();i++){
-			solutions.add(new WaterfallMAXWEQ(MarketFactory.augmentMarketWithReserve(this.market, GeneralApproximation.getReservePrice(this.market, usersAllocated.get(i),efficientAllocation))).Solve());
-			System.out.println(solutions.get(i).sellerRevenuePriceVector());
+			reserveReward = GeneralApproximation.getReservePrice(this.market, usersAllocated.get(i),this.efficientAllocation);
+			System.out.println("reserveReward for user:" + usersAllocated.get(i) + " = " + reserveReward);
+			for(int j=0;j<this.market.getNumberCampaigns();j++){
+				if(this.efficientAllocation[usersAllocated.get(i)][j] > 0){
+					System.out.println("\tcampaign "+j+", " + this.efficientAllocation[usersAllocated.get(i)][j]);
+					reserveBundles.add(new ReserveBundle(reserveReward * this.efficientAllocation[usersAllocated.get(i)][j],this.efficientAllocation[usersAllocated.get(i)][j],j));
+				}
+			}
 		}
+		Printer.printMatrix(this.efficientAllocation);
+		System.out.println(reserveBundles);
+		for(ReserveBundle b: reserveBundles){
+			System.out.println("BUNDLE WITH REWARD : " + b.getReward());
+			System.out.println(MarketFactory.augmentMarketWithReserve(this.market,b.getReward(),b.getDemand()));
+			GeneralApproximation.deduceMatching(new WaterfallMAXWEQ(MarketFactory.augmentMarketWithReserve(this.market,b.getReward(),b.getDemand())).Solve());
+			//solutions.add();
+		}
+		for(MarketPrices s: solutions){
+			System.out.println(s.sellerRevenuePriceVector());
+		}
+		System.out.println(solutions);
 		Collections.sort(solutions,new SolutionComparatorBySellerRevenue());
 		return solutions.get(0);
 	}
+	
+	public static void deduceMatching(MarketPrices output){
+		Printer.printMatrix(output.getMarketAllocation().getAllocation());
+		Printer.printVector(output.getPriceVector());
+		System.out.println(output.sellerRevenuePriceVector());
+	}
+	
 	/*
 	 * Given a market, a user index and an allocation,
-	 * this method computes min_j(R_j / x_{usersAllocated.get(i)j})
+	 * this method computes min_j(R_j / I_j})
 	 */
 	public static double getReservePrice(Market M,int userIndex,int[][] allocation){
 		double min = Double.POSITIVE_INFINITY;
 		for(int j=0;j<M.getNumberCampaigns();j++){
 			if(allocation[userIndex][j]>0){
-				if(M.getCampaign(j).getReward() / allocation[userIndex][j] < min){
-					min = M.getCampaign(j).getReward() / allocation[userIndex][j];
+				if(M.getCampaign(j).getReward() / M.getCampaign(j).getDemand() < min){
+					min = M.getCampaign(j).getReward() / M.getCampaign(j).getDemand();
 				}
 			}
 		}
@@ -75,5 +103,19 @@ public class GeneralApproximation {
 			if(m1.sellerRevenuePriceVector() > m2.sellerRevenuePriceVector()) return -1;
 			return 0;
 		}
-	}	
+	}
+	class ReserveBundle{
+		private final double reward;
+		private final int demand;
+		private final int campaignIndex;
+		public ReserveBundle(double reward, int demand, int campaignIndex){
+			this.reward = reward;
+			this.demand = demand;
+			this.campaignIndex = campaignIndex;
+		}
+		public double getReward(){ return this.reward; }
+		public int getDemand(){ return this.demand; }
+		public int getCampaignIndex(){ return this.campaignIndex; }
+		public String toString(){ return "("+this.reward+","+this.demand+","+this.campaignIndex+")"; }
+	}
 }

@@ -164,6 +164,7 @@ public class MarketPrices {
 		int counter = 0;
     	for(int j=0;j<this.marketAllocation.getMarket().getNumberCampaigns();j++){
     		if(!this.isCampaignEnvyFree(new PriorityQueue<UserPrices>(queue), j)){//Pass a copy of the queue each time...
+    			System.out.println("Campaign " + j + " is envy");
     			counter++;
     		}
     	}

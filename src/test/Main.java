@@ -1,8 +1,17 @@
 package test;
 
+import ilog.concert.IloException;
+import ilog.cplex.IloCplex;
+import algorithms.EfficientAllocationLP;
+import algorithms.EnvyFreePricesSolutionLP;
+import algorithms.EnvyFreePricesVectorLP;
+import algorithms.GeneralApproximation;
+import algorithms.Waterfall;
+import algorithms.WaterfallMAXWEQ;
 import experiments.UnitDemandExperiments;
 import structures.Market;
 import structures.MarketFactory;
+import structures.MarketPrices;
 import unitdemand.EVPApproximation;
 import unitdemand.HungarianAlgorithm;
 import unitdemand.MWBMatchingAlgorithm;
@@ -18,44 +27,23 @@ import util.Printer;
  */
 public class Main {
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IloException{
+		Market randomMarket = MarketFactory.randomMarket(2, 2, 0.75);
+		System.out.println(randomMarket);
 		
-		double[][] costMatrix = new double[3][2];
-		costMatrix[0][0] = Double.NEGATIVE_INFINITY;
-		costMatrix[0][1] = Double.NEGATIVE_INFINITY;
-		costMatrix[1][0] = Double.NEGATIVE_INFINITY;
-		costMatrix[1][1] = Double.NEGATIVE_INFINITY;
-		costMatrix[2][0] = 69.73967854281368;
-		costMatrix[2][1] = 75.25771032239172;
+		System.out.println(">>>>>>>>>>>>>>>>>Watefall MaxWEQ");
+		WaterfallMAXWEQ wfMaxWEQ = new WaterfallMAXWEQ(randomMarket);
+		MarketPrices p = wfMaxWEQ.Solve();
+		System.out.println(p.sellerRevenuePriceVector());
+		Printer.printVector(p.getPriceVector());
+		Printer.printMatrix(p.getMarketAllocation().getAllocation());
+		System.out.println("numberOfEnvyCampaigns = " + p.numberOfEnvyCampaigns());
 		
-		MWBMatchingAlgorithm MWM = new MWBMatchingAlgorithm(3,2);
-		MWM.setAllWeights(costMatrix);
-		int[] res = MWM.getMatching();
-		Printer.printVector(res);
-		
-		/*Market market = MarketFactory.randomMarket(3, 3, 0.75);
-		double [][] costMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(market);
-        Printer.printMatrix(costMatrix);
-        Matching M = UnitDemandExperiments.getMaximumMatchingFromValuationMatrix(costMatrix);
-        int[][] maximumMatchingAllocation = M.getMatching();
-        //double[] rewards = M.getPrices();
-        //Printer.printMatrix(maximumMatchingAllocation);
-		System.out.println("****maxweqsolution*****");
-        MaxWEQ maxWEQ = new MaxWEQ(costMatrix);
-        Matching maxweqMatching = maxWEQ.Solve(); 
-		Printer.printVector(maxweqMatching.getPrices());
-		Printer.printMatrix(maxweqMatching.getMatching());
-		System.out.println(maxweqMatching.getSellerRevenue());
-		
-		EVPApproximation evpApp = new EVPApproximation(costMatrix);
-		System.out.println("****evpsolution*****");
-		Matching evpMatching = evpApp.Solve();
-		Printer.printVector(evpMatching.getPrices());
-		Printer.printMatrix(evpMatching.getMatching());
-		System.out.println(evpMatching.getSellerRevenue());
-		//System.out.println("------maxWEQReserve------");
-		//MaxWEQReservePrices maxWEQReserve = new MaxWEQReservePrices(costMatrix,new Double[]{1.0,1.0,1.0});
-		//maxWEQReserve.Solve();*/
-		
+		System.exit(-1);
+		System.out.println("<<<<<<<<<<<<<<<<<<<General Approximation");
+		IloCplex iloObject0 = new IloCplex();
+		int[][] efficientAllocation = new EfficientAllocationLP(randomMarket).Solve(iloObject0).get(0);
+		GeneralApproximation generalApp = new GeneralApproximation(randomMarket,efficientAllocation);
+		System.out.println(generalApp.Solve().sellerRevenuePriceVector());		
 	}
 }

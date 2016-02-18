@@ -99,7 +99,18 @@ public class EnvyFreePricesVectorLP {
 		for(int i=0;i<this.allocatedMarket.getMarket().getNumberUsers();i++){
 			this.linearConstrains.add(this.cplex.addLe(this.prices[i],Math.ceil(highestReward)));
 		}
-	}	
+	}
+	/*
+	 * Walrasian condition:
+	 */
+	protected void generateWalrasianConditions() throws IloException{
+		for(int i=0;i<this.allocatedMarket.getMarket().getNumberUsers();i++){
+			if(this.allocatedMarket.allocationFromUser(i) == 0){
+				this.linearConstrains.add(this.cplex.addLe(this.prices[i],0.0));
+				this.linearConstrains.add(this.cplex.addGe(this.prices[i],0.0));
+			}
+		}
+	}
 	/*
 	 * This method creates and solves the LP.
 	 */
@@ -132,6 +143,7 @@ public class EnvyFreePricesVectorLP {
 		    this.generateCompactConditions();
 		    this.generateIndividualRationalityConditions();
 		    this.generateBoundConditions();
+		    this.generateWalrasianConditions();
 		    /*
 		     * Solve the LP.
 		     */

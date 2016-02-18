@@ -34,8 +34,10 @@ public class WaterfallMAXWEQ {
 	 */
 	public MarketPrices Solve(){
 		/* Initialize price vector */
+		System.out.println("Initial wf value = " + this.waterfallValue);
 		double[] prices = new double[this.market.getNumberUsers()];
 		for(int i=0;i<this.market.getNumberUsers();i++){
+			System.out.println("wfvalue without item "+i+": "+ new Waterfall(MarketFactory.copyMarketWithoutUser(market, i)).Solve().getMarketAllocation().value());
 			prices[i] = (this.waterfallValue - new Waterfall(MarketFactory.copyMarketWithoutUser(market, i)).Solve().getMarketAllocation().value()) / this.market.getUser(i).getSupply(); 
 		}
 		/*Printer.printVector(prices);
