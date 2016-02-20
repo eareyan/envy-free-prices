@@ -39,4 +39,8 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 	public double getOptimalValue(){
 		return this.optimalValue;
 	}
+	
+	public String toString(){
+		return ""+this.optimalValue;
+	}
 }

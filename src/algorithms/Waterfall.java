@@ -17,8 +17,15 @@ public class Waterfall {
 	
 	protected Market market;
 	
+	protected boolean min = true;
+	
 	public Waterfall(Market market){
 		this.market = market;
+	}
+	
+	public Waterfall(Market market, boolean min){
+		this.market = market;
+		this.min = min;
 	}
 	
 	public WaterfallPrices Solve(){
@@ -100,7 +107,12 @@ public class Waterfall {
 			Collections.sort(SecondHighestBids, new BidComparator());
 			//System.out.println("HighestBids \t  = " + HighestBids);		
 			//System.out.println("SecondHighestBids = " + SecondHighestBids);
-			int cheapestUser = SecondHighestBids.get(SecondHighestBids.size()-1).getUserIndex();
+			int cheapestUser;
+			if(this.min){
+				cheapestUser= SecondHighestBids.get(SecondHighestBids.size()-1).getUserIndex();
+			}else{
+				cheapestUser = SecondHighestBids.get(0).getUserIndex();
+			}
 			double secondHighestCheapestMarket = SecondHighestBids.get(SecondHighestBids.size()-1).getValue();
 			Bid winningBid = this.getBid(cheapestUser, HighestBids);
 			double valueWinningBid = winningBid.getValue();

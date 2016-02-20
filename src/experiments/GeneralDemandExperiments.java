@@ -101,6 +101,7 @@ public class GeneralDemandExperiments extends Experiments{
 				startTime = System.nanoTime();
 				WaterfallMAXWEQ wfMaxWEQ = new WaterfallMAXWEQ(randomMarket);
 				wfMaxWEQRevenue.addValue(wfMaxWEQ.Solve().sellerRevenuePriceVector());
+				wfMaxWEQ.Solve().numberOfEnvyCampaigns()
 				endTime = System.nanoTime();
 				wfMaxWEQTime.addValue(endTime - startTime);
 				

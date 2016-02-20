@@ -1,6 +1,7 @@
 package algorithms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -11,72 +12,54 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketFactory;
 import structures.MarketPrices;
+import unitdemand.Matching;
 import util.Printer;
 
 public class GeneralApproximation {
 
 	protected Market market;
-	protected int[][] efficientAllocation;
+	protected int[][] wfAllocation;
+	protected MarketAllocation marketAllocation;
 	
-	public GeneralApproximation(Market market, int[][] efficientAllocation){
+	public GeneralApproximation(Market market){
 		this.market = market;
-		this.efficientAllocation = efficientAllocation;
+		this.marketAllocation = new Waterfall(this.market).Solve().getMarketAllocation(); 
+		this.wfAllocation = this.marketAllocation.getAllocation();
 	}
 	
 	public MarketPrices Solve() throws IloException{
 		/* Get a list with the users that were allocated */
-		ArrayList<Integer> usersAllocated = GeneralApproximation.getAllocatedUsers(this.efficientAllocation);
-		ArrayList<MarketPrices> solutions = new ArrayList<MarketPrices>();
-		ArrayList<ReserveBundle> reserveBundles = new ArrayList<ReserveBundle>();
+		ArrayList<Integer> usersAllocated = GeneralApproximation.getAllocatedUsers(this.wfAllocation);
 		/* For each Allocated User, compute WaterfallMAXWEQ with reserve prices*/
-		double reserveReward = 0.0;
+		Printer.printMatrix(this.wfAllocation);
+		double reservePrice = 0.0;
+		double[] reservePricesVector = new double[this.market.getNumberUsers()];
+		ArrayList<EnvyFreePricesSolutionLP> setOfSolutions = new ArrayList<EnvyFreePricesSolutionLP>();
+		IloCplex iloObject = new IloCplex();
+		setOfSolutions.add(new EnvyFreePricesVectorLP(this.marketAllocation).Solve(iloObject));
 		for(int i=0;i<usersAllocated.size();i++){
-			reserveReward = GeneralApproximation.getReservePrice(this.market, usersAllocated.get(i),this.efficientAllocation);
-			System.out.println("reserveReward for user:" + usersAllocated.get(i) + " = " + reserveReward);
 			for(int j=0;j<this.market.getNumberCampaigns();j++){
-				if(this.efficientAllocation[usersAllocated.get(i)][j] > 0){
-					System.out.println("\tcampaign "+j+", " + this.efficientAllocation[usersAllocated.get(i)][j]);
-					reserveBundles.add(new ReserveBundle(reserveReward * this.efficientAllocation[usersAllocated.get(i)][j],this.efficientAllocation[usersAllocated.get(i)][j],j));
+				if(this.wfAllocation[usersAllocated.get(i)][j] > 0){
+					IloCplex iloObject0 = new IloCplex();
+					reservePrice = this.market.getCampaign(j).getReward() / this.wfAllocation[usersAllocated.get(i)][j];
+					Arrays.fill(reservePricesVector,reservePrice);
+					System.out.println("\tcampaign "+j+", " + (reservePrice));
+					Printer.printVector(reservePricesVector);
+					EnvyFreePricesSolutionLP VectorSolEfficientAllocation = new EnvyFreePricesVectorLP(this.marketAllocation,reservePricesVector).Solve(iloObject0);
+					if(VectorSolEfficientAllocation.getPriceVector() != null){
+						System.out.println("ONe solution from LP");
+						Printer.printVector(VectorSolEfficientAllocation.getPriceVector());
+						Printer.printMatrix(this.marketAllocation.getAllocation());
+						System.out.println();
+						setOfSolutions.add(VectorSolEfficientAllocation);
+					}
 				}
 			}
 		}
-		Printer.printMatrix(this.efficientAllocation);
-		System.out.println(reserveBundles);
-		for(ReserveBundle b: reserveBundles){
-			System.out.println("BUNDLE WITH REWARD : " + b.getReward());
-			System.out.println(MarketFactory.augmentMarketWithReserve(this.market,b.getReward(),b.getDemand()));
-			GeneralApproximation.deduceMatching(new WaterfallMAXWEQ(MarketFactory.augmentMarketWithReserve(this.market,b.getReward(),b.getDemand())).Solve());
-			//solutions.add();
-		}
-		for(MarketPrices s: solutions){
-			System.out.println(s.sellerRevenuePriceVector());
-		}
-		System.out.println(solutions);
-		Collections.sort(solutions,new SolutionComparatorBySellerRevenue());
-		return solutions.get(0);
+		System.out.println(setOfSolutions);
+		return null;
 	}
-	
-	public static void deduceMatching(MarketPrices output){
-		Printer.printMatrix(output.getMarketAllocation().getAllocation());
-		Printer.printVector(output.getPriceVector());
-		System.out.println(output.sellerRevenuePriceVector());
-	}
-	
-	/*
-	 * Given a market, a user index and an allocation,
-	 * this method computes min_j(R_j / I_j})
-	 */
-	public static double getReservePrice(Market M,int userIndex,int[][] allocation){
-		double min = Double.POSITIVE_INFINITY;
-		for(int j=0;j<M.getNumberCampaigns();j++){
-			if(allocation[userIndex][j]>0){
-				if(M.getCampaign(j).getReward() / M.getCampaign(j).getDemand() < min){
-					min = M.getCampaign(j).getReward() / M.getCampaign(j).getDemand();
-				}
-			}
-		}
-		return min;
-	}
+
 	/*
 	 * Given an allocation matrix, return a list of indices corresponding 
 	 * to user that provided at least one impression.
@@ -92,30 +75,5 @@ public class GeneralApproximation {
 			}
 		}
 		return usersAllocated;		
-	}
-	/*
-	 * Comparator used to order solutions from WaterfallMAXWEQ.
-	 */
-	public class SolutionComparatorBySellerRevenue implements Comparator<MarketPrices>{
-		@Override
-		public int compare(MarketPrices m1, MarketPrices m2) {
-			if(m1.sellerRevenuePriceVector() < m2.sellerRevenuePriceVector()) return 1;
-			if(m1.sellerRevenuePriceVector() > m2.sellerRevenuePriceVector()) return -1;
-			return 0;
-		}
-	}
-	class ReserveBundle{
-		private final double reward;
-		private final int demand;
-		private final int campaignIndex;
-		public ReserveBundle(double reward, int demand, int campaignIndex){
-			this.reward = reward;
-			this.demand = demand;
-			this.campaignIndex = campaignIndex;
-		}
-		public double getReward(){ return this.reward; }
-		public int getDemand(){ return this.demand; }
-		public int getCampaignIndex(){ return this.campaignIndex; }
-		public String toString(){ return "("+this.reward+","+this.demand+","+this.campaignIndex+")"; }
 	}
 }

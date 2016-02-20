@@ -21,7 +21,7 @@ public class EnvyFreePricesVectorLP {
 	/*
 	 * Boolean to control whether or not to output.
 	 */
-	protected boolean verbose = false;
+	protected boolean verbose = true;
 	/*
 	 * Market Allocation Object. Contains the market and the allocation.
 	 */
@@ -36,10 +36,19 @@ public class EnvyFreePricesVectorLP {
 	protected IloNumVar[] prices;
 	protected IloCplex cplex;
 	/*
+	 * Reserve Prices
+	 */
+	protected double[] reservePrices;
+	/*
 	 * Constructor receives an allocated market M.
 	 */
 	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket){
 		this.allocatedMarket = allocatedMarket;
+		this.reservePrices = null;
+	}
+	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket, double[] reservePrices){
+		this.allocatedMarket = allocatedMarket;
+		this.reservePrices = reservePrices;
 	}
 	/*
 	 * This method generate the compact conditions.
@@ -92,7 +101,7 @@ public class EnvyFreePricesVectorLP {
 	}
 	/*
 	 * This method implements conditions so that the vector of prices is not unbounded.
-	 * We will simply constrain the price of a market to be that of the highest reward of the market.
+	 * We will simply constrain the price of a user to be that of the highest reward of the market.
 	 */
 	protected void  generateBoundConditions() throws IloException{
 		double highestReward = this.allocatedMarket.getMarket().getHighestReward();
@@ -109,6 +118,23 @@ public class EnvyFreePricesVectorLP {
 				this.linearConstrains.add(this.cplex.addLe(this.prices[i],0.0));
 				this.linearConstrains.add(this.cplex.addGe(this.prices[i],0.0));
 			}
+		}
+	}
+	/*
+	 * Set reserve prices
+	 */
+	protected void setReservePrices(){
+		if(reservePrices.length != this.allocatedMarket.getMarket().getNumberUsers()){
+			System.out.println("Reserve Prices vector must be of same length as number of users");
+			System.exit(-1);
+		}
+		try {
+			for(int i=0;i<this.reservePrices.length;i++){
+				this.linearConstrains.add(this.cplex.addGe(this.prices[i],this.reservePrices[i]));
+			}
+		} catch (IloException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	/*
@@ -143,7 +169,10 @@ public class EnvyFreePricesVectorLP {
 		    this.generateCompactConditions();
 		    this.generateIndividualRationalityConditions();
 		    this.generateBoundConditions();
-		    this.generateWalrasianConditions();
+		    //this.generateWalrasianConditions();
+		    if(this.reservePrices != null){
+		    	this.setReservePrices();
+		    }
 		    /*
 		     * Solve the LP.
 		     */

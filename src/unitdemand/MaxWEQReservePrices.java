@@ -65,8 +65,9 @@ public class MaxWEQReservePrices {
 				matching[i][j] = matchingWithDummy[i][j];
 			}
 		}
-		//System.out.println("Matching with no dummies");
-		//Printer.printMatrix(matching);
+		System.out.println("++++++Start Deducing Matching+++++++++");
+		System.out.println("Matching with no dummies");
+		Printer.printMatrix(matching);
 		/* while there is an unsold item in the demand set of a real consumer that is not allocated an item, allocate it */
 		for(int i=0;i<this.valuationMatrix.length;i++){
 			boolean itemAllocated = false;
@@ -76,7 +77,7 @@ public class MaxWEQReservePrices {
 				}
 			}
 			if(!itemAllocated){ //item i is not allocated
-				//System.out.println("item #"+i+", is NOT allocated.. let us try to allocated it");
+				System.out.println("item #"+i+", is NOT allocated.. let us try to allocated it");
 				for(int j=0;j<this.valuationMatrix[0].length;j++){
 					boolean campaignAllocated = false;
 					for(int i1=0;i1<this.valuationMatrix.length;i1++){
@@ -85,17 +86,23 @@ public class MaxWEQReservePrices {
 						}
 					}
 					if(!campaignAllocated){//campaign j is not allocated
-						//System.out.println("Campaign #"+j+", is not allocated anything");
-						if(this.valuationMatrix[i][j] - prices[i] >= 0){//It makes sense to allocate this item.
-							//System.out.println("IT DOES MAKE SENSE!: " + "="+(this.valuationMatrix[i][j]) + " - " + prices[i]);
+						System.out.println("Campaign #"+j+", is not allocated anything");
+						System.out.println("*** " + this.valuationMatrix[i][j]);
+						System.out.println("*** " + prices[i]);
+						/* This if statement seems to have numerical issues...
+						 * if(this.valuationMatrix[i][j] - prices[i] >= 0){//It makes sense to allocate this item.
+						 */
+						if(Math.abs(this.valuationMatrix[i][j] - prices[i]) < 0.0001){
+							System.out.println("IT DOES MAKE SENSE!: " + "="+(this.valuationMatrix[i][j]) + " - " + prices[i]);
 							matching[i][j] = 1;
 						}
 					}
 				}
 			}
 		}
-		//System.out.println("Matching with possible more allocated items");
-		//Printer.printMatrix(matching);
+		System.out.println("Matching with possible more allocated items");
+		Printer.printMatrix(matching);
+		System.out.println("++++++End Deducing Matching+++++++++");
 		return new Matching(prices,matching);
 	}
 }
