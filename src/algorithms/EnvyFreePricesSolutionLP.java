@@ -41,6 +41,6 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 	}
 	
 	public String toString(){
-		return ""+this.optimalValue;
+		return ""+this.optimalValue + "-" + this.Status;			
 	}
 }

@@ -21,7 +21,7 @@ public class EnvyFreePricesVectorLP {
 	/*
 	 * Boolean to control whether or not to output.
 	 */
-	protected boolean verbose = true;
+	protected boolean verbose = false;
 	/*
 	 * Market Allocation Object. Contains the market and the allocation.
 	 */
@@ -42,13 +42,9 @@ public class EnvyFreePricesVectorLP {
 	/*
 	 * Constructor receives an allocated market M.
 	 */
-	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket){
+	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket,IloCplex iloObject){
 		this.allocatedMarket = allocatedMarket;
-		this.reservePrices = null;
-	}
-	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket, double[] reservePrices){
-		this.allocatedMarket = allocatedMarket;
-		this.reservePrices = reservePrices;
+		this.cplex = iloObject;
 	}
 	/*
 	 * This method generate the compact conditions.
@@ -121,7 +117,7 @@ public class EnvyFreePricesVectorLP {
 		}
 	}
 	/*
-	 * Set reserve prices
+	 * Set reserve prices for all user classes
 	 */
 	protected void setReservePrices(){
 		if(reservePrices.length != this.allocatedMarket.getMarket().getNumberUsers()){
@@ -138,16 +134,25 @@ public class EnvyFreePricesVectorLP {
 		}
 	}
 	/*
-	 * This method creates and solves the LP.
+	 * Set Reserve price for user class i
 	 */
-	public EnvyFreePricesSolutionLP Solve(IloCplex iloObject){
-		double[] LP_Prices  = {};
-		EnvyFreePricesSolutionLP Solution = new EnvyFreePricesSolutionLP();
+	public void setReservePriceForUser(int i, double reservePrice){
+		try {
+			if(this.verbose) System.out.println("Setting Reserve Price of "+reservePrice+" for user class "+i);
+			this.linearConstrains.add(this.cplex.addGe(this.prices[i],reservePrice));
+		} catch (IloException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	/*
+	 * This method creates the LP
+	 */
+	public void createLP(){
 		try{
 			/*
 			 *  Create Cplex variables.
 			 */
-			this.cplex = iloObject;			
 			if(!this.verbose) this.cplex.setOut(null);
 			this.linearConstrains = new ArrayList<IloRange>();
 		 	cplex.setParam(IloCplex.BooleanParam.PreInd, false);
@@ -170,21 +175,31 @@ public class EnvyFreePricesVectorLP {
 		    this.generateIndividualRationalityConditions();
 		    this.generateBoundConditions();
 		    //this.generateWalrasianConditions();
-		    if(this.reservePrices != null){
-		    	this.setReservePrices();
-		    }
+		} catch (IloException e) {
+			System.out.println("Exception: ==>");
+			e.printStackTrace();
+		}	    
+	}
+	
+	/*
+	 * This method solves the LP.
+	 */
+	public EnvyFreePricesSolutionLP Solve(){
+		double[] LP_Prices  = {};
+		EnvyFreePricesSolutionLP Solution = new EnvyFreePricesSolutionLP();
+		try{
 		    /*
 		     * Solve the LP.
 		     */
-		    if ( cplex.solve() ) {
-		    	LP_Prices = cplex.getValues(this.prices);
-		    	Solution  = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, cplex.getStatus().toString(),this.cplex.getObjValue());
+		    if ( this.cplex.solve() ) {
+		    	LP_Prices = this.cplex.getValues(this.prices);
+		    	Solution  = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, this.cplex.getStatus().toString(),this.cplex.getObjValue());
 		    }else{
-		    	Solution = new EnvyFreePricesSolutionLP(cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolutionLP(this.cplex.getStatus().toString());
 		    }
 	    	if(this.verbose){
-	    		System.out.println("Solution status = " + cplex.getStatus());
-	    		System.out.println("Solution value  = " + cplex.getObjValue());
+	    		System.out.println("Solution status = " + this.cplex.getStatus());
+	    		System.out.println("Solution value  = " + this.cplex.getObjValue());
 	    	}
 		} catch (IloException e) {
 			System.out.println("Exception: ==>");

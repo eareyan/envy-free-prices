@@ -18,62 +18,82 @@ import util.Printer;
 public class GeneralApproximation {
 
 	protected Market market;
-	protected int[][] wfAllocation;
+	protected int[][] allocationMatrix;
 	protected MarketAllocation marketAllocation;
 	
-	public GeneralApproximation(Market market){
-		this.market = market;
-		this.marketAllocation = new Waterfall(this.market).Solve().getMarketAllocation(); 
-		this.wfAllocation = this.marketAllocation.getAllocation();
+	public GeneralApproximation(Market market,boolean efficient){
+		try {
+			this.market = market;
+			if(!efficient){
+				this.marketAllocation = new Waterfall(this.market).Solve().getMarketAllocation();
+			}else{
+				int[][] efficientAllocation = new EfficientAllocationLP(market).Solve(new IloCplex()).get(0);
+				this.marketAllocation = new MarketAllocation(market,efficientAllocation);
+			}
+			this.allocationMatrix = this.marketAllocation.getAllocation();
+		} catch (IloException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public GeneralApproximation(MarketAllocation marketAllocation){
+		this.market = marketAllocation.getMarket();
+		this.marketAllocation = marketAllocation;
+		this.allocationMatrix = this.marketAllocation.getAllocation();
 	}
 	
 	public MarketPrices Solve() throws IloException{
 		/* Get a list with the users that were allocated */
-		ArrayList<Integer> usersAllocated = GeneralApproximation.getAllocatedUsers(this.wfAllocation);
+		ArrayList<Integer> usersAllocated = this.getAllocatedUsers();
 		/* For each Allocated User, compute WaterfallMAXWEQ with reserve prices*/
-		Printer.printMatrix(this.wfAllocation);
-		double reservePrice = 0.0;
-		double[] reservePricesVector = new double[this.market.getNumberUsers()];
+		//Printer.printMatrix(this.allocationMatrix);
 		ArrayList<EnvyFreePricesSolutionLP> setOfSolutions = new ArrayList<EnvyFreePricesSolutionLP>();
-		IloCplex iloObject = new IloCplex();
-		setOfSolutions.add(new EnvyFreePricesVectorLP(this.marketAllocation).Solve(iloObject));
-		for(int i=0;i<usersAllocated.size();i++){
-			for(int j=0;j<this.market.getNumberCampaigns();j++){
-				if(this.wfAllocation[usersAllocated.get(i)][j] > 0){
-					IloCplex iloObject0 = new IloCplex();
-					reservePrice = this.market.getCampaign(j).getReward() / this.wfAllocation[usersAllocated.get(i)][j];
-					Arrays.fill(reservePricesVector,reservePrice);
-					System.out.println("\tcampaign "+j+", " + (reservePrice));
-					Printer.printVector(reservePricesVector);
-					EnvyFreePricesSolutionLP VectorSolEfficientAllocation = new EnvyFreePricesVectorLP(this.marketAllocation,reservePricesVector).Solve(iloObject0);
-					if(VectorSolEfficientAllocation.getPriceVector() != null){
-						System.out.println("ONe solution from LP");
-						Printer.printVector(VectorSolEfficientAllocation.getPriceVector());
-						Printer.printMatrix(this.marketAllocation.getAllocation());
-						System.out.println();
-						setOfSolutions.add(VectorSolEfficientAllocation);
-					}
-				}
-			}
+		EnvyFreePricesVectorLP EFPrices;
+		for(int i=0;i<usersAllocated.size();i++){		
+			EFPrices = new EnvyFreePricesVectorLP(this.marketAllocation,new IloCplex());
+			EFPrices.createLP();
+			EFPrices.setReservePriceForUser(usersAllocated.get(i), this.getReservePrice(usersAllocated.get(i)));
+			setOfSolutions.add(EFPrices.Solve());
 		}
-		System.out.println(setOfSolutions);
-		return null;
+		Collections.sort(setOfSolutions,new EnvyFreePricesSolutionLPComparatorBySellerRevenue());
+		//System.out.println(setOfSolutions);
+		return setOfSolutions.get(0);
 	}
 
 	/*
 	 * Given an allocation matrix, return a list of indices corresponding 
 	 * to user that provided at least one impression.
 	 */
-	public static ArrayList<Integer> getAllocatedUsers(int[][] allocation){
+	protected ArrayList<Integer> getAllocatedUsers(){
 		ArrayList<Integer> usersAllocated = new ArrayList<Integer>();
-		for(int i=0;i<allocation.length;i++){
-			for(int j=0;j<allocation[0].length;j++){
-				if(allocation[i][j]>0){
+		for(int i=0;i<this.allocationMatrix.length;i++){
+			for(int j=0;j<this.allocationMatrix[0].length;j++){
+				if(this.allocationMatrix[i][j]>0){
 					usersAllocated.add(i);
 					break;
 				}
 			}
 		}
 		return usersAllocated;		
+	}
+	
+	/*
+	 * Given a user index, return  min_{j s.t. x_ij > 0} v_ij, where v_ij = R_j / I_j
+	 */
+	protected double getReservePrice(int i){
+		double min = Double.POSITIVE_INFINITY;
+		for(int j=0;j<this.market.getNumberCampaigns();j++){
+			if(this.allocationMatrix[i][j]>0){
+				if(this.market.getCampaign(j).getReward() / this.market.getCampaign(j).getDemand() < min){
+					min = this.market.getCampaign(j).getReward() / this.market.getCampaign(j).getDemand();
+				}
+				/* This produces LOTS of infeasibles LP
+				 * if(this.market.getCampaign(j).getReward()  < min){
+					min = this.market.getCampaign(j).getReward();
+				}*/
+			}
+		}
+		return min;
 	}
 }
