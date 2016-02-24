@@ -1,8 +1,10 @@
-package algorithms;
+package algorithms.lp;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+import algorithms.EnvyFreePricesSolutionLP;
+import algorithms.EnvyFreePricesSolutionLPComparatorBySellerRevenue;
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import structures.Market;

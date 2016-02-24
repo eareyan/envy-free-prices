@@ -113,7 +113,7 @@ public class UnitDemandExperiments extends Experiments{
 				try {
 					iloObject = new IloCplex();
 					startTime = System.nanoTime();
-			        EnvyFreePricesSolutionLP VectorSol = new EnvyFreePricesVectorLP(marketMaxMatchingAllocation).Solve(iloObject);
+			        EnvyFreePricesSolutionLP VectorSol = new EnvyFreePricesVectorLP(marketMaxMatchingAllocation,iloObject).Solve();
 					lpRevenue.addValue(VectorSol.sellerRevenuePriceVector());
 					endTime = System.nanoTime();
 					lpTime.addValue(endTime - startTime);

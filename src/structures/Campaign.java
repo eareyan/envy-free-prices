@@ -15,11 +15,20 @@ public class Campaign {
 	 */
 	protected double reward;
 	/*
+	 * Backpointer to another campaign, default value -1 means no backpointer
+	 */
+	protected int backpointer = -1;
+	/*
 	 * Constructor.
 	 */
 	public Campaign(int demand, double reward){
 		this.demand = demand;
 		this.reward = reward;
+	}
+	public Campaign(int demand, double reward,int backpointer){
+		this.demand = demand;
+		this.reward = reward;
+		this.backpointer = backpointer;
 	}
 	/*
 	 * Getters
@@ -29,5 +38,8 @@ public class Campaign {
 	}
 	public double getReward(){
 		return this.reward;
+	}
+	public int getBackpointer(){
+		return this.backpointer;
 	}
 }

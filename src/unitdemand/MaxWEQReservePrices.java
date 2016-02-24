@@ -8,8 +8,8 @@ public class MaxWEQReservePrices {
 	 * valuation matrix. Provides a valuation v_ij of user i by campaign j.
 	 * Reserve Prices.
 	 */	
-	double[][] valuationMatrix;
-	double[] reservePrices;
+	protected double[][] valuationMatrix;
+	protected double[] reservePrices;
 	
 	public MaxWEQReservePrices(double[][] valuationMatrix, double[] reservePrices){
 		this.valuationMatrix = valuationMatrix;

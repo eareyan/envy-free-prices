@@ -1,10 +1,15 @@
-package algorithms;
+package algorithms.lp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import algorithms.EfficientAllocationLP;
+import algorithms.EnvyFreePricesSolutionLP;
+import algorithms.EnvyFreePricesSolutionLPComparatorBySellerRevenue;
+import algorithms.EnvyFreePricesVectorLP;
+import algorithms.Waterfall;
 import algorithms.Waterfall.Bid;
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;

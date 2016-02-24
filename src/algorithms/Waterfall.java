@@ -189,7 +189,7 @@ public class Waterfall {
 			}
 		}
 	}	
-	class Bid{
+	public class Bid{
 		private final double value;
 		private final int userIndex;
 		private final int campaignIndex;

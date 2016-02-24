@@ -1,5 +1,6 @@
-package unitdemand;
+package unitdemand.dummies;
 
+import unitdemand.MaxWEQReservePrices;
 import util.Printer;
 
 public class Idea3 extends MaxWEQReservePrices{

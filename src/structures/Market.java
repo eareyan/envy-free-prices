@@ -1,5 +1,7 @@
 package structures;
 
+import java.util.ArrayList;
+
 /*
  * A market is a bipartite graph with Users connected to Campaigns.
  * 
@@ -62,6 +64,27 @@ public class Market {
     	return this.connections;
     }
     /*
+     * add a single campaign
+     */
+    public void addCampaign(Campaign c, ArrayList<Integer> users){
+    	/* Add the new campaign to the array of existing campaigns */
+    	Campaign[] newCampaigns = new Campaign[this.getNumberCampaigns() + 1];
+    	System.arraycopy(this.campaigns, 0, newCampaigns, 0, this.getNumberCampaigns());
+    	newCampaigns[this.getNumberCampaigns()] = c;
+    	this.campaigns = newCampaigns;
+    	/* add this new campaign's connections */
+		boolean[][] newConnections = new boolean[this.getNumberUsers()][this.getNumberCampaigns()];
+		for(int i=0;i<this.getNumberUsers();i++){
+			for(int j=0;j<this.getNumberCampaigns()-1;j++){
+				newConnections[i][j] = this.connections[i][j];
+			}
+		}
+		for(Integer userid: users){
+			newConnections[userid][this.getNumberCampaigns()-1] = true;
+		}
+		this.connections = newConnections;
+    }
+    /*
      * Get highest reward among all campaigns. Implements a singleton
      */
     public double getHighestReward(){
@@ -99,6 +122,18 @@ public class Market {
     	return false;
     }
     /*
+     * Get a list of users connected to campaign j
+     */
+    public ArrayList<Integer> getListConnectedUsers(int j){
+    	ArrayList<Integer> listOfUsers = new ArrayList<Integer>();
+    	for(int i=0;i<this.getNumberUsers();i++){
+    		if(this.isConnected(i, j)){
+    			listOfUsers.add(i);
+    		}
+    	}
+    	return listOfUsers;
+    }
+    /*
      * Is user i connected to campaign j?
      */
     public boolean isConnected(int i, int j){
@@ -118,6 +153,9 @@ public class Market {
 		String ret = "";
 		for(int j=0;j<this.getNumberCampaigns();j++){
 			ret += "\nR("+j+") = "+ this.campaigns[j].reward + ";\t I("+j+") = " + this.campaigns[j].demand;
+			if(this.campaigns[j].backpointer != -1){
+				ret += ";\tBackpoints to: " + this.campaigns[j].backpointer;
+			}
 		}
 		return ret;
 	}    

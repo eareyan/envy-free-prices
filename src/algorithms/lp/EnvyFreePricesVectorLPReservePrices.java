@@ -1,4 +1,4 @@
-package algorithms;
+package algorithms.lp;
 
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
@@ -8,6 +8,7 @@ import ilog.cplex.IloCplex;
 
 import java.util.ArrayList;
 
+import algorithms.EnvyFreePricesVectorLP;
 import structures.MarketAllocation;
 import util.Printer;
 

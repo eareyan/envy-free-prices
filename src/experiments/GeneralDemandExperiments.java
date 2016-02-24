@@ -10,10 +10,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
-import algorithms.GeneralApproximation;
 import algorithms.Waterfall;
 import algorithms.WaterfallMAXWEQ;
 import algorithms.WaterfallPrices;
+import algorithms.lp.GeneralApproximation;
 import log.SqlDB;
 import structures.Market;
 import structures.MarketAllocation;
@@ -68,7 +68,7 @@ public class GeneralDemandExperiments extends Experiments{
 				statEffAllocValue.addValue(effAllocValue);
 	
 				/* Run LP Program*/
-				EnvyFreePricesSolutionLP VectorSolEfficientAllocation = new EnvyFreePricesVectorLP(randomMarketEfficientAllocation).Solve(iloObject1);
+				EnvyFreePricesSolutionLP VectorSolEfficientAllocation = new EnvyFreePricesVectorLP(randomMarketEfficientAllocation,iloObject1).Solve();
 				endTime = System.nanoTime();
 				effAllocationTime.addValue(endTime - startTime);
 				effAllocationRevenue.addValue(VectorSolEfficientAllocation.sellerRevenuePriceVector());
@@ -80,7 +80,7 @@ public class GeneralDemandExperiments extends Experiments{
 				/* Run Waterfall*/
 				startTime = System.nanoTime();
 				WaterfallPrices waterFallAllocationPrices = new Waterfall(randomMarket).Solve();
-				EnvyFreePricesSolutionLP VectorSolWaterfallAllocation = new EnvyFreePricesVectorLP(waterFallAllocationPrices.getMarketAllocation()).Solve(iloObject2);
+				EnvyFreePricesSolutionLP VectorSolWaterfallAllocation = new EnvyFreePricesVectorLP(waterFallAllocationPrices.getMarketAllocation(),iloObject2).Solve();
 				endTime = System.nanoTime();
 				double wfAllocValue = VectorSolWaterfallAllocation.getMarketAllocation().value();
 				wfAllocationTime.addValue(endTime - startTime);
@@ -101,16 +101,16 @@ public class GeneralDemandExperiments extends Experiments{
 				startTime = System.nanoTime();
 				WaterfallMAXWEQ wfMaxWEQ = new WaterfallMAXWEQ(randomMarket);
 				wfMaxWEQRevenue.addValue(wfMaxWEQ.Solve().sellerRevenuePriceVector());
-				wfMaxWEQ.Solve().numberOfEnvyCampaigns()
+				//wfMaxWEQ.Solve().numberOfEnvyCampaigns()
 				endTime = System.nanoTime();
 				wfMaxWEQTime.addValue(endTime - startTime);
 				
-				/* Run GeneralApproximation... , i.e., WaterfallMAXWEQ with dummy campaigns*/
+				/* Run GeneralApproximation... , i.e., WaterfallMAXWEQ with dummy campaigns
 				startTime = System.nanoTime();
 				GeneralApproximation generalApp = new GeneralApproximation(randomMarket,efficientAllocation);
 				generalAppRevenue.addValue(generalApp.Solve().sellerRevenuePriceVector());
 				endTime = System.nanoTime();
-				generalAppTime.addValue(endTime - startTime);
+				generalAppTime.addValue(endTime - startTime);*/
 			}
 			dbLogger.saveGeneralCaseData(numUsers, numCampaigns, prob, ratioEfficiency.getMean(), effAllocationRevenue.getMean(), effAllocationTime.getMean() / 1000000, effAllocWEViolation.getMean(),effAllocWERelativeViolations.getMean(), effAllocEFViolation.getMean(), wfAllocationRevenue.getMean(), wfAllocationTime.getMean() / 1000000, wfAllocWEViolation.getMean(),wfAllocWERelativeViolations.getMean(), wfAllocEFViolation.getMean(), wfMaxWEQRevenue.getMean(),wfMaxWEQTime.getMean() / 1000000);
 			//System.exit(-1); /* stop execution... for debugging purposes */		

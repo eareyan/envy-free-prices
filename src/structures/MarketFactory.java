@@ -44,6 +44,16 @@ public class MarketFactory {
 	public static Market randomMarket(int numberUsers, int numberCampaigns, double probabilityConnections){
 		return MarketFactory.randomMarket(numberUsers, 1 ,10,  numberCampaigns, 1 , 10, 1.0, 100.0,  probabilityConnections);		
 	}
+	/*
+	 * Shortcut method to create a random market by just providing the number of users, campaigns, and
+	 * probability of connection.
+	 */
+	public static Market randomMarketMoreCampaignReach(int numberUsers, int numberCampaigns, double probabilityConnections){
+		return MarketFactory.randomMarket(numberUsers, 1 ,5,  numberCampaigns, 6 , 10, 1.0, 100.0,  probabilityConnections);		
+	}	
+	public static Market randomMarketMoreUserSupply(int numberUsers, int numberCampaigns, double probabilityConnections){
+		return MarketFactory.randomMarket(numberUsers, 6 ,10,  numberCampaigns, 1 , 5, 1.0, 100.0,  probabilityConnections);		
+	}	
 	
 	/*
 	 * Shortcut method to create a unit demand random market by just providing the number of users, campaigns, and
@@ -126,5 +136,25 @@ public class MarketFactory {
 			i++;
 		}
 		return new Market(M.users,campaigns,connections);
+	}
+	/*
+	 * Clones a market
+	 */
+	public static Market cloneMarket(Market market){
+		User[] users = new User[market.getNumberUsers()];
+		for(int i=0;i<market.getNumberUsers();i++){
+			users[i] = new User(market.getUser(i).getSupply());
+		}
+		Campaign[] campaigns = new Campaign[market.getNumberCampaigns()];
+		for(int j=0;j<market.getNumberCampaigns();j++){
+			campaigns[j] = new Campaign(market.getCampaign(j).getDemand(),market.getCampaign(j).getReward());
+		}
+		boolean[][] connections = new boolean[market.getNumberUsers()][market.getNumberCampaigns()];
+		for(int i=0;i<market.getNumberUsers();i++){
+			for(int j=0;j<market.getNumberCampaigns();j++){
+				connections[i][j] = market.isConnected(i, j);
+			}
+		}
+		return new Market(users,campaigns,connections);
 	}
 }

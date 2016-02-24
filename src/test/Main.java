@@ -1,29 +1,39 @@
 package test;
 
+import java.util.ArrayList;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
-import algorithms.EnvyFreePricesVectorLPReservePrices;
-import algorithms.GeneralApproximation;
-import algorithms.GeneralApproximation1;
 import algorithms.Waterfall;
 import algorithms.WaterfallMAXWEQ;
 import algorithms.WaterfallPrices;
+import algorithms.lp.EnvyFreePricesVectorLPReservePrices;
+import algorithms.lp.GeneralApproximation;
+import algorithms.lp.GeneralApproximation1;
+import algorithms.lp.GeneralApproximation2;
+import algorithms.lp.LPDummies;
+import experiments.RunParameters;
 import experiments.UnitDemandExperiments;
+import structures.Campaign;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketFactory;
 import structures.MarketPrices;
 import unitdemand.EVPApproximation;
 import unitdemand.HungarianAlgorithm;
-import unitdemand.Idea1;
-import unitdemand.LPReservePrices;
+//import unitdemand.LPReservePrices;
+import algorithms.lp.reserveprices.AbstractLPReservePrices;
+import algorithms.lp.reserveprices.SimpleReservePrices;
 import unitdemand.MWBMatchingAlgorithm;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import unitdemand.MaxWEQReservePrices;
+import unitdemand.dummies.Idea1;
 import util.Printer;
 
 /*
@@ -34,15 +44,48 @@ import util.Printer;
 public class Main {
 	
 	public static void main(String[] args) throws IloException{
-		
-		for(int i=3;i<20;i++){
-			for(int j=3;j<20;j++){
+		/*for(int i=3;i<20;i++){
+			for(int j=3;j<10;j++){
 				for(int p=0;p<4;p++){
 					double prob = 0.25 + p*(0.25);
+					DescriptiveStatistics stat = new DescriptiveStatistics();
+					for(int t=0;t<RunParameters.numTrials;t++){*/
 		
-		Market randomMarket = MarketFactory.randomMarket(i,j, prob);
+						//Market randomMarket = MarketFactory.randomMarket(i,j, prob);
+						//Market randomMarket = MarketFactory.randomMarketMoreCampaignReach(i,j, prob);
+						//Market randomMarket = MarketFactory.randomMarketMoreUserSupply(i,j, prob);
+						//EnvyFreePricesVectorLP EFP = new EnvyFreePricesVectorLP(new Waterfall(randomMarket).Solve().getMarketAllocation(),new IloCplex());
+						//EFP.createLP();
+						//EnvyFreePricesSolutionLP sol = EFP.Solve();
+						/*System.out.println("****Initial Solution:");
+						Printer.printMatrix(sol.getMarketAllocation().getAllocation());
+						Printer.printVector(sol.getPriceVector());
+						System.out.println(sol + "\n*****************");*/
+						
+						
+						//Market randomMarket = MarketFactory.randomMarket(3,3,0.5);
+						//Market randomMarket = MarketFactory.randomMarketMoreCampaignReach(3,3, 1.0);
+						Market randomMarket = MarketFactory.randomMarketMoreUserSupply(3,3, 1.0);
+						System.out.println(randomMarket);
+						SimpleReservePrices lpReservePrices = new SimpleReservePrices(randomMarket);
+						lpReservePrices.Solve();
+						//GeneralApproximation2 GA2 = new GeneralApproximation2(randomMarket,false);
+						//MarketPrices m = GA2.Solve();
+						//if(m!=null){
+						//	stat.addValue(m.sellerRevenuePriceVector() / sol.sellerRevenuePriceVector());
+						//}
+						//double res = lpDummies.Solve();
+						//if(res>-1){
+						//	stat.addValue(res);
+						//}
+					/*}
+					System.out.println(i+","+j+","+prob+","+stat.getMean());
+				}
+			}
+		}*/
+		
 		//System.out.println(randomMarket);
-		GeneralApproximation G = new GeneralApproximation(randomMarket,true);
+		/*GeneralApproximation G = new GeneralApproximation(randomMarket,true);
 		//System.out.print(G.Solve() + " ");
 		GeneralApproximation G1 = new GeneralApproximation(randomMarket,false);
 		//System.out.print(G1.Solve() + " ");
@@ -58,9 +101,9 @@ public class Main {
 		//System.out.println(EFP.Solve());
 		//System.out.println(((EnvyFreePricesSolutionLP) EFP.Solve()).getOptimalValue() / ((EnvyFreePricesSolutionLP) G1.Solve()).getOptimalValue());
 
-				}
-			}
-		}
+				//}
+			//}
+		//}
 		/*Market randomUnitDemandMarket = MarketFactory.randomUnitDemandMarket(3, 7, 1.0);
 		//System.out.println(randomUnitDemandMarket);
 		GeneralApproximation G2 = new GeneralApproximation(randomUnitDemandMarket);

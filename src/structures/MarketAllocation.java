@@ -79,7 +79,13 @@ public class MarketAllocation {
     		}
     	}
     	return totalAllocation;
-    }     
+    }
+    /*
+     * Update an allocation
+     */
+    public void updateAllocationEntry(int i,int j,int alloc){
+    	this.allocation[i][j] = alloc;
+    }
 	/*
 	 * This method sets the columns of the matrix to zero if a campaign is not 
 	 * completely satisfied. This is in line with the way in which all the conditions

@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import unitdemand.dummies.Idea1;
+import unitdemand.dummies.Idea2;
+import unitdemand.dummies.Idea3;
 import util.Printer;
 
 /*

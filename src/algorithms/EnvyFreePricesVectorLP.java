@@ -40,11 +40,33 @@ public class EnvyFreePricesVectorLP {
 	 */
 	protected double[] reservePrices;
 	/*
-	 * Constructor receives an allocated market M.
+	 * Constructor receives an allocated market M only and creates IloCplex Object
+	 */
+	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket){
+		this.allocatedMarket = allocatedMarket;
+		try {
+			this.cplex = new IloCplex();
+		} catch (IloException e) {
+			e.printStackTrace();
+		}
+	}
+	/*
+	 * Constructor receives an allocated market M and an IloCplex Object
 	 */
 	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket,IloCplex iloObject){
 		this.allocatedMarket = allocatedMarket;
 		this.cplex = iloObject;
+	}	
+	/*
+	 * Constructor receives an allocated Market M, and IloCplex Object, and a boolean 
+	 * to indicate if we want to create the LP
+	 */
+	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket,IloCplex iloObject,boolean createLP){
+		this.allocatedMarket = allocatedMarket;
+		this.cplex = iloObject;
+		if(createLP){
+			this.createLP();
+		}
 	}
 	/*
 	 * This method generate the compact conditions.

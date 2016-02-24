@@ -245,4 +245,7 @@ public class MarketPrices {
 		}
 		return violations;
 	}
+	public String toString(){
+		return "" + this.sellerRevenuePriceVector();
+	}
 }
