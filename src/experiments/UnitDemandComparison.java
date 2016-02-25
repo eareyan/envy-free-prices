@@ -7,8 +7,8 @@ import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import unitdemand.EVPApproximation;
 import unitdemand.MaxWEQ;
+import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 
 public class UnitDemandComparison extends Experiments{

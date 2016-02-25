@@ -1,8 +1,10 @@
-package unitdemand;
+package unitdemand.evpapprox;
 
+import unitdemand.Matching;
+import unitdemand.MaxWEQ;
 import util.Printer;
 
-public class MaxWEQReservePrices {
+abstract public class AbstractMaxWEQReservePrices {
 	
 	/*
 	 * valuation matrix. Provides a valuation v_ij of user i by campaign j.
@@ -11,46 +13,34 @@ public class MaxWEQReservePrices {
 	protected double[][] valuationMatrix;
 	protected double[] reservePrices;
 	
-	public MaxWEQReservePrices(double[][] valuationMatrix, double[] reservePrices){
+	public AbstractMaxWEQReservePrices(double[][] valuationMatrix, double[] reservePrices){
 		this.valuationMatrix = valuationMatrix;
 		this.reservePrices = reservePrices;
+	}
+	public AbstractMaxWEQReservePrices(double[][] valuationMatrix){
+		this.valuationMatrix = valuationMatrix;
 	}
 	/*
 	 * The method solve runs MaxWEQ on the augmented valuation matrix
 	 * and then deduces a matching. 
 	 */
-	public Matching Solve(){
-		Matching M = new MaxWEQ(this.augmentValuationMatrix()).Solve();
+	public Matching Solve(int j){
+		Matching M = new MaxWEQ(this.augmentValuationMatrix(j)).Solve();
 		Matching deducedMatching = this.deduceMatching(M);
 		return new Matching(M.getPrices(),deducedMatching.getMatching());
 	}
 	/*
-	 * This method adds two dummy consumers that value item j at the given reserve price and all other items at 0.
-	 * The method adds columns to account for these dummy consumers.
+	 * Set reserve prices.
 	 */
-	public double[][] augmentValuationMatrix(){
-		//System.out.println("Create augmented valuations matrix with reserve ");
-		int newNumberOfCols = (this.valuationMatrix.length)*2 + this.valuationMatrix[0].length;
-		double[][] augmentedValMatrix = new double[this.valuationMatrix.length][newNumberOfCols];
-		for(int i=0;i<this.valuationMatrix.length;i++){
-			/*Create dummy reserve demand */
-			double[] dummyReserveRow = new double[(this.valuationMatrix.length)*2];
-			dummyReserveRow[i*2] = this.reservePrices[i];
-			dummyReserveRow[(i*2)+1] = this.reservePrices[i];
-			/* copy original row*/
-			double[] originalrow = new double[this.valuationMatrix[0].length];
-			System.arraycopy(this.valuationMatrix[i], 0, originalrow, 0,this.valuationMatrix[i].length);
-			double[] finalrow = new double[newNumberOfCols];
-			/* concatenate original and dummy rows together*/
-			System.arraycopy(originalrow,0,finalrow,0,originalrow.length);
-			System.arraycopy(dummyReserveRow,0,finalrow,originalrow.length,dummyReserveRow.length);
-			/* add final row to the augmented matrix*/
-			augmentedValMatrix[i] = finalrow;
-		}
-		//System.out.println("Final Augmented Matrix");
-		//Printer.printMatrix(augmentedValMatrix);
-		return augmentedValMatrix;
-	}	
+	public void setReservePrices(double[] reservePrices){
+		this.reservePrices = reservePrices;
+	}
+	/*
+ 	 * This method is to be extended by an implemented class.
+ 	 * The idea is that a valuation matrix can be extended with dummies in many
+ 	 * different ways. 	
+ 	 */
+	abstract public double[][] augmentValuationMatrix(int j);
 	/*
 	 * From a given matching, remove all dummy consumers and their edges.
 	 * While there is an unsold item i in the demand set of a real consumer j that is not allocated,
@@ -87,8 +77,8 @@ public class MaxWEQReservePrices {
 					}
 					if(!campaignAllocated){//campaign j is not allocated
 						System.out.println("Campaign #"+j+", is not allocated anything");
-						System.out.println("*** " + this.valuationMatrix[i][j]);
-						System.out.println("*** " + prices[i]);
+						System.out.println("\t*** " + this.valuationMatrix[i][j]);
+						System.out.println("\t*** " + prices[i]);
 						/* This if statement seems to have numerical issues...
 						 * if(this.valuationMatrix[i][j] - prices[i] >= 0){//It makes sense to allocate this item.
 						 */
@@ -103,6 +93,7 @@ public class MaxWEQReservePrices {
 		System.out.println("Matching with possible more allocated items");
 		Printer.printMatrix(matching);
 		System.out.println("++++++End Deducing Matching+++++++++");
+		Printer.printVector(prices);
 		return new Matching(prices,matching);
 	}
 }

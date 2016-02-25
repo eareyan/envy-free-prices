@@ -1,7 +1,7 @@
 package experiments;
 
-import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
+//import ilog.concert.IloException;
+//import ilog.cplex.IloCplex;
 
 import java.sql.SQLException;
 
@@ -13,9 +13,9 @@ import log.SqlDB;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketFactory;
-import unitdemand.EVPApproximation;
 import unitdemand.MWBMatchingAlgorithm;
 import unitdemand.MaxWEQ;
+import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 
 /*
@@ -97,7 +97,7 @@ public class UnitDemandExperiments extends Experiments{
 				/*
 				 * Measure evpApp
 				 */
-		        EVPApproximation evpApp = new EVPApproximation(valuationMatrix);
+		        /*EVPApproximation evpApp = new EVPApproximation(valuationMatrix);
 				startTime = System.nanoTime();
 				evpAppRevenue.addValue(evpApp.Solve().getSellerRevenue());
 				endTime = System.nanoTime();
@@ -109,7 +109,7 @@ public class UnitDemandExperiments extends Experiments{
 		        int[][] maximumMatchingAllocation = getMaximumMatchingFromValuationMatrix(valuationMatrix);
 		        MarketAllocation marketMaxMatchingAllocation = new MarketAllocation(market, maximumMatchingAllocation);
 				
-		        IloCplex iloObject;
+		       /* IloCplex iloObject;
 				try {
 					iloObject = new IloCplex();
 					startTime = System.nanoTime();
@@ -118,7 +118,7 @@ public class UnitDemandExperiments extends Experiments{
 					endTime = System.nanoTime();
 					lpTime.addValue(endTime - startTime);
 					/* * Measure violations */
-					double[] WEViolations = VectorSol.computeWalrasianEqViolations();
+				/*	double[] WEViolations = VectorSol.computeWalrasianEqViolations();
 					lpWEViolations.addValue(WEViolations[0]);
 					lpWERelativeViolations.addValue(WEViolations[1]);
 					lpEFViolations.addValue(VectorSol.computeEFViolationUnitDemand());
