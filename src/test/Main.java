@@ -1,8 +1,16 @@
 package test;
 
+import ilog.concert.IloException;
+
 import java.util.ArrayList;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+
+
+
+
+
 
 //import ilog.concert.IloException;
 //import ilog.cplex.IloCplex;
@@ -18,6 +26,7 @@ import algorithms.lp.GeneralApproximation1;
 import algorithms.lp.GeneralApproximation2;
 import algorithms.lp.LPDummies;
 import experiments.RunParameters;
+import experiments.UnitDemandComparison;
 import experiments.UnitDemandExperiments;
 import structures.Campaign;
 import structures.Market;
@@ -27,6 +36,7 @@ import structures.MarketPrices;
 import unitdemand.HungarianAlgorithm;
 //import unitdemand.LPReservePrices;
 import algorithms.lp.reserveprices.AbstractLPReservePrices;
+import algorithms.lp.reserveprices.ComplexReservePrices;
 import algorithms.lp.reserveprices.SimpleReservePrices;
 import unitdemand.MWBMatchingAlgorithm;
 import unitdemand.Matching;
@@ -35,6 +45,7 @@ import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import unitdemand.evpapprox.AbstractMaxWEQReservePrices;
 import unitdemand.evpapprox.OnlyConnectedDummies;
+import unitdemand.evpapprox.Plus1ConnectedDummies;
 import util.Printer;
 
 /*
@@ -44,16 +55,42 @@ import util.Printer;
  */
 public class Main {
 	
-	public static void main(String[] args) {//throws IloException{
-		Market market = MarketFactory.randomUnitDemandMarket(3, 3, 0.5);
-		System.out.println(market);
-		double [][] valuationMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(market);
-		Printer.printMatrix(valuationMatrix);
+	public static void main(String[] args) throws IloException {//throws IloException{
+		/*Market market = MarketFactory.randomUnitDemandMarket(3, 3, 1.0);
+		double [][] valuationMatrix = UnitDemandComparison.getValuationMatrix(3, 3, 1.0);
+		//System.out.println(market);
+		//double [][] valuationMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(market);
+		/*double [][] valuationMatrix = new double[5][4];
+		
+		valuationMatrix[0][0] = 1.0;		
+		valuationMatrix[0][1] = Double.NEGATIVE_INFINITY;		
+		valuationMatrix[0][2] = Double.NEGATIVE_INFINITY;		
+		valuationMatrix[0][3] = Double.NEGATIVE_INFINITY;		
+		valuationMatrix[1][0] = 1.0;
+		valuationMatrix[1][1] = 1.0;
+		valuationMatrix[1][2] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[1][3] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[2][1] = 1.0;
+		valuationMatrix[2][2] = 1.0;
+		valuationMatrix[2][3] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[3][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[3][1] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[3][2] = 5.0;
+		valuationMatrix[3][3] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[4][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[4][1] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[4][2] = 1.0;
+		valuationMatrix[4][3] = Double.NEGATIVE_INFINITY;*/
+		//Printer.printMatrix(valuationMatrix);
 		//EVPApproximation EVP = new EVPApproximation(valuationMatrix,new AllConnectedDummies(valuationMatrix));
 		//EVP.Solve();
 
-		EVPApproximation EVP = new EVPApproximation(valuationMatrix,new OnlyConnectedDummies(valuationMatrix));
-		EVP.Solve();
+		//EVPApproximation EVP = new EVPApproximation(valuationMatrix,new OnlyConnectedDummies(valuationMatrix));
+		//EVP.Solve();
+
+		/*EVPApproximation EVP = new EVPApproximation(valuationMatrix,new Plus1ConnectedDummies(valuationMatrix));
+		EVP.Solve();*/
 
 		/*for(int i=3;i<20;i++){
 			for(int j=3;j<10;j++){
@@ -74,12 +111,13 @@ public class Main {
 						System.out.println(sol + "\n*****************");*/
 						
 						
-						//Market randomMarket = MarketFactory.randomMarket(3,3,0.5);
+						Market randomMarket = MarketFactory.randomMarket(3,3,0.5);
 						//Market randomMarket = MarketFactory.randomMarketMoreCampaignReach(3,3, 1.0);
 						//Market randomMarket = MarketFactory.randomMarketMoreUserSupply(3,3, 1.0);
 						//System.out.println(randomMarket);
 						//SimpleReservePrices lpReservePrices = new SimpleReservePrices(randomMarket);
-						//lpReservePrices.Solve();
+						ComplexReservePrices lpReservePrices = new ComplexReservePrices(randomMarket);
+						lpReservePrices.Solve();
 						//GeneralApproximation2 GA2 = new GeneralApproximation2(randomMarket,false);
 						//MarketPrices m = GA2.Solve();
 						//if(m!=null){

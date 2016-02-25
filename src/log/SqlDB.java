@@ -69,6 +69,17 @@ public class SqlDB {
         preparedStatement.setDouble(7, evpAppTime);    
         preparedStatement.execute();        
     }
+    public void saveNonUniformUnitComparisonData(int n,int m, double p, double onlyConnectedRevenue, double plusOneRevenue, double allConnectedRevenue) throws SQLException{
+        String sql = "INSERT INTO unit_nonuniform_comparison(n,m,p,onlyConnectedRevenue,plusOneRevenue,allConnectedRevenue) VALUES (?,?,?,?,?,?)";
+        PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
+        preparedStatement.setInt(1, n);
+        preparedStatement.setInt(2, m);
+        preparedStatement.setDouble(3, p);
+        preparedStatement.setDouble(4, onlyConnectedRevenue);
+        preparedStatement.setDouble(5, plusOneRevenue);
+        preparedStatement.setDouble(6, allConnectedRevenue);
+        preparedStatement.execute();        
+    }    
     public void saveGeneralCaseData(int n, int m, double p, double ratioEfficiency, double effAllocationRevenue, double effAlocationTime, double effAllocWEViolation,double effAllocWERelativeViolations, double effAllocEFViolation, double wfAllocationRevenue, double wfAllocationTime, double wfAllocWEViolation,double wfAllocWERelativeViolations, double wfAllocEFViolation, double wfMaxWEQRevenue, double wfMaxWEQTime) throws SQLException{
         String sql = "INSERT INTO general_demand(n,m,p,ratioEfficiency,effAllocationRevenue,effAllocationTime,effAllocWEViolation,effAllocWERelativeViolations,effAllocEFViolation,wfAllocationRevenue,wfAllocationTime,wfAllocWEViolation,wfAllocWERelativeViolations,wfAllocEFViolation,wfMaxWEQRevenue,wfMaxWEQTime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);

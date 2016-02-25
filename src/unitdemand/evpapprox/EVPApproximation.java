@@ -44,7 +44,7 @@ public class EVPApproximation {
         	}
         }
         Collections.sort(valuations,new LinksComparatorByValue());//Order valuations in descending order
-        System.out.println("valuations = " + valuations);
+        //System.out.println("valuations = " + valuations);
 		return valuations;
 	}
 	/*
@@ -58,13 +58,16 @@ public class EVPApproximation {
 		ArrayList<Matching> setOfMatchings = new ArrayList<Matching>();
 		/* For each item, run MaxWEQ_r with reserve prices given by the valuation*/
 		for(Link valueLink: valuations){
-			System.out.println("================= reserve price from campaign ("+valueLink.getJ()+") = " + valueLink.getValue() + "++++++++++");
+			//System.out.println("================= reserve price from campaign ("+valueLink.getJ()+") = " + valueLink.getValue() + "++++++++++");
 			Arrays.fill(reservePrices,valueLink.getValue());
 			this.MWRP.setReservePrices(reservePrices);
 			setOfMatchings.add(this.MWRP.Solve(valueLink.getJ()));
 		}
 		Collections.sort(setOfMatchings, new MatchingComparatorBySellerRevenue());
-		System.out.println(setOfMatchings);
+		//System.out.println(setOfMatchings);
+		if(setOfMatchings.size()==0){
+			setOfMatchings.add(new Matching());
+		}
 		return setOfMatchings.get(0);
 	}
 	/*

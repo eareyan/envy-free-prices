@@ -13,6 +13,9 @@ public class Matching {
 	protected int[][] matching;
 	protected double valueOfMatching;
 	
+	public Matching(){
+		
+	}
 	public Matching(double[] prices, int[][] matching){
 		this.prices = prices;
 		this.matching = matching;
@@ -40,6 +43,7 @@ public class Matching {
 	
 	public double getSellerRevenue(){
 		double revenue = 0.0;
+		if(this.matching == null) return 0.0;
 		for(int i=0;i<this.matching.length;i++){
 			for(int j=0;j<this.matching[0].length;j++){
 				if(this.matching[i][j] == 1){

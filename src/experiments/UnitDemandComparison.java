@@ -8,6 +8,7 @@ import log.SqlDB;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import unitdemand.MaxWEQ;
+import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 
@@ -49,7 +50,7 @@ public class UnitDemandComparison extends Experiments{
 				/*
 				 * Measure evpApp
 				 */
-		        EVPApproximation evpApp = new EVPApproximation(valuationMatrix);
+		        EVPApproximation evpApp = new EVPApproximation(valuationMatrix , new AllConnectedDummies(valuationMatrix));
 				startTime = System.nanoTime();
 				evpAppRevenue.addValue(evpApp.Solve().getSellerRevenue());
 				endTime = System.nanoTime();

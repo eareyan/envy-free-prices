@@ -23,6 +23,15 @@ CREATE TABLE unit_comparison (
 	evpAppTime double precision NOT NULL
 	);
 
+CREATE TABLE unit_nonuniform_comparison (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	onlyConnectedRevenue double precision NOT NULL,
+	plusOneRevenue double precision NOT NULL,
+	allConnectedRevenue double precision NOT NULL
+	);
+
 CREATE TABLE general_demand (
 	n integer NOT NULL,
 	m integer NOT NULL,
