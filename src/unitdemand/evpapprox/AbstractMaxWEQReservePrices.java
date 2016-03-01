@@ -20,6 +20,8 @@ abstract public class AbstractMaxWEQReservePrices {
 	public AbstractMaxWEQReservePrices(double[][] valuationMatrix){
 		this.valuationMatrix = valuationMatrix;
 	}
+	public AbstractMaxWEQReservePrices(){
+	}	
 	/*
 	 * The method solve runs MaxWEQ on the augmented valuation matrix
 	 * and then deduces a matching. 
@@ -34,6 +36,12 @@ abstract public class AbstractMaxWEQReservePrices {
 	 */
 	public void setReservePrices(double[] reservePrices){
 		this.reservePrices = reservePrices;
+	}
+	/*
+	 * Set valuation matrix
+	 */
+	public void setValuationMatrix(double[][] valuationMatrix){
+		this.valuationMatrix = valuationMatrix;
 	}
 	/*
  	 * This method is to be extended by an implemented class.

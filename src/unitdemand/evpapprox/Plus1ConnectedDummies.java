@@ -10,13 +10,16 @@ public class Plus1ConnectedDummies extends AbstractMaxWEQReservePrices{
 	public Plus1ConnectedDummies(double[][] valuationMatrix) {
 		super(valuationMatrix);
 	}
+	public Plus1ConnectedDummies() {
+		super();
+	}	
 	/*
 	 * This method adds two dummy consumers that value item i at reserve price
 	 * only in case (i,j)\in E and all other items at 0.
 	 * The method adds columns to account for these dummy consumers.
 	 */	
 	public double[][] augmentValuationMatrix(int j){
-		//System.out.println("Dummies connected to all items");
+		System.out.println("------Dummies connected plus 1 items");
 		int newNumberOfCols = (this.valuationMatrix.length)*2 + this.valuationMatrix[0].length;
 		double[][] augmentedValMatrix = new double[this.valuationMatrix.length][newNumberOfCols];
 		for(int i=0;i<this.valuationMatrix.length;i++){
@@ -36,8 +39,8 @@ public class Plus1ConnectedDummies extends AbstractMaxWEQReservePrices{
 			/* add final row to the augmented matrix*/
 			augmentedValMatrix[i] = finalrow;
 		}
-		//System.out.println("Final Augmented Matrix");
-		//Printer.printMatrix(augmentedValMatrix);
+		System.out.println("Final Augmented Matrix");
+		Printer.printMatrix(augmentedValMatrix);
 		return augmentedValMatrix;
 	}
 	public boolean includeUser(int userIndex, int campaignIndex){
@@ -45,8 +48,10 @@ public class Plus1ConnectedDummies extends AbstractMaxWEQReservePrices{
 		for(int j=0;j<this.valuationMatrix[0].length;j++){
 			if(this.valuationMatrix[userIndex][j] > Double.NEGATIVE_INFINITY){
 				for(int i=0;i<this.valuationMatrix.length;i++){
-					if(this.valuationMatrix[i][j]>Double.NEGATIVE_INFINITY && this.valuationMatrix[i][campaignIndex]>Double.NEGATIVE_INFINITY){
-						return true;
+					if(campaignIndex > -1){
+						if(this.valuationMatrix[i][j]>Double.NEGATIVE_INFINITY && this.valuationMatrix[i][campaignIndex]>Double.NEGATIVE_INFINITY){
+							return true;
+						}
 					}
 				}
 			}

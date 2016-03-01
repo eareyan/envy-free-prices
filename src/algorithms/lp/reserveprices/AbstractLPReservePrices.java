@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
+import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.Waterfall;
@@ -25,8 +26,12 @@ public abstract class AbstractLPReservePrices {
 	}
 	
 	public MarketPrices Solve() throws IloException{
+		System.out.println("LP with reserve Price");
 		/* * Compute an allocation  * */
-		this.initialMarketAllocation = new Waterfall(this.market).Solve().getMarketAllocation();
+		//Waterfall
+		//this.initialMarketAllocation = new Waterfall(this.market).Solve().getMarketAllocation();
+		//Optimal		
+		this.initialMarketAllocation = new MarketAllocation(this.market, new EfficientAllocationLP(this.market).Solve(new IloCplex()).get(0));		
 		/* * Compute Initial Prices * */
 		this.initialPrices = new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve().getPriceVector();
 		/* * Prints for debugging purposes * */
@@ -51,15 +56,20 @@ public abstract class AbstractLPReservePrices {
 						//Printer.printMatrix(sol.getMarketAllocation().getAllocation());
 						System.out.println("Total revenue = " + sol.sellerRevenuePriceVector());
 						setOfSolutions.add(sol);
+					}else{
+						System.out.println("LP was " + sol.getStatus());
 					}
 				}
 			}
 		}
 		Collections.sort(setOfSolutions,new MarketPricesComparatorBySellerRevenue());
 		for(MarketPrices sol:setOfSolutions){
-			System.out.println(sol.sellerRevenuePriceVector());			
+			System.out.println("Solution-->");
+			Printer.printMatrix(sol.getMarketAllocation().getAllocation());
+			Printer.printVector(sol.getPriceVector());
+			System.out.println(sol.sellerRevenuePriceVector());
 		}
-		return null;
+		return setOfSolutions.get(0);
 	}
 	/*
 	 * Given a campaign index j, return a list of users to which we want to set reserve prices

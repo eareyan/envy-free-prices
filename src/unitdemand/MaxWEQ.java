@@ -54,7 +54,7 @@ public class MaxWEQ {
 		double[] prices = new double[this.valuationMatrix.length]; 
 		Matching matchingCompleteV = this.computeMaximumWeightMatchingValue(this.valuationMatrix);
 		double maxWeightCompleteV = matchingCompleteV.getValueOfMatching();
-		//System.out.println("w(V) = " + maxWeightCompleteV);
+		System.out.println("w(V) = " + maxWeightCompleteV);
 		for(int i=0;i<this.valuationMatrix.length;i++){
 			prices[i] = maxWeightCompleteV - this.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching();
 			/*System.out.println("\t Matrix without row "+i);

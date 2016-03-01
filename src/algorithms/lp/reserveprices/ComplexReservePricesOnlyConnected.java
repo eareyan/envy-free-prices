@@ -3,9 +3,9 @@ package algorithms.lp.reserveprices;
 import algorithms.EnvyFreePricesVectorLP;
 import structures.Market;
 
-public class ComplexReservePrices extends AbstractOnlyConnectedUsers{
+public class ComplexReservePricesOnlyConnected extends AbstractOnlyConnectedUsers{
 
-	public ComplexReservePrices(Market market) {
+	public ComplexReservePricesOnlyConnected(Market market) {
 		super(market);
 	}
 

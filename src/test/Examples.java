@@ -1,0 +1,48 @@
+package test;
+
+import util.Printer;
+
+public class Examples {
+	
+	public static void main(String[] args){
+		/* * Example where All Connected EVPApp performs better than plus 1 EVPApp in NON-Uniform, unit demand case */
+		double [][] valuationMatrix = new double[3][3];
+		
+		valuationMatrix[0][0] = 29.60;		
+		valuationMatrix[0][1] = 18.66;		
+		valuationMatrix[0][2] = Double.NEGATIVE_INFINITY;		
+
+		valuationMatrix[1][0] = Double.NEGATIVE_INFINITY;		
+		valuationMatrix[1][1] = Double.NEGATIVE_INFINITY;		
+		valuationMatrix[1][2] = 27.10;		
+
+		valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;		
+		valuationMatrix[2][1] = 58.66;		
+		valuationMatrix[2][2] = 97.06;		
+
+		Printer.printMatrix(valuationMatrix);
+		
+		/* * Example where Plus 1 EVPApp performs better than All Connected EVPApp in NON-Uniform, unit demand case */
+		valuationMatrix = new double[3][2];
+		valuationMatrix[0][0] = 19.47;
+		valuationMatrix[0][1] = Double.NEGATIVE_INFINITY;
+
+		valuationMatrix[1][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[1][1] = 41.11;
+
+		valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[2][1] = 73.16;
+		
+		/* * Example where LP with all connected, simple reserve price Rj/Ij does better than regular EVP (All-connected)*/
+		valuationMatrix = new double[3][2];
+		valuationMatrix[0][0] = 39.92;
+		valuationMatrix[0][1] = Double.NEGATIVE_INFINITY;
+
+		valuationMatrix[1][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[1][1] = 43.51;
+
+		valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[2][1] = 43.51;
+		
+	}
+}

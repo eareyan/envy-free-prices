@@ -10,6 +10,9 @@ public class OnlyConnectedDummies extends AbstractMaxWEQReservePrices{
 	public OnlyConnectedDummies(double[][] valuationMatrix) {
 		super(valuationMatrix);
 	}
+	public OnlyConnectedDummies() {
+		super();
+	}	
 	/*
 	 * This method adds two dummy consumers that value item i at reserve price
 	 * only in case (i,j)\in E and all other items at 0.

@@ -25,7 +25,9 @@ public class EVPApproximation {
 	public EVPApproximation(double[][] valuationMatrix, AbstractMaxWEQReservePrices MWRP){
 		this.valuationMatrix = valuationMatrix;
 		this.MWRP = MWRP;
+		this.MWRP.setValuationMatrix(valuationMatrix);
 	}
+	
 
 	/*
 	 * Edge valuations are the values of the maximum weight matching.
@@ -61,10 +63,16 @@ public class EVPApproximation {
 			//System.out.println("================= reserve price from campaign ("+valueLink.getJ()+") = " + valueLink.getValue() + "++++++++++");
 			Arrays.fill(reservePrices,valueLink.getValue());
 			this.MWRP.setReservePrices(reservePrices);
-			setOfMatchings.add(this.MWRP.Solve(valueLink.getJ()));
+			Matching x = this.MWRP.Solve(valueLink.getJ());
+			setOfMatchings.add(x);
+			System.out.println("''''''");
+			Printer.printMatrix(x.getMatching());
+			Printer.printVector(x.getPrices());
+			System.out.println(x.getSellerRevenue());
+			System.out.println("''''''");			
 		}
 		Collections.sort(setOfMatchings, new MatchingComparatorBySellerRevenue());
-		//System.out.println(setOfMatchings);
+		System.out.println(setOfMatchings);
 		if(setOfMatchings.size()==0){
 			setOfMatchings.add(new Matching());
 		}

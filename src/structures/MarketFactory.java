@@ -157,4 +157,31 @@ public class MarketFactory {
 		}
 		return new Market(users,campaigns,connections);
 	}
+	/*
+	 * Create a singleton market from a valuation matrix
+	 */
+	public static Market createMarketFromValuationMatrix(double [][] valuationMatrix){
+		User[] users = new User[valuationMatrix.length];
+		for(int i=0;i<valuationMatrix.length;i++){
+			users[i] = new User(1);
+		}
+		Campaign[] campaigns = new Campaign[valuationMatrix[0].length];
+		for(int j=0;j<valuationMatrix[0].length;j++){
+			double reward = Double.NEGATIVE_INFINITY;
+			for(int i=0;i<valuationMatrix.length;i++){
+				if(valuationMatrix[i][j] > Double.NEGATIVE_INFINITY){
+					reward = valuationMatrix[i][j];
+					break;
+				}
+			}
+			campaigns[j] = new Campaign(1,reward);
+		}
+		boolean[][] connections = new boolean[valuationMatrix.length][valuationMatrix[0].length];
+		for(int i=0;i<valuationMatrix.length;i++){
+			for(int j=0;j<valuationMatrix[0].length;j++){
+				connections[i][j] = valuationMatrix[i][j] > Double.NEGATIVE_INFINITY;
+			}
+		}
+		return new Market(users,campaigns,connections);
+	}
 }

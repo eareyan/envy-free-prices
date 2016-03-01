@@ -10,12 +10,15 @@ public class AllConnectedDummies extends AbstractMaxWEQReservePrices{
 	public AllConnectedDummies(double[][] valuationMatrix) {
 		super(valuationMatrix);
 	}
+	public AllConnectedDummies() {
+		super();
+	}
 	/*
 	 * This method adds two dummy consumers to all items at the given reserve price.
 	 * The method adds columns to account for these dummy consumers.
 	 */	
 	public double[][] augmentValuationMatrix(int j){
-		//System.out.println("Dummies connected to all items");
+		System.out.println("*********Dummies connected to all items");
 		int newNumberOfCols = (this.valuationMatrix.length)*2 + this.valuationMatrix[0].length;
 		double[][] augmentedValMatrix = new double[this.valuationMatrix.length][newNumberOfCols];
 		for(int i=0;i<this.valuationMatrix.length;i++){
@@ -33,8 +36,8 @@ public class AllConnectedDummies extends AbstractMaxWEQReservePrices{
 			/* add final row to the augmented matrix*/
 			augmentedValMatrix[i] = finalrow;
 		}
-		//System.out.println("Final Augmented Matrix");
-		//Printer.printMatrix(augmentedValMatrix);
+		System.out.println("Final Augmented Matrix");
+		Printer.printMatrix(augmentedValMatrix);
 		return augmentedValMatrix;
 	}	
 
