@@ -36,11 +36,11 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 		return this.Status;
 	}
 	
-	public double getOptimalValue(){
+	public double xxgetOptimalValue(){
 		return this.optimalValue;
 	}
 	
 	public String toString(){
-		return ""+this.optimalValue + "-" + this.Status;			
+		return  "Revenue:\t"+this.sellerRevenuePriceVector()+ "-" + this.Status + "\n";
 	}
 }

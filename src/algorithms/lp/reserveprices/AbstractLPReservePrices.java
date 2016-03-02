@@ -26,19 +26,22 @@ public abstract class AbstractLPReservePrices {
 	}
 	
 	public MarketPrices Solve() throws IloException{
-		System.out.println("LP with reserve Price");
+		//System.out.println("LP with reserve Price");
 		/* * Compute an allocation  * */
 		//Waterfall
 		//this.initialMarketAllocation = new Waterfall(this.market).Solve().getMarketAllocation();
 		//Optimal		
 		this.initialMarketAllocation = new MarketAllocation(this.market, new EfficientAllocationLP(this.market).Solve(new IloCplex()).get(0));		
 		/* * Compute Initial Prices * */
-		this.initialPrices = new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve().getPriceVector();
+		EnvyFreePricesSolutionLP initialSolution = new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve();
+		this.initialPrices = initialSolution.getPriceVector();
 		/* * Prints for debugging purposes * */
-		Printer.printMatrix(this.initialMarketAllocation.getAllocation());
+		/*Printer.printMatrix(this.initialMarketAllocation.getAllocation());
 		Printer.printVector(this.initialPrices);
-		System.out.println(new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve().sellerRevenuePriceVector());
+		System.out.println(new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve().sellerRevenuePriceVector());*/
 		ArrayList<MarketPrices> setOfSolutions = new ArrayList<MarketPrices>();
+		/* * Add initial solution to set of solutions, so that we have a baseline with reserve prices all zero */
+		setOfSolutions.add(initialSolution);
 		/* * For each x_{ij}. * */
 		for(int i=0;i<this.market.getNumberUsers();i++){
 			for(int j=0;j<this.market.getNumberCampaigns();j++){
@@ -54,21 +57,23 @@ public abstract class AbstractLPReservePrices {
 						//Printer.printVector(sol.getPriceVector());
 						this.tryReallocate(j,sol);//Try to reallocate
 						//Printer.printMatrix(sol.getMarketAllocation().getAllocation());
-						System.out.println("Total revenue = " + sol.sellerRevenuePriceVector());
+						//System.out.println("Total revenue = " + sol.sellerRevenuePriceVector());
 						setOfSolutions.add(sol);
 					}else{
-						System.out.println("LP was " + sol.getStatus());
+						//System.out.println("LP was " + sol.getStatus());
 					}
 				}
 			}
 		}
 		Collections.sort(setOfSolutions,new MarketPricesComparatorBySellerRevenue());
-		for(MarketPrices sol:setOfSolutions){
+		/* For debugging purposes only: */ 
+		//System.out.println(setOfSolutions);
+		/* for(MarketPrices sol:setOfSolutions){
 			System.out.println("Solution-->");
 			Printer.printMatrix(sol.getMarketAllocation().getAllocation());
 			Printer.printVector(sol.getPriceVector());
 			System.out.println(sol.sellerRevenuePriceVector());
-		}
+		}*/
 		return setOfSolutions.get(0);
 	}
 	/*

@@ -12,7 +12,9 @@ public class Matching {
 	protected double[] prices;
 	protected int[][] matching;
 	protected double valueOfMatching;
-	
+	/*
+	 * Constructors.
+	 */
 	public Matching(){
 		
 	}
@@ -28,7 +30,9 @@ public class Matching {
 	public Matching(double[] prices){
 		this.prices = prices;
 	}
-	
+	/*
+	 * Getters.
+	 */
 	public double[] getPrices(){
 		return this.prices;
 	}

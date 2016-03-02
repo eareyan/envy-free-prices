@@ -54,9 +54,10 @@ public class EVPApproximation {
 	 */
 	public Matching Solve(){
 		//System.out.println("============ SOLVE ============");
-		 ArrayList<Link> valuations = this.getEdgeValuations();
+		ArrayList<Link> valuations = this.getEdgeValuations();
+		valuations.add(new Link(-1,0.0)); //We add reserve price of zero always. This makes EVPApp at least as good as MaxWEQ.
+		//System.out.println("valuations = " + valuations);
 		double[] reservePrices = new double[this.valuationMatrix.length];
-		//Printer.printVector(valuations);
 		ArrayList<Matching> setOfMatchings = new ArrayList<Matching>();
 		/* For each item, run MaxWEQ_r with reserve prices given by the valuation*/
 		for(Link valueLink: valuations){
@@ -65,17 +66,14 @@ public class EVPApproximation {
 			this.MWRP.setReservePrices(reservePrices);
 			Matching x = this.MWRP.Solve(valueLink.getJ());
 			setOfMatchings.add(x);
-			System.out.println("''''''");
+			/*System.out.println("''''''");
 			Printer.printMatrix(x.getMatching());
 			Printer.printVector(x.getPrices());
 			System.out.println(x.getSellerRevenue());
-			System.out.println("''''''");			
+			System.out.println("''''''");	*/		
 		}
 		Collections.sort(setOfMatchings, new MatchingComparatorBySellerRevenue());
-		System.out.println(setOfMatchings);
-		if(setOfMatchings.size()==0){
-			setOfMatchings.add(new Matching());
-		}
+		//System.out.println(setOfMatchings);
 		return setOfMatchings.get(0);
 	}
 	/*

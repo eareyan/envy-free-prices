@@ -214,7 +214,7 @@ public class EnvyFreePricesVectorLP {
 		     * Solve the LP.
 		     */
 		    if ( this.cplex.solve() ) {
-		    	LP_Prices = this.cplex.getValues(this.prices);
+		    	LP_Prices = this.roundPrices(this.cplex.getValues(this.prices));
 		    	Solution  = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, this.cplex.getStatus().toString(),this.cplex.getObjValue());
 		    }else{
 		    	Solution = new EnvyFreePricesSolutionLP(this.cplex.getStatus().toString());
@@ -228,5 +228,12 @@ public class EnvyFreePricesVectorLP {
 			e.printStackTrace();
 		}
 		return Solution;
+	}
+	
+	public double[] roundPrices(double[] prices){
+		for(int i=0;i<prices.length;i++){
+			prices[i] = Math.round(prices[i] * 100000.0) / 100000.0;
+		}
+		return prices;
 	}
 }

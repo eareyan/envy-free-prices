@@ -11,7 +11,7 @@ public class SimpleReservePricesAllConnected extends AbstractAllConnectedUsers{
 
 	@Override
 	protected void setReservePrices(int i, int j, EnvyFreePricesVectorLP LP, double[] initialPrices) {
-		System.out.println("Set reserve for user "+i+", of: " + (this.market.getCampaign(j).getReward() / this.market.getCampaign(j).getDemand()));
+		//System.out.println("Set reserve for user "+i+", of: " + (this.market.getCampaign(j).getReward() / this.market.getCampaign(j).getDemand()));
 		LP.setReservePriceForUser(i, this.market.getCampaign(j).getReward() / this.market.getCampaign(j).getDemand());
 	}
 }

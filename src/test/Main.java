@@ -63,10 +63,11 @@ public class Main {
 		for(int i=2;i<20;i++){
 			for(int j=2;j<20;j++){
 				for(int p=0;p<4;p++){
-					//double prob = 0.25 + p*(0.25);
-					double prob = 1.0;
+					double prob = 0.25 + p*(0.25);
+					System.out.println("(i,j,p) = (" + i + "," + j + "," + prob + ")");
+					//double prob = 1.0;
 					Market market = MarketFactory.randomUnitDemandMarket(i, j, prob);
-					System.out.println(market);
+					//System.out.println(market);
 					double [][] valuationMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(market);
 					/*valuationMatrix = new double[3][2];
 					valuationMatrix[0][0] = 39.92;
@@ -80,18 +81,25 @@ public class Main {
 					market = MarketFactory.createMarketFromValuationMatrix(valuationMatrix);
 					System.out.println(market);*/
 					EVPApproximation EVPAllConnected = new EVPApproximation(valuationMatrix,new AllConnectedDummies());
-					Matching allConnected = EVPAllConnected.Solve();
-					System.out.println(allConnected.getSellerRevenue());
-					Printer.printMatrix(allConnected.getMatching());
-					Printer.printVector(allConnected.getPrices());
+					Matching evpAllConnected = EVPAllConnected.Solve();
+					System.out.println("evpAllConnected revenue = \t"+evpAllConnected.getSellerRevenue());
+					//Printer.printMatrix(evpAllConnected.getMatching());
+					//Printer.printVector(evpAllConnected.getPrices());
 					
+					MaxWEQ maxWEQ = new MaxWEQ(valuationMatrix);
+					Matching maxWeqSOL= maxWEQ.Solve();
+					 System.out.println("MaxWEQ revenue = \t\t" + maxWeqSOL.getSellerRevenue());
+					/*if(maxWeqSOL.getSellerRevenue() - evpAllConnected.getSellerRevenue()  >= 0.1){
+						System.out.println("MAXWEQ was better or equal than EVP");
+						System.exit(-1);
+					}*/
 					SimpleReservePricesAllConnected SRPAllConnected = new SimpleReservePricesAllConnected(market);
 					MarketPrices LPRP = SRPAllConnected.Solve();
-					System.out.println(LPRP.sellerRevenuePriceVector());
-					Printer.printMatrix(LPRP.getMarketAllocation().getAllocation());
-					Printer.printVector(LPRP.getPriceVector());
+					System.out.println("LPSRP revenue = \t\t" + LPRP.sellerRevenuePriceVector());
+					//Printer.printMatrix(LPRP.getMarketAllocation().getAllocation());
+					//Printer.printVector(LPRP.getPriceVector());
 					
-					if(LPRP.sellerRevenuePriceVector() - allConnected.getSellerRevenue()  >= 0.1){
+					if(LPRP.sellerRevenuePriceVector() > evpAllConnected.getSellerRevenue()){
 						System.out.println("LPRP was better or equal than EVP");
 						System.exit(-1);
 					}

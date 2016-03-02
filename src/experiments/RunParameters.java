@@ -75,6 +75,8 @@ public class RunParameters{
 			return new UnitDemandComparison();
 		}else if(type.equals("UnitNonUniformComparison")){
 			return new UnitDemandNonUniformExperiments();
+		}else if(type.equals("UnitUniformDemand")){
+			return new UnitUniformDemandExperiments();
 		}else{
 			throw new Exception("Unknown demand type");
 		}
