@@ -2,8 +2,10 @@ package algorithms;
 
 import structures.MarketAllocation;
 import structures.MarketPrices;
+
 /*
  * This class stores the resulting envy-free prices from LP.
+ * It extends MarketPrices.
  * 
  * @author Enrique Areyan Viqueira
  */

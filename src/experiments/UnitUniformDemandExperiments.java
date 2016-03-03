@@ -9,7 +9,9 @@ import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import algorithms.lp.reserveprices.SimpleReservePricesAllConnected;
+import algorithms.lp.reserveprices.LPReservePrices;
+import algorithms.lp.reserveprices.SelectAllConnectedUsers;
+import algorithms.lp.reserveprices.SetReservePricesSimple;
 import structures.Market;
 import structures.MarketFactory;
 import structures.MarketPrices;
@@ -35,7 +37,7 @@ public class UnitUniformDemandExperiments extends Experiments{
 				Matching evpAllConnected = EVPAllConnected.Solve();
 				evpAppRevenue.addValue(evpAllConnected.getSellerRevenue());
 				/* * Measure LPSRP */				
-				SimpleReservePricesAllConnected SRPAllConnected = new SimpleReservePricesAllConnected(market);
+				LPReservePrices SRPAllConnected = new LPReservePrices(market,new SelectAllConnectedUsers(), new SetReservePricesSimple());
 				MarketPrices LPRP = SRPAllConnected.Solve();
 				lpReservePriceRevenue.addValue(LPRP.sellerRevenuePriceVector());
 			}

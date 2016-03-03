@@ -2,6 +2,11 @@ package algorithms;
 
 import java.util.Comparator;
 
+/*
+ * Comparator class to compare to solutions from LP by seller revenue.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class EnvyFreePricesSolutionLPComparatorBySellerRevenue implements Comparator<EnvyFreePricesSolutionLP>{
 	@Override
 	public int compare(EnvyFreePricesSolutionLP sol1, EnvyFreePricesSolutionLP sol2) {

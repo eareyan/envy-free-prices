@@ -9,20 +9,34 @@ import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.Waterfall;
+import algorithms.lp.reserveprices.interfaces.SelectUsers;
+import algorithms.lp.reserveprices.interfaces.SetReservePrices;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.MarketPricesComparatorBySellerRevenue;
 import util.Printer;
 
-public abstract class AbstractLPReservePrices {
+/*
+ * This abstract class implements the main methods for LP with reserve prices.
+ * Extending classes should define two methods: selectUsers and setReservePrices.
+ * The first determines which users should get a reserve price and the second
+ * determines what these reserve prices should be.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
+public class LPReservePrices {
 	
 	protected Market market;
 	protected MarketAllocation initialMarketAllocation;
 	protected double[] initialPrices;
+	protected SelectUsers selectUsersObject;
+	protected SetReservePrices setReservePricesObject;
 	
-	public AbstractLPReservePrices(Market market){
+	public LPReservePrices(Market market,SelectUsers selectUsersObject, SetReservePrices setReservePricesObject){
 		this.market = market;
+		this.selectUsersObject = selectUsersObject;
+		this.setReservePricesObject = setReservePricesObject;
 	}
 	
 	public MarketPrices Solve() throws IloException{
@@ -48,9 +62,9 @@ public abstract class AbstractLPReservePrices {
 				if(this.initialMarketAllocation.getAllocation()[i][j]>0){ 	// If x_{ij}>0
 					//System.out.println("x["+i+"]["+j+"] = " + this.initialMarketAllocation.getAllocation()[i][j]);
 					EnvyFreePricesVectorLP efpLP = new EnvyFreePricesVectorLP(new MarketAllocation(this.market,this.copyInitialAllocationMatrixWihtoutCampaignJ(j)),new IloCplex(),true);
-					ArrayList<Integer> users = this.selectUsers(j); 		//Select users to set reserve prices
+					ArrayList<Integer> users = this.selectUsersObject.selectUsers(j,this.market); 		//Select users to set reserve prices
 					for(Integer userIndex: users){
-						this.setReservePrices(userIndex, j, efpLP, this.initialPrices);
+						this.setReservePricesObject.setReservePrices(userIndex, j, efpLP, this.initialPrices,this.market,this.initialMarketAllocation);
 					}
 					EnvyFreePricesSolutionLP sol = efpLP.Solve();
 					if(sol.getStatus().equals("Optimal")){ 					//We obtained an optimal solution from this LP
@@ -79,11 +93,11 @@ public abstract class AbstractLPReservePrices {
 	/*
 	 * Given a campaign index j, return a list of users to which we want to set reserve prices
 	 */
-	protected abstract ArrayList<Integer> selectUsers(int j);
+	//protected abstract ArrayList<Integer> selectUsers(int j);
 	/*
 	 * Given a user index i and a campaign index j, and a LP 
 	 */
-	protected abstract void setReservePrices(int i,int j,EnvyFreePricesVectorLP LP, double[] initialPrices);
+	//protected abstract void setReservePrices(int i,int j,EnvyFreePricesVectorLP LP, double[] initialPrices);
 	/*
 	 * Try to reallocate campaign j after solving the LP.
 	 */

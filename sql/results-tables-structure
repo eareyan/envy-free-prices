@@ -13,6 +13,14 @@ CREATE TABLE unit_demand (
 	lpEFViolations double precision NOT NULL
 	);
 
+CREATE TABLE unit_uniform_demand (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	evpAppRevenue double precision NOT NULL,
+	lpReservePriceRevenue double precision NOT NULL
+	);
+
 CREATE TABLE unit_comparison (
 	n integer NOT NULL,
 	m integer NOT NULL,

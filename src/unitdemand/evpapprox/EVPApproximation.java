@@ -41,8 +41,6 @@ public class EVPApproximation {
         	if(result[i] > -1){
         		/* If an assignment is possible, then the valuation for item j is the weight of that assignment, otherwise is zero*/
         		valuations.add(new Link(result[i],this.valuationMatrix[i][result[i]]));
-        	}else{
-        		//valuations.add(new Link(-1,0.0));
         	}
         }
         Collections.sort(valuations,new LinksComparatorByValue());//Order valuations in descending order

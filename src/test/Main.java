@@ -5,16 +5,6 @@ import ilog.concert.IloException;
 import java.util.ArrayList;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
-
-
-
-
-
-
-
-
-
 //import ilog.concert.IloException;
 //import ilog.cplex.IloCplex;
 import algorithms.EfficientAllocationLP;
@@ -38,10 +28,9 @@ import structures.MarketFactory;
 import structures.MarketPrices;
 import unitdemand.HungarianAlgorithm;
 //import unitdemand.LPReservePrices;
-import algorithms.lp.reserveprices.AbstractLPReservePrices;
-import algorithms.lp.reserveprices.ComplexReservePricesOnlyConnected;
-import algorithms.lp.reserveprices.SimpleReservePricesAllConnected;
-import algorithms.lp.reserveprices.SimpleReservePricesOnlyConnected;
+import algorithms.lp.reserveprices.LPReservePrices;
+import algorithms.lp.reserveprices.SelectAllConnectedUsers;
+import algorithms.lp.reserveprices.SetReservePricesSimple;
 import unitdemand.MWBMatchingAlgorithm;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
@@ -63,9 +52,9 @@ public class Main {
 		for(int i=2;i<20;i++){
 			for(int j=2;j<20;j++){
 				for(int p=0;p<4;p++){
-					double prob = 0.25 + p*(0.25);
+					//double prob = 0.25 + p*(0.25);
+					double prob = 1.0;
 					System.out.println("(i,j,p) = (" + i + "," + j + "," + prob + ")");
-					//double prob = 1.0;
 					Market market = MarketFactory.randomUnitDemandMarket(i, j, prob);
 					//System.out.println(market);
 					double [][] valuationMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(market);
@@ -93,7 +82,7 @@ public class Main {
 						System.out.println("MAXWEQ was better or equal than EVP");
 						System.exit(-1);
 					}*/
-					SimpleReservePricesAllConnected SRPAllConnected = new SimpleReservePricesAllConnected(market);
+					 LPReservePrices SRPAllConnected = new LPReservePrices(market,new SelectAllConnectedUsers(), new SetReservePricesSimple());
 					MarketPrices LPRP = SRPAllConnected.Solve();
 					System.out.println("LPSRP revenue = \t\t" + LPRP.sellerRevenuePriceVector());
 					//Printer.printMatrix(LPRP.getMarketAllocation().getAllocation());

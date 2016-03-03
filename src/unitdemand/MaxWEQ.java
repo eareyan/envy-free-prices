@@ -2,7 +2,7 @@ package unitdemand;
 
 import util.Printer;
 /*
- * This class implements MaxEQ: Maximum Walrasian Prices, as states in Guruswami et al.
+ * This class implements MaxEQ: Maximum Walrasian Prices, as stated in Guruswami et al.
  * 
  * @author Enrique Areyan Viqueira
  */

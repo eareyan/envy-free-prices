@@ -14,11 +14,18 @@ import structures.MarketAllocation;
  *  @author Enrique Areyan Viqueira
  */
 public class Waterfall {
-	
+	/*
+	 * Input Market
+	 */
 	protected Market market;
-	
+	/*
+	 * If min = true, then select the cheapest market, i.e., the one with the lowest
+	 * second-highest bid.
+	 */
 	protected boolean min = true;
-	
+	/*
+	 * Constructors
+	 */
 	public Waterfall(Market market){
 		this.market = market;
 	}
@@ -188,7 +195,11 @@ public class Waterfall {
 				System.out.print(df.format(matrix[i][j]) + "\t");
 			}
 		}
-	}	
+	}
+	/*
+	 * This inner class represents a bid placed by a campaign to acquire
+	 * a user class. 
+	 */
 	public class Bid{
 		private final double value;
 		private final int userIndex;
@@ -203,6 +214,9 @@ public class Waterfall {
 		public int getCampaignIndex(){ return this.campaignIndex; }
 		public String toString(){ return "("+this.value+","+this.userIndex+","+this.campaignIndex+")"; }
 	}
+	/*
+	 * Comparator to compare bids by value.
+	 */
 	public class BidComparator implements Comparator<Bid>{
 		@Override
 		public int compare(Bid b1, Bid b2) {

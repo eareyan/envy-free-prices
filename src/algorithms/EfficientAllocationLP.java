@@ -7,9 +7,11 @@ import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
 import ilog.cplex.IloCplex;
+
 /*
- * This class implements an ILP to find an efficient allocation
- * for a given market. 
+ * This class uses CPLEX to implement and solve a mixed-ILP to find an efficient allocation for an input market. 
+ * 
+ * @author Enrique Areyan Viqueira
  */
 public class EfficientAllocationLP {
 	/*

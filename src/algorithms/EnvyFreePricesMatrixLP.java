@@ -10,6 +10,12 @@ import java.util.ArrayList;
 
 import structures.MarketAllocation;
 
+/*
+ * This class uses CPLEX to implement and solve a LP to find a matrix of restricted envy-free prices for an input market
+ * The LP must receive an input allocation. 
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class EnvyFreePricesMatrixLP {
 	/*
 	 * Boolean to control whether or not to output.
