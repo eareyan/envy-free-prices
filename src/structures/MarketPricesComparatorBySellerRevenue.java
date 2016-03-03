@@ -2,6 +2,11 @@ package structures;
 
 import java.util.Comparator;
 
+/*
+ * Comparator to compare MarketPrices objects by sellerrevenue.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class MarketPricesComparatorBySellerRevenue implements Comparator<MarketPrices>{
 	@Override
 	public int compare(MarketPrices MP1, MarketPrices MP2) {

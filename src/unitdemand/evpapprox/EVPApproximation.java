@@ -12,6 +12,9 @@ import util.Printer;
 
 /*
  * Implements Envy-Free Pricing Approximation Algorithm by Guruswami et. al.
+ * Note that this class receives and object AbstractMaxWEQReservePrices that defines
+ * how and where dummies are to be included. The original Guruswami et. al. implementation
+ * uses class AllConnectedDummies in this same package.
  * 
  *  @author Enrique Areyan Viqueira
  */

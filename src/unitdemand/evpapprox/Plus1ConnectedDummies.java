@@ -2,6 +2,11 @@ package unitdemand.evpapprox;
 
 import util.Printer;
 
+/*
+ * Adds dummy only to connected users plus one more level.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class Plus1ConnectedDummies extends AbstractMaxWEQReservePrices{
 
 	public Plus1ConnectedDummies(double[][] valuationMatrix, double[] reservePrices) {

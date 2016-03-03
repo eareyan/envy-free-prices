@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
  
 /*
- * Saves results of experiments to a sql database.
+ * Saves results of experiments to a SQL database.
  * 
  * @author Enrique Areyan Viqueira
  */

@@ -11,7 +11,8 @@ import java.util.PriorityQueue;
  * 
  * This class support common operations on prices for an allocated market,
  * regardless of the algorithm that produced the allocation and/or prices.
- * Such operations might be printing the prices or computing values.
+ * Such operations might be printing the prices or computing values such
+ * as seller revenue.
  * 
  * @author Enrique Areyan Viqueira
  */

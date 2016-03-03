@@ -4,6 +4,13 @@ import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import util.Printer;
 
+/*
+ * This abstract class implements the common methods for EVPApp algorithm.
+ * Extending classes should implement augmentValuationMatrix, which defines
+ * where and how many dummies to add at each iteration of the algorithm.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 abstract public class AbstractMaxWEQReservePrices {
 	
 	/*

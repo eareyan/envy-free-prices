@@ -20,7 +20,8 @@ import structures.MarketAllocation;
 import structures.MarketFactory;
 
 /*
- * This class implements experiments between LP (using WF and Efficient Allocation) and WF MaxWEQ.
+ * This class implements experiments in the general demand case.
+ * It compares LP (using WF and Efficient Allocation) and WF MaxWEQ.
  * 
  * @author Enrique Areyan Viqueira
  */

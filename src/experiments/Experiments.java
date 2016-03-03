@@ -6,7 +6,12 @@ import java.sql.SQLException;
 
 import log.SqlDB;
 
-public class Experiments {
+/*
+ * Abstract class to test algorithms. 
+ * 
+ * @author Enrique Areyan Viqueira
+ */
+public abstract class Experiments {
 
 	public void bulkTest(SqlDB dbLogger) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IloException{
 		
@@ -39,13 +44,12 @@ public class Experiments {
 		}
 	}
 
-	public void runOneExperiment(int numUsers, int numCampaigns, double prob, SqlDB dbLogger)  throws SQLException, IloException{
-		/* 
-		 * This method is implemented by a particular type of experiment class.
-		 * This method receives the number of users, number of campaigns and probability
-		 * and runs one experiments, saving the result in the database.
-		 * This method should also check if we have that result first before running the
-		 * experiment.
-		 */
-	}
+	/* 
+	 * This method is implemented by a particular type of experiment class.
+	 * This method receives the number of users, number of campaigns and probability
+	 * and runs one experiments, saving the result in the database.
+	 * This method should also check if we have that result first before running the
+	 * experiment.
+	 */
+	abstract public void runOneExperiment(int numUsers, int numCampaigns, double prob, SqlDB dbLogger)  throws SQLException, IloException;
 }

@@ -2,6 +2,11 @@ package util;
 
 import java.text.DecimalFormat;
 
+/*
+ * Library with common methods.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class Printer {
 	
     public static void printMatrix(double[][] matrix){

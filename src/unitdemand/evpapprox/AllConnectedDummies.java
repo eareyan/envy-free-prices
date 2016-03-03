@@ -2,6 +2,12 @@ package unitdemand.evpapprox;
 
 import util.Printer;
 
+/*
+ * Extends AbstractMaxWEQReservePrices and  adds two dummy consumers to all items at the given reserve price.
+ * Note that this is the way it is done in the original paper in Guruswami et. al.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class AllConnectedDummies extends AbstractMaxWEQReservePrices{
 
 	public AllConnectedDummies(double[][] valuationMatrix, double[] reservePrices) {

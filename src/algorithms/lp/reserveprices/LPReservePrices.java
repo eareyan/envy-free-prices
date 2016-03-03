@@ -18,8 +18,9 @@ import structures.MarketPricesComparatorBySellerRevenue;
 import util.Printer;
 
 /*
- * This abstract class implements the main methods for LP with reserve prices.
- * Extending classes should define two methods: selectUsers and setReservePrices.
+ * This class implements the main methods for LP with reserve prices.
+ * It receives two types of objects: SelectUsers and SetReservePrices.
+ * These objects define two methods: selectUsers and setReservePrices respectively.
  * The first determines which users should get a reserve price and the second
  * determines what these reserve prices should be.
  * 
@@ -91,15 +92,8 @@ public class LPReservePrices {
 		return setOfSolutions.get(0);
 	}
 	/*
-	 * Given a campaign index j, return a list of users to which we want to set reserve prices
-	 */
-	//protected abstract ArrayList<Integer> selectUsers(int j);
-	/*
-	 * Given a user index i and a campaign index j, and a LP 
-	 */
-	//protected abstract void setReservePrices(int i,int j,EnvyFreePricesVectorLP LP, double[] initialPrices);
-	/*
-	 * Try to reallocate campaign j after solving the LP.
+	 * After solving an LP with reserve prices, we try to reallocate the campaign
+	 * that was deallocated.
 	 */
 	protected EnvyFreePricesSolutionLP tryReallocate(int j, EnvyFreePricesSolutionLP sol){
 		//System.out.println("Reallocating campaign " + j);

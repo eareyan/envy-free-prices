@@ -12,6 +12,12 @@ import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 
+/*
+ * This class implements experiments in the unit-NON-uniform case.
+ * It compares MawWEQ against EVPApp.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class UnitDemandComparison extends Experiments{
 	
 	public static double[][] getValuationMatrix(int n,int m, double prob) {

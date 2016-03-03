@@ -19,7 +19,7 @@ import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 
 /*
- * This class implements experiments in the case of unit demand.
+ * This class implements experiments in the case of unit-uniform demand.
  * 
  * @author Enrique Areyan Viqueira
  */

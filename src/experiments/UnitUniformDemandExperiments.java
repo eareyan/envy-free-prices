@@ -21,6 +21,12 @@ import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 
+/*
+ * This class implements experiments in the case of unit-uniform demand.
+ * It compares EVPApp with LPReservePrices.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class UnitUniformDemandExperiments extends Experiments{
 	
 	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException, IloException{

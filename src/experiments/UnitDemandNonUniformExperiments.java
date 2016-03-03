@@ -13,6 +13,12 @@ import unitdemand.evpapprox.OnlyConnectedDummies;
 import unitdemand.evpapprox.Plus1ConnectedDummies;
 import util.Printer;
 
+/*
+ * This class implements experiments in the case of unit-NON-uniform demand.
+ * It compares different flavors of EVPApp.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class UnitDemandNonUniformExperiments extends Experiments{
 	
 	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException{
