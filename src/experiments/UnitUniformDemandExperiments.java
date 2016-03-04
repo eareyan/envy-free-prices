@@ -43,8 +43,8 @@ public class UnitUniformDemandExperiments extends Experiments{
 				Matching evpAllConnected = EVPAllConnected.Solve();
 				evpAppRevenue.addValue(evpAllConnected.getSellerRevenue());
 				/* * Measure LPSRP */				
-				LPReservePrices SRPAllConnected = new LPReservePrices(market,new SelectAllConnectedUsers(), new SetReservePricesSimple());
-				MarketPrices LPRP = SRPAllConnected.Solve();
+				unitdemand.lp.LPReservePrices LPRPUnitDemand = new unitdemand.lp.LPReservePrices(market);
+				MarketPrices LPRP = LPRPUnitDemand.Solve();
 				lpReservePriceRevenue.addValue(LPRP.sellerRevenuePriceVector());
 			}
 			/* log results in database */

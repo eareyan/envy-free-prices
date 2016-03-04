@@ -1,44 +1,18 @@
 package test;
 
 import ilog.concert.IloException;
-
-import java.util.ArrayList;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-//import ilog.concert.IloException;
-//import ilog.cplex.IloCplex;
-import algorithms.EfficientAllocationLP;
-import algorithms.EnvyFreePricesSolutionLP;
-import algorithms.EnvyFreePricesVectorLP;
-import algorithms.Waterfall;
-import algorithms.WaterfallMAXWEQ;
-import algorithms.WaterfallPrices;
-import algorithms.lp.EnvyFreePricesVectorLPReservePrices;
-import algorithms.lp.GeneralApproximation;
-import algorithms.lp.GeneralApproximation1;
-import algorithms.lp.GeneralApproximation2;
-import algorithms.lp.LPDummies;
-import experiments.RunParameters;
-import experiments.UnitDemandComparison;
-import experiments.UnitDemandExperiments;
-import structures.Campaign;
 import structures.Market;
-import structures.MarketAllocation;
 import structures.MarketFactory;
 import structures.MarketPrices;
-//import unitdemand.LPReservePrices;
-import algorithms.lp.reserveprices.LPReservePrices;
-import algorithms.lp.reserveprices.SelectAllConnectedUsers;
-import algorithms.lp.reserveprices.SetReservePricesSimple;
-import unitdemand.MWBMatchingAlgorithm;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
-import unitdemand.evpapprox.AbstractMaxWEQReservePrices;
-import unitdemand.evpapprox.OnlyConnectedDummies;
-import unitdemand.evpapprox.Plus1ConnectedDummies;
 import util.Printer;
+import experiments.RunParameters;
+import experiments.UnitDemandExperiments;
+//import ilog.concert.IloException;
+//import ilog.cplex.IloCplex;
 
 /*
  * Main class. Use for testing purposes.
@@ -47,12 +21,18 @@ import util.Printer;
  */
 public class Main {
 	
+	public static void main2(String[] args) throws IloException {//throws IloException{
+		Market market = MarketFactory.randomUnitDemandMarket(3, 3, 0.5);
+		unitdemand.lp.LPReservePrices LP = new unitdemand.lp.LPReservePrices(market);
+		LP.Solve();
+	}
 	public static void main(String[] args) throws IloException {//throws IloException{
 		for(int i=2;i<20;i++){
 			for(int j=2;j<20;j++){
 				for(int p=0;p<4;p++){
-					//double prob = 0.25 + p*(0.25);
-					double prob = 1.0;
+					///for(int k=0;k<RunParameters.numTrials;k++){
+					double prob = 0.25 + p*(0.25);
+					//double prob = 1.0;
 					System.out.println("(i,j,p) = (" + i + "," + j + "," + prob + ")");
 					Market market = MarketFactory.randomUnitDemandMarket(i, j, prob);
 					//System.out.println(market);
@@ -81,16 +61,20 @@ public class Main {
 						System.out.println("MAXWEQ was better or equal than EVP");
 						System.exit(-1);
 					}*/
-					 LPReservePrices SRPAllConnected = new LPReservePrices(market,new SelectAllConnectedUsers(), new SetReservePricesSimple());
+					/*algorithms.lp.reserveprices.LPReservePrices SRPAllConnected = new algorithms.lp.reserveprices.LPReservePrices(market,new algorithms.lp.reserveprices.SelectAllConnectedUsers(), new algorithms.lp.reserveprices.SetReservePricesSimple());
 					MarketPrices LPRP = SRPAllConnected.Solve();
+					System.out.println("LPSRP revenue = \t\t" + LPRP.sellerRevenuePriceVector());*/
+					unitdemand.lp.LPReservePrices LPRPUnitDemand = new unitdemand.lp.LPReservePrices(market);
+					MarketPrices LPRP = LPRPUnitDemand.Solve();
 					System.out.println("LPSRP revenue = \t\t" + LPRP.sellerRevenuePriceVector());
 					//Printer.printMatrix(LPRP.getMarketAllocation().getAllocation());
 					//Printer.printVector(LPRP.getPriceVector());
 					
-					if(LPRP.sellerRevenuePriceVector() > evpAllConnected.getSellerRevenue()){
-						System.out.println("LPRP was better or equal than EVP");
+					if(LPRP.sellerRevenuePriceVector() < evpAllConnected.getSellerRevenue()){
+						System.out.println("EVPApp was better or equal than LPRP");
 						System.exit(-1);
 					}
+					//}
 				}
 			}
 		}

@@ -36,10 +36,6 @@ public class EnvyFreePricesVectorLP {
 	protected IloNumVar[] prices;
 	protected IloCplex cplex;
 	/*
-	 * Reserve Prices
-	 */
-	protected double[] reservePrices;
-	/*
 	 * Constructor receives an allocated market M only and creates IloCplex Object
 	 */
 	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket){
@@ -141,14 +137,15 @@ public class EnvyFreePricesVectorLP {
 	/*
 	 * Set reserve prices for all user classes
 	 */
-	protected void setReservePrices(){
+	public void setReservePrices(double[] reservePrices){
 		if(reservePrices.length != this.allocatedMarket.getMarket().getNumberUsers()){
 			System.out.println("Reserve Prices vector must be of same length as number of users");
 			System.exit(-1);
 		}
 		try {
-			for(int i=0;i<this.reservePrices.length;i++){
-				this.linearConstrains.add(this.cplex.addGe(this.prices[i],this.reservePrices[i]));
+			for(int i=0;i<reservePrices.length;i++){
+				//System.out.println("Set reserve price of user " + i + " to " + reservePrices[i]);
+				this.linearConstrains.add(this.cplex.addGe(this.prices[i],reservePrices[i]));
 			}
 		} catch (IloException e) {
 			// TODO Auto-generated catch block
