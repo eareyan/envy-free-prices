@@ -1,9 +1,19 @@
 package test;
 
+import algorithms.EfficientAllocationLP;
+import algorithms.EnvyFreePricesSolutionLP;
+import algorithms.EnvyFreePricesVectorLP;
+import algorithms.Waterfall;
+import algorithms.WaterfallPrices;
 import ilog.concert.IloException;
+import ilog.cplex.IloCplex;
+import structures.Campaign;
 import structures.Market;
-import structures.MarketFactory;
+import structures.MarketAllocation;
 import structures.MarketPrices;
+import structures.User;
+import structures.factory.MarketAllocationFactory;
+import structures.factory.MarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
@@ -21,10 +31,104 @@ import experiments.UnitDemandExperiments;
  */
 public class Main {
 	
+	public static void main1(String[] args) throws IloException{
+		System.out.println("Testing Waterfall");
+		/*Market market = MarketFactory.randomMarket(3,3,1.0);
+		System.out.println(market);
+		Waterfall WF = new Waterfall(market);
+		WaterfallPrices WFSol = WF.Solve();
+		Printer.printMatrix(WFSol.getMarketAllocation().getAllocation());*/
+		
+		int numCamp = 30;
+		int numUser = 5;
+		
+		numUser = numCamp;
+		Campaign[] campaigns = new Campaign[numCamp];
+		for(int j=0;j<numCamp;j++){
+			campaigns[j] = new Campaign(2  /* demand */ ,2*(numCamp - j)/* reward */);
+		}
+		User[] users = new User[numUser];
+		for(int i=0;i<numUser;i++){
+			users[i] = new User(1);
+		}
+		boolean[][] connections = new boolean[numUser][numCamp];
+		int counter = 0;
+		//connections[0][0] = true;
+		//connections[0][numUser-1] = true;
+		connections[numUser-1][numUser-1] = true;
+		for(int i=0;i<numUser-1;i++){
+			connections[i][counter] = true;
+			counter++;
+			connections[i][counter] = true;
+		}
+		/*connections[0][0] = true;
+		connections[1][0] = true;
+		connections[1][1] = true;
+		connections[2][1] = true;
+		connections[2][2] = true;
+		//connections[3][2] = true;
+		connections[3][3] = true;*/
+		
+		Market weirdMarket = new Market(users,campaigns,connections);
+		System.out.println(weirdMarket);
+		Waterfall WF = new Waterfall(weirdMarket);
+		WaterfallPrices WFSol = WF.Solve();
+		System.out.println("WF Alloc");
+		//Printer.printMatrix(WFSol.getMarketAllocation().getAllocation());	
+		System.out.println(WFSol.getMarketAllocation().value());
+		
+		MarketAllocation y = new MarketAllocation(weirdMarket,new EfficientAllocationLP(weirdMarket).Solve(new IloCplex()).get(0));
+		System.out.println("Efficient Alloc");
+		//Printer.printMatrix(y.getAllocation());
+		System.out.println(y.value());
+		
+		System.out.println(WFSol.getMarketAllocation().value() / y.value());
+	}
+	
+	
 	public static void main2(String[] args) throws IloException {//throws IloException{
 		Market market = MarketFactory.randomUnitDemandMarket(3, 3, 0.5);
 		unitdemand.lp.LPReservePrices LP = new unitdemand.lp.LPReservePrices(market);
 		LP.Solve();
+	}
+	public static void main3(String[] args){
+		for(int j=2;j<20;j++){
+			for(int i=2;i<20;i++){
+				for(int p=0;p<4;p++){
+					for(int k=0;k<RunParameters.numTrials;k++){
+					double prob = 0.25 + p*(0.25);		
+		System.out.println("Compare MaxWEQ with LP in uniform-unit demand case");
+		Market market = MarketFactory.randomUnitDemandMarket(i, j, prob);
+		System.out.println(market);
+		double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(market);		
+		
+		Printer.printMatrix(valuationMatrix);
+		MaxWEQ maxWEQ = new MaxWEQ(valuationMatrix);
+		Matching maxWEQSol = maxWEQ.Solve();
+		System.out.println("1)------MaxWEQ Solution");
+		Printer.printMatrix(maxWEQSol.getMatching());
+		Printer.printVector(maxWEQSol.getPrices());
+		System.out.println(maxWEQSol.getSellerRevenue());
+		
+		//EnvyFreePricesVectorLP efpvLP = new EnvyFreePricesVectorLP(MarketAllocationFactory.getMaxWeightMatchingAllocation(market));
+		EnvyFreePricesVectorLP efpvLP = new EnvyFreePricesVectorLP(MarketAllocationFactory.getMaxWeightMatchingAllocation(MarketFactory.createMarketFromValuationMatrix(valuationMatrix)));
+		efpvLP.createLP();
+		EnvyFreePricesSolutionLP efpvSol = efpvLP.Solve();
+		System.out.println("2)------efPVLP Solution");
+		if(efpvSol.getMarketAllocation()!=null){
+		Printer.printMatrix(efpvSol.getMarketAllocation().getAllocation());
+		Printer.printVector(efpvSol.getPriceVector());
+		System.out.println(efpvSol.sellerRevenuePriceVector());
+		if(maxWEQSol.getSellerRevenue() != efpvSol.sellerRevenuePriceVector()){
+			System.out.println("DIFFERENT");
+			System.exit(-1);
+		}
+		}
+				}
+			}
+		}
+		}
+		
 	}
 	public static void main(String[] args) throws IloException {//throws IloException{
 		for(int i=2;i<20;i++){
@@ -36,7 +140,7 @@ public class Main {
 					System.out.println("(i,j,p) = (" + i + "," + j + "," + prob + ")");
 					Market market = MarketFactory.randomUnitDemandMarket(i, j, prob);
 					//System.out.println(market);
-					double [][] valuationMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(market);
+					double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(market);
 					/*valuationMatrix = new double[3][2];
 					valuationMatrix[0][0] = 39.92;
 					valuationMatrix[0][1] = Double.NEGATIVE_INFINITY;

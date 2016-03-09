@@ -15,8 +15,8 @@ import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketFactory;
 import structures.MarketPrices;
+import structures.factory.MarketFactory;
 import unitdemand.Matching;
 import util.Printer;
 

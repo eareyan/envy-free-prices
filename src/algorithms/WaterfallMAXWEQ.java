@@ -2,8 +2,8 @@ package algorithms;
 
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketFactory;
 import structures.MarketPrices;
+import structures.factory.MarketFactory;
 import util.Printer;
 
 /*

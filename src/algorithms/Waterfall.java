@@ -103,13 +103,14 @@ public class Waterfall {
 				bidVector.add(new Bid(this.market.getUser(Users.get(k)).getReservePrice(),Users.get(k),-1));
 				for(int l=0;l<feasibleCampaigns.size();l++){
 					if(this.market.isConnected(Users.get(k), feasibleCampaigns.get(l))){
+						//System.out.println("(" + Users.get(k) + "," + feasibleCampaigns.get(l) + ")");
 						bidVector.add(new Bid(budget[feasibleCampaigns.get(l)] / demand[feasibleCampaigns.get(l)] , Users.get(k), feasibleCampaigns.get(l)));
 					}
 				}
 				Collections.sort(bidVector, new BidComparator());
 				HighestBids.add(bidVector.get(0));
 				SecondHighestBids.add(bidVector.get(1));
-				//System.out.println("bidvector ordered: " + bidVector);
+				//System.out.println("bidvector ordered for user  "+ Users.get(k) + " = " + bidVector);
 			}
 			Collections.sort(SecondHighestBids, new BidComparator());
 			//System.out.println("HighestBids \t  = " + HighestBids);		
@@ -144,6 +145,8 @@ public class Waterfall {
 			if(demand[indexCampaignWinningBid] == 0){
 				Campaigns.remove(new Integer(indexCampaignWinningBid));
 			}
+			//System.out.println("Current Allocation:");
+			//printMatrix(allocation);
 		}
 		//printMatrix(bids);
 		//System.out.println("\n-");

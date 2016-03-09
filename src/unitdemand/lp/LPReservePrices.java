@@ -7,16 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import algorithms.EnvyFreePricesSolutionLP;
-import algorithms.EnvyFreePricesVectorLP;
-import experiments.UnitDemandExperiments;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.MarketPricesComparatorBySellerRevenue;
+import structures.factory.MarketAllocationFactory;
 import unitdemand.Link;
 import unitdemand.Matching;
-import util.Printer;
+import algorithms.EnvyFreePricesVectorLP;
 
 public class LPReservePrices {
 	protected Market market;
@@ -27,7 +25,7 @@ public class LPReservePrices {
 
 	public MarketPrices Solve() throws IloException{
 		/* Compute MWM */
-		double [][] valuationMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(this.market);
+		double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(this.market);
 		//Printer.printMatrix(valuationMatrix);
 		ArrayList<Link> valuations = Link.getEdgeValuations(valuationMatrix);
 		valuations.add(new Link(-1,0.0)); // Add valuation of zero

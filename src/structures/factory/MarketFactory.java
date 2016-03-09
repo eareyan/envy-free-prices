@@ -1,6 +1,10 @@
-package structures;
+package structures.factory;
 
 import java.util.Random;
+
+import structures.Campaign;
+import structures.Market;
+import structures.User;
 
 /*
  * Markets can be created in different ways.
@@ -135,7 +139,7 @@ public class MarketFactory {
 			connections[i][j] = (j-M.getNumberCampaigns() == i);
 			i++;
 		}
-		return new Market(M.users,campaigns,connections);
+		return new Market(M.getUsers(),campaigns,connections);
 	}
 	/*
 	 * Clones a market

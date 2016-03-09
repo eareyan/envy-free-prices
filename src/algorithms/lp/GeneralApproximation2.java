@@ -13,9 +13,9 @@ import ilog.cplex.IloCplex;
 import structures.Campaign;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketFactory;
 import structures.MarketPrices;
 import structures.MarketPricesComparatorBySellerRevenue;
+import structures.factory.MarketFactory;
 import util.Printer;
 
 public class GeneralApproximation2 extends GeneralApproximation{

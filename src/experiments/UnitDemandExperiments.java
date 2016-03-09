@@ -12,7 +12,8 @@ import algorithms.EnvyFreePricesVectorLP;
 import log.SqlDB;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketFactory;
+import structures.factory.MarketAllocationFactory;
+import structures.factory.MarketFactory;
 import unitdemand.MWBMatchingAlgorithm;
 import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.EVPApproximation;
@@ -24,42 +25,6 @@ import util.Printer;
  * @author Enrique Areyan Viqueira
  */
 public class UnitDemandExperiments extends Experiments{
-	
-	/*
-	 * Given a market, return a cost matrix to be input to the Hungarian algorithm. 
-	 * This matrix encodes the fact that a campaign is not connected to a user by 
-	 * assigning an infinite cost. For a connected campaign, we add a random valuation
-	 * between 1 and 100 for each edge. 
-	 */
-	public static double[][] getValuationMatrixFromMarket(Market market){
-		double[][] costMatrix = new double[market.getNumberUsers()][market.getNumberCampaigns()];        
-        for(int i=0;i<market.getNumberUsers();i++){
-        	for(int j=0;j<market.getNumberCampaigns();j++){
-        		if(market.isConnected(i, j)){
-        			costMatrix[i][j] = market.getCampaign(j).getReward();
-        		}else{
-        			costMatrix[i][j] = Double.NEGATIVE_INFINITY;
-        		}
-        	}
-        }
-        return costMatrix;
-	}
-	
-	/*
-	 * Given a cost matrix, run the Hungarian algorithm and return the max weight matching.
-	 */
-	public static int[][] getMaximumMatchingFromValuationMatrix(double[][] valuationMatrix){
-		int[] result  = new MWBMatchingAlgorithm(valuationMatrix).getMatching();
-        /* Initialize allocation as all disconnected */
-        int[][] allocationMatrix = new int[valuationMatrix.length][valuationMatrix[0].length];
-        for(int i=0;i<result.length;i++){
-        	//If the assignment is possible and the user is actually connected to the campaigns
-        	if(result[i] > -1 && valuationMatrix[i][result[i]] > Double.NEGATIVE_INFINITY){
-            	allocationMatrix[i][result[i]] = 1;
-        	}
-        }
-        return allocationMatrix;
-	}
 	
 	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException{
 		/*
@@ -85,7 +50,7 @@ public class UnitDemandExperiments extends Experiments{
 			for(int t=0;t<RunParameters.numTrials;t++){
 				/* Create random unitDemand market. Then get valuation matrix associated to the market. */
 				Market market = MarketFactory.randomUnitDemandMarket(numUsers, numCampaigns, prob);
-				double [][] valuationMatrix = UnitDemandExperiments.getValuationMatrixFromMarket(market);
+				double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(market);
 				/*
 				 * Measure maxEQ
 				 */
@@ -106,7 +71,7 @@ public class UnitDemandExperiments extends Experiments{
 				 * Measure lp with optimal allocation. The optimal allocation in this case is just the maximum weight matching
 				 */
 				/* First, get the maximum matching allocation.*/
-		        int[][] maximumMatchingAllocation = getMaximumMatchingFromValuationMatrix(valuationMatrix);
+		        int[][] maximumMatchingAllocation = MarketAllocationFactory.getMaximumMatchingFromValuationMatrix(valuationMatrix);
 		        MarketAllocation marketMaxMatchingAllocation = new MarketAllocation(market, maximumMatchingAllocation);
 				
 		       /* IloCplex iloObject;

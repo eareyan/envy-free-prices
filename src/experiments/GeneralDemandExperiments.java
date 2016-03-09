@@ -17,7 +17,7 @@ import algorithms.lp.GeneralApproximation;
 import log.SqlDB;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketFactory;
+import structures.factory.MarketFactory;
 
 /*
  * This class implements experiments in the general demand case.

@@ -44,5 +44,16 @@ public class Examples {
 		valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;
 		valuationMatrix[2][1] = 43.51;
 		
+		/* Example to test LP in the uniform unit-demand case with and without walrasian conditions */
+		valuationMatrix = new double[3][2];
+		valuationMatrix[0][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[0][1] = 62;
+
+		valuationMatrix[1][0] = 96;
+		valuationMatrix[1][1] = 62;
+
+		valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;
+		valuationMatrix[2][1] = 62;		
+		
 	}
 }
