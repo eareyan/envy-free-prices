@@ -42,4 +42,10 @@ public class Campaign {
 	public int getBackpointer(){
 		return this.backpointer;
 	}
+	/*
+	 * Setters
+	 */
+	public void setReward(double reward){
+		this.reward = reward;
+	}
 }

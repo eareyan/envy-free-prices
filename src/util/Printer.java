@@ -3,7 +3,7 @@ package util;
 import java.text.DecimalFormat;
 
 /*
- * Library with common methods.
+ * Library with common methods for printing information to the standard output.
  * 
  * @author Enrique Areyan Viqueira
  */

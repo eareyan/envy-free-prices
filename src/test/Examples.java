@@ -1,5 +1,8 @@
 package test;
 
+import structures.Campaign;
+import structures.Market;
+import structures.User;
 import util.Printer;
 
 public class Examples {
@@ -53,7 +56,35 @@ public class Examples {
 		valuationMatrix[1][1] = 62;
 
 		valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;
-		valuationMatrix[2][1] = 62;		
+		valuationMatrix[2][1] = 62;
+		
+		/* Example market where GeneralMaxWEQ produces non-envy-free prices*/
+		Campaign c1 = new Campaign(1, 79);
+		Campaign c2 = new Campaign(1, 89);
+		Campaign c3 = new Campaign(1, 53);
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		campaigns[2] = c3;
+		
+		User u1 = new User(1);
+		User u2 = new User(1);
+		User u3 = new User(1);
+		User[] users = new User[3];
+		users[0] = u1;
+		users[1] = u2;
+		users[2] = u3;
+		
+		boolean[][] connections = new boolean[3][3];
+		connections[0][0] = true;
+		connections[0][2] = true;
+		
+		connections[1][1] = true;
+		
+		connections[2][1] = true;
+		
+		Market market = new Market(users,campaigns,connections);
+		
 		
 	}
 }

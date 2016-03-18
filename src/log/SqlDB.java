@@ -111,4 +111,19 @@ public class SqlDB {
         preparedStatement.setDouble(16, wfMaxWEQTime);
         preparedStatement.execute();
     }
+	public void saveAllocationData(int n, int m, double p, double greedy0ToEfficient, double greedy1ToEfficient, double greedy2ToEfficient, double wfToEfficient, double wfToGreedy0, double wfToGreedy1, double wfToGreedy2) throws SQLException {
+        String sql = "INSERT INTO allocation(n,m,p,greedy0ToEfficient,greedy1ToEfficient,greedy2ToEfficient,wfToEfficient,wfToGreedy0,wfToGreedy1,wfToGreedy2) VALUES (?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
+        preparedStatement.setInt(1, n);
+        preparedStatement.setInt(2, m);
+        preparedStatement.setDouble(3, p);
+        preparedStatement.setDouble(4, greedy0ToEfficient);
+        preparedStatement.setDouble(5, greedy1ToEfficient);
+        preparedStatement.setDouble(6, greedy2ToEfficient);
+        preparedStatement.setDouble(7, wfToEfficient);
+        preparedStatement.setDouble(8, wfToGreedy0);
+        preparedStatement.setDouble(9, wfToGreedy1);
+        preparedStatement.setDouble(10, wfToGreedy2);
+        preparedStatement.execute();        
+	}
 }

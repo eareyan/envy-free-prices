@@ -116,6 +116,38 @@ public class MarketFactory {
 	}
 	
 	/*
+	 * Copies the given market without user i, deleting the corresponding row from connection matrix
+	 */
+	public static Market copyMarketWithoutCampaign(Market market, int campaignToDelete){
+		//Create Users
+		User[] users = new User[market.getNumberUsers()];
+		for(int i=0;i<market.getNumberUsers();i++){
+			users[i] = new User(market.getUser(i).getSupply());
+		}
+		//Create Campaigns
+		Campaign[] campaigns = new Campaign[market.getNumberCampaigns()-1];
+		int k = 0;
+		for(int j=0;j<market.getNumberCampaigns();j++){
+			if(j != campaignToDelete){
+				campaigns[k] = new Campaign(market.getCampaign(j).getDemand() , market.getCampaign(j).getReward());
+				k++;
+			}
+		}
+		//Create Connections
+		boolean[][] connections = new boolean[market.getNumberUsers()][market.getNumberCampaigns()-1];
+		int l = 0;
+		for(int j=0;j<market.getNumberCampaigns();j++){
+			if(j != campaignToDelete){
+				for(int i=0;i<market.getNumberUsers();i++){
+					connections[i][l] = market.isConnected(i, j);
+				}
+				l++;
+			}
+		}
+		return new Market(users,campaigns,connections);
+	}
+	
+	/*
 	 * Adds a dummy campaign per item that demands impressions from that item at the given value
 	 * and is not connected to any other item
 	 */

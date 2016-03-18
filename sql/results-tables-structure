@@ -40,6 +40,19 @@ CREATE TABLE unit_nonuniform_comparison (
 	allConnectedRevenue double precision NOT NULL
 	);
 
+CREATE TABLE allocation (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	greedy0ToEfficient double precision NOT NULL,
+	greedy1ToEfficient double precision NOT NULL,
+	greedy2ToEfficient double precision NOT NULL,
+	wfToEfficient double precision NOT NULL,
+	wfToGreedy0 double precision NOT NULL,
+	wfToGreedy1 double precision NOT NULL,
+	wfToGreedy2 double precision NOT NULL
+	);
+
 CREATE TABLE general_demand (
 	n integer NOT NULL,
 	m integer NOT NULL,
@@ -62,3 +75,6 @@ CREATE TABLE general_demand (
 \copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-demand.csv' csv header
 \copy unit_comparison to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-comparison.csv' csv header
 \copy general_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-general-demand.csv' csv header
+
+\copy (SELECT lpReservePriceRevenue / evpAppRevenue FROM unit_uniform_demand WHERE lpReservePriceRevenue >= evpAppRevenue AND p=0.25) to '/home/eareyanv/workspace/envy-free-prices/results/unit-uniform-demand/lpBiggerEqualevpapp-p25.csv' csv header
+

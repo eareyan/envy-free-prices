@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import structures.Market;
 import ilog.concert.IloException;
+import ilog.concert.IloLPMatrix;
 import ilog.concert.IloLinearNumExpr;
+import ilog.concert.IloNumExpr;
 import ilog.concert.IloNumVar;
 import ilog.cplex.IloCplex;
 
@@ -31,10 +33,22 @@ public class EfficientAllocationLP {
 	 */
 	protected IloCplex cplex;
 	/*
-	 * Constructor receives a game G.
+	 * Reserve price. Default value 0.0, in which case the reserve price is ignore.
 	 */
-	public EfficientAllocationLP(Market G){
-		this.market = G;
+	protected double reservePrice = 0.0;
+	/*
+	 * Constructor receives a market.
+	 */
+	public EfficientAllocationLP(Market market){
+		this.market = market;
+	}
+	/*
+	 * Constructor receives a market and a reserve price
+	 */
+	public EfficientAllocationLP(Market market, double reservePrice){
+		this.market = market;
+		this.reservePrice = reservePrice;
+		
 	}
 	/*
 	 * Solver method. Returns an ArrayList of int[][] containing all the efficient allocations
@@ -63,8 +77,20 @@ public class EfficientAllocationLP {
 			 * Objective.
 			 */
 			IloLinearNumExpr obj = this.cplex.linearNumExpr();
-			for (int j=0; j<this.market.getNumberCampaigns(); j++){
-				obj.addTerm(this.market.getCampaign(j).getReward(), indicatorVariable[j]);
+			/*
+			 * Check if we need reserve price.
+			 */
+			if(this.reservePrice <= 0){
+				//System.out.println("No reserve price");
+				for (int j=0; j<this.market.getNumberCampaigns(); j++){
+					obj.addTerm(this.market.getCampaign(j).getReward(), indicatorVariable[j]);
+				}
+			}else{
+				//System.out.println("Accounting for reserve price of " + this.reservePrice);
+				for (int j=0; j<this.market.getNumberCampaigns(); j++){
+					obj.addTerm(this.market.getCampaign(j).getReward() - this.reservePrice*this.market.getCampaign(j).getDemand(), indicatorVariable[j]);
+				}
+				//System.out.println(obj);
 			}
 			this.cplex.addMaximize(obj);
 			/*
@@ -83,7 +109,7 @@ public class EfficientAllocationLP {
 					}
 				}
 				this.cplex.addGe(expr,indicatorVariable[j]);
-				this.cplex.addLe(expr,1);
+				this.cplex.addLe(expr,indicatorVariable[j]);
 			}
 			/*
 			 * Constrain (2). Allocation from user can not be more than supply.
@@ -95,6 +121,22 @@ public class EfficientAllocationLP {
 				}
 				this.cplex.addLe(expr,this.market.getUser(i).getSupply());
 			}
+			/*
+			 * Constrain (3). For all j: If y_j = 0 then x_{ij} = 0 for all i.
+			 */
+			/*IloNumVar[] indicatorVariableIfThen = cplex.boolVarArray(this.market.getNumberCampaigns());
+			for(int j=0;j<this.market.getNumberCampaigns();j++){
+				//System.out.println("Add IF-THEN constraint for campaign " + j);
+				this.cplex.addGe(cplex.sum(indicatorVariable[j],
+									cplex.prod(Integer.MAX_VALUE,
+											cplex.sum(1,
+													cplex.prod(-1,indicatorVariableIfThen[j]))))
+													,1);
+				for(int i=0;i<this.market.getNumberUsers();i++){
+					this.cplex.addGe(cplex.prod(Integer.MAX_VALUE, indicatorVariableIfThen[j]), allocationMatrixVariable[i][j]);
+				}
+				
+			}*/
 			/*
 			 * Solve the problem and get many solutions:
 			 */
@@ -110,6 +152,8 @@ public class EfficientAllocationLP {
 					System.out.println("The solution pool contains " + numsol + " solutions.");
 					System.out.println(numsolreplaced + " solutions were removed due to the " + "solution pool relative gap parameter.");
 					System.out.println("In total, " + (numsol + numsolreplaced) + " solutions were generated.");
+					System.out.println("Solution status = " + this.cplex.getStatus());
+			    	System.out.println("Solution value  = " + this.cplex.getObjValue());
 				}
 	            /*
 	             * Store all the solutions in an ArrayList.
@@ -132,6 +176,10 @@ public class EfficientAllocationLP {
 	    				}
 	    			}
 	    			Solutions.add(sol);
+	    			
+	    			/*for(int j=0;j<this.market.getNumberCampaigns();j++){
+	    				System.out.println(this.cplex.getValue(indicatorVariable[j],l));
+	    			}*/
 	            }
 	            this.cplex.end();
 	            return Solutions;

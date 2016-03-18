@@ -3,6 +3,7 @@ package structures.factory;
 import structures.Market;
 import structures.MarketAllocation;
 import unitdemand.MWBMatchingAlgorithm;
+import unitdemand.Matching;
 
 public class MarketAllocationFactory {
 	
@@ -49,5 +50,22 @@ public class MarketAllocationFactory {
 	public static MarketAllocation getMaxWeightMatchingAllocation(Market market){
 		return new MarketAllocation(market,MarketAllocationFactory.getMaximumMatchingFromValuationMatrix(MarketAllocationFactory.getValuationMatrixFromMarket(market)));
 	}
+	
+	/*
+	 * This method is for the unit demand case only
+	 * This method first computes a new valuation matrix by subtracting the reserve values
+	 * and setting negative values to negative infinity.
+	 * Then, get an allocation for the new valuation matrix by solving for the MWM with new valuation matrix	
+	 */
+	public static int[][] getAllocationWithReservePrices(double[][] valuationMatrix, double reserve){
+		double[][] valuationMatrixWithReserve = new double[valuationMatrix.length][valuationMatrix[0].length];
+		for(int i=0;i<valuationMatrix.length;i++){
+			for(int j=0;j<valuationMatrix[0].length;j++){
+				valuationMatrixWithReserve[i][j] = (valuationMatrix[i][j] - reserve < 0) ? Double.NEGATIVE_INFINITY : (valuationMatrix[i][j] - reserve);
+			}
+		}
+		//Printer.printMatrix(valuationMatrixWithReserve);
+		return Matching.computeMaximumWeightMatchingValue(valuationMatrixWithReserve).getMatching();
+	}	
 
 }

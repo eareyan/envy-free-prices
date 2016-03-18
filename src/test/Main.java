@@ -3,6 +3,8 @@ package test;
 import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
+import algorithms.GeneralMaxWEQ;
+import algorithms.GreedyAllocation;
 import algorithms.Waterfall;
 import algorithms.WaterfallPrices;
 import ilog.concert.IloException;
@@ -130,7 +132,104 @@ public class Main {
 		}
 		
 	}
-	public static void main(String[] args) throws IloException {//throws IloException{
+	
+	public static void main5(String[] args) throws IloException{
+		Market market = MarketFactory.randomMarket(3, 3, 1.0);
+		System.out.println(market);
+		
+
+		MarketAllocation efficient = new MarketAllocation(market,new EfficientAllocationLP(market).Solve(new IloCplex()).get(0));
+		Printer.printMatrix(efficient.getAllocation());
+		System.out.println();
+
+		GreedyAllocation G0 = new GreedyAllocation(market,0);
+		MarketAllocation greedy0 = G0.Solve();
+		Printer.printMatrix(greedy0.getAllocation());
+
+		GreedyAllocation G1 = new GreedyAllocation(market,1);
+		MarketAllocation greedy1 = G1.Solve();
+		Printer.printMatrix(greedy1.getAllocation());
+
+		GreedyAllocation G2 = new GreedyAllocation(market,-1);
+		MarketAllocation greedy2 = G2.Solve();
+		Printer.printMatrix(greedy2.getAllocation());
+
+		
+		
+		/* System.out.println(greedy.value() / efficient.value());
+		WaterfallPrices waterFallAllocationPrices = new Waterfall(market).Solve();		
+		System.out.println();
+		Printer.printMatrix(waterFallAllocationPrices.getMarketAllocation().getAllocation());
+		System.out.println(waterFallAllocationPrices.getMarketAllocation().value() / efficient.value());
+		
+		
+		MarketAllocation efficient1 = new MarketAllocation(market,new EfficientAllocationLP(market).Solve(new IloCplex()).get(0));
+		MarketAllocation greedy1 = new GreedyAllocation(market).Solve();
+		MarketAllocation wf1 = new Waterfall(market).Solve().getMarketAllocation();	
+		System.out.println(wf1.value() / greedy1.value());
+		System.out.println(greedy1.value() / efficient1.value());
+		System.out.println(wf1.value() / efficient1.value());*/
+		
+		
+	}
+	
+	public static void main6(String[] args){
+		
+		Campaign c1 = new Campaign(1, 79);
+		Campaign c2 = new Campaign(1, 89);
+		Campaign c3 = new Campaign(1, 53);
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		campaigns[2] = c3;
+		
+		User u1 = new User(1);
+		User u2 = new User(1);
+		User u3 = new User(1);
+		User[] users = new User[3];
+		users[0] = u1;
+		users[1] = u2;
+		users[2] = u3;
+		
+		boolean[][] connections = new boolean[3][3];
+		connections[0][0] = true;
+		connections[0][2] = true;		
+		
+		connections[1][1] = true;
+		
+		connections[2][1] = true;
+		
+		//Market market = new Market(users,campaigns,connections);		
+		
+		Market market = MarketFactory.randomUnitDemandMarket(2, 3, 1.0);
+		System.out.println(market);
+		double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(market);
+		MaxWEQ maxWEQ = new MaxWEQ(valuationMatrix);
+		Matching maxWeqSOL= maxWEQ.Solve();
+		Printer.printMatrix(maxWeqSOL.getMatching());
+		Printer.printVector(maxWeqSOL.getPrices());
+		GeneralMaxWEQ generalMaxWEQ = new GeneralMaxWEQ(market);
+		generalMaxWEQ.Solve();
+
+	}
+	public static void main(String[] args) throws IloException{
+		double reservePrice =10.0;
+		System.out.println("Efficient allocation with reserve price of " + reservePrice);
+		//Market market = MarketFactory.randomUnitDemandMarket(3, 3, 1.0);
+		Market market = MarketFactory.randomMarket(3, 3, 1.0);
+		System.out.println(market);
+		int[][] efficientAllocation = new EfficientAllocationLP(market).Solve(new IloCplex()).get(0);
+		Printer.printMatrix(efficientAllocation);
+		System.out.println();
+		int[][] efficientAllocationReservePrice = new EfficientAllocationLP(market,reservePrice).Solve(new IloCplex()).get(0);
+		Printer.printMatrix(efficientAllocationReservePrice);
+		/*System.out.println();
+		Printer.printMatrix(MarketAllocationFactory.getMaximumMatchingFromValuationMatrix(MarketAllocationFactory.getValuationMatrixFromMarket(market)));
+		System.out.println();		
+		Printer.printMatrix(MarketAllocationFactory.getAllocationWithReservePrices(MarketAllocationFactory.getValuationMatrixFromMarket(market), reservePrice));*/
+		
+	}
+	public static void main4(String[] args) throws IloException {//throws IloException{
 		for(int i=2;i<20;i++){
 			for(int j=2;j<20;j++){
 				for(int p=0;p<4;p++){
@@ -141,7 +240,7 @@ public class Main {
 					Market market = MarketFactory.randomUnitDemandMarket(i, j, prob);
 					//System.out.println(market);
 					double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(market);
-					/*valuationMatrix = new double[3][2];
+					valuationMatrix = new double[3][2];
 					valuationMatrix[0][0] = 39.92;
 					valuationMatrix[0][1] = Double.NEGATIVE_INFINITY;
 
@@ -151,14 +250,14 @@ public class Main {
 					valuationMatrix[2][0] = Double.NEGATIVE_INFINITY;
 					valuationMatrix[2][1] = 43.51;					
 					market = MarketFactory.createMarketFromValuationMatrix(valuationMatrix);
-					System.out.println(market);*/
+					System.out.println(market);
 					EVPApproximation EVPAllConnected = new EVPApproximation(valuationMatrix,new AllConnectedDummies());
 					Matching evpAllConnected = EVPAllConnected.Solve();
 					System.out.println("evpAllConnected revenue = \t"+evpAllConnected.getSellerRevenue());
 					//Printer.printMatrix(evpAllConnected.getMatching());
 					//Printer.printVector(evpAllConnected.getPrices());
 					
-					MaxWEQ maxWEQ = new MaxWEQ(valuationMatrix);
+					/*MaxWEQ maxWEQ = new MaxWEQ(valuationMatrix);
 					Matching maxWeqSOL= maxWEQ.Solve();
 					 System.out.println("MaxWEQ revenue = \t\t" + maxWeqSOL.getSellerRevenue());
 					/*if(maxWeqSOL.getSellerRevenue() - evpAllConnected.getSellerRevenue()  >= 0.1){

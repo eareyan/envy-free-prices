@@ -7,6 +7,7 @@ import java.util.Collections;
 import unitdemand.Link;
 import unitdemand.Matching;
 import unitdemand.MatchingComparatorBySellerRevenue;
+import util.Printer;
 
 /*
  * Implements Envy-Free Pricing Approximation Algorithm by Guruswami et. al.
@@ -45,14 +46,14 @@ public class EVPApproximation {
 			this.MWRP.setReservePrices(reservePrices);
 			Matching x = this.MWRP.Solve(valueLink.getJ());
 			setOfSolutionMatchings.add(x);
-			/*System.out.println("''''''");
+			//System.out.println("''''''");
 			Printer.printMatrix(x.getMatching());
 			Printer.printVector(x.getPrices());
-			System.out.println(x.getSellerRevenue());
-			System.out.println("''''''");	*/		
+			//System.out.println(x.getSellerRevenue());
+			//System.out.println("''''''");	
 		}
-		Collections.sort(setOfSolutionMatchings, new MatchingComparatorBySellerRevenue());
-		//System.out.println(setOfMatchings);
+		System.out.println(setOfSolutionMatchings);
+		Collections.sort(setOfSolutionMatchings, new MatchingComparatorBySellerRevenue());		
 		return setOfSolutionMatchings.get(0);
 	}
 }
