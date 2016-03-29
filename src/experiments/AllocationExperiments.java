@@ -11,9 +11,9 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.factory.MarketFactory;
 import util.NumberMethods;
-import algorithms.EfficientAllocationLP;
-import algorithms.GreedyAllocation;
 import algorithms.Waterfall;
+import algorithms.allocations.EfficientAllocationILP;
+import algorithms.allocations.GreedyAllocation;
 import log.SqlDB;
 
 public class AllocationExperiments extends Experiments{
@@ -33,7 +33,7 @@ public class AllocationExperiments extends Experiments{
 				/* Create a random Market*/
 				Market randomMarket = MarketFactory.randomMarket(numUsers, numCampaigns, prob);
 				/* Compute different allocations */
-				MarketAllocation efficient = new MarketAllocation(randomMarket,new EfficientAllocationLP(randomMarket).Solve(new IloCplex()).get(0));
+				MarketAllocation efficient = new MarketAllocation(randomMarket,new EfficientAllocationILP(randomMarket).Solve(new IloCplex()).get(0));
 				MarketAllocation greedy0 = new GreedyAllocation(randomMarket).Solve();
 				MarketAllocation greedy1 = new GreedyAllocation(randomMarket,1).Solve();
 				MarketAllocation greedy2 = new GreedyAllocation(randomMarket,-1).Solve();

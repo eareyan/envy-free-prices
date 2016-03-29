@@ -7,13 +7,13 @@ import java.sql.SQLException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import algorithms.EfficientAllocationLP;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.Waterfall;
 import algorithms.WaterfallMAXWEQ;
 import algorithms.WaterfallPrices;
-import algorithms.lp.GeneralApproximation;
+import algorithms.allocations.EfficientAllocationILP;
+import algorithms.pricing.lp.GeneralApproximation;
 import log.SqlDB;
 import structures.Market;
 import structures.MarketAllocation;
@@ -63,7 +63,7 @@ public class GeneralDemandExperiments extends Experiments{
 				Market randomMarket = MarketFactory.randomMarket(numUsers, numCampaigns, prob);
 				/* Find the efficient allocation*/
 				startTime = System.nanoTime();
-				int[][] efficientAllocation = new EfficientAllocationLP(randomMarket).Solve(iloObject0).get(0);
+				int[][] efficientAllocation = new EfficientAllocationILP(randomMarket).Solve(iloObject0).get(0);
 				MarketAllocation randomMarketEfficientAllocation = new MarketAllocation(randomMarket, efficientAllocation);
 				double effAllocValue = randomMarketEfficientAllocation.value();
 				statEffAllocValue.addValue(effAllocValue);

@@ -19,14 +19,19 @@ public class MarketAllocation {
 		this.market = m;
 		this.allocation = this.cleanMatrix(allocation);
 	}
+	/*
+	 * Getters
+	 */
 	
 	public Market getMarket(){
 		return this.market;
 	}
-	
 	public int[][] getAllocation(){
 		return this.allocation;
 	}
+	public int getAllocation(int i, int j){
+		return this.allocation[i][j];
+	}	
 	/*
 	 * Get value of allocation. The value of an allocation is defined as the
 	 * sum of all the campaigns that are fulfilled by the allocation.
