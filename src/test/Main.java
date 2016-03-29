@@ -17,10 +17,12 @@ import structures.factory.MarketAllocationFactory;
 import structures.factory.MarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
+import unitdemand.ascendingauction.AscendingAuction;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 import experiments.RunParameters;
+import experiments.UnitDemandComparison;
 import experiments.UnitDemandExperiments;
 //import ilog.concert.IloException;
 //import ilog.cplex.IloCplex;
@@ -132,7 +134,16 @@ public class Main {
 		
 	}
 	
-	public static void main(String[] args) throws IloException{
+	public static void main(String[] args){
+		double[][] valuationMatrix = UnitDemandComparison.getValuationMatrix(2, 3, 0.5);
+		Market m = MarketFactory.createMarketFromValuationMatrix(valuationMatrix);
+		System.out.println(m);
+		valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(m);
+		AscendingAuction A = new AscendingAuction(valuationMatrix);
+		A.Solve();
+	}
+	
+	public static void main7(String[] args) throws IloException{
 		Market market = MarketFactory.randomMarket(3, 3, 1.0);
 		System.out.println(market);
 		
