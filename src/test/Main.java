@@ -6,6 +6,7 @@ import algorithms.Waterfall;
 import algorithms.WaterfallPrices;
 import algorithms.allocations.EfficientAllocationILP;
 import algorithms.allocations.GreedyAllocation;
+import algorithms.ascendingauction.AscendingAuction;
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import structures.Campaign;
@@ -17,7 +18,7 @@ import structures.factory.MarketAllocationFactory;
 import structures.factory.MarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
-import unitdemand.ascendingauction.AscendingAuction;
+//import unitdemand.ascendingauction.AscendingAuction;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
@@ -134,13 +135,30 @@ public class Main {
 		
 	}
 	
+	
 	public static void main(String[] args){
-		double[][] valuationMatrix = UnitDemandComparison.getValuationMatrix(2, 3, 0.5);
+		Market market = MarketFactory.randomMarket(2, 3, 0.55);
+		System.out.println(market);
+		AscendingAuction A = new AscendingAuction(market);
+		A.Solve();
+	}
+	
+	
+	public static void main9(String[] args){
+		double[][] valuationMatrix = UnitDemandComparison.getValuationMatrix(2, 3,1.0);
 		Market m = MarketFactory.createMarketFromValuationMatrix(valuationMatrix);
 		System.out.println(m);
 		valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(m);
-		AscendingAuction A = new AscendingAuction(valuationMatrix);
-		A.Solve();
+		//Printer.printMatrix(valuationMatrix);
+		//AscendingAuction A = new AscendingAuction(valuationMatrix);
+		//A.Solve();
+		
+		MaxWEQ maxWEQ = new MaxWEQ(valuationMatrix);
+		Matching maxWEQSol = maxWEQ.Solve();
+		System.out.println("1)------MaxWEQ Solution");
+		Printer.printMatrix(maxWEQSol.getMatching());
+		Printer.printVector(maxWEQSol.getPrices());
+		System.out.println(maxWEQSol.getSellerRevenue());
 	}
 	
 	public static void main7(String[] args) throws IloException{
