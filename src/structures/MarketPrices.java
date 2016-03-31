@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-
 /*
  * In this class we have an allocated market and prices.
  * Prices could be a vector of prices or a matrix of prices.
@@ -17,11 +16,17 @@ import java.util.PriorityQueue;
  * @author Enrique Areyan Viqueira
  */
 public class MarketPrices {
-	
+	/*
+	 * Market Allocation Object. Contains a market object and an allocation (matrix of integers) 
+	 */
 	protected MarketAllocation marketAllocation;
-	
+	/*
+	 * pricesMatrix[i][j] is the price for campaign j per impression in user class i
+	 */
 	protected double[][] pricesMatrix;
-
+	/*
+	 * priceVector[i] is the price per impression of user i
+	 */
 	protected double[] pricesVector;
 	
 	public MarketPrices(){
@@ -43,10 +48,16 @@ public class MarketPrices {
 	public MarketAllocation getMarketAllocation(){
 		return this.marketAllocation;
 	}
-
+	public double[] getPriceVector(){
+		return this.pricesVector;
+	}
 	public double getPriceVectorComponent(int i){
 		return this.pricesVector[i];
 	}
+	/*
+	 * Seller revenue for price matrix
+	 * Seller revenue is defined as \sum_{i,j}x_{i,j}p_{i,j}
+	 */
 	public double sellerRevenuePriceMatrix(){
 		double value = 0;
 		for(int i=0;i<this.marketAllocation.allocation.length;i++){
@@ -57,9 +68,10 @@ public class MarketPrices {
 		return value;
 	}
 	
-	public double[] getPriceVector(){
-		return this.pricesVector;
-	}
+	/*
+	 * Seller revenue for price vector
+	 * Seller revenue is defined as \sum_{i,j}x_{i,j}p_{i}
+	 */
 
 	public double sellerRevenuePriceVector(){
 		double value = 0;
@@ -70,7 +82,9 @@ public class MarketPrices {
 		}
 		return value;
 	}
-	
+	/*
+	 * Printers
+	 */
 	public void printPricesMatrix(){
 		DecimalFormat df = new DecimalFormat("#.00"); 
 		System.out.println("Prices Matrix: ");

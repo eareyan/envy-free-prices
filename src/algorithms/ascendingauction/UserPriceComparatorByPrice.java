@@ -1,7 +1,12 @@
-package algorithms.ascendingauction2;
+package algorithms.ascendingauction;
 
 import java.util.Comparator;
 
+/*
+ * Comparator to compare two UserPrice objects by price.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class UserPriceComparatorByPrice implements Comparator<UserPrice>{
 
 	@Override

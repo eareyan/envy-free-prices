@@ -6,7 +6,7 @@ import algorithms.Waterfall;
 import algorithms.WaterfallPrices;
 import algorithms.allocations.EfficientAllocationILP;
 import algorithms.allocations.GreedyAllocation;
-import algorithms.ascendingauction2.AscendingAuction;
+import algorithms.ascendingauction.AscendingAuction;
 //import ilog.concert.IloException;
 //import ilog.cplex.IloCplex;
 import structures.Campaign;
@@ -137,10 +137,41 @@ public class Main {
 	
 	
 	public static void main(String[] args){
-		Market market = MarketFactory.randomMarket(1, 3, 1.0);
+		
+		
+		
+		/*Campaign c1 = new Campaign(10, 6.8130);
+		Campaign c2 = new Campaign(4, 84.9019);
+		Campaign c3 = new Campaign(2, 15.2527);
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		campaigns[2] = c3;
+		
+		User u1 = new User(5);
+		User[] users = new User[1];
+		users[0] = u1;
+		
+		boolean[][] connections = new boolean[1][3];
+		connections[0][0] = true;
+		connections[0][1] = true;		
+		connections[0][2] = true;
+		
+		Market market = new Market(users,campaigns,connections);*/
+		
+		
+		
+		
+		Market market = MarketFactory.randomMarket(2, 5, 0.5);
 		System.out.println(market);
 		AscendingAuction A = new AscendingAuction(market);
-		A.Solve();
+		MarketPrices M = A.Solve();
+		System.out.println("Seller Revenue = " + M.sellerRevenuePriceVector());
+		
+		/*double[][] valuationMatrix = UnitDemandComparison.getValuationMatrix(2, 5,1.0);
+		Printer.printMatrix(valuationMatrix);
+		unitdemand.ascendingauction.AscendingAuction unitDemandAuction = new unitdemand.ascendingauction.AscendingAuction(valuationMatrix);
+		unitDemandAuction.Solve();*/
 	}
 	
 	

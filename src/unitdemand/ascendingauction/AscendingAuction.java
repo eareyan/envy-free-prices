@@ -13,7 +13,7 @@ public class AscendingAuction {
 	
 	protected double[] prices;
 	
-	protected static double epsilon = 0.001;
+	protected static double epsilon = 0.0001;
 	
 	public AscendingAuction(double[][] valuationMatrix){
 		this.valuationMatrix = valuationMatrix;

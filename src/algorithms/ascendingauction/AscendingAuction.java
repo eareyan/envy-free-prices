@@ -4,191 +4,159 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import structures.Market;
-import unitdemand.ascendingauction.Bid;
+import structures.MarketAllocation;
+import structures.MarketPrices;
 import util.Printer;
 
 /*
- * Implements an ascending auction in a market object.
- * Outputs allocation and prices.
+ * Implements an ascending auction.
+ * This class returns an allocation and prices so that
+ * every campaign is envy-free (uop to epsilon) and a user class that is completely unallocated
+ * has price zero.
  * 
  * @author Enrique Areyan Viqueira
  */
 public class AscendingAuction {
+	
 	protected Market market;
 	
-	protected static double epsilon = 0.5;
+	protected double[] prices;
 	
-	double[][] prices;
-	int[][] allocation;
+	protected int[][] allocation;
+	
+	protected static double epsilon = 0.0001;
 	
 	public AscendingAuction(Market market){
 		this.market = market;
-		this.prices = new double[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
+		this.prices = new double[this.market.getNumberUsers()];
 		this.allocation = new int[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
 	}
 	
-	public void Solve(){
-		
-		System.out.println("Initial Allocation:");
-		Printer.printMatrix(this.allocation);
-
-		System.out.println("Initial Prices:");
-		Printer.printMatrix(this.prices);
-		
+	public MarketPrices Solve(){
+		ArrayList<UserPrice> currentPrices = new ArrayList<UserPrice>(this.market.getNumberUsers());
 		/* Initial structures */
+		for(int i=0;i<this.market.getNumberUsers();i++){
+			currentPrices.add(new UserPrice(i,0.0));
+		}
 		ArrayList<Integer> unallocatedCampaigns = new ArrayList<Integer>();
-		ArrayList<ArrayList<UserPriceAlloc>> listOfUsers = new ArrayList<ArrayList<UserPriceAlloc>>(this.market.getNumberCampaigns()); 
+		ArrayList<ArrayList<BundleEntry>> listOfUsers = new ArrayList<ArrayList<BundleEntry>>(this.market.getNumberCampaigns()); 
 		for(int j=0;j<this.market.getNumberCampaigns();j++){ /* Initially all campaigns are unallocated*/
 			unallocatedCampaigns.add(j);
 			/* Populate the list of users that campaigns have access to*/
-			ArrayList<UserPriceAlloc> listOfUsersForCampaign = new ArrayList<UserPriceAlloc>();
+			ArrayList<BundleEntry> listOfUsersForCampaign = new ArrayList<BundleEntry>();
 			for(int i=0;i<this.market.getNumberUsers();i++){
 				if(this.market.isConnected(i, j)){
-					listOfUsersForCampaign.add(new UserPriceAlloc(i,0.0,0));
+					listOfUsersForCampaign.add(new BundleEntry(i,0));
 				}
 			}
 			listOfUsers.add(listOfUsersForCampaign);
 		}
-		
-		/* Main Loop*/
 		while(true){
-			ArrayList<Bundle> setOfBids = new ArrayList<Bundle>();
-			System.out.println(listOfUsers);
-			System.out.println("unallocatedCampaigns = " + unallocatedCampaigns);
-			for(Integer j: unallocatedCampaigns){
-				ArrayList<UserPriceAlloc> bundle = this.findGreedyMatch(listOfUsers.get(j),j);
-				System.out.println("Greedy match for campaign " + j + " => " + bundle);
-				if(bundle.size()>0){
-					setOfBids.add(new Bundle(j,bundle));
+			//System.out.println("unallocatedCampaigns = " + unallocatedCampaigns);
+			ArrayList<Bundle> B = new ArrayList<Bundle>();
+			for(Integer j:unallocatedCampaigns){
+				//System.out.println("Campaign "+j+" is unallocated, try to find a match");
+				ArrayList<BundleEntry> bundle = this.findUtilityMaximizerBundle(currentPrices, j);
+				//System.out.println("greedyBundle = " + bundle);
+				if(!bundle.isEmpty()){
+					B.add(new Bundle(j,bundle));
 				}
 			}
-			System.out.println("All bids: " + setOfBids);
-			
-			if(setOfBids.size()>0){
-				Bundle b = setOfBids.get(0);
-				System.out.println("Current bid = " + b);
-				int campaignIndex = b.getCampaignIndex();
-				ArrayList<UserPriceAlloc> currentAlloc = listOfUsers.get(campaignIndex);
-				System.out.println("currentAlloc = " + currentAlloc);
-				System.out.println("Allocate the following bundle: " + b.getBundle());
+			//System.out.println("SET B = " + B);
+			if(B.size()>0){ //If some unallocated campaign placed a bid.
+				Bundle b = B.get(0);
+				int campaignIndex = b.getJ();
+				ArrayList<BundleEntry> bundle = b.getBundle();
+				//System.out.println("Alloc campaign " + campaignIndex + " with bundle " + bundle);
 				unallocatedCampaigns.remove(new Integer(campaignIndex));
-				for(UserPriceAlloc u:b.getBundle()){
-					System.out.println("User = " + u.getI());
-					updateAllocAndPrices(currentAlloc,u.getI(),u.getAlloc());
-					if(userOverSupplied(listOfUsers,u.getI())){
-						System.out.println("User is OVERSUPPLIED!");
-						/* Unallocate enough campaigns to have this user not beign oversupplied*/
-						unallocateCampaigns(listOfUsers, unallocatedCampaigns, u.getI(),campaignIndex);
+				for(BundleEntry entry:bundle){ //For each entry in the bundle of the bid
+					int userId = entry.getI() , campaignId = b.getJ(),  allocToUser = 0;
+					//System.out.println("\t\tx[i][j] = x["+userId + "][" +campaignId + "] = " + entry.getX());
+					this.allocation[userId][campaignId] = entry.getX(); //Allocate this many
+					for(int l=0;l<this.market.getNumberCampaigns();l++){
+						allocToUser += this.allocation[userId][l];
+					}
+					if(allocToUser > this.market.getUser(userId).getSupply()){ //Check if we haven't exceed the total supply of this user
+						//We need to unallocate campaigns now since we have exceed supply!
+						//System.out.println("We need to unallocate campaigns from user " + userId+", current alloc = " + allocToUser + ", max = " + this.market.getUser(userId).getSupply());
+						this.updatePrices(currentPrices, userId);
+						for(int l=0;l<this.market.getNumberCampaigns();l++){
+							if(l!=campaignId && this.allocation[userId][l]>0){
+								/*Completely unallocate another campaign also allocated to this user*/ 
+								allocToUser -= this.allocation[userId][l];
+								for(int i=0;i<this.market.getNumberUsers();i++){
+									this.allocation[i][l] = 0;
+								}
+								unallocatedCampaigns.add(new Integer(l));
+								if(allocToUser <= this.market.getUser(userId).getSupply()){
+									break;
+								}
+							}
+						}	
 					}
 				}
-				
-			}else{ //No more bids, halt with current allocation and prices
+			}else{
 				break;
 			}
-			System.out.println("unallocatedCampaigns = " + unallocatedCampaigns);
 		}
-			
-			System.out.println(listOfUsers);
-			convertBidsIntoMatrices(listOfUsers);
-			System.out.println("Final Allocation:");
-			Printer.printMatrix(this.allocation);
+		System.out.println("Final Allocation:");
+		Printer.printMatrix(this.allocation);
 
-			System.out.println("Final Prices:");
-			Printer.printMatrix(this.prices);
+		System.out.println("Final Prices:");
+		this.storeFinalPrices(currentPrices);
+		Printer.printVector(this.prices);
+		for(int i=0;i<this.market.getNumberUsers();i++){
+			System.out.println("P["+i+"] = "+this.prices[i]);
+		}
+		return new MarketPrices(new MarketAllocation(this.market,this.allocation),this.prices);
 	}
-	
-	public void updateAllocAndPrices(ArrayList<UserPriceAlloc> currentAlloc, int i, int alloc){
-		System.out.println("Current alloc update user " + i + " to have " + alloc);
-		for(UserPriceAlloc x: currentAlloc){
-			if(x.getI() == i){
-				x.updateAlloc(alloc);
-				x.updatePrice(x.getPrice() + AscendingAuction.epsilon);
+	/*
+	 * Stores final price vecto
+	 */
+	public void storeFinalPrices(ArrayList<UserPrice> prices){
+		for(UserPrice u: prices){
+			this.prices[u.getI()] = u.getPrice();
+		}
+	}
+	/*
+	 * Given the list of prices and a user i, increment P_i by epsilon
+	 */
+	public void updatePrices(ArrayList<UserPrice> prices, int i){
+		for(int k=0;k<this.market.getNumberUsers();k++){
+			if(prices.get(k).getI() == i){
+				prices.get(k).updatePrice(prices.get(k).getPrice() + AscendingAuction.epsilon);
 			}
 		}
 	}
-	
-	public void unallocateCampaigns(ArrayList<ArrayList<UserPriceAlloc>> listOfUsers,ArrayList<Integer> unallocatedCampaigns, int i,int j){
-		int currentCampaignIndex = 0;
-		main_loop:
-		for(ArrayList<UserPriceAlloc> allocFromCampaign : listOfUsers){
-			if(currentCampaignIndex!= j){
-				for(UserPriceAlloc y: allocFromCampaign){
-					if(y.getI() == i){
-						completelyUnallocateCampaign(allocFromCampaign);
-						unallocatedCampaigns.add(currentCampaignIndex);
-						if(!userOverSupplied(listOfUsers,i)){
-							break main_loop;
-						}
-					}
+	/*
+	 * Receives the current prices and a campaign index and returns the utility maximizer bundle for that campaign
+	 */
+	public ArrayList<BundleEntry> findUtilityMaximizerBundle(ArrayList<UserPrice> currentPrices, int j){
+		Collections.sort(currentPrices,new UserPriceComparatorByPrice());
+		double priceOfBundle = 0.0, priceOfUser = 0.0;
+		int sizeOfBundle = 0 , currentSizeOfBundle = 0 , i = -1;
+		ArrayList<BundleEntry> bundle = new ArrayList<BundleEntry>();
+		for(UserPrice u:currentPrices){
+			i = u.getI();
+			priceOfUser = u.getPrice();
+			if(this.market.isConnected(i, j)){
+				currentSizeOfBundle = this.market.getCampaign(j).getDemand() - sizeOfBundle;
+				if(currentSizeOfBundle < this.market.getUser(i).getSupply()){
+					//priceOfBundle += currentSizeOfBundle * (priceOfUser + AscendingAuction.epsilon);
+					priceOfBundle += currentSizeOfBundle * priceOfUser;
+					sizeOfBundle  += currentSizeOfBundle;
+					bundle.add(new BundleEntry(i,currentSizeOfBundle));
+				}else{ //Bump price by epsilon only if we exhaust a market
+					priceOfBundle += this.market.getUser(i).getSupply() * (priceOfUser + AscendingAuction.epsilon);
+					sizeOfBundle  += this.market.getUser(i).getSupply();
+					bundle.add(new BundleEntry(i,this.market.getUser(i).getSupply()));
+				}
+				if(sizeOfBundle == this.market.getCampaign(j).getDemand() && priceOfBundle<= this.market.getCampaign(j).getReward()){
+					return bundle;
 				}
 			}
-			currentCampaignIndex++;
 		}
+		return new ArrayList<BundleEntry>();
 	}
-	
-	public void completelyUnallocateCampaign(ArrayList<UserPriceAlloc> allocFromCampaign){
-		for(UserPriceAlloc y: allocFromCampaign){
-			y.updateAlloc(0);
-			y.updatePrice(y.getPrice() + AscendingAuction.epsilon);
-		}
-	}
-	
-	public boolean userOverSupplied(ArrayList<ArrayList<UserPriceAlloc>> listOfUsers, int i){
-		System.out.println(">>Check if user " + i + " is over supplied");
-		int totalSupply = 0;
-		for(ArrayList<UserPriceAlloc> allocFromCampaign : listOfUsers){
-			for(UserPriceAlloc y: allocFromCampaign){
-				if(y.getI() == i){
-					totalSupply += y.getAlloc();
-				}
-			}
-		}
-		System.out.println(">>>> totalSupply for user: " + i + " is = " + totalSupply);
-		if(totalSupply > this.market.getUser(i).getSupply()){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	public ArrayList<UserPriceAlloc> findGreedyMatch(ArrayList<UserPriceAlloc> listOfUsers,int j){
-		//System.out.println("findGreedyMatch for campaign " + j);
-		Collections.sort(listOfUsers,new UserPriceAllocComparatorByPrice());
-		double priceOfBundle = 0.0;
-		int sizeOfBundle = 0 , x = 0;
-		ArrayList<UserPriceAlloc> bundle = new ArrayList<UserPriceAlloc>();
-		for(UserPriceAlloc u:listOfUsers){
-			//System.out.println(u);
-			x = this.market.getCampaign(j).getDemand() - sizeOfBundle;
-			if(x < this.market.getUser(u.getI()).getSupply()){
-				//System.out.println("Take: " + x + " from user " + u.getI());
-				priceOfBundle += x * (u.getPrice() + AscendingAuction.epsilon);
-				sizeOfBundle  += x;
-				bundle.add(new UserPriceAlloc(u.getI(),-1.0,x));
-			}else{
-				//System.out.println("Take: " + this.market.getUser(u.getI()).getSupply() + " from user " + u.getI());
-				priceOfBundle += this.market.getUser(u.getI()).getSupply() * (u.getPrice() + AscendingAuction.epsilon);
-				sizeOfBundle  += this.market.getUser(u.getI()).getSupply();
-				bundle.add(new UserPriceAlloc(u.getI(),-1.0,this.market.getUser(u.getI()).getSupply()));
-			}
-			if(sizeOfBundle == this.market.getCampaign(j).getDemand() && priceOfBundle<= this.market.getCampaign(j).getReward()){
-				//System.out.println("We can satisfy campaign " + j);
-				//System.out.println("Price of bundle: " + priceOfBundle);
-				//System.out.println("final bundle = " + bundle);
-				return bundle;
-			}
-		}
-		return new ArrayList<UserPriceAlloc>();
-	}
-	
-	public void convertBidsIntoMatrices(ArrayList<ArrayList<UserPriceAlloc>> listOfUsers){
-		int campaignIndex = 0;
-		for(ArrayList<UserPriceAlloc> allocFromCampaign : listOfUsers){
-			for(UserPriceAlloc y: allocFromCampaign){
-				this.allocation[y.getI()][campaignIndex] = y.getAlloc();
-				this.prices[y.getI()][campaignIndex] = y.getPrice();
-			}
-			campaignIndex++;
-		}
-	}
+
 }
