@@ -54,10 +54,10 @@ public class AscendingAuction {
 				//System.out.println("Set x["+b.getUser()+"]["+b.getCampaign()+"] = 1, and p["+b.getUser()+"] = p + e, and try to reallocate");
 				this.allocation[b.getUser()][b.getCampaign()] = 1;
 				unallocatedCampaigns.remove(new Integer(b.getCampaign()));
-				this.prices[b.getUser()] += AscendingAuction.epsilon;
 				for(int j=0;j<this.valuationMatrix[0].length;j++){
 					if(j!=b.getCampaign() && this.allocation[b.getUser()][j] == 1){
 						this.allocation[b.getUser()][j] = 0;
+						this.prices[b.getUser()] += AscendingAuction.epsilon;
 						unallocatedCampaigns.add(new Integer(j));
 						//System.out.println("We have to unallocate");
 					}
