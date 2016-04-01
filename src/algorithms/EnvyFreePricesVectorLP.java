@@ -39,14 +39,20 @@ public class EnvyFreePricesVectorLP {
 	/*
 	 * Constructor receives an allocated market M only and creates IloCplex Object
 	 */
-	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket){
+	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket) throws IloException{
 		this.allocatedMarket = allocatedMarket;
-		try {
-			this.cplex = new IloCplex();
-		} catch (IloException e) {
-			e.printStackTrace();
-		}
+		this.cplex = new IloCplex();
 	}
+	/*
+	 * Constructor receives an allocated Market M, and a boolean to indicate if we want to create the LP
+	 */
+	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket,boolean createLP) throws IloException{
+		this.allocatedMarket = allocatedMarket;
+		this.cplex = new IloCplex();
+		if(createLP){
+			this.createLP();
+		}
+	}	
 	/*
 	 * Constructor receives an allocated market M and an IloCplex Object
 	 */

@@ -1,5 +1,7 @@
 package test;
 
+import algorithms.Waterfall;
+import algorithms.WaterfallPrices;
 import structures.Campaign;
 import structures.Market;
 import structures.User;
@@ -109,6 +111,53 @@ public class Examples {
 		connections[1][2] = true;
 		
 		Market market = new Market(users,campaigns,connections);
+		
+		
+		/* Example where WF fails*/
+		int numCamp = 30;
+		int numUser = 5;
+		
+		numUser = numCamp;
+		Campaign[] campaigns1 = new Campaign[numCamp];
+		for(int j=0;j<numCamp;j++){
+			campaigns1[j] = new Campaign(2  /* demand */ ,2*(numCamp - j)/* reward */);
+		}
+		User[] users1 = new User[numUser];
+		for(int i=0;i<numUser;i++){
+			users1[i] = new User(1);
+		}
+		boolean[][] connections1 = new boolean[numUser][numCamp];
+		int counter = 0;
+		//connections[0][0] = true;
+		//connections[0][numUser-1] = true;
+		connections1[numUser-1][numUser-1] = true;
+		for(int i=0;i<numUser-1;i++){
+			connections1[i][counter] = true;
+			counter++;
+			connections1[i][counter] = true;
+		}
+		/*connections[0][0] = true;
+		connections[1][0] = true;
+		connections[1][1] = true;
+		connections[2][1] = true;
+		connections[2][2] = true;
+		//connections[3][2] = true;
+		connections[3][3] = true;*/
+		
+		Market weirdMarket = new Market(users1,campaigns1,connections1);
+		System.out.println(weirdMarket);
+		Waterfall WF = new Waterfall(weirdMarket);
+		WaterfallPrices WFSol = WF.Solve();
+		System.out.println("WF Alloc");
+		//Printer.printMatrix(WFSol.getMarketAllocation().getAllocation());	
+		System.out.println(WFSol.getMarketAllocation().value());
+		
+		//MarketAllocation y = new MarketAllocation(weirdMarket,new EfficientAllocationILP(weirdMarket).Solve(new IloCplex()).get(0));
+		System.out.println("Efficient Alloc");
+		//Printer.printMatrix(y.getAllocation());
+		//System.out.println(y.value());
+		
+		//System.out.println(WFSol.getMarketAllocation().value() / y.value());		
 		
 		
 	}

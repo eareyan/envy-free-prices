@@ -1,15 +1,14 @@
 package algorithms.allocations;
 
+import ilog.concert.IloException;
+import ilog.concert.IloLinearNumExpr;
+import ilog.concert.IloNumVar;
+import ilog.cplex.IloCplex;
+
 import java.util.ArrayList;
 
 import structures.Market;
 import util.Printer;
-import ilog.concert.IloException;
-import ilog.concert.IloLPMatrix;
-import ilog.concert.IloLinearNumExpr;
-import ilog.concert.IloNumExpr;
-import ilog.concert.IloNumVar;
-import ilog.cplex.IloCplex;
 
 /*
  * This class uses CPLEX to implement and solve a mixed-ILP to find an efficient allocation for an input market. 

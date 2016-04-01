@@ -56,7 +56,7 @@ public class GreedyAllocation {
 			}
 			//System.out.println(accessibleUsers);
 			Collections.sort(accessibleUsers, new UsersSupplyComparatorByRemainingSupply(this.Order));
-			System.out.println(accessibleUsers);
+			//System.out.println(accessibleUsers);
 			if(totalAvailableSupply >= this.market.getCampaign(campaigns[j].getBackpointer()).getDemand()){
 				/* Try to allocate */
 				for (UserSupply user : accessibleUsers) {

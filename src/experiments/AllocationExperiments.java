@@ -18,7 +18,7 @@ import log.SqlDB;
 
 public class AllocationExperiments extends Experiments{
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException, IloException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException, IloException {
 		if(!dbLogger.checkIfUnitDemandRowExists("allocation",numUsers, numCampaigns, prob)){
 			System.out.println("\t Add data ");
 			DescriptiveStatistics greedy0ToEfficient = new DescriptiveStatistics();

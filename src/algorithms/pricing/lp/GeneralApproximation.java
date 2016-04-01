@@ -1,24 +1,19 @@
 package algorithms.pricing.lp;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import ilog.concert.IloException;
+import ilog.cplex.IloCplex;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import structures.Market;
+import structures.MarketAllocation;
+import structures.MarketPrices;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesSolutionLPComparatorBySellerRevenue;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.Waterfall;
-import algorithms.Waterfall.Bid;
 import algorithms.allocations.EfficientAllocationILP;
-import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
-import structures.Market;
-import structures.MarketAllocation;
-import structures.MarketPrices;
-import structures.factory.MarketFactory;
-import unitdemand.Matching;
-import util.Printer;
 
 public class GeneralApproximation {
 
