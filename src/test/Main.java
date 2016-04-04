@@ -1,9 +1,10 @@
 package test;
 
-import ilog.concert.IloException;
+//import ilog.concert.IloException;
 import statistics.PricesStatistics;
 import structures.Market;
 import structures.MarketAllocation;
+import structures.MarketPrices;
 import structures.factory.MarketAllocationFactory;
 import structures.factory.RandomMarketFactory;
 import structures.factory.UnitMarketFactory;
@@ -13,6 +14,7 @@ import util.Printer;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
 import algorithms.allocations.GreedyAllocation;
+import algorithms.ascendingauction.AscendingAuction;
 import experiments.RunParameters;
 /*
  * Main class. Use for testing purposes.
@@ -21,7 +23,24 @@ import experiments.RunParameters;
  */
 public class Main {
 	
-	public static void main(String[] args) throws IloException{
+	public static void main(String[] args){
+		System.out.println("Market Generation");
+		Market m = RandomMarketFactory.RandomKMarket(3,3,.75,2);
+		System.out.println(m);
+		AscendingAuction A = new AscendingAuction(m);
+		MarketPrices allocPrices = A.Solve();
+		Printer.printMatrix(allocPrices.getMarketAllocation().getAllocation());
+		Printer.printVector(allocPrices.getPriceVector());
+		PricesStatistics P = new PricesStatistics(allocPrices);
+		
+		MarketAllocation X = new GreedyAllocation(m).Solve();
+		Printer.printMatrix(X.getAllocation());
+		
+		System.out.println("There are " + P.numberOfEnvyCampaigns() +" many envy campaigns");
+	}
+	
+	
+	public static void main1(String[] args) {//throws IloException{
 		
 		for(int i=3;i<20;i++){
 			for(int j=3;j<20;j++){
@@ -39,7 +58,7 @@ public class Main {
 						Printer.printMatrix(X.getAllocation());
 						
 						
-						EnvyFreePricesSolutionLP efpvLP = new EnvyFreePricesVectorLP(X,true).Solve();
+						/*EnvyFreePricesSolutionLP efpvLP = new EnvyFreePricesVectorLP(X,true).Solve();
 						Printer.printVector(efpvLP.getPriceVector());
 
 
@@ -52,7 +71,7 @@ public class Main {
 						if(weViolations[0] > 0){
 							System.out.println("ENVY!!!!");
 							System.exit(-1);
-						}
+						}*/
 					}
 				}
 			}
@@ -60,7 +79,7 @@ public class Main {
 	}
 	
 	
-	public static void main2(String[] args) throws IloException{
+	public static void main2(String[] args){// throws IloException{
 		for(int j=2;j<20;j++){
 			for(int i=2;i<20;i++){
 				for(int p=0;p<4;p++){
@@ -79,7 +98,7 @@ public class Main {
 						Printer.printVector(maxWEQSol.getPrices());
 						System.out.println(maxWEQSol.getSellerRevenue());
 						
-						//EnvyFreePricesVectorLP efpvLP = new EnvyFreePricesVectorLP(MarketAllocationFactory.getMaxWeightMatchingAllocation(market));
+						/*EnvyFreePricesVectorLP efpvLP = new EnvyFreePricesVectorLP(MarketAllocationFactory.getMaxWeightMatchingAllocation(market));
 						EnvyFreePricesVectorLP efpvLP = new EnvyFreePricesVectorLP(MarketAllocationFactory.getMaxWeightMatchingAllocation(UnitMarketFactory.createMarketFromValuationMatrix(valuationMatrix)));
 						efpvLP.createLP();
 						EnvyFreePricesSolutionLP efpvSol = efpvLP.Solve();
@@ -92,7 +111,7 @@ public class Main {
 								System.out.println("DIFFERENT");
 								System.exit(-1);
 							}
-						}
+						}*/
 					}
 				}
 			}
