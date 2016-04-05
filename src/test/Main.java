@@ -1,17 +1,13 @@
 package test;
 
 //import ilog.concert.IloException;
-import java.util.Arrays;
-
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import statistics.PricesStatistics;
-import structures.Campaign;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.factory.MarketAllocationFactory;
-import structures.factory.MarketFactory;
 import structures.factory.RandomMarketFactory;
 import structures.factory.UnitMarketFactory;
 import unitdemand.Matching;
@@ -19,16 +15,9 @@ import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
-import algorithms.EnvyFreePricesSolutionLP;
-import algorithms.EnvyFreePricesVectorLP;
-import algorithms.Waterfall;
-import algorithms.WaterfallPrices;
 import algorithms.allocations.EfficientAllocationILP;
-import algorithms.allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
 import algorithms.allocations.greedy.GreedyAllocation;
-import algorithms.allocations.greedy.UsersSupplyComparatorByRemainingSupply;
 import algorithms.ascendingauction.AscendingAuction;
-import algorithms.pricing.lp.heuristicreserveprices.SelectAllConnectedUsers;
 import algorithms.pricing.lp.reserveprices.EfficientAlloc;
 import algorithms.pricing.lp.reserveprices.GreedyAlloc;
 import algorithms.pricing.lp.reserveprices.LPReservePrices;
