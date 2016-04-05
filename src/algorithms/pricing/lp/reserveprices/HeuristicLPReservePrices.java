@@ -26,70 +26,75 @@ import util.Printer;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class LPReservePrices {
+public class HeuristicLPReservePrices {
 	
 	protected Market market;
 	protected MarketAllocation initialMarketAllocation;
 	protected double[] initialPrices;
 	protected SelectUsers selectUsersObject;
 	protected SetReservePrices setReservePricesObject;
+	protected ArrayList<MarketPrices> setOfSolutions;
 	
-	public LPReservePrices(Market market,SelectUsers selectUsersObject, SetReservePrices setReservePricesObject){
+	public HeuristicLPReservePrices(Market market,MarketAllocation initialMarketAllocation,SelectUsers selectUsersObject, SetReservePrices setReservePricesObject) throws IloException{
 		this.market = market;
 		this.selectUsersObject = selectUsersObject;
 		this.setReservePricesObject = setReservePricesObject;
+		this.initialMarketAllocation = initialMarketAllocation;
+		/* Create the first LP with no reserves */
+		EnvyFreePricesVectorLP initialLP = new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex());
+		initialLP.setWalrasianConditions(false);
+		initialLP.createLP();
+		EnvyFreePricesSolutionLP initialSolution = initialLP.Solve();
+		this.initialPrices = initialSolution.getPriceVector();
+		this.setOfSolutions = new ArrayList<MarketPrices>();
+		/* * Add initial solution to set of solutions, so that we have a baseline with reserve prices all zero */
+		setOfSolutions.add(initialSolution);
 	}
 	
 	public MarketPrices Solve() throws IloException{
 		//System.out.println("LP with reserve Price");
-		/* * Compute an allocation  * */
-		//Waterfall
-		//this.initialMarketAllocation = new Waterfall(this.market).Solve().getMarketAllocation();
-		//Optimal		
-		this.initialMarketAllocation = new MarketAllocation(this.market, new EfficientAllocationILP(this.market).Solve(new IloCplex()).get(0));		
 		/* * Compute Initial Prices * */
-		EnvyFreePricesSolutionLP initialSolution = new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve();
-		this.initialPrices = initialSolution.getPriceVector();
-		/* * Prints for debugging purposes * */
-		/*Printer.printMatrix(this.initialMarketAllocation.getAllocation());
+		/* * Prints for debugging purposes */
+		Printer.printMatrix(this.initialMarketAllocation.getAllocation());
 		Printer.printVector(this.initialPrices);
-		System.out.println(new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve().sellerRevenuePriceVector());*/
-		ArrayList<MarketPrices> setOfSolutions = new ArrayList<MarketPrices>();
-		/* * Add initial solution to set of solutions, so that we have a baseline with reserve prices all zero */
-		setOfSolutions.add(initialSolution);
+		System.out.println(new EnvyFreePricesVectorLP(this.initialMarketAllocation,new IloCplex(),true).Solve().sellerRevenuePriceVector());
+		
 		/* * For each x_{ij}. * */
 		for(int i=0;i<this.market.getNumberUsers();i++){
 			for(int j=0;j<this.market.getNumberCampaigns();j++){
 				if(this.initialMarketAllocation.getAllocation()[i][j]>0){ 	// If x_{ij}>0
 					//System.out.println("x["+i+"]["+j+"] = " + this.initialMarketAllocation.getAllocation()[i][j]);
-					EnvyFreePricesVectorLP efpLP = new EnvyFreePricesVectorLP(new MarketAllocation(this.market,this.copyInitialAllocationMatrixWihtoutCampaignJ(j)),new IloCplex(),true);
+					EnvyFreePricesVectorLP efpLP = new EnvyFreePricesVectorLP(new MarketAllocation(this.market,this.copyInitialAllocationMatrixWihtoutCampaignJ(j)),new IloCplex());
+					efpLP.setWalrasianConditions(false);
+					efpLP.createLP();
 					ArrayList<Integer> users = this.selectUsersObject.selectUsers(j,this.market); 		//Select users to set reserve prices
 					for(Integer userIndex: users){
 						this.setReservePricesObject.setReservePrices(userIndex, j, efpLP, this.initialPrices,this.market,this.initialMarketAllocation);
 					}
 					EnvyFreePricesSolutionLP sol = efpLP.Solve();
 					if(sol.getStatus().equals("Optimal")){ 					//We obtained an optimal solution from this LP
+						System.out.println("LP was " + sol.getStatus());
 						//Printer.printVector(sol.getPriceVector());
 						this.tryReallocate(j,sol);//Try to reallocate
 						//Printer.printMatrix(sol.getMarketAllocation().getAllocation());
 						//System.out.println("Total revenue = " + sol.sellerRevenuePriceVector());
-						setOfSolutions.add(sol);
+						this.setOfSolutions.add(sol);
 					}else{
-						//System.out.println("LP was " + sol.getStatus());
+						System.out.println("LP was " + sol.getStatus());
 					}
 				}
 			}
 		}
-		Collections.sort(setOfSolutions,new MarketPricesComparatorBySellerRevenue());
+		Collections.sort(this.setOfSolutions,new MarketPricesComparatorBySellerRevenue());
 		/* For debugging purposes only: */ 
-		//System.out.println(setOfSolutions);
-		/* for(MarketPrices sol:setOfSolutions){
+		System.out.println(this.setOfSolutions);
+		 for(MarketPrices sol:this.setOfSolutions){
 			System.out.println("Solution-->");
 			Printer.printMatrix(sol.getMarketAllocation().getAllocation());
 			Printer.printVector(sol.getPriceVector());
 			System.out.println(sol.sellerRevenuePriceVector());
-		}*/
-		return setOfSolutions.get(0);
+		}
+		return this.setOfSolutions.get(0);
 	}
 	/*
 	 * After solving an LP with reserve prices, we try to reallocate the campaign
@@ -112,20 +117,20 @@ public class LPReservePrices {
 			}
 		}
 		if(currentcost <= this.market.getCampaign(j).getReward() && compactcondition){ // Makes Sense to reallocate
-			//System.out.println("MAKES SENSE TO RE-ALLOCATE!!!");
+			System.out.println("MAKES SENSE TO RE-ALLOCATE!!!");
 			for(int i=0;i<this.market.getNumberUsers();i++){
 				sol.getMarketAllocation().updateAllocationEntry(i, j, this.initialMarketAllocation.getAllocation()[i][j]);
 			}
 		}else{
 			/*
-			 * Only for debugging purposes
+			 * Only for debugging purposes*/
 			 
 			if(currentcost > this.market.getCampaign(j).getReward()){
 				System.out.println("\t\t --- >I.R. failed");
 			}
 			if(!compactcondition){
 				System.out.println("\t\t --- >C.C. failed");				
-			}*/
+			}
 		}
 		return sol;
 	}

@@ -1,6 +1,5 @@
 package unitdemand;
 
-import util.Printer;
 /*
  * This class implements MaxEQ: Maximum Walrasian Prices, as stated in Guruswami et al.
  * 
@@ -45,6 +44,6 @@ public class MaxWEQ {
 			System.out.println("w(V_i) = " + this.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching());
 			System.out.println("price["+i+"] = " + prices[i]);*/
 		}
-		return new Matching(prices,matchingCompleteV.getMatching());
+		return new Matching(this.valuationMatrix,matchingCompleteV.getMatching(),prices);
 	}
 }

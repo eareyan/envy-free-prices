@@ -13,7 +13,6 @@ import structures.MarketPrices;
 import structures.MarketPricesComparatorBySellerRevenue;
 import structures.factory.MarketAllocationFactory;
 import unitdemand.Link;
-import util.Printer;
 import algorithms.EnvyFreePricesVectorLP;
 
 public class LPReservePrices {
@@ -34,23 +33,25 @@ public class LPReservePrices {
 		for(Link valueLink: valuations){//For each link
 			IloCplex iloObject = new IloCplex();
 			//System.out.println("================= reserve price from campaign ("+valueLink.getJ()+") = " + valueLink.getValue() + "++++++++++");
-			//Get the new allocation
-			//Printer.printMatrix(this.computeNewAllocation(valuationMatrix, valueLink.getValue()));
+			//Printer.printMatrix(MarketAllocationFactory.getAllocationWithReservePrices(valuationMatrix, valueLink.getValue()));
+			/* Get the new allocation */
 			MarketAllocation marketAlloc = new MarketAllocation(this.market,MarketAllocationFactory.getAllocationWithReservePrices(valuationMatrix, valueLink.getValue()));
-			//Feed new allocation with initial market to LP and set reserve prices.			
-			EnvyFreePricesVectorLP LP = new EnvyFreePricesVectorLP(marketAlloc,iloObject,true);
+			/* Feed new allocation with initial market to LP and set reserve prices. */			
+			EnvyFreePricesVectorLP LP = new EnvyFreePricesVectorLP(marketAlloc,iloObject);
+			LP.setWalrasianConditions(false);
+			LP.createLP();
 			Arrays.fill(reservePrices, valueLink.getValue());
 			LP.setReservePrices(reservePrices);
 			setOfSolutions.add(LP.Solve());
 		}
 		/* For debugging purposes only: */ 
-		System.out.println(setOfSolutions);
-		for(MarketPrices sol:setOfSolutions){
+		//System.out.println(setOfSolutions);
+		/*for(MarketPrices sol:setOfSolutions){
 			System.out.println("Solution-->");
 			Printer.printMatrix(sol.getMarketAllocation().getAllocation());
 			Printer.printVector(sol.getPriceVector());
-			//System.out.println(sol.sellerRevenuePriceVector());
-		}
+			System.out.println(sol.sellerRevenuePriceVector());
+		}*/
 		Collections.sort(setOfSolutions,new MarketPricesComparatorBySellerRevenue());
 		return setOfSolutions.get(0);
 	}

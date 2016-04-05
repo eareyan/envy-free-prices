@@ -3,7 +3,7 @@ package unitdemand.ascendingauction;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import util.Printer;
+import unitdemand.Matching;
 
 public class AscendingAuction {
 	
@@ -13,7 +13,7 @@ public class AscendingAuction {
 	
 	protected double[] prices;
 	
-	protected static double epsilon = 0.0001;
+	protected static double epsilon = 0.01;
 	
 	public AscendingAuction(double[][] valuationMatrix){
 		this.valuationMatrix = valuationMatrix;
@@ -21,12 +21,7 @@ public class AscendingAuction {
 		this.allocation = new int[this.valuationMatrix.length][this.valuationMatrix[0].length];
 	}
 	
-	public void Solve(){
-		System.out.println("Initial Prices : ");
-		Printer.printVector(this.prices);
-		System.out.println("Initial Allocation : ");
-		Printer.printMatrix(this.allocation);
-		
+	public Matching Solve(){		
 		ArrayList<Integer> unallocatedCampaigns = new ArrayList<Integer>();
 		for(int j=0;j<this.valuationMatrix[0].length;j++){ /* Initially all campaigns are unallocated*/
 			unallocatedCampaigns.add(j);
@@ -66,14 +61,6 @@ public class AscendingAuction {
 				break;
 			}
 		}
-		System.out.println("Final Prices : ");
-		Printer.printVector(this.prices);
-		System.out.println("Final Allocation : ");
-		Printer.printMatrix(this.allocation);
-		
-		for(int i=0;i<this.valuationMatrix.length;i++){
-			System.out.println(this.prices[i]);
-		}
-		
+		return new Matching(this.valuationMatrix, this.allocation,this.prices);
 	}
 }

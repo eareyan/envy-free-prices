@@ -5,20 +5,21 @@ import ilog.cplex.IloCplex;
 
 import java.sql.SQLException;
 
+import log.SqlDB;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import structures.Market;
 import structures.MarketAllocation;
-import structures.factory.MarketFactory;
+import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
 import algorithms.Waterfall;
 import algorithms.allocations.EfficientAllocationILP;
 import algorithms.allocations.GreedyAllocation;
-import log.SqlDB;
 
 public class AllocationExperiments extends Experiments{
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, SqlDB dbLogger) throws SQLException, IloException {
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException {
 		if(!dbLogger.checkIfUnitDemandRowExists("allocation",numUsers, numCampaigns, prob)){
 			System.out.println("\t Add data ");
 			DescriptiveStatistics greedy0ToEfficient = new DescriptiveStatistics();
@@ -31,7 +32,7 @@ public class AllocationExperiments extends Experiments{
 
 			for(int t=0;t<RunParameters.numTrials;t++){
 				/* Create a random Market*/
-				Market randomMarket = MarketFactory.randomMarket(numUsers, numCampaigns, prob);
+				Market randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
 				/* Compute different allocations */
 				MarketAllocation efficient = new MarketAllocation(randomMarket,new EfficientAllocationILP(randomMarket).Solve(new IloCplex()).get(0));
 				MarketAllocation greedy0 = new GreedyAllocation(randomMarket).Solve();

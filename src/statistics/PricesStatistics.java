@@ -93,7 +93,7 @@ public class PricesStatistics {
 	 * This method computes how many violations to the Walrasian equilibrium, there are.
 	 * A violation is one where an unallocated user has a price greater than zero.
 	 */
-	public double[] computeWalrasianEqViolations(){
+	public double[] computeWalrasianViolations(){
 		int violations = 0;
 		double totalPricesOfUsers = 0.0;
 		double totalPricesOfViolatingUsers = 0.0;

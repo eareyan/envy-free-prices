@@ -140,6 +140,20 @@ public class Market {
     	return this.connections[i][j];
     }
     /*
+     * Get supply to demand ratio. 
+     */
+    public double getSupplyToDemandRatio(){
+    	int supply = 0;
+    	int demand = 0;
+    	for(int i=0;i<this.getNumberUsers();i++){
+    		supply += this.getUser(i).getSupply();
+    	}
+		for(int j=0;j<this.getNumberCampaigns();j++){
+			demand += this.getCampaign(j).getDemand();
+		}
+		return (double) supply / demand;
+    }
+    /*
      * Printers. Representation of objects as strings.
      */
     protected String stringUsersInfo(){

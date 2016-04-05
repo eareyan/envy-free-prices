@@ -1,5 +1,7 @@
 package structures.factory;
 
+import java.util.Random;
+
 import structures.Campaign;
 import structures.Market;
 import structures.User;
@@ -117,6 +119,33 @@ public class MarketFactory {
 		for(int i=0;i<market.getNumberUsers();i++){
 			for(int j=0;j<market.getNumberCampaigns();j++){
 				connections[i][j] = market.isConnected(i, j);
+			}
+		}
+		return new Market(users,campaigns,connections);
+	}
+	/*
+	 * Transpose market, i.e., interchange users for campaigns.
+	 * This means: a user i with supply N_i becomes a campaign j with demand N_i and a new random reward.
+	 * A campaign j with demand I_j becomes a user i with supply I_j. 
+	 * The connections are preserved, i.e. if (i,j) is connected in the original market, then
+	 * it will be in the transposed market.
+	 */
+	public static Market transposeMarket(Market market){
+		User[] users = new User[market.getNumberCampaigns()];
+		for(int j=0;j<market.getNumberCampaigns();j++){
+			users[j] = new User(market.getCampaign(j).getDemand());
+		}
+		Campaign[] campaigns = new Campaign[market.getNumberUsers()];
+		int maxReward = 100;
+		int minReward = 1;
+		Random generator = new Random();
+		for(int i=0;i<market.getNumberUsers();i++){
+			campaigns[i] = new Campaign(market.getUser(i).getSupply(), generator.nextDouble() * (maxReward - minReward) + minReward);
+		}
+		boolean[][] connections = new boolean[market.getNumberCampaigns()][market.getNumberUsers()];
+		for(int i=0;i<market.getNumberUsers();i++){
+			for(int j=0;j<market.getNumberCampaigns();j++){
+				connections[j][i] = market.isConnected(i, j);				
 			}
 		}
 		return new Market(users,campaigns,connections);

@@ -2,43 +2,113 @@ CREATE TABLE unit_demand (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	p double precision NOT NULL,
-	maxWEQRevenue double precision NOT NULL,
-	maxWEQTime double precision NOT NULL,
-	evpAppRevenue double precision NOT NULL,
-	evpAppTime double precision NOT NULL,
-	lpRevenue double precision NOT NULL,
-	lpTime double precision NOT NULL,
-	lpWEViolations double precision NOT NULL,
-	lpWERelativeViolations double precision NOT NULL,
-	lpEFViolations double precision NOT NULL
+	ckEfficiency double precision NOT NULL,
+	ckRevenue double precision NOT NULL,
+	ckTime double precision NOT NULL,
+	ckWE1 double precision NOT NULL,
+	ckWE2 double precision NOT NULL,
+	evpEfficiency double precision NOT NULL,
+	evpRevenue double precision NOT NULL,
+	evpTime double precision NOT NULL,
+	evpWE1 double precision NOT NULL,
+	evpWE2 double precision NOT NULL,
+	mweqEfficiency double precision NOT NULL,
+	mweqRevenue double precision NOT NULL,
+	mweqTime double precision NOT NULL,
+	mweqWE1 double precision NOT NULL,
+	mweqWE2 double precision NOT NULL
 	);
 
 CREATE TABLE unit_uniform_demand (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	p double precision NOT NULL,
-	evpAppRevenue double precision NOT NULL,
-	lpReservePriceRevenue double precision NOT NULL
+	ckEfficiency double precision NOT NULL,
+	ckRevenue double precision NOT NULL,
+	ckTime double precision NOT NULL,
+	ckWE1 double precision NOT NULL,
+	ckWE2 double precision NOT NULL,
+	evpEfficiency double precision NOT NULL,
+	evpRevenue double precision NOT NULL,
+	evpTime double precision NOT NULL,
+	evpWE1 double precision NOT NULL,
+	evpWE2 double precision NOT NULL,
+	mweqEfficiency double precision NOT NULL,
+	mweqRevenue double precision NOT NULL,
+	mweqTime double precision NOT NULL,
+	mweqWE1 double precision NOT NULL,
+	mweqWE2 double precision NOT NULL,
+	lpEfficiency double precision NOT NULL,
+	lpRevenue double precision NOT NULL,
+	lpTime double precision NOT NULL,
+	lpWE1 double precision NOT NULL,
+	lpWE2 double precision NOT NULL
 	);
 
-CREATE TABLE unit_comparison (
+CREATE TABLE fancy_underdemand (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	p double precision NOT NULL,
-	maxWEQRevenue double precision NOT NULL,
-	maxWEQTime double precision NOT NULL,
-	evpAppRevenue double precision NOT NULL,
-	evpAppTime double precision NOT NULL
+	b integer NOT NULL,
+	ckEfficiency double precision NOT NULL,
+	ckRevenue double precision NOT NULL,
+	ckTime double precision NOT NULL,
+	ckWE1 double precision NOT NULL,
+	ckWE2 double precision NOT NULL,
+	lpOptEfficiency double precision NOT NULL,
+	lpOptRevenue double precision NOT NULL,
+	lpOptTime double precision NOT NULL,
+	lpOptWE1 double precision NOT NULL,
+	lpOptWE2 double precision NOT NULL,
+	lpWFEfficiency double precision NOT NULL,
+	lpWFRevenue double precision NOT NULL,
+	lpWFTime double precision NOT NULL,
+	lpWFWE1 double precision NOT NULL,
+	lpWFWE2 double precision NOT NULL,
+	lpG1Efficiency double precision NOT NULL,
+	lpG1Revenue double precision NOT NULL,
+	lpG1Time double precision NOT NULL,
+	lpG1WE1 double precision NOT NULL,
+	lpG1WE2 double precision NOT NULL,
+	lpG2Efficiency double precision NOT NULL,
+	lpG2Revenue double precision NOT NULL,
+	lpG2Time double precision NOT NULL,
+	lpG2WE1 double precision NOT NULL,
+	lpG2WE2 double precision NOT NULL
 	);
 
-CREATE TABLE unit_nonuniform_comparison (
+CREATE TABLE fancy_overdemand (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	p double precision NOT NULL,
-	onlyConnectedRevenue double precision NOT NULL,
-	plusOneRevenue double precision NOT NULL,
-	allConnectedRevenue double precision NOT NULL
+	b integer NOT NULL,
+	ckEfficiency double precision NOT NULL,
+	ckRevenue double precision NOT NULL,
+	ckTime double precision NOT NULL,
+	ckWE1 double precision NOT NULL,
+	ckWE2 double precision NOT NULL,
+	lpOptEfficiency double precision NOT NULL,
+	lpOptRevenue double precision NOT NULL,
+	lpOptTime double precision NOT NULL,
+	lpOptWE1 double precision NOT NULL,
+	lpOptWE2 double precision NOT NULL,
+	lpWFEfficiency double precision NOT NULL,
+	lpWFRevenue double precision NOT NULL,
+	lpWFTime double precision NOT NULL,
+	lpWFWE1 double precision NOT NULL,
+	lpWFWE2 double precision NOT NULL,
+	lpG1Efficiency double precision NOT NULL,
+	lpG1Revenue double precision NOT NULL,
+	lpG1Time double precision NOT NULL,
+	lpG1WE1 double precision NOT NULL,
+	lpG1WE2 double precision NOT NULL,
+	lpG2Efficiency double precision NOT NULL,
+	lpG2Revenue double precision NOT NULL,
+	lpG2Time double precision NOT NULL,
+	lpG2WE1 double precision NOT NULL,
+	lpG2WE2 double precision NOT NULL
 	);
+
 
 CREATE TABLE allocation (
 	n integer NOT NULL,
@@ -51,25 +121,6 @@ CREATE TABLE allocation (
 	wfToGreedy0 double precision NOT NULL,
 	wfToGreedy1 double precision NOT NULL,
 	wfToGreedy2 double precision NOT NULL
-	);
-
-CREATE TABLE general_demand (
-	n integer NOT NULL,
-	m integer NOT NULL,
-	p double precision NOT NULL,
-	ratioEfficiency double precision NOT NULL,
-	effAllocationRevenue double precision NOT NULL,
-	effAllocationTime double precision NOT NULL,
-	effAllocWEViolation double precision NOT NULL,
-	effAllocWERelativeViolations double precision NOT NULL,
-	effAllocEFViolation double precision NOT NULL,
-	wfAllocationRevenue double precision NOT NULL,
-	wfAllocationTime double precision NOT NULL,
-	wfAllocWEViolation double precision NOT NULL,
-	wfAllocWERelativeViolations double precision NOT NULL,
-	wfAllocEFViolation double precision NOT NULL,
-	wfMaxWEQRevenue double precision NOT NULL,
-	wfMaxWEQTime double precision NOT NULL
 	);
 
 \copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-demand.csv' csv header

@@ -53,6 +53,12 @@ public class RandomMarketFactory {
 	public static Market randomMarketMoreUserSupply(int numberUsers, int numberCampaigns, double probabilityConnections){
 		return RandomMarketFactory.randomMarket(numberUsers, 6 ,10,  numberCampaigns, 1 , 5, 1.0, 100.0,  probabilityConnections);		
 	}
+	public static Market generateOverDemandedMarket(int numberUsers, int numberCampaigns,double probabilityConnection, int b){
+		return RandomKMarket(numberUsers, numberCampaigns, probabilityConnection, b);
+	}
+	public static Market generateOverSuppliedMarket(int numberUsers, int numberCampaigns,double probabilityConnection, int b){
+		return MarketFactory.transposeMarket(RandomKMarket(numberCampaigns, numberUsers, probabilityConnection, b));
+	}
 	/*
 	 * Generate a random market with a fixed supply to demand ratio.
 	 */
@@ -77,13 +83,17 @@ public class RandomMarketFactory {
 		/*
 		 * Generate supply and demand to maintain the ratio
 		 */
-		int totalSupply = 0;
-		int totalDemand = 0;
+		int totalDemand = numberCampaigns; //Each campaign demands one initially. This is so that we don't have campaigns demanding 0 impressions.
+		int[] finalDemands = new int[numberCampaigns];
+		for(int j=0;j<numberCampaigns;j++){
+			finalDemands[j] = 1;
+		}
 		int[] finalSupply = new int[numberUsers]; 
-		int[] finalDemands = new int[numberCampaigns]; 
 		int x = 0 , k = 0;
+		int totalSupply = 0;
 		for(int i=0;i<numberUsers;i++){
-			finalSupply[i] = generator.nextInt((maxSupplyPerUser - minSupplyPerUser) + 1) + minSupplyPerUser;
+			finalSupply[i] = campaignConnectedToUser[i] + generator.nextInt((maxSupplyPerUser - minSupplyPerUser) + 1) + minSupplyPerUser;
+			//System.out.println("finalSupply["+i+"] = " + finalSupply[i]);
 			totalSupply += finalSupply[i];
 			x = totalSupply * b - totalDemand;
 			totalDemand += x;
@@ -107,10 +117,10 @@ public class RandomMarketFactory {
 	}
 	/*
 	 * This function takes a pair of positive integers (n,x) and returns 
-	 * a list of n integers that add up to x.
+	 * a list of n random integers that add up to x.
 	 */
 	public static ArrayList<Integer> generateRandomIntegerFixedSum(int n, int x){
-		if(x == 1){
+		if(x == 1 || x <= 0){
 			ArrayList<Integer> listNumbers = new ArrayList<Integer>(n);
 			listNumbers.add(1);
 			for(int i=0;i<n-1;i++){
@@ -123,7 +133,7 @@ public class RandomMarketFactory {
 		ArrayList<Integer> listNumbers = new ArrayList<Integer>(n);
 		int max = x-1;
 		int min = 1;
-		System.out.println("n = " + n +", x = " + x);
+		//System.out.println("n = " + n +", x = " + x);
 		for(int i=0;i<n-2;i++){
 			listNumbers.add(generator.nextInt((max-min) + 1) + min);
 		}
@@ -134,7 +144,7 @@ public class RandomMarketFactory {
 		for(int i=0;i<n-1;i++){
 			finalList.add(listNumbers.get(i+1)-listNumbers.get(i));
 		}
-		System.out.println(finalList);
+		//System.out.println(finalList);
 		return finalList;
 	}
 }

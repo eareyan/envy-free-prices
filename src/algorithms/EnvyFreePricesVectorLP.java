@@ -37,6 +37,10 @@ public class EnvyFreePricesVectorLP {
 	protected IloNumVar[] prices;
 	protected IloCplex cplex;
 	/*
+	 * BY default, set the walrasian conditions
+	 */
+	protected boolean walrasianConditionsOn = true;
+	/*
 	 * Constructor receives an allocated market M only and creates IloCplex Object
 	 */
 	public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket) throws IloException{
@@ -70,6 +74,12 @@ public class EnvyFreePricesVectorLP {
 		if(createLP){
 			this.createLP();
 		}
+	}
+	/*
+	 * Set/Unset Walrasian conditions
+	 */
+	public void setWalrasianConditions(boolean set){
+		this.walrasianConditionsOn = set;
 	}
 	/*
 	 * This method generate the compact conditions.
@@ -200,7 +210,9 @@ public class EnvyFreePricesVectorLP {
 		    this.generateCompactConditions();
 		    this.generateIndividualRationalityConditions();
 		    this.generateBoundConditions();
-		    this.generateWalrasianConditions();
+		    if(this.walrasianConditionsOn){
+		    	this.generateWalrasianConditions();
+		    }
 		} catch (IloException e) {
 			System.out.println("Exception: ==>");
 			e.printStackTrace();

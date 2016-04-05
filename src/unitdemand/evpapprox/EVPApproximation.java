@@ -47,12 +47,12 @@ public class EVPApproximation {
 			Matching x = this.MWRP.Solve(valueLink.getJ());
 			setOfSolutionMatchings.add(x);
 			//System.out.println("''''''");
-			Printer.printMatrix(x.getMatching());
-			Printer.printVector(x.getPrices());
+			//Printer.printMatrix(x.getMatching());
+			//Printer.printVector(x.getPrices());
 			//System.out.println(x.getSellerRevenue());
 			//System.out.println("''''''");	
 		}
-		System.out.println(setOfSolutionMatchings);
+		//System.out.println(setOfSolutionMatchings);
 		Collections.sort(setOfSolutionMatchings, new MatchingComparatorBySellerRevenue());		
 		return setOfSolutionMatchings.get(0);
 	}

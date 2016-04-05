@@ -2,7 +2,6 @@ package unitdemand.evpapprox;
 
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
-import util.Printer;
 
 /*
  * This abstract class implements the common methods for EVPApp algorithm.
@@ -36,7 +35,7 @@ abstract public class AbstractMaxWEQReservePrices {
 	public Matching Solve(int j){
 		Matching M = new MaxWEQ(this.augmentValuationMatrix(j)).Solve();
 		Matching deducedMatching = this.deduceMatching(M);
-		return new Matching(M.getPrices(),deducedMatching.getMatching());
+		return new Matching(this.valuationMatrix,deducedMatching.getMatching(),M.getPrices());
 	}
 	/*
 	 * Set reserve prices.
@@ -109,6 +108,6 @@ abstract public class AbstractMaxWEQReservePrices {
 		//Printer.printMatrix(matching);
 		//System.out.println("++++++End Deducing Matching+++++++++");
 		//Printer.printVector(prices);
-		return new Matching(prices,matching);
+		return new Matching(inputMatching.getValuationMarix(),matching,prices);
 	}
 }

@@ -12,7 +12,7 @@ import log.SqlDB;
  * @author Enrique Areyan Viqueira
  */
 public abstract class Experiments {
-
+	
 	public void bulkTest(SqlDB dbLogger) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IloException{
 		
 		int numUsers = 21;
@@ -21,8 +21,10 @@ public abstract class Experiments {
 			for(int j=2;j<numCampaigns;j++){
 				for(int p=0;p<4;p++){
 					double prob = 0.25 + p*(0.25);
-					System.out.print(" n = " + i + ", m = " + j + ", prob = " + prob);
-					this.runOneExperiment(i, j, prob, dbLogger);
+					for(int b=0;b<4;b++){
+						System.out.print(" n = " + i + ", m = " + j + ", prob = " + prob + ", b = " + (b+1));
+						this.runOneExperiment(i, j, prob, b+1 , dbLogger);
+					}
 				}
 			}
 		}
@@ -34,7 +36,7 @@ public abstract class Experiments {
 		RunParameters Parameters = new RunParameters(args);
 		SqlDB dbLogger = new SqlDB(Parameters.dbProvider,Parameters.dbHost,Parameters.dbPort,Parameters.dbName,Parameters.dbUsername,Parameters.dbPassword);
 		if(args[0].equals("grid")){
-			Parameters.experimentObject.runOneExperiment(Parameters.numUsers, Parameters.numCampaigns, Parameters.prob, dbLogger);
+			Parameters.experimentObject.runOneExperiment(Parameters.numUsers, Parameters.numCampaigns, Parameters.prob,Parameters.b, dbLogger);
 		}else{
 			/*
 			 * Running local bulk tests
@@ -51,5 +53,5 @@ public abstract class Experiments {
 	 * This method should also check if we have that result first before running the
 	 * experiment.
 	 */
-	abstract public void runOneExperiment(int numUsers, int numCampaigns, double prob, SqlDB dbLogger)  throws SQLException, IloException;
+	abstract public void runOneExperiment(int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger)  throws SQLException, IloException;
 }
