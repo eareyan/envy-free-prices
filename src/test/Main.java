@@ -1,9 +1,12 @@
 package test;
 
 //import ilog.concert.IloException;
+import java.util.Arrays;
+
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import statistics.PricesStatistics;
+import structures.Campaign;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
@@ -18,11 +21,18 @@ import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
 import algorithms.EnvyFreePricesSolutionLP;
 import algorithms.EnvyFreePricesVectorLP;
+import algorithms.Waterfall;
+import algorithms.WaterfallPrices;
 import algorithms.allocations.EfficientAllocationILP;
-import algorithms.allocations.GreedyAllocation;
+import algorithms.allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
+import algorithms.allocations.greedy.GreedyAllocation;
+import algorithms.allocations.greedy.UsersSupplyComparatorByRemainingSupply;
 import algorithms.ascendingauction.AscendingAuction;
-import algorithms.pricing.lp.reserveprices.GeneralLPReserve;
-import algorithms.pricing.lp.reserveprices.SelectAllConnectedUsers;
+import algorithms.pricing.lp.heuristicreserveprices.SelectAllConnectedUsers;
+import algorithms.pricing.lp.reserveprices.EfficientAlloc;
+import algorithms.pricing.lp.reserveprices.GreedyAlloc;
+import algorithms.pricing.lp.reserveprices.LPReservePrices;
+import algorithms.pricing.lp.reserveprices.WFAlloc;
 import experiments.RunParameters;
 /*
  * Main class. Use for testing purposes.
@@ -31,7 +41,76 @@ import experiments.RunParameters;
  */
 public class Main {
 	
+	
 	public static void main(String[] args) throws IloException{
+		Market market = RandomMarketFactory.generateOverDemandedMarket(3, 3, 0.75, 1);
+		System.out.println(market);
+		
+		/*Market marketWithReserve = MarketFactory.createReservePriceMarket(market, 2.0);
+		System.out.println(marketWithReserve);*/
+		
+		/*Campaign[] c = market.getCampaigns();
+		Arrays.sort(c, new CampaignComparatorByRewardToImpressionsRatio());
+		for(Campaign j: c){
+			System.out.println(j);
+		}*/
+		
+		/*GreedyAllocation G = new GreedyAllocation(market,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(-1));
+		MarketAllocation gSol = G.Solve();
+		System.out.println(market);
+		Printer.printMatrix(gSol.getAllocation());
+		System.out.println(gSol.value());*/
+
+		
+		/*System.out.println("efficient");
+		MarketAllocation efficientWithReserve = new MarketAllocation(market,new EfficientAllocationILP(market , 2.0).Solve(new IloCplex()).get(0));
+		Printer.printMatrix(efficientWithReserve.getAllocation());
+		System.out.println(efficientWithReserve.value());
+		
+		System.out.println("greedy");
+		GreedyAllocation GWithReserve = new GreedyAllocation(market,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(-1), 2.0);
+		MarketAllocation GWithReserveSol = GWithReserve.Solve();
+		Printer.printMatrix(GWithReserveSol.getAllocation());
+		
+		System.out.println("wf");
+		Waterfall wf = new Waterfall(market, 2.0);
+		WaterfallPrices wfSol = wf.Solve();
+		Printer.printMatrix(wfSol.getMarketAllocation().getAllocation());*/
+		
+		System.out.println("LP with efficient");
+		LPReservePrices lprOPT = new LPReservePrices(market,new EfficientAlloc());
+		MarketPrices lprOPTSol = lprOPT.Solve();
+		Printer.printMatrix(lprOPTSol.getMarketAllocation().getAllocation());
+		Printer.printVector(lprOPTSol.getPriceVector());
+		System.out.println("value = " + lprOPTSol.getMarketAllocation().value());
+		PricesStatistics lprOPTStat = new PricesStatistics(lprOPTSol);
+		System.out.println(lprOPTStat.numberOfEnvyCampaigns());
+		System.out.println(lprOPTStat.computeWalrasianViolations()[0]);
+
+		System.out.println("LP with Greedy");
+		LPReservePrices lprGreedy = new LPReservePrices(market,new GreedyAlloc(-1));
+		MarketPrices lprGreedySol = lprGreedy.Solve();
+		Printer.printMatrix(lprGreedySol.getMarketAllocation().getAllocation());
+		Printer.printVector(lprGreedySol.getPriceVector());
+		System.out.println("value = " + lprGreedySol.getMarketAllocation().value());
+		PricesStatistics lprGreedyStat = new PricesStatistics(lprGreedySol);
+		System.out.println(lprGreedyStat.numberOfEnvyCampaigns());
+		System.out.println(lprGreedyStat.computeWalrasianViolations()[0]);
+
+		System.out.println("LP with WF");
+		LPReservePrices lprWF = new LPReservePrices(market,new WFAlloc());
+		MarketPrices lprWFSol = lprWF.Solve();
+		Printer.printMatrix(lprWFSol.getMarketAllocation().getAllocation());
+		Printer.printVector(lprWFSol.getPriceVector());
+		System.out.println("value = " + lprWFSol.getMarketAllocation().value());
+		PricesStatistics lprWFStat = new PricesStatistics(lprWFSol);
+		System.out.println(lprWFStat.numberOfEnvyCampaigns());
+		System.out.println(lprWFStat.computeWalrasianViolations()[0]);
+
+		
+	}
+	
+	public static void main333(String[] args) throws IloException{
 		Market market = RandomMarketFactory.generateOverDemandedMarket(3, 7, 0.25, 2);
 		System.out.println(market);
 		MarketAllocation efficient = new MarketAllocation(market,new EfficientAllocationILP(market).Solve(new IloCplex()).get(0));
@@ -50,7 +129,7 @@ public class Main {
 		
 		System.out.println("GeneralLPReserve");
 		
-		GeneralLPReserve lpr = new GeneralLPReserve(market,efficient);
+		LPReservePrices lpr = new LPReservePrices(market,new EfficientAlloc());
 		MarketPrices bla = lpr.Solve();
 		Printer.printMatrix(bla.getMarketAllocation().getAllocation());
 		Printer.printVector(bla.getPriceVector());
@@ -74,7 +153,7 @@ public class Main {
 	public static void main7(String[] args) throws IloException{
 		Market market = UnitMarketFactory.randomUnitDemandMarket(7,5,.75);
 		System.out.println(market);
-		unitdemand.lp.LPReservePrices lp = new unitdemand.lp.LPReservePrices(market);
+		unitdemand.lp.UnitLPReservePrices lp = new unitdemand.lp.UnitLPReservePrices(market);
 		MarketPrices lpSol = lp.Solve();
 		Printer.printMatrix(lpSol.getMarketAllocation().getAllocation());
 		Printer.printVector(lpSol.getPriceVector());

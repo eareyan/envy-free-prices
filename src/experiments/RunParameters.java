@@ -79,8 +79,8 @@ public class RunParameters{
 			return new unit_demand();
 		}else if(type.equals("unit_uniform_demand")){
 			return new unit_uniform_demand();
-		}else if(type.equals("UnitComparison")){
-			return new unit_demand();
+		}else if(type.equals("fancy_underdemand")){
+			return new fancy_underdemand();
 		}else if(type.equals("Allocation")){
 			return new AllocationExperiments();
 		}else{

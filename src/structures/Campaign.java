@@ -48,4 +48,10 @@ public class Campaign {
 	public void setReward(double reward){
 		this.reward = reward;
 	}
+	/*
+	 * String representation
+	 */
+	public String toString(){
+		return "R = " + this.reward + ", I = " + this.getDemand();
+	}
 }

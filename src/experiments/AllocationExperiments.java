@@ -15,7 +15,9 @@ import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
 import algorithms.Waterfall;
 import algorithms.allocations.EfficientAllocationILP;
-import algorithms.allocations.GreedyAllocation;
+import algorithms.allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
+import algorithms.allocations.greedy.GreedyAllocation;
+import algorithms.allocations.greedy.UsersSupplyComparatorByRemainingSupply;
 
 public class AllocationExperiments extends Experiments{
 	
@@ -36,8 +38,8 @@ public class AllocationExperiments extends Experiments{
 				/* Compute different allocations */
 				MarketAllocation efficient = new MarketAllocation(randomMarket,new EfficientAllocationILP(randomMarket).Solve(new IloCplex()).get(0));
 				MarketAllocation greedy0 = new GreedyAllocation(randomMarket).Solve();
-				MarketAllocation greedy1 = new GreedyAllocation(randomMarket,1).Solve();
-				MarketAllocation greedy2 = new GreedyAllocation(randomMarket,-1).Solve();
+				MarketAllocation greedy1 = new GreedyAllocation(randomMarket,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(1)).Solve();
+				MarketAllocation greedy2 = new GreedyAllocation(randomMarket,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(-1)).Solve();
 				MarketAllocation wf = new Waterfall(randomMarket).Solve().getMarketAllocation();
 				/* Compute statistics */
 				greedy0ToEfficient.addValue(NumberMethods.getRatio(greedy0.value() , efficient.value()));

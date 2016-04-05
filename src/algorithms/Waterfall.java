@@ -24,12 +24,19 @@ public class Waterfall {
 	 */
 	protected boolean min = true;
 	/*
+	 * reserve price
+	 */
+	protected double reserve = 0.0;
+	/*
 	 * Constructors
 	 */
 	public Waterfall(Market market){
 		this.market = market;
 	}
-	
+	public Waterfall(Market market, double reserve){
+		this.market = market;
+		this.reserve = reserve;
+	}
 	public Waterfall(Market market, boolean min){
 		this.market = market;
 		this.min = min;
@@ -59,11 +66,11 @@ public class Waterfall {
 			budget[j] = this.market.getCampaign(j).getReward();
 		}
 		/*
-		 * Find out which campaigns actually have connections
+		 * Find out which campaigns actually have connections and have enough to pay for reserve prices.
 		 */
 		ArrayList<Integer> Campaigns = new ArrayList<Integer>();		
 		for(int j=0;j<this.market.getNumberCampaigns();j++){
-			if(this.market.hasConnectionsCampaign(j)){
+			if(this.market.hasConnectionsCampaign(j) && (this.market.getCampaign(j).getReward() - this.market.getCampaign(j).getDemand() * this.reserve) > 0){
 				Campaigns.add(j);
 			}
 		}		

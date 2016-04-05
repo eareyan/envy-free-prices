@@ -99,6 +99,7 @@ public class AscendingAuction {
 				break;
 			}
 		}
+		/* For debugging only
 		System.out.println("Final Allocation:");
 		Printer.printMatrix(this.allocation);
 
@@ -107,7 +108,7 @@ public class AscendingAuction {
 		Printer.printVector(this.prices);
 		for(int i=0;i<this.market.getNumberUsers();i++){
 			System.out.println("P["+i+"] = "+this.prices[i]);
-		}
+		}*/
 		return new MarketPrices(new MarketAllocation(this.market,this.allocation),this.prices);
 	}
 	/*

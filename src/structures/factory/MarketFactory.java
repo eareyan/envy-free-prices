@@ -150,5 +150,16 @@ public class MarketFactory {
 		}
 		return new Market(users,campaigns,connections);
 	}
-
+	/*
+	 * Creates a clone market but 
+	 * Subtract the rewards of all campaign by the parameter r times number of impressions.
+	 * Call this market with reserve price r.
+	 */
+	public static Market createReservePriceMarket(Market market, double r){
+		Market clone = cloneMarket(market);
+		for(int j=0;j<clone.getNumberCampaigns();j++){
+			clone.getCampaign(j).setReward(market.getCampaign(j).getReward() - r*market.getCampaign(j).getDemand());
+		}
+		return clone;
+	}
 }

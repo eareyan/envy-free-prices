@@ -107,7 +107,7 @@ public class unit_uniform_demand extends Experiments{
 				/*
 				 * Measure LP
 				 */
-				unitdemand.lp.LPReservePrices lp = new unitdemand.lp.LPReservePrices(market);
+				unitdemand.lp.UnitLPReservePrices lp = new unitdemand.lp.UnitLPReservePrices(market);
 				startTime = System.nanoTime();
 				MarketPrices lpSol = lp.Solve();
 				endTime = System.nanoTime();
