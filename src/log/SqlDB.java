@@ -122,14 +122,14 @@ public class SqlDB {
         preparedStatement.setDouble(23, lpWE2);
         preparedStatement.execute();		
 	}
-	public void save_fancy_underdemand(int n, int m, double p, int b,
+	public void save_fancy_demand(String table_name, int n, int m, double p, int b,
 			double ckEfficiency, double ckRevenue, double ckTime, double ckWE1, double ckWE2,
 			double lpOptEfficiency, double lpOptRevenue, double lpOptTime, double lpOptWE1, double lpOptWE2,
 			double lpWFEfficiency, double lpWFRevenue, double lpWFTime, double lpWFWE1, double lpWFWE2,
 			double lpG1Efficiency, double lpG1Revenue, double lpG1Time, double lpG1WE1, double lpG1WE2,
 			double lpG2Efficiency, double lpG2Revenue, double lpG2Time, double lpG2WE1, double lpG2WE2
 			) throws SQLException {
-        String sql = "INSERT INTO fancy_underdemand(n,m,p,b,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,lpOptEfficiency,lpOptRevenue,lpOptTime,lpOptWE1,lpOptWE2,lpWFEfficiency,lpWFRevenue,lpWFTime,lpWFWE1,lpWFWE2,lpG1Efficiency,lpG1Revenue,lpG1Time,lpG1WE1,lpG1WE2,lpG2Efficiency,lpG2Revenue,lpG2Time,lpG2WE1,lpG2WE2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO "+table_name+" (n,m,p,b,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,lpOptEfficiency,lpOptRevenue,lpOptTime,lpOptWE1,lpOptWE2,lpWFEfficiency,lpWFRevenue,lpWFTime,lpWFWE1,lpWFWE2,lpG1Efficiency,lpG1Revenue,lpG1Time,lpG1WE1,lpG1WE2,lpG2Efficiency,lpG2Revenue,lpG2Time,lpG2WE1,lpG2WE2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
         preparedStatement.setInt(1, n);
         preparedStatement.setInt(2, m);
