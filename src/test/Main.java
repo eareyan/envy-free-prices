@@ -31,7 +31,7 @@ import experiments.RunParameters;
 public class Main {
 	
 	
-	public static void main(String[] args) throws IloException{
+	public static void main0(String[] args) throws IloException{
 		Market market = RandomMarketFactory.generateOverDemandedMarket(3, 3, 0.75, 1);
 		System.out.println(market);
 		
@@ -220,15 +220,9 @@ public class Main {
 		System.out.println("There were: "+ ckSol.computeWalrasianViolations() + " many WE violations");
 	}
 	
-	public static void main0(String[] args){
-		System.out.println("Market Generation");
-		Market m = RandomMarketFactory.RandomKMarket(5,3,1.0,2);
+	public static void main(String[] args){
+		Market m = RandomMarketFactory.generateOverDemandedMarket(3,5,.75,2);
 		System.out.println(m);
-		System.out.println(m.getSupplyToDemandRatio());
-		m = RandomMarketFactory.generateOverDemandedMarket(3,5,.75,1);
-		System.out.println(m);
-		//m = RandomMarketFactory.generateOverSuppliedMarket(5,20,1.0,3);
-		//System.out.println(m);
 		System.out.println(m.getSupplyToDemandRatio());
 		
 		AscendingAuction A = new AscendingAuction(m);
@@ -237,8 +231,8 @@ public class Main {
 		Printer.printVector(allocPrices.getPriceVector());
 		PricesStatistics P = new PricesStatistics(allocPrices);
 		
-		MarketAllocation X = new GreedyAllocation(m).Solve();
-		Printer.printMatrix(X.getAllocation());
+		//MarketAllocation X = new GreedyAllocation(m).Solve();
+		//Printer.printMatrix(X.getAllocation());
 		
 		System.out.println("There are " + P.numberOfEnvyCampaigns() +" many envy campaigns");
 	}

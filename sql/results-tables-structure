@@ -123,9 +123,8 @@ CREATE TABLE allocation (
 	wfToGreedy2 double precision NOT NULL
 	);
 
-\copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-demand.csv' csv header
-\copy unit_comparison to '/home/eareyanv/workspace/envy-free-prices/results/results-unit-comparison.csv' csv header
-\copy general_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-general-demand.csv' csv header
+\copy (SELECT * FROM unit_demand ORDER BY n,m,p) to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_demand.csv' csv header
+\copy (SELECT * FROM unit_uniform_demand ORDER BY n,m,p) to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_uniform_demand.csv' csv header
 
 \copy (SELECT lpReservePriceRevenue / evpAppRevenue FROM unit_uniform_demand WHERE lpReservePriceRevenue >= evpAppRevenue AND p=0.25) to '/home/eareyanv/workspace/envy-free-prices/results/unit-uniform-demand/lpBiggerEqualevpapp-p25.csv' csv header
 

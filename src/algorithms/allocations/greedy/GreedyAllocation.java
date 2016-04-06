@@ -26,6 +26,8 @@ public class GreedyAllocation {
 	
 	public GreedyAllocation(Market market){
 		this.market = market;
+		this.CampaignComparator = new CampaignComparatorByRewardToImpressionsRatio();
+		this.UserSupplyComparator = new UsersSupplyComparatorByRemainingSupply(); 
 	}
 	
 	public GreedyAllocation(Market market, Comparator<Campaign> CampaignComparator, Comparator<UserSupply> UserSupplyComparator){

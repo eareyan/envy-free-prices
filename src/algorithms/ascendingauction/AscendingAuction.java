@@ -101,11 +101,11 @@ public class AscendingAuction {
 		}
 		/* For debugging only
 		System.out.println("Final Allocation:");
-		Printer.printMatrix(this.allocation);
+		Printer.printMatrix(this.allocation);*/
 
-		System.out.println("Final Prices:");
+		//System.out.println("Final Prices:");
 		this.storeFinalPrices(currentPrices);
-		Printer.printVector(this.prices);
+		/*Printer.printVector(this.prices);
 		for(int i=0;i<this.market.getNumberUsers();i++){
 			System.out.println("P["+i+"] = "+this.prices[i]);
 		}*/
