@@ -1,0 +1,8 @@
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+&\textbf{Efficiency}&\textbf{Revenue}&\textbf{Time}&\textbf{WE1}&\textbf{WE2}\\\hline
+\textbf{CK}&1.00&112.56&24.14&0.00&0.00\\\hline
+\textbf{EVApp}&0.88&308.20&9.68&0.00&5.54\\\hline
+\textbf{MaxWEQ}&1.00&158.07&0.31&0.00&0.00\\\hline
+\textbf{LP}&0.89&320.47&15.38&0.00&5.47\\\hline
+\end{tabular}

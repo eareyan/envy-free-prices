@@ -93,11 +93,11 @@ public class fancy_demand extends Experiments{
 				endTime = System.nanoTime();
 
 				ckEfficiency.addValue(NumberMethods.getRatio(ckSol.getMarketAllocation().value() , valueOptAllocaction));
-				ckRevenue.addValue(ckSol.sellerRevenuePriceVector());
+				ckRevenue.addValue(NumberMethods.getRatio(ckSol.sellerRevenuePriceVector() , valueOptAllocaction));
 				ckTime.addValue(endTime - startTime);
 				PricesStatistics ckStat = new PricesStatistics(ckSol);
-				ckWE1.addValue(ckStat.numberOfEnvyCampaigns());
-				ckWE2.addValue(ckStat.computeWalrasianViolations()[0]);
+				ckWE1.addValue((double) ckStat.numberOfEnvyCampaigns() / numCampaigns);
+				ckWE2.addValue((double) ckStat.computeWalrasianViolations()[0] / numUsers);
 				/*
 				 * Measure lpOPT
 				 */
@@ -106,11 +106,11 @@ public class fancy_demand extends Experiments{
 				MarketPrices lpOPTSol = lpOPT.Solve();
 				endTime = System.nanoTime();
 				lpOptEfficiency.addValue(NumberMethods.getRatio(lpOPTSol.getMarketAllocation().value(),valueOptAllocaction));
-				lpOptRevenue.addValue(lpOPTSol.sellerRevenuePriceVector());
+				lpOptRevenue.addValue(NumberMethods.getRatio(lpOPTSol.sellerRevenuePriceVector() , valueOptAllocaction));
 				lpOptTime.addValue(endTime - startTime);
 				PricesStatistics lpOPTStat = new PricesStatistics(lpOPTSol);
-				lpOptWE1.addValue(lpOPTStat.numberOfEnvyCampaigns());
-				lpOptWE2.addValue(lpOPTStat.computeWalrasianViolations()[0]);
+				lpOptWE1.addValue((double) lpOPTStat.numberOfEnvyCampaigns() / numCampaigns);
+				lpOptWE2.addValue((double) lpOPTStat.computeWalrasianViolations()[0] / numUsers);
 				/*
 				 * Measure lpWF
 				 */
@@ -119,11 +119,11 @@ public class fancy_demand extends Experiments{
 				MarketPrices lpWFSol = lpWF.Solve();
 				endTime = System.nanoTime();
 				lpWFEfficiency.addValue(NumberMethods.getRatio(lpWFSol.getMarketAllocation().value(),valueOptAllocaction));
-				lpWFRevenue.addValue(lpWFSol.sellerRevenuePriceVector());
+				lpWFRevenue.addValue(NumberMethods.getRatio(lpWFSol.sellerRevenuePriceVector() , valueOptAllocaction));
 				lpWFTime.addValue(endTime - startTime);
 				PricesStatistics lpWFStat = new PricesStatistics(lpWFSol);
-				lpWFWE1.addValue(lpWFStat.numberOfEnvyCampaigns());
-				lpWFWE2.addValue(lpWFStat.computeWalrasianViolations()[0]);
+				lpWFWE1.addValue((double) lpWFStat.numberOfEnvyCampaigns() / numCampaigns);
+				lpWFWE2.addValue((double) lpWFStat.computeWalrasianViolations()[0] / numUsers);
 				/*
 				 * Measure lpG1
 				 */
@@ -132,11 +132,11 @@ public class fancy_demand extends Experiments{
 				MarketPrices lpG1Sol = lpG1.Solve();
 				endTime = System.nanoTime();
 				lpG1Efficiency.addValue(NumberMethods.getRatio(lpG1Sol.getMarketAllocation().value(),valueOptAllocaction));
-				lpG1Revenue.addValue(lpG1Sol.sellerRevenuePriceVector());
+				lpG1Revenue.addValue(NumberMethods.getRatio(lpG1Sol.sellerRevenuePriceVector() , valueOptAllocaction));
 				lpG1Time.addValue(endTime - startTime);
 				PricesStatistics lpG1Stat = new PricesStatistics(lpG1Sol);
-				lpG1WE1.addValue(lpG1Stat.numberOfEnvyCampaigns());
-				lpG1WE2.addValue(lpG1Stat.computeWalrasianViolations()[0]);
+				lpG1WE1.addValue((double) lpG1Stat.numberOfEnvyCampaigns() / numCampaigns);
+				lpG1WE2.addValue((double) lpG1Stat.computeWalrasianViolations()[0] / numUsers);
 				/*
 				 * Measure lpG1
 				 */
@@ -145,11 +145,11 @@ public class fancy_demand extends Experiments{
 				MarketPrices lpG2Sol = lpG2.Solve();
 				endTime = System.nanoTime();
 				lpG2Efficiency.addValue(NumberMethods.getRatio(lpG2Sol.getMarketAllocation().value(),valueOptAllocaction));
-				lpG2Revenue.addValue(lpG2Sol.sellerRevenuePriceVector());
+				lpG2Revenue.addValue(NumberMethods.getRatio(lpG2Sol.sellerRevenuePriceVector() , valueOptAllocaction));
 				lpG2Time.addValue(endTime - startTime);
 				PricesStatistics lpG2Stat = new PricesStatistics(lpG2Sol);
-				lpG2WE1.addValue(lpG2Stat.numberOfEnvyCampaigns());
-				lpG2WE2.addValue(lpG2Stat.computeWalrasianViolations()[0]);				
+				lpG2WE1.addValue((double) lpG2Stat.numberOfEnvyCampaigns() / numCampaigns);
+				lpG2WE2.addValue((double) lpG2Stat.computeWalrasianViolations()[0] / numUsers);				
 			}
 			dbLogger.save_fancy_demand(tablename, numUsers, numCampaigns, prob, b,
 					ckEfficiency.getMean(), ckRevenue.getMean(), ckTime.getMean() / 1000000, ckWE1.getMean() , ckWE2.getMean() ,

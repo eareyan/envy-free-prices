@@ -140,18 +140,30 @@ public class Market {
     	return this.connections[i][j];
     }
     /*
+     * Total supply is defined as \sum_{i} N_i
+     */
+    public int getTotalSupply(){
+    	int totalSupply = 0;
+    	for(int i=0;i<this.getNumberUsers();i++){
+    		totalSupply += this.getUser(i).getSupply();
+    	}
+    	return totalSupply;
+    }    
+    /*
+     * Total demand is defined as \sum_{j} I_j
+     */
+    public int getTotalDemand(){
+    	int totalDemand = 0;
+    	for(int j=0;j<this.getNumberCampaigns();j++){
+    		totalDemand += this.getCampaign(j).getDemand();
+    	}
+    	return totalDemand;
+    }
+    /*
      * Get supply to demand ratio. 
      */
     public double getSupplyToDemandRatio(){
-    	int supply = 0;
-    	int demand = 0;
-    	for(int i=0;i<this.getNumberUsers();i++){
-    		supply += this.getUser(i).getSupply();
-    	}
-		for(int j=0;j<this.getNumberCampaigns();j++){
-			demand += this.getCampaign(j).getDemand();
-		}
-		return (double) supply / demand;
+		return (double) this.getTotalSupply() / this.getTotalDemand();
     }
     /*
      * Printers. Representation of objects as strings.

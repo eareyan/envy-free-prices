@@ -24,7 +24,7 @@ public class AscendingAuction {
 	
 	protected int[][] allocation;
 	
-	protected static double epsilon = 0.0001;
+	protected static double epsilon = 0.005;
 	
 	public AscendingAuction(Market market){
 		this.market = market;
@@ -77,7 +77,7 @@ public class AscendingAuction {
 						allocToUser += this.allocation[userId][l];
 					}
 					if(allocToUser > this.market.getUser(userId).getSupply()){ //Check if we haven't exceed the total supply of this user
-						//We need to unallocate campaigns now since we have exceed supply!
+						//We need to unallocate campaigns now since we have exceeded supply!
 						//System.out.println("We need to unallocate campaigns from user " + userId+", current alloc = " + allocToUser + ", max = " + this.market.getUser(userId).getSupply());
 						this.updatePrices(currentPrices, userId);
 						for(int l=0;l<this.market.getNumberCampaigns();l++){
@@ -88,9 +88,14 @@ public class AscendingAuction {
 									this.allocation[i][l] = 0;
 								}
 								unallocatedCampaigns.add(new Integer(l));
-								if(allocToUser <= this.market.getUser(userId).getSupply()){
+								/*
+								 * If the following if is not commented, then we will delete enough campaigns to make the
+								 * user not over exhausted. Note that doing so produces not envy-free prices.
+								 */
+								
+								/*if(allocToUser <= this.market.getUser(userId).getSupply()){ 
 									break;
-								}
+								}*/ 
 							}
 						}	
 					}
@@ -112,7 +117,7 @@ public class AscendingAuction {
 		return new MarketPrices(new MarketAllocation(this.market,this.allocation),this.prices);
 	}
 	/*
-	 * Stores final price vecto
+	 * Stores final price vector
 	 */
 	public void storeFinalPrices(ArrayList<UserPrice> prices){
 		for(UserPrice u: prices){

@@ -1,12 +1,19 @@
 package test;
 
 //import ilog.concert.IloException;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import statistics.PricesStatistics;
+import structures.Campaign;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
+import structures.User;
 import structures.factory.MarketAllocationFactory;
 import structures.factory.RandomMarketFactory;
 import structures.factory.UnitMarketFactory;
@@ -15,9 +22,12 @@ import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
+import algorithms.Waterfall;
+import algorithms.WaterfallPrices;
 import algorithms.allocations.EfficientAllocationILP;
 import algorithms.allocations.greedy.GreedyAllocation;
 import algorithms.ascendingauction.AscendingAuction;
+import algorithms.ascendingauction.AscendingAuctionModified;
 import algorithms.pricing.lp.reserveprices.EfficientAlloc;
 import algorithms.pricing.lp.reserveprices.GreedyAlloc;
 import algorithms.pricing.lp.reserveprices.LPReservePrices;
@@ -220,8 +230,162 @@ public class Main {
 		System.out.println("There were: "+ ckSol.computeWalrasianViolations() + " many WE violations");
 	}
 	
+	
+	public static void main777(String[] args){
+		Campaign[] c = new Campaign[2];
+		c[0] = new Campaign(9,6.621868893434204);
+		c[1] = new Campaign(2,5.890038198003152);
+		User[] u = new User[2];
+		u[0] = new User(3);
+		u[1] = new User(10);
+		
+		boolean[][] connections = new boolean[2][2];
+		connections[0][0] = true;
+		
+		connections[1][0] = true;
+		connections[1][1] = true;
+		
+		Market m = new Market(u,c,connections);
+		System.out.println(m);
+		AscendingAuction A = new AscendingAuction(m);
+		MarketPrices ASol = A.Solve();
+		Printer.printMatrix(ASol.getMarketAllocation().getAllocation());
+		Printer.printVector(ASol.getPriceVector());
+		PricesStatistics PA = new PricesStatistics(ASol);
+		for(int i=0;i<ASol.getPriceVector().length;i++){
+			System.out.println(ASol.getPriceVector()[i]);
+		}
+		System.out.println("There are " + PA.numberOfEnvyCampaigns() + " envy campaigns");
+		
+		AscendingAuctionModified A2 = new AscendingAuctionModified(m);
+		MarketPrices A2Sol = A2.Solve();
+		Printer.printMatrix(A2Sol.getMarketAllocation().getAllocation());
+		Printer.printVector(A2Sol.getPriceVector());
+		PricesStatistics PA2 = new PricesStatistics(A2Sol);
+		for(int i=0;i<A2Sol.getPriceVector().length;i++){
+			System.out.println(A2Sol.getPriceVector()[i]);
+		}
+		System.out.println("There are " + PA2.numberOfEnvyCampaigns() + " envy campaigns");
+		
+		if(PA.numberOfEnvyCampaigns() > 0 || PA2.numberOfEnvyCampaigns()>0){
+			System.out.println("SOMEONE ENVY!");
+			System.exit(-1);
+		}
+		
+	}
+	
+	public static void main9696(String[] args) throws IloException{
+		DescriptiveStatistics time = new DescriptiveStatistics();
+		for(int i=0;i<1000;i++){
+			double startTime = System.nanoTime();
+			IloCplex x = new IloCplex();
+			double endTime = System.nanoTime();
+			time.addValue(endTime - startTime);
+		}
+		System.out.println(time.getMean() / 1000000);
+	}
+	
 	public static void main(String[] args){
-		Market m = RandomMarketFactory.generateOverDemandedMarket(3,5,.75,2);
+		Market m = RandomMarketFactory.randomMarket(3, 3, 1.0);
+		System.out.println(m);
+		
+		Waterfall WF = new Waterfall(m);
+		WaterfallPrices x = WF.Solve();
+		Printer.printMatrix(x.getMarketAllocation().getAllocation());
+		ArrayList<Integer> list = new ArrayList<Integer>(2);
+		list.add(9);
+		list.add(10);
+		System.out.println(list);
+		Collections.swap(list, 0, 1);
+		System.out.println(list);
+	}
+	
+	public static void main66(String[] args){		
+		
+		for(int i=2;i<15;i++){
+			for(int j=2;j<15;j++){
+				for(int p=0;p<4;p++){
+					double prob =0.25 +  0.25*p;
+					for(int k=1;k<100;k++){	
+					Market m = RandomMarketFactory.randomMarket(i, j, prob);
+					System.out.println(m);
+					
+		AscendingAuction A = new AscendingAuction(m);
+		MarketPrices ASol = A.Solve();
+		Printer.printMatrix(ASol.getMarketAllocation().getAllocation());
+		Printer.printVector(ASol.getPriceVector());
+		PricesStatistics PA = new PricesStatistics(ASol);
+		System.out.println("There are " + PA.numberOfEnvyCampaigns() + " envy campaigns");
+		
+		AscendingAuctionModified A2 = new AscendingAuctionModified(m);
+		MarketPrices A2Sol = A2.Solve();
+		Printer.printMatrix(A2Sol.getMarketAllocation().getAllocation());
+		Printer.printVector(A2Sol.getPriceVector());
+		PricesStatistics PA2 = new PricesStatistics(A2Sol);
+		System.out.println("There are " + PA2.numberOfEnvyCampaigns() + " envy campaigns");
+		
+		if(PA.numberOfEnvyCampaigns() > 0 || PA2.numberOfEnvyCampaigns()>0){
+			System.out.println("SOMEONE ENVY!");
+			System.exit(-1);
+		}
+					}
+				}
+			}
+		}
+	
+	}
+	
+	
+	public static void main9(String[] args){
+		for(int i=2;i<15;i++){
+			for(int j=2;j<15;j++){
+				for(int k=1;k<100;k++){
+				Market m = RandomMarketFactory.generateOverDemandedMarket(i,j,.5,2);
+				System.out.println(m);
+				System.out.println(m.getSupplyToDemandRatio());
+				
+				AscendingAuction A = new AscendingAuction(m);
+				MarketPrices allocPrices = A.Solve();
+				Printer.printMatrix(allocPrices.getMarketAllocation().getAllocation());
+				Printer.printVector(allocPrices.getPriceVector());
+				PricesStatistics P = new PricesStatistics(allocPrices);
+				
+				//MarketAllocation X = new GreedyAllocation(m).Solve();
+				//Printer.printMatrix(X.getAllocation());
+				
+				if(P.numberOfEnvyCampaigns() > 0){
+					System.out.println("There are " + P.numberOfEnvyCampaigns() +" many envy campaigns");
+					System.exit(-1);
+				}
+				}
+			}
+		}
+	}
+	
+	public static void main10(String[] args){
+		Campaign c1 = new Campaign(5, 8);
+		Campaign c2 = new Campaign(5, 6);
+		Campaign c3 = new Campaign(4, 3);
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		campaigns[2] = c3;
+		
+		User u1 = new User(12);
+		User u2 = new User(2);
+		User[] users = new User[2];
+		users[0] = u1;
+		users[1] = u2;
+		
+		boolean[][] connections = new boolean[2][3];
+		connections[0][0] = true;
+		
+		connections[0][1] = true;
+		
+		connections[0][2] = true;		
+		connections[1][2] = true;		
+		Market m = new Market(users,campaigns,connections);
+		
 		System.out.println(m);
 		System.out.println(m.getSupplyToDemandRatio());
 		
@@ -234,7 +398,11 @@ public class Main {
 		//MarketAllocation X = new GreedyAllocation(m).Solve();
 		//Printer.printMatrix(X.getAllocation());
 		
-		System.out.println("There are " + P.numberOfEnvyCampaigns() +" many envy campaigns");
+		if(P.numberOfEnvyCampaigns() > 0){
+			System.out.println("There are " + P.numberOfEnvyCampaigns() +" many envy campaigns");
+			System.exit(-1);
+		}
+		
 	}
 	
 	

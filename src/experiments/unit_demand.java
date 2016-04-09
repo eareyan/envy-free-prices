@@ -73,10 +73,10 @@ public class unit_demand extends Experiments{
 				endTime = System.nanoTime();
 
 				ckEfficiency.addValue(NumberMethods.getRatio(ckSol.getValueOfMatching() , valueOptAllocaction));
-				ckRevenue.addValue(ckSol.getSellerRevenue());
+				ckRevenue.addValue(NumberMethods.getRatio(ckSol.getSellerRevenue(), valueOptAllocaction));
 				ckTime.addValue(endTime - startTime);
-				ckWE1.addValue(ckSol.numberOfEnvyCampaigns());
-				ckWE2.addValue(ckSol.computeWalrasianViolations());
+				ckWE1.addValue((double) ckSol.numberOfEnvyCampaigns() / numCampaigns);
+				ckWE2.addValue((double) ckSol.computeWalrasianViolations() / numUsers);
 				/*
 				 * Measure evpApp
 				 */
@@ -86,10 +86,10 @@ public class unit_demand extends Experiments{
 				endTime = System.nanoTime();
 				
 				evpEfficiency.addValue(NumberMethods.getRatio(evpSol.getValueOfMatching() , valueOptAllocaction));
-				evpRevenue.addValue(evpSol.getSellerRevenue());
+				evpRevenue.addValue(NumberMethods.getRatio(evpSol.getSellerRevenue() , valueOptAllocaction));
 				evpTime.addValue(endTime - startTime);
-				evpWE1.addValue(evpSol.numberOfEnvyCampaigns());
-				evpWE2.addValue(evpSol.computeWalrasianViolations());
+				evpWE1.addValue((double) evpSol.numberOfEnvyCampaigns() / numCampaigns);
+				evpWE2.addValue((double) evpSol.computeWalrasianViolations() / numUsers);
 				/*
 				 * Measure maxEQ
 				 */
@@ -99,10 +99,10 @@ public class unit_demand extends Experiments{
 				endTime = System.nanoTime();
 				
 				mweqEfficiency.addValue(NumberMethods.getRatio(mweqSol.getValueOfMatching() , valueOptAllocaction));
-				mweqRevenue.addValue(mweqSol.getSellerRevenue());
+				mweqRevenue.addValue(NumberMethods.getRatio(mweqSol.getSellerRevenue() , valueOptAllocaction));
 				mweqTime.addValue(endTime - startTime);
-				mweqWE1.addValue(mweqSol.numberOfEnvyCampaigns());
-				mweqWE2.addValue(mweqSol.computeWalrasianViolations());				
+				mweqWE1.addValue((double) mweqSol.numberOfEnvyCampaigns() / numCampaigns);
+				mweqWE2.addValue((double) mweqSol.computeWalrasianViolations() / numUsers);				
 			}
 			/* log results in database */
 			dbLogger.save_unit_demand(numUsers, numCampaigns, prob, 

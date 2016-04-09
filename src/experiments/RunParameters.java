@@ -83,8 +83,8 @@ public class RunParameters{
 			return new fancy_underdemand();
 		}else if(type.equals("fancy_overdemand")){
 			return new fancy_overdemand();
-		}else if(type.equals("Allocation")){
-			return new AllocationExperiments();
+		}else if(type.equals("allocation")){
+			return new allocation();
 		}else{
 			throw new Exception("Unknown demand type");
 		}

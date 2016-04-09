@@ -157,8 +157,34 @@ public class Examples {
 		//Printer.printMatrix(y.getAllocation());
 		//System.out.println(y.value());
 		
-		//System.out.println(WFSol.getMarketAllocation().value() / y.value());		
+		//System.out.println(WFSol.getMarketAllocation().value() / y.value());	
 		
+	}
+	
+	public static void moreExamples(){
+		/* Example where the first implementation of CK outputs envy prices*/
 		
+		Campaign c1 = new Campaign(5, 8.79);
+		Campaign c2 = new Campaign(5, 6.45);
+		Campaign c3 = new Campaign(4, 3.47);
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		campaigns[2] = c3;
+		
+		User u1 = new User(12);
+		User u2 = new User(2);
+		User[] users = new User[2];
+		users[0] = u1;
+		users[1] = u2;
+		
+		boolean[][] connections = new boolean[2][3];
+		connections[0][0] = true;
+		
+		connections[0][1] = true;
+		
+		connections[2][0] = true;		
+		connections[2][1] = true;		
+		Market market = new Market(users,campaigns,connections);
 	}
 }

@@ -38,7 +38,7 @@ public class UnitMarketFactory {
 	 * probability of connection.
 	 */
 	public static Market randomUnitDemandMarket(int numberUsers, int numberCampaigns, double probabilityConnections){
-		return RandomMarketFactory.randomMarket(numberUsers, 1 ,1,  numberCampaigns, 1 , 1, 1.0, 100.0,  probabilityConnections);		
+		return RandomMarketFactory.randomMarket(numberUsers, 1 ,1,  numberCampaigns, 1 , 1, RandomMarketFactory.defaultMinReward, RandomMarketFactory.defaultMaxReward,  probabilityConnections);		
 	}	
 	
 	/*

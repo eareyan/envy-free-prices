@@ -14,7 +14,7 @@ public class PricesStatistics {
 	
 	protected double[] pricesVector;
 	
-	protected static double epsilon = 0.01;
+	protected static double epsilon = 0.5;
 	
 	
 	public PricesStatistics(MarketPrices marketPrices){

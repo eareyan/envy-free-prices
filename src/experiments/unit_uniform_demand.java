@@ -18,7 +18,6 @@ import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.NumberMethods;
-import util.Printer;
 
 /*
  * This class implements experiments in the case of unit-uniform demand.
@@ -74,10 +73,10 @@ public class unit_uniform_demand extends Experiments{
 				endTime = System.nanoTime();
 
 				ckEfficiency.addValue(NumberMethods.getRatio(ckSol.getValueOfMatching() , valueOptAllocaction));
-				ckRevenue.addValue(ckSol.getSellerRevenue());
+				ckRevenue.addValue(NumberMethods.getRatio(ckSol.getSellerRevenue() , valueOptAllocaction));
 				ckTime.addValue(endTime - startTime);
-				ckWE1.addValue(ckSol.numberOfEnvyCampaigns());
-				ckWE2.addValue(ckSol.computeWalrasianViolations());
+				ckWE1.addValue((double) ckSol.numberOfEnvyCampaigns() / numCampaigns);
+				ckWE2.addValue((double) ckSol.computeWalrasianViolations() / numUsers);
 				/*
 				 * Measure evpApp
 				 */
@@ -87,10 +86,10 @@ public class unit_uniform_demand extends Experiments{
 				endTime = System.nanoTime();
 				
 				evpEfficiency.addValue(NumberMethods.getRatio(evpSol.getValueOfMatching() , valueOptAllocaction));
-				evpRevenue.addValue(evpSol.getSellerRevenue());
+				evpRevenue.addValue(NumberMethods.getRatio(evpSol.getSellerRevenue() , valueOptAllocaction));
 				evpTime.addValue(endTime - startTime);
-				evpWE1.addValue(evpSol.numberOfEnvyCampaigns());
-				evpWE2.addValue(evpSol.computeWalrasianViolations());
+				evpWE1.addValue((double) evpSol.numberOfEnvyCampaigns() / numCampaigns);
+				evpWE2.addValue((double) evpSol.computeWalrasianViolations() / numUsers);
 				/*
 				 * Measure maxEQ
 				 */
@@ -100,10 +99,10 @@ public class unit_uniform_demand extends Experiments{
 				endTime = System.nanoTime();
 				
 				mweqEfficiency.addValue(NumberMethods.getRatio(mweqSol.getValueOfMatching() , valueOptAllocaction));
-				mweqRevenue.addValue(mweqSol.getSellerRevenue());
+				mweqRevenue.addValue(NumberMethods.getRatio(mweqSol.getSellerRevenue() , valueOptAllocaction));
 				mweqTime.addValue(endTime - startTime);
-				mweqWE1.addValue(mweqSol.numberOfEnvyCampaigns());
-				mweqWE2.addValue(mweqSol.computeWalrasianViolations());
+				mweqWE1.addValue((double) mweqSol.numberOfEnvyCampaigns() / numCampaigns);
+				mweqWE2.addValue((double) mweqSol.computeWalrasianViolations() / numUsers);
 				/*
 				 * Measure LP
 				 */
@@ -113,11 +112,11 @@ public class unit_uniform_demand extends Experiments{
 				endTime = System.nanoTime();
 				
 				lpEfficiency.addValue(NumberMethods.getRatio(lpSol.getMarketAllocation().value(), valueOptAllocaction));
-				lpRevenue.addValue(lpSol.sellerRevenuePriceVector());
+				lpRevenue.addValue(NumberMethods.getRatio(lpSol.sellerRevenuePriceVector() , valueOptAllocaction));
 				lpTime.addValue(endTime - startTime);
 				PricesStatistics p = new PricesStatistics(lpSol);
-				lpWE1.addValue(p.numberOfEnvyCampaigns());
-				lpWE2.addValue(p.computeWalrasianViolations()[0]);
+				lpWE1.addValue((double) p.numberOfEnvyCampaigns() / numCampaigns);
+				lpWE2.addValue((double) p.computeWalrasianViolations()[0] / numUsers);
 
 			}
 			/* log results in database */

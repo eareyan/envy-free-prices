@@ -24,8 +24,16 @@ public class GreedyAllocation {
 	
 	protected double reserve = 0.0;
 	
+	protected boolean swapUsers = false;
+	
 	public GreedyAllocation(Market market){
 		this.market = market;
+		this.CampaignComparator = new CampaignComparatorByRewardToImpressionsRatio();
+		this.UserSupplyComparator = new UsersSupplyComparatorByRemainingSupply(); 
+	}
+	public GreedyAllocation(Market market, Comparator<Campaign> CampaignComparator, Comparator<UserSupply> UserSupplyComparator, boolean swapUsers){
+		this.market = market;
+		this.swapUsers = swapUsers;
 		this.CampaignComparator = new CampaignComparatorByRewardToImpressionsRatio();
 		this.UserSupplyComparator = new UsersSupplyComparatorByRemainingSupply(); 
 	}
@@ -66,6 +74,12 @@ public class GreedyAllocation {
 			}
 			//System.out.println(accessibleUsers);
 			Collections.sort(accessibleUsers, this.UserSupplyComparator);
+			if(this.swapUsers){
+				if(accessibleUsers.size()>1){
+					//Swap first two users
+					Collections.swap(accessibleUsers, 0, 1);
+				}				
+			}
 			//System.out.println(accessibleUsers);
 			if(totalAvailableSupply >= this.market.getCampaign(campaigns[j].getBackpointer()).getDemand()){
 				/* Try to allocate */

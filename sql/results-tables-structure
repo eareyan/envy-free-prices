@@ -128,3 +128,13 @@ CREATE TABLE allocation (
 
 \copy (SELECT lpReservePriceRevenue / evpAppRevenue FROM unit_uniform_demand WHERE lpReservePriceRevenue >= evpAppRevenue AND p=0.25) to '/home/eareyanv/workspace/envy-free-prices/results/unit-uniform-demand/lpBiggerEqualevpapp-p25.csv' csv header
 
+\copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_demand.csv' csv header
+\copy unit_uniform_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_uniform_demand.csv' csv header
+
+
+\copy fancy_underdemand to '/home/eareyanv/workspace/envy-free-prices/results/results-fancy_underdemand.csv' csv header
+\copy fancy_overdemand to '/home/eareyanv/workspace/envy-free-prices/results/results-fancy_overdemand.csv' csv header
+
+SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,ck2Time,ck2WE1,ck2WE2 FROM fancy_underdemand;
+SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,ck2Time,ck2WE1,ck2WE2 FROM fancy_overdemand;
+

@@ -9,6 +9,12 @@ import structures.Market;
 import structures.User;
 
 public class RandomMarketFactory {
+	public static double defaultMaxReward = 10.0;
+	public static double defaultMinReward = 1.0;
+	public static int defaultMaxSupplyPerUser = 10;
+	public static int defaultMinSupplyPerUser = 1;
+	public static int defaultMaxDemandPerCampaign = 10;
+	public static int defaultMinDemandPerCampaign = 1;
 	/*
 	 * Creation of a fully parameterizable random market. 
 	 */
@@ -38,21 +44,14 @@ public class RandomMarketFactory {
 	}
 	/*
 	 * Shortcut method to create a random market by just providing the number of users, campaigns, and
-	 * probability of connection.
+	 * probability of connection. Other parameters are given by default (static members of this class).
 	 */
 	public static Market randomMarket(int numberUsers, int numberCampaigns, double probabilityConnections){
-		return RandomMarketFactory.randomMarket(numberUsers, 1 ,10,  numberCampaigns, 1 , 10, 1.0, 100.0,  probabilityConnections);		
+		return RandomMarketFactory.randomMarket(numberUsers, RandomMarketFactory.defaultMinSupplyPerUser ,RandomMarketFactory.defaultMaxSupplyPerUser,  numberCampaigns, RandomMarketFactory.defaultMinDemandPerCampaign , RandomMarketFactory.defaultMaxDemandPerCampaign, RandomMarketFactory.defaultMinReward, RandomMarketFactory.defaultMaxReward,  probabilityConnections);		
 	}
 	/*
-	 * Shortcut method to create a random market by just providing the number of users, campaigns, and
-	 * probability of connection.
+	 * Generate over demanded and over supplied markets
 	 */
-	public static Market randomMarketMoreCampaignReach(int numberUsers, int numberCampaigns, double probabilityConnections){
-		return RandomMarketFactory.randomMarket(numberUsers, 1 ,5,  numberCampaigns, 6 , 10, 1.0, 100.0,  probabilityConnections);		
-	}	
-	public static Market randomMarketMoreUserSupply(int numberUsers, int numberCampaigns, double probabilityConnections){
-		return RandomMarketFactory.randomMarket(numberUsers, 6 ,10,  numberCampaigns, 1 , 5, 1.0, 100.0,  probabilityConnections);		
-	}
 	public static Market generateOverDemandedMarket(int numberUsers, int numberCampaigns,double probabilityConnection, int b){
 		return RandomKMarket(numberUsers, numberCampaigns, probabilityConnection, b);
 	}
@@ -64,8 +63,6 @@ public class RandomMarketFactory {
 	 */
 	public static Market RandomKMarket(int numberUsers, int numberCampaigns, double probabilityConnection, int b){
 		Random generator = new Random();
-		int maxReward = 100;
-		int minReward = 1;
 		User[] users = new User[numberUsers];
 		Campaign[] campaigns = new Campaign[numberCampaigns];
 		int[] campaignConnectedToUser = new int[numberUsers];
@@ -78,8 +75,6 @@ public class RandomMarketFactory {
 				}
 			}
 		}
-		int maxSupplyPerUser = 10;
-		int minSupplyPerUser = 1;
 		/*
 		 * Generate supply and demand to maintain the ratio
 		 */
@@ -92,7 +87,7 @@ public class RandomMarketFactory {
 		int x = 0 , k = 0;
 		int totalSupply = 0;
 		for(int i=0;i<numberUsers;i++){
-			finalSupply[i] = campaignConnectedToUser[i] + generator.nextInt((maxSupplyPerUser - minSupplyPerUser) + 1) + minSupplyPerUser;
+			finalSupply[i] = campaignConnectedToUser[i] + generator.nextInt((RandomMarketFactory.defaultMaxSupplyPerUser - RandomMarketFactory.defaultMinSupplyPerUser) + 1) + RandomMarketFactory.defaultMinSupplyPerUser;
 			//System.out.println("finalSupply["+i+"] = " + finalSupply[i]);
 			totalSupply += finalSupply[i];
 			x = totalSupply * b - totalDemand;
@@ -110,7 +105,7 @@ public class RandomMarketFactory {
 			users[i] = new User(finalSupply[i]);
 		}
 		for(int j=0;j<numberCampaigns;j++){
-			campaigns[j] = new Campaign(finalDemands[j],generator.nextDouble() * (maxReward - minReward) + minReward);			
+			campaigns[j] = new Campaign(finalDemands[j],generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);			
 		}
 				
 		return new Market(users,campaigns,connections);
