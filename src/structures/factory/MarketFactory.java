@@ -162,4 +162,33 @@ public class MarketFactory {
 		}
 		return clone;
 	}
+	
+	/*
+	 * Create a market from a given market where, for all users i, we create N_i
+	 * users, each supplying only one impression and with the same connections as i.
+	 */
+	public static Market createUnitSupplyMarket(Market market){
+		
+		/* Given a market, construct a new market where each user class i is
+		 * divided into N_i new user classes. Run Ascending Auction in this new market
+		 * and then convert the price of the different user classes to a single price
+		 * via a min operator.
+		 * */
+		Campaign[] campaigns = market.getCampaigns(); 	// Use same campaigns
+		int totalUserSupply = market.getTotalSupply(); // Compute total supply
+		User[] newUsers = new User[totalUserSupply];		//Have as many new users as total supply
+		boolean[][] newConnections = new boolean[totalUserSupply][market.getNumberCampaigns()];
+		int k=0;
+		for(int i=0;i<market.getNumberUsers();i++){ //For each original user
+			//System.out.println("Create "+ this.market.getUser(i).getSupply() + " many users from user " + i);
+			for(int iPrime=0;iPrime<market.getUser(i).getSupply();iPrime++){
+				newUsers[k] = new User(1); //Create N_i copies for user i
+				for(int j=0;j<market.getNumberCampaigns();j++){ //Compute the new connections
+					newConnections[k][j] = market.isConnected(i, j);
+				}
+				k++;
+			}
+		}
+		return new Market(newUsers,campaigns,newConnections);
+	}
 }

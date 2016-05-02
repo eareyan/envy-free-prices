@@ -77,6 +77,34 @@ CREATE TABLE fancy_underdemand (
 	lpG2WE2 double precision NOT NULL
 	);
 
+
+CREATE TABLE fancy_unitsupply_underdemand (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	b integer NOT NULL,
+	lpOptEfficiency double precision NOT NULL,
+	lpOptRevenue double precision NOT NULL,
+	lpOptTime double precision NOT NULL,
+	lpOptWE1 double precision NOT NULL,
+	lpOptWE2 double precision NOT NULL,
+	lpWFEfficiency double precision NOT NULL,
+	lpWFRevenue double precision NOT NULL,
+	lpWFTime double precision NOT NULL,
+	lpWFWE1 double precision NOT NULL,
+	lpWFWE2 double precision NOT NULL,
+	lpG1Efficiency double precision NOT NULL,
+	lpG1Revenue double precision NOT NULL,
+	lpG1Time double precision NOT NULL,
+	lpG1WE1 double precision NOT NULL,
+	lpG1WE2 double precision NOT NULL,
+	lpG2Efficiency double precision NOT NULL,
+	lpG2Revenue double precision NOT NULL,
+	lpG2Time double precision NOT NULL,
+	lpG2WE1 double precision NOT NULL,
+	lpG2WE2 double precision NOT NULL
+	);
+
 CREATE TABLE fancy_overdemand (
 	n integer NOT NULL,
 	m integer NOT NULL,
@@ -109,18 +137,41 @@ CREATE TABLE fancy_overdemand (
 	lpG2WE2 double precision NOT NULL
 	);
 
+CREATE TABLE fancy_unitsupply_overdemand (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	b integer NOT NULL,
+	lpOptEfficiency double precision NOT NULL,
+	lpOptRevenue double precision NOT NULL,
+	lpOptTime double precision NOT NULL,
+	lpOptWE1 double precision NOT NULL,
+	lpOptWE2 double precision NOT NULL,
+	lpWFEfficiency double precision NOT NULL,
+	lpWFRevenue double precision NOT NULL,
+	lpWFTime double precision NOT NULL,
+	lpWFWE1 double precision NOT NULL,
+	lpWFWE2 double precision NOT NULL,
+	lpG1Efficiency double precision NOT NULL,
+	lpG1Revenue double precision NOT NULL,
+	lpG1Time double precision NOT NULL,
+	lpG1WE1 double precision NOT NULL,
+	lpG1WE2 double precision NOT NULL,
+	lpG2Efficiency double precision NOT NULL,
+	lpG2Revenue double precision NOT NULL,
+	lpG2Time double precision NOT NULL,
+	lpG2WE1 double precision NOT NULL,
+	lpG2WE2 double precision NOT NULL
+	);
+
 
 CREATE TABLE allocation (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	p double precision NOT NULL,
-	greedy0ToEfficient double precision NOT NULL,
-	greedy1ToEfficient double precision NOT NULL,
-	greedy2ToEfficient double precision NOT NULL,
+	greedyToEfficient double precision NOT NULL,
 	wfToEfficient double precision NOT NULL,
-	wfToGreedy0 double precision NOT NULL,
-	wfToGreedy1 double precision NOT NULL,
-	wfToGreedy2 double precision NOT NULL
+	wfToGreedy double precision NOT NULL
 	);
 
 \copy (SELECT * FROM unit_demand ORDER BY n,m,p) to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_demand.csv' csv header
@@ -137,4 +188,5 @@ CREATE TABLE allocation (
 
 SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,ck2Time,ck2WE1,ck2WE2 FROM fancy_underdemand;
 SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,ck2Time,ck2WE1,ck2WE2 FROM fancy_overdemand;
+SELECT n,m,p, lprevenue, evprevenue FROM unit_uniform_demand WHERE lprevenue > evprevenue;
 

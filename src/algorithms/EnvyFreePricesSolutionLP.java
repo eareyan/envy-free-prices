@@ -17,8 +17,9 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 		super();
 		this.Status = "Empty";
 	}
-	public EnvyFreePricesSolutionLP(String Status){
+	public EnvyFreePricesSolutionLP(MarketAllocation marketAllocation,String Status){
 		super();
+		this.marketAllocation = marketAllocation;
 		this.Status = Status;
 	}
 	

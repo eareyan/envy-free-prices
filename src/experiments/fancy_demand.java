@@ -13,6 +13,7 @@ import statistics.PricesStatistics;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
+import structures.factory.MarketFactory;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
 import algorithms.allocations.EfficientAllocationILP;
@@ -32,11 +33,13 @@ public class fancy_demand extends Experiments{
 	public boolean underdemand; //Boolean switch. True if underdemand, false otherwise.
 
 	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException{
-		String tablename ="";
+		String tablename ="" , unittablename = "";
 		if(this.underdemand){
 			tablename = "fancy_underdemand";
+			unittablename = "fancy_unitsupply_underdemand";
 		}else{
 			tablename = "fancy_overdemand";
+			unittablename = "fancy_unitsupply_overdemand";
 		}
 		if(!dbLogger.checkIfFancyDemandRowExists(tablename,numUsers, numCampaigns, prob, b)){
 			System.out.println("\t Add data ");
@@ -69,7 +72,32 @@ public class fancy_demand extends Experiments{
 			DescriptiveStatistics lpG2Revenue = new DescriptiveStatistics();
 			DescriptiveStatistics lpG2Time = new DescriptiveStatistics();
 			DescriptiveStatistics lpG2WE1 = new DescriptiveStatistics();
-			DescriptiveStatistics lpG2WE2 = new DescriptiveStatistics();			
+			DescriptiveStatistics lpG2WE2 = new DescriptiveStatistics();
+			
+			
+			DescriptiveStatistics lpUnitOptEfficiency = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitOptRevenue = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitOptTime = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitOptWE1 = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitOptWE2 = new DescriptiveStatistics();
+
+			DescriptiveStatistics lpUnitWFEfficiency = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitWFRevenue = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitWFTime = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitWFWE1 = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitWFWE2 = new DescriptiveStatistics();
+			
+			DescriptiveStatistics lpUnitG1Efficiency = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG1Revenue = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG1Time = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG1WE1 = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG1WE2 = new DescriptiveStatistics();			
+
+			DescriptiveStatistics lpUnitG2Efficiency = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG2Revenue = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG2Time = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG2WE1 = new DescriptiveStatistics();
+			DescriptiveStatistics lpUnitG2WE2 = new DescriptiveStatistics();			
 
 			long startTime , endTime ;
 			for(int t=0;t<RunParameters.numTrials;t++){
@@ -149,7 +177,68 @@ public class fancy_demand extends Experiments{
 				lpG2Time.addValue(endTime - startTime);
 				PricesStatistics lpG2Stat = new PricesStatistics(lpG2Sol);
 				lpG2WE1.addValue((double) lpG2Stat.numberOfEnvyCampaigns() / numCampaigns);
-				lpG2WE2.addValue((double) lpG2Stat.computeWalrasianViolations()[0] / numUsers);				
+				lpG2WE2.addValue((double) lpG2Stat.computeWalrasianViolations()[0] / numUsers);	
+				
+				/****
+				 * Unit Supply
+				 */
+				Market unitSupplyMarket = MarketFactory.createUnitSupplyMarket(market);
+				MarketAllocation efficientUnit = new MarketAllocation(unitSupplyMarket,new EfficientAllocationILP(unitSupplyMarket).Solve(new IloCplex()).get(0));
+				double valueOptAllocactionUnit = efficientUnit.value();				
+				/*
+				 * Measure lpOPT
+				 */
+				LPReservePrices LPUnit = new LPReservePrices(unitSupplyMarket,new EfficientAlloc());
+				startTime = System.nanoTime();
+				MarketPrices lpOPTUnitSol = LPUnit.Solve();
+				endTime = System.nanoTime();
+				lpUnitOptEfficiency.addValue(NumberMethods.getRatio(lpOPTUnitSol.getMarketAllocation().value(),valueOptAllocactionUnit));
+				lpUnitOptRevenue.addValue(NumberMethods.getRatio(lpOPTUnitSol.sellerRevenuePriceVector() , valueOptAllocactionUnit));
+				lpUnitOptTime.addValue(endTime - startTime);
+				PricesStatistics lpOPTUnitStat = new PricesStatistics(lpOPTUnitSol);
+				lpUnitOptWE1.addValue((double) lpOPTUnitStat.numberOfEnvyCampaigns() / numCampaigns);
+				lpUnitOptWE2.addValue((double) lpOPTUnitStat.computeWalrasianViolations()[0] / numUsers);
+				/*
+				 * Measure lpWF
+				 */
+				LPReservePrices lpUnitWF = new LPReservePrices(unitSupplyMarket,new WFAlloc());
+				startTime = System.nanoTime();
+				MarketPrices lpUnitWFSol = lpUnitWF.Solve();
+				endTime = System.nanoTime();
+				lpUnitWFEfficiency.addValue(NumberMethods.getRatio(lpUnitWFSol.getMarketAllocation().value(),valueOptAllocactionUnit));
+				lpUnitWFRevenue.addValue(NumberMethods.getRatio(lpUnitWFSol.sellerRevenuePriceVector() , valueOptAllocactionUnit));
+				lpUnitWFTime.addValue(endTime - startTime);
+				PricesStatistics lpUnitWFStat = new PricesStatistics(lpUnitWFSol);
+				lpUnitWFWE1.addValue((double) lpUnitWFStat.numberOfEnvyCampaigns() / numCampaigns);
+				lpUnitWFWE2.addValue((double) lpUnitWFStat.computeWalrasianViolations()[0] / numUsers);
+				/*
+				 * Measure lpG1
+				 */
+				LPReservePrices lpUnitG1 = new LPReservePrices(unitSupplyMarket,new GreedyAlloc(1));
+				startTime = System.nanoTime();
+				MarketPrices lpUnitG1Sol = lpUnitG1.Solve();
+				endTime = System.nanoTime();
+				lpUnitG1Efficiency.addValue(NumberMethods.getRatio(lpUnitG1Sol.getMarketAllocation().value(),valueOptAllocactionUnit));
+				lpUnitG1Revenue.addValue(NumberMethods.getRatio(lpUnitG1Sol.sellerRevenuePriceVector() , valueOptAllocactionUnit));
+				lpUnitG1Time.addValue(endTime - startTime);
+				PricesStatistics lpUnitG1Stat = new PricesStatistics(lpUnitG1Sol);
+				lpUnitG1WE1.addValue((double) lpUnitG1Stat.numberOfEnvyCampaigns() / numCampaigns);
+				lpUnitG1WE2.addValue((double) lpUnitG1Stat.computeWalrasianViolations()[0] / numUsers);
+				/*
+				 * Measure lpG1
+				 */
+				LPReservePrices lpUnitG2 = new LPReservePrices(unitSupplyMarket,new GreedyAlloc(-1));
+				startTime = System.nanoTime();
+				MarketPrices lpUnitG2Sol = lpUnitG2.Solve();
+				endTime = System.nanoTime();
+				lpUnitG2Efficiency.addValue(NumberMethods.getRatio(lpUnitG2Sol.getMarketAllocation().value(),valueOptAllocactionUnit));
+				lpUnitG2Revenue.addValue(NumberMethods.getRatio(lpUnitG2Sol.sellerRevenuePriceVector() , valueOptAllocactionUnit));
+				lpUnitG2Time.addValue(endTime - startTime);
+				PricesStatistics lpUnitG2Stat = new PricesStatistics(lpUnitG2Sol);
+				lpUnitG2WE1.addValue((double) lpUnitG2Stat.numberOfEnvyCampaigns() / numCampaigns);
+				lpUnitG2WE2.addValue((double) lpUnitG2Stat.computeWalrasianViolations()[0] / numUsers);					
+				
+				
 			}
 			dbLogger.save_fancy_demand(tablename, numUsers, numCampaigns, prob, b,
 					ckEfficiency.getMean(), ckRevenue.getMean(), ckTime.getMean() / 1000000, ckWE1.getMean() , ckWE2.getMean() ,
@@ -158,6 +247,17 @@ public class fancy_demand extends Experiments{
 					lpG1Efficiency.getMean(), lpG1Revenue.getMean(), lpG1Time.getMean() / 1000000, lpG1WE1.getMean() , lpG1WE2.getMean() ,
 					lpG2Efficiency.getMean(), lpG2Revenue.getMean(), lpG2Time.getMean() / 1000000, lpG2WE1.getMean() , lpG2WE2.getMean()
 					);
+			
+			/****
+			 * UNIT SUPPLY
+			 */
+			dbLogger.save_fancy_unitsupply(unittablename, numUsers, numCampaigns, prob, b,
+					lpUnitOptEfficiency.getMean(), lpUnitOptRevenue.getMean(), lpUnitOptTime.getMean() / 1000000, lpUnitOptWE1.getMean() , lpUnitOptWE2.getMean(), 
+					lpUnitWFEfficiency.getMean(), lpUnitWFRevenue.getMean(), lpUnitWFTime.getMean() / 1000000, lpUnitWFWE1.getMean() , lpUnitWFWE2.getMean() ,
+					lpUnitG1Efficiency.getMean(), lpUnitG1Revenue.getMean(), lpUnitG1Time.getMean() / 1000000, lpUnitG1WE1.getMean() , lpUnitG1WE2.getMean() ,
+					lpUnitG2Efficiency.getMean(), lpUnitG2Revenue.getMean(), lpUnitG2Time.getMean() / 1000000, lpUnitG2WE1.getMean() , lpUnitG2WE2.getMean()
+					);
+
 			//System.exit(-1); /* stop execution... for debugging purposes */		
 		}else{
 			System.out.println("\t Already have data ");			

@@ -41,18 +41,18 @@ public class EVPApproximation {
 		ArrayList<Matching> setOfSolutionMatchings = new ArrayList<Matching>();
 		/* For each item, run MaxWEQ_r with reserve prices given by the valuation*/
 		for(Link valueLink: valuations){
-			//System.out.println("================= reserve price from campaign ("+valueLink.getJ()+") = " + valueLink.getValue() + "++++++++++");
+			System.out.println("================= reserve price from campaign ("+valueLink.getJ()+") = " + valueLink.getValue() + "++++++++++");
 			Arrays.fill(reservePrices,valueLink.getValue());
 			this.MWRP.setReservePrices(reservePrices);
 			Matching x = this.MWRP.Solve(valueLink.getJ());
 			setOfSolutionMatchings.add(x);
-			//System.out.println("''''''");
-			//Printer.printMatrix(x.getMatching());
-			//Printer.printVector(x.getPrices());
-			//System.out.println(x.getSellerRevenue());
-			//System.out.println("''''''");	
+			System.out.println("''''''");
+			Printer.printMatrix(x.getMatching());
+			Printer.printVector(x.getPrices());
+			System.out.println(x.getSellerRevenue());
+			System.out.println("''''''");	
 		}
-		//System.out.println(setOfSolutionMatchings);
+		System.out.println(setOfSolutionMatchings);
 		Collections.sort(setOfSolutionMatchings, new MatchingComparatorBySellerRevenue());		
 		return setOfSolutionMatchings.get(0);
 	}

@@ -73,6 +73,10 @@ public class MarketPrices {
 
 	public double sellerRevenuePriceVector(){
 		double value = 0;
+		if(this.pricesVector == null){
+			//throw new Exception("Ask for seller revenue using price vector but this price vector is null");
+			return 0.0;
+		}
 		for(int i=0;i<this.marketAllocation.allocation.length;i++){
 			for(int j=0;j<this.marketAllocation.allocation[0].length;j++){
 				value += this.marketAllocation.allocation[i][j] * this.pricesVector[i];

@@ -15,6 +15,7 @@ import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.User;
 import structures.factory.MarketAllocationFactory;
+import structures.factory.MarketFactory;
 import structures.factory.RandomMarketFactory;
 import structures.factory.UnitMarketFactory;
 import unitdemand.Matching;
@@ -22,6 +23,8 @@ import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
 import util.Printer;
+import algorithms.EnvyFreePricesSolutionLP;
+import algorithms.EnvyFreePricesVectorLP;
 import algorithms.Waterfall;
 import algorithms.WaterfallPrices;
 import algorithms.allocations.EfficientAllocationILP;
@@ -285,7 +288,7 @@ public class Main {
 		System.out.println(time.getMean() / 1000000);
 	}
 	
-	public static void main(String[] args){
+	public static void main789(String[] args){
 		Market m = RandomMarketFactory.randomMarket(3, 3, 1.0);
 		System.out.println(m);
 		
@@ -298,6 +301,108 @@ public class Main {
 		System.out.println(list);
 		Collections.swap(list, 0, 1);
 		System.out.println(list);
+	}
+	
+	public static void main111(String[] args){
+		double[][] matrix = new double[3][2];
+		matrix[0][0] = 1.0;
+		matrix[0][1] = 3.0;
+		matrix[1][0] = 2.0;
+		matrix[1][1] = 4.0;
+		matrix[2][0] = Double.NEGATIVE_INFINITY;
+		matrix[2][1] = 2.0;
+		Printer.printMatrix(MarketAllocationFactory.getMaximumMatchingFromValuationMatrix(matrix));
+	}
+	public static void main2345234(String[] args) throws IloException{
+		Campaign[] C = new Campaign[4];
+		C[0] = new Campaign(1,10.0);
+		C[1] = new Campaign(1,9.0);
+		C[2] = new Campaign(1,8.0);
+		C[3] = new Campaign(1,7.0);
+		
+		User[] U = new User[2];
+		U[0] = new User(1);
+		U[1] = new User(1);
+		
+		boolean[][] connections = new boolean[2][4];
+		connections[0][0] = true;
+		connections[0][1] = true;
+		connections[0][3] = true;
+		
+		connections[1][2] = true;
+		connections[1][3] = true;
+		
+		Market market = new Market(U,C,connections);
+		
+		
+		//Market market = UnitMarketFactory.randomUnitDemandMarket(4, 6, 1.0);
+		System.out.println(market);
+		MarketAllocation efficient = new MarketAllocation(market,new EfficientAllocationILP(market).Solve(new IloCplex()).get(0));
+		Printer.printMatrix(efficient.getAllocation());
+		//double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(market);
+		//Printer.printMatrix(Matching.computeMaximumWeightMatchingValue(valuationMatrix).getMatching());
+		
+		EnvyFreePricesVectorLP efpvlp = new EnvyFreePricesVectorLP(efficient);
+		efpvlp.createLP();
+		Printer.printVector(efpvlp.Solve().getPriceVector());
+		
+		/*Market marketWithReserve = MarketFactory.createReservePriceMarket(market, 3.0);
+		System.out.println(marketWithReserve);
+		Printer.printMatrix(MarketAllocationFactory.getValuationMatrixFromMarket(marketWithReserve));
+		
+		EnvyFreePricesVectorLP efpvlpWithReserve = new EnvyFreePricesVectorLP(new MarketAllocation(marketWithReserve,new EfficientAllocationILP(marketWithReserve).Solve(new IloCplex()).get(0)));
+		efpvlpWithReserve.setWalrasianConditions(false);
+		efpvlpWithReserve.createLP();
+		efpvlpWithReserve.setReservePrices(new double[]{3.0,3.0,3.0});
+		Printer.printMatrix(efpvlpWithReserve.Solve().getMarketAllocation().getAllocation());
+		Printer.printVector(efpvlpWithReserve.Solve().getPriceVector());*/
+	}
+	
+	public static void main6456(String[] args) throws IloException{
+		
+		for(int i=3;i<15;i++){
+			for(int j=3;j<15;j++){
+				for(int p=0;p<4;p++){
+					//double prob =0.25 +  0.25*p;
+					double prob = 1.0;
+					for(int k=1;k<100;k++){	
+		
+		Market m = UnitMarketFactory.randomUnitDemandMarket(i, j, prob);
+		System.out.println(m);
+		//double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(m);
+		
+		double[][] valuationMatrix = new double[3][2];
+		valuationMatrix[0][0] = 9.0;
+		valuationMatrix[0][1] = Double.NEGATIVE_INFINITY;
+
+		valuationMatrix[1][0] = 9.0;
+		valuationMatrix[1][1] = 7.0;
+
+		valuationMatrix[2][0] = 9.0;
+		valuationMatrix[2][1] = Double.NEGATIVE_INFINITY;
+		
+		EVPApproximation evp = new EVPApproximation(valuationMatrix , new AllConnectedDummies(valuationMatrix));
+		Matching evpSol = evp.Solve();
+		Printer.printMatrix(evpSol.getMatching());
+		Printer.printVector(evpSol.getPrices());
+		System.out.println(evpSol.getSellerRevenue());
+		System.out.println("----");
+		
+		unitdemand.lp.UnitLPReservePrices lp = new unitdemand.lp.UnitLPReservePrices(UnitMarketFactory.createMarketFromValuationMatrix(valuationMatrix));
+		MarketPrices lpSol = lp.Solve();
+		Printer.printMatrix(lpSol.getMarketAllocation().getAllocation());
+		if(lpSol.getPriceVector() != null)
+			Printer.printVector(lpSol.getPriceVector());
+		System.out.println(lpSol.sellerRevenuePriceVector());
+		
+		if(evpSol.getSellerRevenue() != lpSol.sellerRevenuePriceVector()){
+			System.out.println("DISTINCT!");
+			System.exit(-1);
+		}
+					}
+				}
+			}
+		}
 	}
 	
 	public static void main66(String[] args){		
@@ -336,6 +441,29 @@ public class Main {
 	}
 	
 	
+	public static void main98989(String[] args){
+		Campaign[] C = new Campaign[2];
+		C[0] = new Campaign(1,4.0);
+		C[1] = new Campaign(2,5.0);
+		
+		User[] U = new User[2];
+		U[0] = new User(1);
+		U[1] = new User(1);
+		
+		boolean[][] connections = new boolean[2][2];
+		connections[0][0] = true;
+		connections[0][1] = true;
+		connections[1][0] = true;
+		connections[1][1] = true;
+		
+		Market m = new Market(U,C,connections);
+		
+		AscendingAuction A = new AscendingAuction(m);
+		MarketPrices allocPrices = A.Solve();
+		Printer.printMatrix(allocPrices.getMarketAllocation().getAllocation());
+		Printer.printVector(allocPrices.getPriceVector());		
+	}
+	
 	public static void main9(String[] args){
 		for(int i=2;i<15;i++){
 			for(int j=2;j<15;j++){
@@ -361,6 +489,59 @@ public class Main {
 			}
 		}
 	}
+	
+	public static void main(String args[]) throws IloException{
+		
+		System.out.println("Change input");
+		
+		Campaign c1 = new Campaign(1, 10);
+		Campaign c2 = new Campaign(2, 5);
+		Campaign[] campaigns = new Campaign[2];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		
+		User u1 = new User(2);
+		User u2 = new User(2);
+		User[] users = new User[2];
+		users[0] = u1;
+		users[1] = u2;
+		
+		boolean[][] connections = new boolean[2][2];
+		connections[0][0] = true;
+		connections[0][1] = true;
+		connections[1][1] = true;
+		
+		Market m = new Market(users,campaigns,connections);
+		
+		System.out.println(m);
+		MarketAllocation X = new GreedyAllocation(m).Solve();
+		Printer.printMatrix(X.getAllocation());
+		EnvyFreePricesSolutionLP efpvLP = new EnvyFreePricesVectorLP(X,true).Solve();
+		Printer.printVector(efpvLP.getPriceVector());
+		
+
+		
+		Market unitSupplyMarket = MarketFactory.createUnitSupplyMarket(m); 
+		MarketAllocation XUnit = new GreedyAllocation(unitSupplyMarket).Solve();
+		Printer.printMatrix(XUnit.getAllocation());
+		EnvyFreePricesVectorLP efpvLPUnit = new EnvyFreePricesVectorLP(XUnit);
+		efpvLPUnit.setWalrasianConditions(false);
+		efpvLPUnit.createLP();
+		EnvyFreePricesSolutionLP x = efpvLPUnit.Solve();
+		Printer.printVector(x.getPriceVector());
+		
+		System.out.println(unitSupplyMarket);
+		
+		
+		LPReservePrices lpOPT = new LPReservePrices(unitSupplyMarket,new EfficientAlloc());
+		MarketPrices y = lpOPT.Solve();
+		
+		Printer.printMatrix(y.getMarketAllocation().getAllocation());
+		Printer.printVector(y.getPriceVector());
+		
+		
+	}
+	
 	
 	public static void main10(String[] args){
 		Campaign c1 = new Campaign(5, 8);

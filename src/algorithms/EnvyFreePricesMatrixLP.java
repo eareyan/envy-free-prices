@@ -144,7 +144,7 @@ public class EnvyFreePricesMatrixLP {
 		    	}
 		    	Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket, solDouble, cplex.getStatus().toString(),this.cplex.getObjValue());
 		    }else{
-		    	Solution = new EnvyFreePricesSolutionLP(cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket,cplex.getStatus().toString());
 		    }
 	    	if(this.verbose){
 	    		System.out.println("Solution status = " + cplex.getStatus());

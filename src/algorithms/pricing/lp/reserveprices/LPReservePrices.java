@@ -64,7 +64,8 @@ public class LPReservePrices {
 					System.out.println("Reserve: x["+i+"]["+j+"] = " + this.initialMarketAllocation.getAllocation()[i][j]);
 					System.out.println("R_"+j+"/ x_{"+i+""+j+"} = "+this.market.getCampaign(j).getReward() + " / " + this.initialMarketAllocation.getAllocation()[i][j] +" = "+reserve);
 					Printer.printMatrix(allocRespectReserve);
-					System.out.println(efp.Solve().getStatus());*/
+					System.out.println(efp.Solve().getStatus());
+					Printer.printVector(efp.Solve().getPriceVector());*/
 				}
 			}
 		}

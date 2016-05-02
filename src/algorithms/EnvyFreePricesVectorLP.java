@@ -141,7 +141,7 @@ public class EnvyFreePricesVectorLP {
 		}
 	}
 	/*
-	 * Walrasian condition:
+	 * Walrasian condition: unallocated items priced at zero
 	 */
 	protected void generateWalrasianConditions() throws IloException{
 		for(int i=0;i<this.allocatedMarket.getMarket().getNumberUsers();i++){
@@ -150,6 +150,18 @@ public class EnvyFreePricesVectorLP {
 				this.linearConstrains.add(this.cplex.addGe(this.prices[i],0.0));
 			}
 		}
+	}
+	
+	/*
+	 * Walrasian condition with reserve: unallocated items priced at reserve
+	 */
+	public void generateWalrasianConditionsWithReserve(double reserve) throws IloException{
+		for(int i=0;i<this.allocatedMarket.getMarket().getNumberUsers();i++){
+			if(this.allocatedMarket.allocationFromUser(i) == 0){
+				this.linearConstrains.add(this.cplex.addLe(this.prices[i],reserve));
+				this.linearConstrains.add(this.cplex.addGe(this.prices[i],reserve));
+			}
+		}		
 	}
 	/*
 	 * Set reserve prices for all user classes
@@ -233,7 +245,7 @@ public class EnvyFreePricesVectorLP {
 		    	LP_Prices = NumberMethods.roundPrices(this.cplex.getValues(this.prices));
 		    	Solution  = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, this.cplex.getStatus().toString(),this.cplex.getObjValue());
 		    }else{
-		    	Solution = new EnvyFreePricesSolutionLP(this.cplex.getStatus().toString());
+		    	Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket, this.cplex.getStatus().toString());
 		    }
 	    	if(this.verbose){
 	    		System.out.println("Solution status = " + this.cplex.getStatus());

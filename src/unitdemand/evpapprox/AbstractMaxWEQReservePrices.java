@@ -2,6 +2,7 @@ package unitdemand.evpapprox;
 
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
+import util.Printer;
 
 /*
  * This abstract class implements the common methods for EVPApp algorithm.
@@ -70,9 +71,10 @@ abstract public class AbstractMaxWEQReservePrices {
 			}
 		}
 		//System.out.println("++++++Start Deducing Matching+++++++++");
-		//System.out.println("Matching with no dummies");
-		//Printer.printMatrix(matching);
+		System.out.println("Matching with no dummies");
+		Printer.printMatrix(matching);
 		/* while there is an unsold item in the demand set of a real consumer that is not allocated an item, allocate it */
+		mainloop:
 		for(int i=0;i<this.valuationMatrix.length;i++){
 			boolean itemAllocated = false;
 			for(int j=0;j<this.valuationMatrix[0].length;j++){
@@ -96,9 +98,11 @@ abstract public class AbstractMaxWEQReservePrices {
 						/* This if statement seems to have numerical issues...
 						 * if(this.valuationMatrix[i][j] - prices[i] >= 0){//It makes sense to allocate this item.
 						 */
-						if(Math.abs(this.valuationMatrix[i][j] - prices[i]) < 0.0001){
+						if(Math.abs(this.valuationMatrix[i][j] - prices[i])<= 0.0001){ //NUmerical Issues
+						//if(this.valuationMatrix[i][j] >= prices[i]){
 							//System.out.println("IT DOES MAKE SENSE!: " + "="+(this.valuationMatrix[i][j]) + " - " + prices[i]);
 							matching[i][j] = 1;
+							continue mainloop;
 						}
 					}
 				}

@@ -60,7 +60,7 @@ public class GreedyAllocation {
 		int[][] greedyAllocation = new int[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
 		int[] totalAllocationFromUserSoFar = new int[this.market.getNumberUsers()];
 		for(int j=0;j<this.market.getNumberCampaigns();j++){
-			if(campaigns[j].getReward() <= 0) continue; //Ignore campaigns with zero or negative reward.
+			if(campaigns[j].getReward() < 0) continue; //Ignore campaigns with zero or negative reward.
 			//Backpointer of the campaign points to the campaign in the original market
 			//System.out.println(campaigns[j].getBackpointer() + " = " + campaigns[j].getReward());
 			ArrayList<UserSupply> accessibleUsers = new ArrayList<UserSupply>();
