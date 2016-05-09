@@ -11,8 +11,8 @@ public class RunParameters{
 	public static final int totalNumUsers = 19;
 	public static final int totalNumCamp = 19;
 	public static final int totalProbabilities = 4;
-	public static final int totalB = 4;
-	public static final int numTrials = 100;
+	public static final int totalB = 3;
+	public static final int numTrials = 50;
 	
 	public int numUsers;
 	public int numCampaigns;
@@ -61,7 +61,7 @@ public class RunParameters{
 								case 0: this.b = 1; break; 
 								case 1: this.b = 2; break;
 								case 2: this.b = 3; break;
-								case 3: this.b = 4; break;
+								//case 3: this.b = 4; break;
 							}
 							this.numUsers = i+2;
 							this.numCampaigns = j+2;

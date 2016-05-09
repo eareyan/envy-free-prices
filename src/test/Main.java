@@ -490,12 +490,12 @@ public class Main {
 		}
 	}
 	
-	public static void main(String args[]) throws IloException{
+	public static void main88(String args[]) throws IloException{
 		
 		System.out.println("Change input");
 		
 		Campaign c1 = new Campaign(1, 10);
-		Campaign c2 = new Campaign(2, 5);
+		Campaign c2 = new Campaign(2, -5);
 		Campaign[] campaigns = new Campaign[2];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
@@ -543,10 +543,10 @@ public class Main {
 	}
 	
 	
-	public static void main10(String[] args){
-		Campaign c1 = new Campaign(5, 8);
-		Campaign c2 = new Campaign(5, 6);
-		Campaign c3 = new Campaign(4, 3);
+	public static void main(String[] args){
+		Campaign c1 = new Campaign(5, -8);
+		Campaign c2 = new Campaign(5, -6);
+		Campaign c3 = new Campaign(4, -3);
 		Campaign[] campaigns = new Campaign[3];
 		campaigns[0] = c1;
 		campaigns[1] = c2;

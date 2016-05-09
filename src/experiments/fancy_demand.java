@@ -41,7 +41,8 @@ public class fancy_demand extends Experiments{
 			tablename = "fancy_overdemand";
 			unittablename = "fancy_unitsupply_overdemand";
 		}
-		if(!dbLogger.checkIfFancyDemandRowExists(tablename,numUsers, numCampaigns, prob, b)){
+		if( !dbLogger.checkIfFancyDemandRowExists(tablename,numUsers, numCampaigns, prob, b) && 
+			!dbLogger.checkIfFancyDemandRowExists(unittablename, numUsers, numCampaigns, prob, b)){
 			System.out.println("\t Add data ");
 			
 			DescriptiveStatistics ckEfficiency = new DescriptiveStatistics();
@@ -247,7 +248,6 @@ public class fancy_demand extends Experiments{
 					lpG1Efficiency.getMean(), lpG1Revenue.getMean(), lpG1Time.getMean() / 1000000, lpG1WE1.getMean() , lpG1WE2.getMean() ,
 					lpG2Efficiency.getMean(), lpG2Revenue.getMean(), lpG2Time.getMean() / 1000000, lpG2WE1.getMean() , lpG2WE2.getMean()
 					);
-			
 			/****
 			 * UNIT SUPPLY
 			 */
