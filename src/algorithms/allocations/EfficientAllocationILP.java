@@ -51,6 +51,12 @@ public class EfficientAllocationILP {
 		
 	}
 	/*
+	 * Wrapper method to solve for the efficient allocation without having to pass in a Cplex Object.
+	 */
+	public ArrayList<int[][]> Solve() throws IloException{
+		return this.Solve(new IloCplex());
+	}
+	/*
 	 * Solver method. Returns an ArrayList of int[][] containing all the efficient allocations
 	 * found by the ILP.
 	 */
