@@ -44,6 +44,37 @@ import experiments.RunParameters;
 public class Main {
 	
 	
+	public static void main(String args[]) throws IloException{
+		Campaign[] C = new Campaign[1];
+		C[0] = new Campaign(1514,16.0);
+		User[] U = new User[8];
+		U[0] = new User(364);
+		U[1] = new User(578);
+		U[2] = new User(1148);
+		U[3] = new User(2812);
+		U[4] = new User(3410);
+		U[5] = new User(2549);
+		U[6] = new User(2608);
+		U[7] = new User(735);
+		
+		boolean[][] connections = new boolean[8][1];
+		connections[3][0] = true;
+		connections[4][0] = false;
+		
+		Market M = new Market(U,C,connections);
+		
+		System.out.println(M);
+		int[][] X = new EfficientAllocationILP(M).Solve().get(0);
+		Printer.printMatrix(X);
+		EnvyFreePricesVectorLP EFPVLP = new EnvyFreePricesVectorLP(new MarketAllocation(M,X),true);
+		EnvyFreePricesSolutionLP p = EFPVLP.Solve();
+		Printer.printVector(p.getPriceVector());
+		
+		for(int i=0;i<8;i++){
+			System.out.println("p("+i+")"+p.getPriceVectorComponent(i));
+		}		
+	}
+	
 	public static void main0(String[] args) throws IloException{
 		Market market = RandomMarketFactory.generateOverDemandedMarket(3, 3, 0.75, 1);
 		System.out.println(market);
@@ -197,7 +228,7 @@ public class Main {
 			RunParameters R = new RunParameters(new String[]{"grid", "GeneralDemand", " postgresql" , "db.cs.brown.edu", "5432" , "envyfreeresults" , "***" , "***" , i + ""});
 			System.out.println(R);
 		}*/
-		double[][] valuationMatrix = experiments.unit_demand.getValuationMatrix(5, 3, .75);
+		double[][] valuationMatrix = RandomMarketFactory.getValuationMatrix(5, 3, .75);
 		Matching maxWeightmatching = Matching.computeMaximumWeightMatchingValue(valuationMatrix);
 		Printer.printMatrix(maxWeightmatching.getMatching());
 		System.out.println("Value of Matching = " + maxWeightmatching.getValueOfMatching());
@@ -543,7 +574,7 @@ public class Main {
 	}
 	
 	
-	public static void main(String[] args){
+	public static void main784784(String[] args){
 		Campaign c1 = new Campaign(5, -8);
 		Campaign c2 = new Campaign(5, -6);
 		Campaign c3 = new Campaign(4, -3);

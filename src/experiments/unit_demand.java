@@ -7,6 +7,7 @@ import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import structures.factory.RandomMarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
@@ -21,20 +22,6 @@ import util.NumberMethods;
  */
 public class unit_demand extends Experiments{
 	
-	public static double[][] getValuationMatrix(int n,int m, double prob) {
-		Random generator = new Random();
-		double[][] valuationMatrix = new double[n][m];
-		for(int i=0;i<n;i++){
-			for(int j=0;j<m;j++){
-				if(generator.nextDouble() <= prob){
-					valuationMatrix[i][j] = generator.nextDouble() * (100.0 - 1.0) + 1.0;
-				}else{
-					valuationMatrix[i][j] = Double.NEGATIVE_INFINITY;
-				}
-			}
-		}
-		return valuationMatrix;
-	}
 	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException{
 		if(!dbLogger.checkIfUnitDemandRowExists("unit_demand",numUsers, numCampaigns, prob)){
 			System.out.println("\t Adding data ");		
@@ -59,7 +46,7 @@ public class unit_demand extends Experiments{
 
 			long startTime , endTime ;
 			for(int t=0;t<RunParameters.numTrials;t++){
-				double[][] valuationMatrix = unit_demand.getValuationMatrix(numUsers, numCampaigns, prob) ;
+				double[][] valuationMatrix = RandomMarketFactory.getValuationMatrix(numUsers, numCampaigns, prob) ;
 				/*
 				 * Compute the efficient allocation, in this case, the maximum weight matching.
 				 */

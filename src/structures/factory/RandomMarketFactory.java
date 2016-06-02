@@ -142,4 +142,32 @@ public class RandomMarketFactory {
 		//System.out.println(finalList);
 		return finalList;
 	}
+	
+	/*
+	 * Produces a random valuation matrix V_ij, where valuations are within the default range
+	 */
+	public static double[][] getValuationMatrix(int n,int m, double prob) {
+		Random generator = new Random();
+		double[][] valuationMatrix = new double[n][m];
+		for(int i=0;i<n;i++){
+			for(int j=0;j<m;j++){
+				valuationMatrix[i][j] = (generator.nextDouble() <= prob) ? (generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward) : Double.NEGATIVE_INFINITY; 
+			}
+		}
+		return valuationMatrix;
+	}
+	/*
+	 * Given a valuation matrix V_ij, returns a valuation V_ij' that respects resever price r.
+	 * Respect in this context means that any valuation below r becomes -infinity and all others are
+	 * decreased by r. You can think of this operation as "shiftting" the matrix by r.
+	 */
+	public static double[][] getValuationReserve(double[][] X,double r){
+		double[][] XReserve = new double[X.length][X[0].length]; 
+		for(int i=0;i<X.length;i++){
+			for(int j=0;j<X[0].length;j++){
+				XReserve[i][j] = (X[i][j] - r <= 0) ? Double.NEGATIVE_INFINITY : X[i][j] - r ;
+			}
+		}
+		return XReserve;
+	}
 }
