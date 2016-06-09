@@ -5,7 +5,6 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.User;
-import util.Printer;
 
 public class AscendingAuctionModified {
 	

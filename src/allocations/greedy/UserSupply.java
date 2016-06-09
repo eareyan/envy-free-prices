@@ -1,4 +1,4 @@
-package algorithms.allocations.greedy;
+package allocations.greedy;
 
 /*
  * This auxiliary data structure keeps track of the remaining supply of users

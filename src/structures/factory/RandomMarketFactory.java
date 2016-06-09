@@ -146,15 +146,18 @@ public class RandomMarketFactory {
 	/*
 	 * Produces a random valuation matrix V_ij, where valuations are within the default range
 	 */
-	public static double[][] getValuationMatrix(int n,int m, double prob) {
+	public static double[][] getValuationMatrix(int n,int m, double prob,double minReward,double maxReward) {
 		Random generator = new Random();
 		double[][] valuationMatrix = new double[n][m];
 		for(int i=0;i<n;i++){
 			for(int j=0;j<m;j++){
-				valuationMatrix[i][j] = (generator.nextDouble() <= prob) ? (generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward) : Double.NEGATIVE_INFINITY; 
+				valuationMatrix[i][j] = (generator.nextDouble() <= prob) ? (generator.nextDouble() * (maxReward - minReward) + minReward) : Double.NEGATIVE_INFINITY;
 			}
 		}
 		return valuationMatrix;
+	}
+	public static double[][] getValuationMatrix(int n,int m,double prob){
+		return getValuationMatrix(n,m,prob,RandomMarketFactory.defaultMinReward,RandomMarketFactory.defaultMaxReward);
 	}
 	/*
 	 * Given a valuation matrix V_ij, returns a valuation V_ij' that respects resever price r.

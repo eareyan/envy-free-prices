@@ -6,7 +6,6 @@ import java.util.Collections;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
-import util.Printer;
 
 /*
  * Implements an ascending auction.

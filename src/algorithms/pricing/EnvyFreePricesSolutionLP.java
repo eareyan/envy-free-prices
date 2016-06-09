@@ -1,4 +1,4 @@
-package algorithms;
+package algorithms.pricing;
 
 import structures.MarketAllocation;
 import structures.MarketPrices;

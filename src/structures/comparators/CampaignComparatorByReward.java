@@ -4,6 +4,11 @@ import java.util.Comparator;
 
 import structures.Campaign;
 
+/*
+ * This class implements a comparator by reward for campaigns
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class CampaignComparatorByReward  implements Comparator<Campaign>{
 	@Override
 	public int compare(Campaign c1, Campaign c2) {

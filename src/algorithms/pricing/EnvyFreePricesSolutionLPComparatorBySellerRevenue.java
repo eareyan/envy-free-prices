@@ -1,4 +1,4 @@
-package algorithms;
+package algorithms.pricing;
 
 import java.util.Comparator;
 

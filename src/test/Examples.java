@@ -1,7 +1,7 @@
 package test;
 
-import algorithms.Waterfall;
-import algorithms.WaterfallPrices;
+import algorithms.waterfall.Waterfall;
+import algorithms.waterfall.WaterfallPrices;
 import structures.Campaign;
 import structures.Market;
 import structures.User;
@@ -110,7 +110,7 @@ public class Examples {
 		
 		connections[1][2] = true;
 		
-		Market market = new Market(users,campaigns,connections);
+		//Market market = new Market(users,campaigns,connections);
 		
 		
 		/* Example where WF fails*/
@@ -161,7 +161,7 @@ public class Examples {
 		
 	}
 	
-	public static void moreExamples(){
+	public static Market market1(){
 		/* Example where the first implementation of CK outputs envy prices*/
 		
 		Campaign c1 = new Campaign(5, 8.79);
@@ -183,8 +183,163 @@ public class Examples {
 		
 		connections[0][1] = true;
 		
-		connections[2][0] = true;		
-		connections[2][1] = true;		
+		connections[1][0] = true;		
+		connections[1][1] = true;		
 		Market market = new Market(users,campaigns,connections);
+		return market;
+	}
+	
+	public static Market market2(){
+		Campaign c1 = new Campaign(10, 100);
+		Campaign c2 = new Campaign(9, 10);
+		Campaign[] campaigns = new Campaign[2];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		
+		User u1 = new User(10);
+		User u2 = new User(5);
+		User[] users = new User[2];
+		users[0] = u1;
+		users[1] = u2;
+
+		boolean[][] connections = new boolean[2][2];
+		connections[0][0] = false;
+		connections[0][1] = true;
+		connections[1][0] = true;
+		connections[1][1] = true;
+		
+		return new Market(users,campaigns,connections);
+	}
+	
+	public static Market market3(){
+		Campaign c1 = new Campaign(10, 1234);
+		Campaign c2 = new Campaign(454, 2856);
+		Campaign[] campaigns = new Campaign[2];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		
+		User u1 = new User(25);
+		User u2 = new User(25);
+		User[] users = new User[2];
+		users[0] = u1;
+		users[1] = u2;
+
+		boolean[][] connections = new boolean[2][2];
+		connections[0][0] = true;
+		connections[0][1] = true;
+		connections[1][0] = true;
+		connections[1][1] = true;
+		
+		return new Market(users,campaigns,connections);
+	}
+	
+	public static Market market4(){
+		Campaign c1 = new Campaign(50, 500);
+		Campaign[] campaigns = new Campaign[1];
+		campaigns[0] = c1;
+		
+		User u1 = new User(25);
+		User u2 = new User(25);
+		User[] users = new User[2];
+		users[0] = u1;
+		users[1] = u2;
+
+		boolean[][] connections = new boolean[2][1];
+		connections[0][0] = true;
+		connections[1][0] = true;
+		
+		return new Market(users,campaigns,connections);
+	}
+	
+	
+	public static Market market5(){
+		/* Example market with priorities*/
+		
+		Campaign c1 = new Campaign(5, 8,0,1);
+		Campaign c2 = new Campaign(5, 6,0,1);
+		Campaign c3 = new Campaign(5, 3,0,2);
+		Campaign c4 = new Campaign(5, 1,0,2);
+		Campaign[] campaigns = new Campaign[4];
+		campaigns[0] = c1;
+		campaigns[1] = c2;
+		campaigns[2] = c3;
+		campaigns[3] = c4;
+		
+		User u1 = new User(4);
+		User u2 = new User(6);
+		User[] users = new User[2];
+		users[0] = u1;
+		users[1] = u2;
+		
+		boolean[][] connections = new boolean[2][4];
+		connections[0][0] = true;
+		connections[0][1] = true;
+		connections[0][2] = true;
+		connections[0][3] = true;
+		
+		connections[1][0] = true;		
+		connections[1][1] = true;		
+		connections[1][2] = true;		
+		connections[1][3] = true;		
+
+		Market market = new Market(users,campaigns,connections);
+		return market;
+	}	
+	
+	public static Market typicalTACMarket(){
+		Campaign c0 = new Campaign(4142,4622.0,0,2);
+		Campaign c1 = new Campaign(1920,671.0,1,2);
+		Campaign c2 = new Campaign(481,900.0,2,1);
+		Campaign c3 = new Campaign(2478,6195.0,3,1);
+		Campaign c4 = new Campaign(259,387.0,4,1);
+		Campaign c5 = new Campaign(1921,4802.0,5,1);
+		Campaign[] campaigns = new Campaign[6];
+		campaigns[0] = c0;
+		campaigns[1] = c1;
+		campaigns[2] = c2;
+		campaigns[3] = c3;
+		campaigns[4] = c4;
+		campaigns[5] = c5;
+		
+		User u0 = new User(2812);
+		User u1 = new User(3410);
+		User u2 = new User(735);
+		User u3 = new User(1148);
+		User u4 = new User(2549);
+		User u5 = new User(578);
+		User u6 = new User(2608);
+		User u7 = new User(364);
+		User[] users = new User[8];
+		users[0] = u0;
+		users[1] = u1;
+		users[2] = u2;
+		users[3] = u3;
+		users[4] = u4;
+		users[5] = u5;
+		users[6] = u6;
+		users[7] = u7;
+		
+		boolean[][] connections = new boolean[8][6];
+		connections[0][1] = true;
+		
+		connections[1][2] = true;
+		connections[1][5] = true;
+		
+		connections[2][0] = true;
+		connections[2][3] = true;
+		connections[2][4] = true;
+		
+		connections[3][0] = true;
+		connections[3][3] = true;
+		
+		connections[4][3] = true;
+
+		connections[5][0] = true;
+		
+		connections[6][3] = true;
+		
+		connections[7][0] = true;
+
+		return new Market(users,campaigns,connections);
 	}
 }

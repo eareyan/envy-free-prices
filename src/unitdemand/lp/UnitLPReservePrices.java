@@ -14,7 +14,7 @@ import structures.comparators.MarketPricesComparatorBySellerRevenue;
 import structures.factory.MarketAllocationFactory;
 import unitdemand.Link;
 import util.Printer;
-import algorithms.EnvyFreePricesVectorLP;
+import algorithms.pricing.EnvyFreePricesVectorLP;
 
 public class UnitLPReservePrices {
 	protected Market market;

@@ -13,15 +13,16 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
-import algorithms.Waterfall;
-import algorithms.allocations.EfficientAllocationILP;
-import algorithms.allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
-import algorithms.allocations.greedy.GreedyAllocation;
-import algorithms.allocations.greedy.UsersSupplyComparatorByRemainingSupply;
+import algorithms.waterfall.Waterfall;
+import allocations.error.AllocationException;
+import allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
+import allocations.greedy.GreedyAllocation;
+import allocations.greedy.UsersSupplyComparatorByRemainingSupply;
+import allocations.optimal.SingleStepEfficientAllocationILP;
 
 public class allocation extends Experiments{
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException {
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException {
 		if(!dbLogger.checkIfUnitDemandRowExists("allocation",numUsers, numCampaigns, prob)){
 			System.out.println("\t Add data ");
 			DescriptiveStatistics greedyToEfficient = new DescriptiveStatistics();
@@ -32,7 +33,7 @@ public class allocation extends Experiments{
 				/* Create a random Market*/
 				Market randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
 				/* Compute different allocations */
-				MarketAllocation efficient = new MarketAllocation(randomMarket,new EfficientAllocationILP(randomMarket).Solve(new IloCplex()).get(0));
+				MarketAllocation efficient = new MarketAllocation(randomMarket,new SingleStepEfficientAllocationILP(randomMarket).Solve(new IloCplex()).get(0));
 				MarketAllocation greedy = new GreedyAllocation(randomMarket,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(1),true).Solve();
 				//MarketAllocation greedy2 = new GreedyAllocation(randomMarket,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(-1)).Solve();
 				MarketAllocation wf = new Waterfall(randomMarket).Solve().getMarketAllocation();

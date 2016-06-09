@@ -2,7 +2,7 @@ package algorithms.pricing.lp.heuristicreserveprices.interfaces;
 
 import structures.Market;
 import structures.MarketAllocation;
-import algorithms.EnvyFreePricesVectorLP;
+import algorithms.pricing.EnvyFreePricesVectorLP;
 
 /*
  * This interface SetReservePrices defines one method setReservePrices.

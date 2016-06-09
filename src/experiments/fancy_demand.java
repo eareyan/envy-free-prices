@@ -16,11 +16,12 @@ import structures.MarketPrices;
 import structures.factory.MarketFactory;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
-import algorithms.allocations.EfficientAllocationILP;
 import algorithms.pricing.lp.reserveprices.EfficientAlloc;
 import algorithms.pricing.lp.reserveprices.GreedyAlloc;
 import algorithms.pricing.lp.reserveprices.LPReservePrices;
 import algorithms.pricing.lp.reserveprices.WFAlloc;
+import allocations.error.AllocationException;
+import allocations.optimal.SingleStepEfficientAllocationILP;
 
 /*
  * This class implements experiments in the general demand case.
@@ -32,7 +33,7 @@ public class fancy_demand extends Experiments{
 	
 	public boolean underdemand; //Boolean switch. True if underdemand, false otherwise.
 
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException{
 		String tablename ="" , unittablename = "";
 		if(this.underdemand){
 			tablename = "fancy_underdemand";
@@ -111,7 +112,7 @@ public class fancy_demand extends Experiments{
 				/*
 				 * Compute the efficient allocation, in this case, the ILP efficient alloc
 				 */
-				MarketAllocation efficient = new MarketAllocation(market,new EfficientAllocationILP(market).Solve(new IloCplex()).get(0));
+				MarketAllocation efficient = new MarketAllocation(market,new SingleStepEfficientAllocationILP(market).Solve(new IloCplex()).get(0));
 				double valueOptAllocaction = efficient.value();
 				/*
 				 * Measure CK
@@ -184,7 +185,7 @@ public class fancy_demand extends Experiments{
 				 * Unit Supply
 				 */
 				Market unitSupplyMarket = MarketFactory.createUnitSupplyMarket(market);
-				MarketAllocation efficientUnit = new MarketAllocation(unitSupplyMarket,new EfficientAllocationILP(unitSupplyMarket).Solve(new IloCplex()).get(0));
+				MarketAllocation efficientUnit = new MarketAllocation(unitSupplyMarket,new SingleStepEfficientAllocationILP(unitSupplyMarket).Solve(new IloCplex()).get(0));
 				double valueOptAllocactionUnit = efficientUnit.value();				
 				/*
 				 * Measure lpOPT

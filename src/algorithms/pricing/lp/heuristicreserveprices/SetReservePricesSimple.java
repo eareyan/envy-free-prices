@@ -1,6 +1,6 @@
 package algorithms.pricing.lp.heuristicreserveprices;
 
-import algorithms.EnvyFreePricesVectorLP;
+import algorithms.pricing.EnvyFreePricesVectorLP;
 import algorithms.pricing.lp.heuristicreserveprices.interfaces.SetReservePrices;
 import structures.Market;
 import structures.MarketAllocation;

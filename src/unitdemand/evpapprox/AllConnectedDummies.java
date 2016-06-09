@@ -1,6 +1,5 @@
 package unitdemand.evpapprox;
 
-import util.Printer;
 
 /*
  * Extends AbstractMaxWEQReservePrices and  adds two dummy consumers to all items at the given reserve price.

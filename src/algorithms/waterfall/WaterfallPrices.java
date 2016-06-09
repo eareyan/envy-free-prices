@@ -1,4 +1,4 @@
-package algorithms;
+package algorithms.waterfall;
 
 import structures.MarketAllocation;
 import structures.MarketPrices;

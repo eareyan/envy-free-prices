@@ -1,6 +1,5 @@
 package unitdemand.evpapprox;
 
-import util.Printer;
 
 /*
  * Adds dummy only to connected users.

@@ -14,15 +14,48 @@ import structures.factory.RandomMarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import util.Printer;
-import algorithms.EnvyFreePricesSolutionLP;
-import algorithms.EnvyFreePricesVectorLP;
-import algorithms.allocations.EfficientAllocationILP;
+import algorithms.pricing.EnvyFreePricesSolutionLP;
+import algorithms.pricing.EnvyFreePricesVectorLP;
+import allocations.optimal.SingleStepEfficientAllocationILP;
 
 public class Grapher {
 	
 	/*
 	 * Some Testing function....
 	 */
+	public static void main(String args[]){
+		System.out.println("Grapher");
+		//DescriptiveStatistics revenue = new DescriptiveStatistics();
+		DescriptiveStatistics welfare = new DescriptiveStatistics();
+		DescriptiveStatistics test = new DescriptiveStatistics();
+		double acum = 0.0;
+		int numberPoints = 9000000;
+		for(int k=0;k<numberPoints;k++){
+			double[][] X = RandomMarketFactory.getValuationMatrix(2, 2, 1.0,0.0,1.0);
+			MaxWEQ maxWEQAlgo = new MaxWEQ(X);
+			Matching matching = maxWEQAlgo.Solve();
+			welfare.addValue(matching.getValueOfMatching());
+			/*System.out.println("---");
+			Printer.printMatrix(X);
+			System.out.println("---");
+			System.out.println(matching.getValueOfMatching());
+			Printer.printMatrix(matching.getMatching());
+			System.out.println("---");
+			Printer.printVector(matching.getPrices());*/
+			/*System.out.println(matching.getSellerRevenue());
+			revenue.addValue(matchingWithReserve.getSellerRevenue());*/
+			double u1 = Math.random();
+			double u2 = Math.random();
+			double u3 = Math.random();
+			double u4 = Math.random();
+			test.addValue(Math.max(u1+u2, u3+u4));
+			acum += Math.max(u1+u2, u3+u4);
+		}
+		//System.out.println("TOTAL = " + revenue.getMean());
+		System.out.println("TOTAL Welfare= " + welfare.getMean());
+		System.out.println("TEST = " + test.getMean());
+		System.out.println("Acum = " + acum / numberPoints);
+	}
 	public static void main2(String args[]){
 		double[][] X = RandomMarketFactory.getValuationMatrix(4, 4, 1.0);
 		Printer.printMatrix(X);
@@ -124,7 +157,7 @@ public class Grapher {
 	 * 		4) Compute the seller revenue as usual (allocation times prices)
 	 * Repeat this process many times to get an estimate for the mean seller revenue.
 	 */	
-	public static void main(String args[]) throws Exception{		
+	public static void main3(String args[]) throws Exception{		
 		/*
 		 * Basic Parameters received by command line
 		 */
@@ -159,11 +192,11 @@ public class Grapher {
 					M = RandomMarketFactory.generateOverDemandedMarket(numUsers, numCampa, p, b);
 				}
 				/* Compute the efficient allocation */
-				MarketAllocation efficient = new MarketAllocation(M,new EfficientAllocationILP(M).Solve().get(0));
+				MarketAllocation efficient = new MarketAllocation(M,new SingleStepEfficientAllocationILP(M).Solve().get(0));
 				double valueOptAllocaction = efficient.value();		
 
 				/* Compute allocation that respects reserve price */
-				MarketAllocation allocRespectReserve = new MarketAllocation(M,new EfficientAllocationILP(M,reserve).Solve().get(0));
+				MarketAllocation allocRespectReserve = new MarketAllocation(M,new SingleStepEfficientAllocationILP(M,reserve).Solve().get(0));
 
 				/* Compute envy-free prices */
 				EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(allocRespectReserve);

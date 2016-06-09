@@ -11,8 +11,8 @@ import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.comparators.MarketPricesComparatorBySellerRevenue;
 import util.Printer;
-import algorithms.EnvyFreePricesSolutionLP;
-import algorithms.EnvyFreePricesVectorLP;
+import algorithms.pricing.EnvyFreePricesSolutionLP;
+import algorithms.pricing.EnvyFreePricesVectorLP;
 import algorithms.pricing.lp.heuristicreserveprices.interfaces.SelectUsers;
 import algorithms.pricing.lp.heuristicreserveprices.interfaces.SetReservePrices;
 

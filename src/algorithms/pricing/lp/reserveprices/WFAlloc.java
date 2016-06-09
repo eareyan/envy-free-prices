@@ -1,7 +1,7 @@
 package algorithms.pricing.lp.reserveprices;
 
-import algorithms.Waterfall;
-import algorithms.WaterfallPrices;
+import algorithms.waterfall.Waterfall;
+import algorithms.waterfall.WaterfallPrices;
 import structures.Market;
 import structures.MarketAllocation;
 

@@ -1,7 +1,6 @@
 package experiments;
 
 import java.sql.SQLException;
-import java.util.Random;
 
 import log.SqlDB;
 

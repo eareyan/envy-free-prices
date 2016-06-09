@@ -182,6 +182,9 @@ public class Market {
 			if(this.campaigns[j].backpointer != -1){
 				ret += ";\tBackpoints to: " + this.campaigns[j].backpointer;
 			}
+			if(this.campaigns[j].priority != -1){
+				ret += ";\tPriority: " + this.campaigns[j].priority;
+			}
 		}
 		return ret;
 	}    

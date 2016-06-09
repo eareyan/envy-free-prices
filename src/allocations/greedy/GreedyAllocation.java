@@ -1,4 +1,4 @@
-package algorithms.allocations.greedy;
+package allocations.greedy;
 
 import java.util.ArrayList;
 import java.util.Arrays;

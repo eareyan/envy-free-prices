@@ -1,4 +1,4 @@
-package algorithms.allocations;
+package allocations.optimal;
 
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
@@ -7,6 +7,8 @@ import ilog.cplex.IloCplex;
 
 import java.util.ArrayList;
 
+import allocations.error.AllocationErrorCodes;
+import allocations.error.AllocationException;
 import structures.Market;
 import util.Printer;
 
@@ -15,7 +17,7 @@ import util.Printer;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class EfficientAllocationILP {
+public class SingleStepEfficientAllocationILP {
 	/*
 	 * Boolean to control whether or not to output.
 	 */
@@ -39,28 +41,31 @@ public class EfficientAllocationILP {
 	/*
 	 * Constructor receives a market.
 	 */
-	public EfficientAllocationILP(Market market){
+	public SingleStepEfficientAllocationILP(Market market){
 		this.market = market;
 	}
 	/*
 	 * Constructor receives a market and a reserve price
 	 */
-	public EfficientAllocationILP(Market market, double reservePrice){
+	public SingleStepEfficientAllocationILP(Market market, double reservePrice) throws AllocationException{
 		this.market = market;
+		if(reservePrice < 0){
+			throw new AllocationException(AllocationErrorCodes.RESERVE_NEGATIVE);
+		}
 		this.reservePrice = reservePrice;
 		
 	}
 	/*
 	 * Wrapper method to solve for the efficient allocation without having to pass in a Cplex Object.
 	 */
-	public ArrayList<int[][]> Solve() throws IloException{
+	public ArrayList<int[][]> Solve() throws IloException, AllocationException{
 		return this.Solve(new IloCplex());
 	}
 	/*
 	 * Solver method. Returns an ArrayList of int[][] containing all the efficient allocations
 	 * found by the ILP.
 	 */
-	public ArrayList<int[][]> Solve(IloCplex iloObject){
+	public ArrayList<int[][]> Solve(IloCplex iloObject) throws AllocationException{
 		try {
 			this.cplex = iloObject;
 			if(!this.verbose) cplex.setOut(null);
@@ -70,7 +75,7 @@ public class EfficientAllocationILP {
 			 * The second parameter controls how many solutions we will get in total.
 			 */
 			this.cplex.setParam(IloCplex.DoubleParam.SolnPoolGap, 0.0);
-			this.cplex.setParam(IloCplex.IntParam.PopulateLim, EfficientAllocationILP.numSolutions);
+			this.cplex.setParam(IloCplex.IntParam.PopulateLim, SingleStepEfficientAllocationILP.numSolutions);
 			/*
 			 * variables
 			 */
@@ -86,18 +91,10 @@ public class EfficientAllocationILP {
 			/*
 			 * Check if we need reserve price.
 			 */
-			if(this.reservePrice <= 0){
-				//System.out.println("No reserve price");
-				for (int j=0; j<this.market.getNumberCampaigns(); j++){
-					obj.addTerm(this.market.getCampaign(j).getReward(), indicatorVariable[j]);
-				}
-			}else{
-				//System.out.println("Accounting for reserve price of " + this.reservePrice);
-				for (int j=0; j<this.market.getNumberCampaigns(); j++){
-					obj.addTerm(this.market.getCampaign(j).getReward() - this.reservePrice*this.market.getCampaign(j).getDemand(), indicatorVariable[j]);
-				}
-				//System.out.println(obj);
+			for (int j=0; j<this.market.getNumberCampaigns(); j++){
+				obj.addTerm(this.market.getCampaign(j).getReward() - this.reservePrice*this.market.getCampaign(j).getDemand(), indicatorVariable[j]);
 			}
+			//System.out.println(obj);
 			this.cplex.addMaximize(obj);
 			/*
 			 * Constraint (1). Allocation satisfies campaign. 
@@ -109,9 +106,7 @@ public class EfficientAllocationILP {
 					if(this.market.isConnected(i, j)){
 						expr.addTerm(coeff,allocationMatrixVariable[i][j]);
 					}else{
-						IloLinearNumExpr restrict = cplex.linearNumExpr();
-						restrict.addTerm(1,allocationMatrixVariable[i][j]);
-						this.cplex.addEq(0,restrict);
+						this.cplex.addEq(0,allocationMatrixVariable[i][j]);
 					}
 				}
 				this.cplex.addGe(expr,indicatorVariable[j]);
@@ -185,20 +180,20 @@ public class EfficientAllocationILP {
 	    			if(this.verbose){
 	    				Printer.printMatrix(sol);
 	    				System.out.println();
+		    			for(int j=0;j<this.market.getNumberCampaigns();j++){
+		    				System.out.println(this.cplex.getValue(indicatorVariable[j],l));
+		    			}
 	    			}
-	    			/*for(int j=0;j<this.market.getNumberCampaigns();j++){
-	    				System.out.println(this.cplex.getValue(indicatorVariable[j],l));
-	    			}*/
 	            }
 	            this.cplex.end();
 	            return Solutions;
 			}
-			return null;
 		} catch (IloException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Exception: ==>");
+			/* Report that CPLEX failed. */
 			e.printStackTrace();
+			throw new AllocationException(AllocationErrorCodes.CPLEX_FAILED);
 		}
-		return null;//if we reach this point, then there were no envy-free prices
+		/* If we ever do reach this point, then we don't really know what happened. */
+		throw new AllocationException(AllocationErrorCodes.UNKNOWN_ERROR);
 	}
 }

@@ -1,8 +1,8 @@
 package algorithms.pricing.lp.reserveprices;
 
-import algorithms.allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
-import algorithms.allocations.greedy.GreedyAllocation;
-import algorithms.allocations.greedy.UsersSupplyComparatorByRemainingSupply;
+import allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
+import allocations.greedy.GreedyAllocation;
+import allocations.greedy.UsersSupplyComparatorByRemainingSupply;
 import structures.Market;
 import structures.MarketAllocation;
 
