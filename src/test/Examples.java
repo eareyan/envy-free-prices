@@ -190,8 +190,8 @@ public class Examples {
 	}
 	
 	public static Market market2(){
-		Campaign c1 = new Campaign(10, 100, 1.0, 0.0, -1, -1);
-		Campaign c2 = new Campaign(9, 10, 0.25, 0.0, -1, -1);
+		Campaign c1 = new Campaign(10, 100, 0.5, 1.0, -1, -1);
+		Campaign c2 = new Campaign(9, 10, 1.0, 1.1, -1, -1);
 		Campaign[] campaigns = new Campaign[2];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
@@ -325,7 +325,7 @@ public class Examples {
 	}
 	
 	public static Market typicalTACMarket(){
-		Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),1.5,0,2);
+		Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),1.1,0,2);
 		//Campaign c0 = new Campaign(4142,4622.0,0,2);
 		Campaign c1 = new Campaign(1920,671.0,1,0.34,1,2);
 		Campaign c2 = new Campaign(481,900.0,1.0,1.7,2,1);

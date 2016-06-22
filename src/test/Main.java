@@ -52,8 +52,8 @@ public class Main {
 	
 	
 	public static void main(String args[]) throws IloException, AllocationException{
-		//Market M = Examples.market2();
-		Market M = Examples.typicalTACMarket();
+		Market M = Examples.market2();
+		//Market M = Examples.typicalTACMarket();
 		System.out.println(M);
 		/* Single-Step Efficient */
 		System.out.println("Single-Step Efficient Allocation");
@@ -61,11 +61,12 @@ public class Main {
 		/* Single-Step Greedy */
 		System.out.println("Single-Step Greedy Allocation");
 		Printer.printMatrix(new GreedyAllocation(M).Solve().getAllocation());
+		int stepSize = 1;
 		/* Multi-Step Efficient */
 		System.out.println("Multi-Step Efficient Allocation");
-		Printer.printMatrix(new MultiStepEfficientAllocationILP(M,10,new IdentityObjectiveFunction()).Solve().get(0));
+		Printer.printMatrix(new MultiStepEfficientAllocationILP(M,stepSize,new IdentityObjectiveFunction()).Solve().get(0));
 		/* Multi-Step Greedy */
 		System.out.println("Multi-Step Greedy Allocation");
-		Printer.printMatrix(new GreedyMultiStepAllocation(M,10,new IdentityObjectiveFunction()).Solve().getAllocation());
+		Printer.printMatrix(new GreedyMultiStepAllocation(M,stepSize,new IdentityObjectiveFunction()).Solve().getAllocation());
 	}
 }

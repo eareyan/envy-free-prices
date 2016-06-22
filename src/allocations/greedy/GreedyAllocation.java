@@ -54,7 +54,7 @@ public class GreedyAllocation {
 		int[] totalAllocationFromUserSoFar = new int[this.market.getNumberUsers()];
 		/* Allocate each campaign, if possible, one at a time */
 		for(int j=0;j<this.market.getNumberCampaigns();j++){
-			if(campaigns[j].getReward() < 0) continue; //Ignore campaigns with zero or negative reward.
+			if(campaigns[j].getReward() <= 0) continue; //Ignore campaigns with zero or negative reward.
 			ArrayList<UserSupply> accessibleUsers = new ArrayList<UserSupply>();
 			int totalAvailableSupply = 0;
 			int totalAllocationToCampaignSoFar = 0;
