@@ -6,37 +6,51 @@ package structures;
  * @author Enrique Areyan Viqueira
  */
 public class Campaign {
-	/*
-	 * Demand of this campaign
-	 */
+	/* Demand of this campaign. */
 	protected int demand;
-	/*
-	 * Reward of this campaign
-	 */
+	/* Reward of this campaign. */
 	protected double reward;
-	/*
-	 * Backpointer to another campaign, default value -1 means no backpointer
-	 */
+	/* User access level. Indicates what percentage of visibility the campaign has across all users. */
+	protected double level = 1.0;
+	/* Reserve Price. Indicates the minimum amount a campaign must pay per impression. */
+	protected double reserve = 0.0;
+	/* Backpointer to another campaign, default value -1 means no backpointer. */
 	protected int backpointer = -1;
-	/*
-	 * Priority. This is used to have a notion of priority among campaigns.
-	 */
+	/* Priority. This is used to have a notion of priority among campaigns.*/
 	protected int priority = -1;
 	/*
-	 * Constructor.
+	 * Constructors.
 	 */
 	public Campaign(int demand, double reward){
+		/*if(demand <= 0){
+			throw new CampaignCreationException("The demand of a campaign must be a positive integer");
+		}*/
 		this.demand = demand;
+		/*if(reward <= 0){
+			throw new CampaignCreationException("The reward of a campaign must be a positive double");
+		}*/
 		this.reward = reward;
 	}
+	public Campaign(int demand, double reward, double level, double reserve){
+		this(demand,reward);
+		/*if(reserve<0.0){
+		throw new CampaignCreationException("The reserve price of a campaign must be a positive double at least zero");
+		}*/
+		this.level = level;
+		this.reserve = reserve;
+	}
 	public Campaign(int demand, double reward,int backpointer){
-		this.demand = demand;
-		this.reward = reward;
+		this(demand, reward);
 		this.backpointer = backpointer;
 	}
 	public Campaign(int demand, double reward,int backpointer, int priority){
 		this(demand,reward,backpointer);
 		this.priority = priority;
+	}
+	public Campaign(int demand, double reward, double level,double reserve, int backpointer, int priority){
+		this(demand,reward,backpointer,priority);
+		this.level = level;
+		this.reserve = reserve;
 	}
 	/*
 	 * Getters
@@ -46,6 +60,12 @@ public class Campaign {
 	}
 	public double getReward(){
 		return this.reward;
+	}
+	public double getLevel(){
+		return this.level;
+	}
+	public double getReserve(){
+		return this.reserve;
 	}
 	public int getBackpointer(){
 		return this.backpointer;
@@ -59,10 +79,13 @@ public class Campaign {
 	public void setReward(double reward){
 		this.reward = reward;
 	}
+	public void setReserve(double reserve){
+		this.reserve = reserve;
+	}
 	/*
 	 * String representation
 	 */
 	public String toString(){
-		return "R = " + this.reward + ", I = " + this.getDemand();
+		return "(Demand = " + this.getDemand() + ", Reward = " + this.reward + ", Backpointer = " + this.getBackpointer() + ", priority = " + this.getPriority() + ")";
 	}
 }

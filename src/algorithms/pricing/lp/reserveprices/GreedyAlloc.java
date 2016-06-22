@@ -1,10 +1,10 @@
 package algorithms.pricing.lp.reserveprices;
 
+import structures.Market;
+import structures.MarketAllocation;
 import allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
 import allocations.greedy.GreedyAllocation;
 import allocations.greedy.UsersSupplyComparatorByRemainingSupply;
-import structures.Market;
-import structures.MarketAllocation;
 
 public class GreedyAlloc implements AllocationAlgorithm{
 	protected int order;

@@ -44,7 +44,7 @@ public class Printer {
 		}
    }
 	public static void printVector(double[] vector){
-		DecimalFormat df = new DecimalFormat("#.00"); 
+		DecimalFormat df = new DecimalFormat("#.000000"); 
 		for(int i=0;i<vector.length;i++){
 			if(vector[i] == -1.0*Double.MAX_VALUE){
 				System.out.print("-Inf \t");

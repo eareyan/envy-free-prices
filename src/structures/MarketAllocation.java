@@ -17,7 +17,8 @@ public class MarketAllocation {
 		
 	public MarketAllocation(Market m, int[][] allocation){
 		this.market = m;
-		this.allocation = this.cleanMatrix(allocation);
+		//this.allocation = this.cleanMatrix(allocation); //This cleaning has been taken care of in the ILPs directly.
+		this.allocation = allocation;
 	}
 	/*
 	 * Getters
@@ -39,7 +40,7 @@ public class MarketAllocation {
 	public double value(){
 		int allocation;
 		double totalReward = 0.0;
-		/* Loop through each campign to check if it is satisfied*/
+		/* Loop through each campaign to check if it is satisfied*/
 		for(int j=0;j<this.market.getNumberCampaigns();j++){
 			allocation = 0;
 			for(int i=0;i<this.market.getNumberUsers();i++){

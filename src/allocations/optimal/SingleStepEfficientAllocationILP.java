@@ -35,10 +35,6 @@ public class SingleStepEfficientAllocationILP {
 	 */
 	protected IloCplex cplex;
 	/*
-	 * Reserve price. Default value 0.0, in which case the reserve price is ignore.
-	 */
-	protected double reservePrice = 0.0;
-	/*
 	 * Constructor receives a market.
 	 */
 	public SingleStepEfficientAllocationILP(Market market){
@@ -52,8 +48,10 @@ public class SingleStepEfficientAllocationILP {
 		if(reservePrice < 0){
 			throw new AllocationException(AllocationErrorCodes.RESERVE_NEGATIVE);
 		}
-		this.reservePrice = reservePrice;
-		
+		/* Set the reserve of every campaign to be the same reserve price, received by the constructor.*/
+		for(int j=0;j<this.market.getNumberCampaigns();j++){
+			this.market.getCampaign(j).setReserve(reservePrice);
+		}
 	}
 	/*
 	 * Wrapper method to solve for the efficient allocation without having to pass in a Cplex Object.
@@ -88,11 +86,8 @@ public class SingleStepEfficientAllocationILP {
 			 * Objective.
 			 */
 			IloLinearNumExpr obj = this.cplex.linearNumExpr();
-			/*
-			 * Check if we need reserve price.
-			 */
 			for (int j=0; j<this.market.getNumberCampaigns(); j++){
-				obj.addTerm(this.market.getCampaign(j).getReward() - this.reservePrice*this.market.getCampaign(j).getDemand(), indicatorVariable[j]);
+				obj.addTerm(this.market.getCampaign(j).getReward() - this.market.getCampaign(j).getReserve()*this.market.getCampaign(j).getDemand(), indicatorVariable[j]);
 			}
 			//System.out.println(obj);
 			this.cplex.addMaximize(obj);
@@ -123,21 +118,13 @@ public class SingleStepEfficientAllocationILP {
 				this.cplex.addLe(expr,this.market.getUser(i).getSupply());
 			}
 			/*
-			 * Constrain (3). For all j: If y_j = 0 then x_{ij} = 0 for all i.
+			 * Constrain (3). Campaigns have access to at most as many users as given by their level
 			 */
-			/*IloNumVar[] indicatorVariableIfThen = cplex.boolVarArray(this.market.getNumberCampaigns());
-			for(int j=0;j<this.market.getNumberCampaigns();j++){
-				//System.out.println("Add IF-THEN constraint for campaign " + j);
-				this.cplex.addGe(cplex.sum(indicatorVariable[j],
-									cplex.prod(Integer.MAX_VALUE,
-											cplex.sum(1,
-													cplex.prod(-1,indicatorVariableIfThen[j]))))
-													,1);
-				for(int i=0;i<this.market.getNumberUsers();i++){
-					this.cplex.addGe(cplex.prod(Integer.MAX_VALUE, indicatorVariableIfThen[j]), allocationMatrixVariable[i][j]);
+			for(int i=0;i<this.market.getNumberUsers();i++){
+				for(int j=0;j<this.market.getNumberCampaigns();j++){
+					this.cplex.addLe(allocationMatrixVariable[i][j],Math.floor(this.market.getCampaign(j).getLevel() * this.market.getUser(i).getSupply()));
 				}
-				
-			}*/
+			}
 			/*
 			 * Solve the problem and get many solutions:
 			 */

@@ -20,41 +20,97 @@ import allocations.optimal.SingleStepEfficientAllocationILP;
 
 public class Grapher {
 	
-	/*
-	 * Some Testing function....
-	 */
+	static double constant = 1.0;
+	static int numberPoints = 10000;
+	
+	public static void main6(String args[]){
+		double acum = 0.0;
+		for(int k=0;k<numberPoints;k++){
+			double u11 = constant*Math.random();
+			double u12 = constant*Math.random();
+			double u13 = constant*Math.random();
+			double u21 = constant*Math.random();
+			double u22 = constant*Math.random();
+			double u23 = constant*Math.random();
+			double u31 = constant*Math.random();
+			double u32 = constant*Math.random();
+			double u33 = constant*Math.random();
+			double v1 = Math.max(u11+u22+u33, u12+u21+u33);
+			double v2 = Math.max(u12+u23+u32, u13+u22+u31);
+			double v3 = Math.max(u13+u21+u32, u11+u23+u32);
+			acum += Math.max(Math.max(v1,v2),v3);
+		}
+		System.out.println("Acum = " + acum / numberPoints);
+	}
+	public static double randInt(){
+		/*Random r = new Random();
+		int Low = 1;
+		int High = 10;
+		return r.nextInt(High-Low) + Low;	*/
+		return Math.random();
+	}
+	
 	public static void main(String args[]){
 		System.out.println("Grapher");
 		//DescriptiveStatistics revenue = new DescriptiveStatistics();
-		DescriptiveStatistics welfare = new DescriptiveStatistics();
-		DescriptiveStatistics test = new DescriptiveStatistics();
+		
+		double welfare = 0.0;
 		double acum = 0.0;
-		int numberPoints = 9000000;
 		for(int k=0;k<numberPoints;k++){
-			double[][] X = RandomMarketFactory.getValuationMatrix(2, 2, 1.0,0.0,1.0);
+
+
+			double u11 = randInt();
+			double u12 = randInt();
+			double u13 = randInt();
+			double u21 = randInt();
+			double u22 = randInt();
+			double u23 = randInt();
+			double u31 = randInt();
+			double u32 = randInt();
+			double u33 = randInt();
+			double v1 = Math.max(u11+u22+u33, u12+u21+u33);
+			double v2 = Math.max(u12+u23+u31, u13+u22+u31);
+			double v3 = Math.max(u13+u21+u32, u11+u23+u32);
+			acum += Math.max(Math.max(v1,v2),v3);	
+			
+			double[][] X = {{u11,u12,u13},{u21,u22,u23},{u31,u32,u33}};
+			
+			//double[][] X = RandomMarketFactory.getValuationMatrix(3, 3, 1.0,0.0,constant);
+			
+			/*System.out.println("u11 = " + u11);
+			System.out.println("u12 = " + u12);
+			System.out.println("u13 = " + u13);
+
+			System.out.println("u21 = " + u21);
+			System.out.println("u22 = " + u22);
+			System.out.println("u23 = " + u23);
+
+			System.out.println("u31 = " + u31);
+			System.out.println("u32 = " + u32);
+			System.out.println("u33 = " + u33);*/
+
 			MaxWEQ maxWEQAlgo = new MaxWEQ(X);
 			Matching matching = maxWEQAlgo.Solve();
-			welfare.addValue(matching.getValueOfMatching());
+			welfare += matching.getValueOfMatching();
+			/*Printer.printMatrix(X);
+			System.out.println("***");
+			Printer.printMatrix(matching.getMatching());
 			/*System.out.println("---");
 			Printer.printMatrix(X);
 			System.out.println("---");
 			System.out.println(matching.getValueOfMatching());
 			Printer.printMatrix(matching.getMatching());
 			System.out.println("---");
-			Printer.printVector(matching.getPrices());*/
+			Printer.printVector(matching.getPrices());
 			/*System.out.println(matching.getSellerRevenue());
 			revenue.addValue(matchingWithReserve.getSellerRevenue());*/
-			double u1 = Math.random();
-			double u2 = Math.random();
-			double u3 = Math.random();
-			double u4 = Math.random();
-			test.addValue(Math.max(u1+u2, u3+u4));
-			acum += Math.max(u1+u2, u3+u4);
+			
 		}
 		//System.out.println("TOTAL = " + revenue.getMean());
-		System.out.println("TOTAL Welfare= " + welfare.getMean());
-		System.out.println("TEST = " + test.getMean());
+		System.out.println("TOTAL Welfare= " + welfare / numberPoints);
 		System.out.println("Acum = " + acum / numberPoints);
+		System.out.println((welfare - acum) / numberPoints);
+		
 	}
 	public static void main2(String args[]){
 		double[][] X = RandomMarketFactory.getValuationMatrix(4, 4, 1.0);

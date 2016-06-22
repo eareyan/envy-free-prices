@@ -178,16 +178,16 @@ public class Market {
 	protected String stringCampaignsInfo(){
 		String ret = "";
 		for(int j=0;j<this.getNumberCampaigns();j++){
-			ret += "\nR("+j+") = "+ this.campaigns[j].reward + ";\t I("+j+") = " + this.campaigns[j].demand;
+			ret += "\nR("+j+") = "+ this.campaigns[j].reward + ";\t I("+j+") = " + this.campaigns[j].demand + ";\t L("+j+") = " + this.campaigns[j].level + ";\t r("+j+") = " + this.campaigns[j].reserve;
 			if(this.campaigns[j].backpointer != -1){
-				ret += ";\tBackpoints to: " + this.campaigns[j].backpointer;
+				ret += "\tBackpoints to: " + this.campaigns[j].backpointer;
 			}
 			if(this.campaigns[j].priority != -1){
-				ret += ";\tPriority: " + this.campaigns[j].priority;
+				ret += "\tPriority: " + this.campaigns[j].priority + ".";
 			}
 		}
 		return ret;
-	}    
+	}
 	protected String stringConnectionsMatrix(){
 		if(this.connections != null){	   
 			String ret = "";
@@ -210,7 +210,7 @@ public class Market {
     public String toString(){
     	return  "NbrCampaigns:\t"+this.getNumberCampaigns() + "\n" +
     			"NbrUsers:\t"+this.getNumberUsers() + "\n" +
-    			"Campaigns Rewards \t\t Campaigns Demand" + this.stringCampaignsInfo() + "\n" +
+    			"Camp. Rewards \t Camp. Demand \t Level \te Reserve \t\tBackpointer \t\t\tPriority" + this.stringCampaignsInfo() + "\n" +
     			"Users Supply" + this.stringUsersInfo() + "\n" +
     			"Connections Matrix:\t"+this.stringConnectionsMatrix();
     }

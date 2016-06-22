@@ -1,7 +1,6 @@
 package experiments;
 
 import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
 
 import java.sql.SQLException;
 
@@ -13,37 +12,37 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
-import algorithms.waterfall.Waterfall;
 import allocations.error.AllocationException;
-import allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
-import allocations.greedy.GreedyAllocation;
-import allocations.greedy.UsersSupplyComparatorByRemainingSupply;
-import allocations.optimal.SingleStepEfficientAllocationILP;
+import allocations.greedy.multistep.GreedyMultiStepAllocation;
+import allocations.objectivefunction.EffectiveReachRatio;
+import allocations.optimal.MultiStepEfficientAllocationILP;
 
+@SuppressWarnings("unused")
 public class allocation extends Experiments{
 	
 	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException {
 		if(!dbLogger.checkIfUnitDemandRowExists("allocation",numUsers, numCampaigns, prob)){
 			System.out.println("\t Add data ");
 			DescriptiveStatistics greedyToEfficient = new DescriptiveStatistics();
-			DescriptiveStatistics wfToEfficient = new DescriptiveStatistics();
-			DescriptiveStatistics wfToGreedy = new DescriptiveStatistics();
 
 			for(int t=0;t<RunParameters.numTrials;t++){
 				/* Create a random Market*/
 				Market randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
 				/* Compute different allocations */
-				MarketAllocation efficient = new MarketAllocation(randomMarket,new SingleStepEfficientAllocationILP(randomMarket).Solve(new IloCplex()).get(0));
-				MarketAllocation greedy = new GreedyAllocation(randomMarket,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(1),true).Solve();
-				//MarketAllocation greedy2 = new GreedyAllocation(randomMarket,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(-1)).Solve();
-				MarketAllocation wf = new Waterfall(randomMarket).Solve().getMarketAllocation();
+				MarketAllocation efficient = new MarketAllocation(randomMarket,new MultiStepEfficientAllocationILP(randomMarket,1,new EffectiveReachRatio()).Solve().get(0));
+				MarketAllocation greedy = new GreedyMultiStepAllocation(randomMarket,1, new EffectiveReachRatio()).Solve();
 				/* Compute statistics */
-				greedyToEfficient.addValue(NumberMethods.getRatio(greedy.value() , efficient.value()));
-				wfToEfficient.addValue(NumberMethods.getRatio(wf.value() , efficient.value()));
-				wfToGreedy.addValue(NumberMethods.getRatio(wf.value() , greedy.value()));
-				
+				double greedyValue = greedy.value();
+				double efficientValue = efficient.value();
+				double ratio = 0.0;
+				if((greedyValue == 0.0 && efficientValue == 0.0) || efficientValue == 0.0){
+					ratio = 1.0;
+				}else{
+					ratio = greedyValue / efficientValue;
+				}
+				greedyToEfficient.addValue(ratio);
 			}
-			dbLogger.saveAllocationData(numUsers, numCampaigns, prob, greedyToEfficient.getMean(), wfToEfficient.getMean(), wfToGreedy.getMean());
+			dbLogger.saveAllocationData(numUsers, numCampaigns, prob, greedyToEfficient.getMean());
 		}else{
 			System.out.println("\t Already have data ");			
 		}

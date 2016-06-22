@@ -33,10 +33,6 @@ public class MultiStepEfficientAllocationILP {
 	 */
 	protected ObjectiveFunction objectiveFunction;
 	/*
-	 * Reserve price. Default value 0.0, in which case the reserve price is ignore.
-	 */
-	protected double reservePrice = 0.0;	
-	/*
 	 * Objects needed to interface with CPlex Library.
 	 */
 	protected IloCplex cplex;
@@ -65,10 +61,13 @@ public class MultiStepEfficientAllocationILP {
 	 */
 	public MultiStepEfficientAllocationILP(Market market, int stepSize, ObjectiveFunction objectiveFunction, double reservePrice) throws IloException, AllocationException{
 		this(market, stepSize, objectiveFunction);
-		this.reservePrice = reservePrice;
-		if(this.reservePrice<=0){
+		if(reservePrice<=0){
 			throw new AllocationException(AllocationErrorCodes.RESERVE_NEGATIVE);
 		}
+		/* Set the reserve of every campaign to be the same reserve price, received by the constructor.*/
+		for(int j=0;j<this.market.getNumberCampaigns();j++){
+			this.market.getCampaign(j).setReserve(reservePrice);
+		}		
 	}
 	/*
 	 * Solve function. Creates the ILP and returns all the solutions found in an array of integer matrices.
@@ -106,7 +105,7 @@ public class MultiStepEfficientAllocationILP {
 			for (int j=0; j<this.market.getNumberCampaigns(); j++){
 				int currentStep = this.stepSize;
 				for(int k=0;k < indicators.get(j).length;k++){
-					obj.addTerm(this.objectiveFunction.getObjective(this.market.getCampaign(j).getReward(),this.market.getCampaign(j).getDemand(), currentStep) - this.reservePrice*currentStep, indicators.get(j)[k]);
+					obj.addTerm(this.objectiveFunction.getObjective(this.market.getCampaign(j).getReward(),this.market.getCampaign(j).getDemand(), currentStep) - this.market.getCampaign(j).getReserve()*currentStep, indicators.get(j)[k]);
 					currentStep += this.stepSize;
 				}
 			}
@@ -180,6 +179,15 @@ public class MultiStepEfficientAllocationILP {
 				}
 				this.cplex.addLe(sumOfAlloc,this.cplex.prod(Double.MAX_VALUE, sumOfIndicators));
 			}
+			/*
+			 * Constraint (5). Campaings can only see a number of users according to their level.
+			 */
+			for(int i=0;i<this.market.getNumberUsers();i++){
+				for(int j=0;j<this.market.getNumberCampaigns();j++){
+					this.cplex.addLe(allocationMatrixVariable[i][j],Math.floor(this.market.getCampaign(j).getLevel() * this.market.getUser(i).getSupply()));
+				}
+			}
+
 			/* Solve the program */
 			this.cplex.solve();
 			if ( cplex.populate() ) {

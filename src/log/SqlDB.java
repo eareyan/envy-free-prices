@@ -49,15 +49,13 @@ public class SqlDB {
         preparedStatement.setDouble(4, b);
         return ((ResultSet) preparedStatement.executeQuery()).next();
     }
-	public void saveAllocationData(int n, int m, double p, double greedyToEfficient,  double wfToEfficient, double wfToGreedy) throws SQLException {
-        String sql = "INSERT INTO allocation(n,m,p,greedyToEfficient,wfToEfficient,wfToGreedy) VALUES (?,?,?,?,?,?)";
+	public void saveAllocationData(int n, int m, double p, double greedyToEfficient) throws SQLException {
+        String sql = "INSERT INTO allocation(n,m,p,greedyToEfficient) VALUES (?,?,?,?)";
         PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
         preparedStatement.setInt(1, n);
         preparedStatement.setInt(2, m);
         preparedStatement.setDouble(3, p);
         preparedStatement.setDouble(4, greedyToEfficient);
-        preparedStatement.setDouble(5, wfToEfficient);
-        preparedStatement.setDouble(6, wfToGreedy);
 
         preparedStatement.execute();        
 	}

@@ -190,8 +190,8 @@ public class Examples {
 	}
 	
 	public static Market market2(){
-		Campaign c1 = new Campaign(10, 100);
-		Campaign c2 = new Campaign(9, 10);
+		Campaign c1 = new Campaign(10, 100, 1.0, 0.0, -1, -1);
+		Campaign c2 = new Campaign(9, 10, 0.25, 0.0, -1, -1);
 		Campaign[] campaigns = new Campaign[2];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
@@ -203,7 +203,7 @@ public class Examples {
 		users[1] = u2;
 
 		boolean[][] connections = new boolean[2][2];
-		connections[0][0] = false;
+		connections[0][0] = true;
 		connections[0][1] = true;
 		connections[1][0] = true;
 		connections[1][1] = true;
@@ -255,10 +255,10 @@ public class Examples {
 	public static Market market5(){
 		/* Example market with priorities*/
 		
-		Campaign c1 = new Campaign(5, 8,0,1);
-		Campaign c2 = new Campaign(5, 6,0,1);
-		Campaign c3 = new Campaign(5, 3,0,2);
-		Campaign c4 = new Campaign(5, 1,0,2);
+		Campaign c1 = new Campaign(5, 8, 0.4, 0.0, 0, 1);
+		Campaign c2 = new Campaign(5, 6, 0.49,0.0, 0, 1);
+		Campaign c3 = new Campaign(5, 3, 1.0, 0.0, 0, 2);
+		Campaign c4 = new Campaign(5, 1, 1.0, 0.0, 0, 2);
 		Campaign[] campaigns = new Campaign[4];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
@@ -286,12 +286,51 @@ public class Examples {
 		return market;
 	}	
 	
+	public static Market market6(){
+		/* Example market with priorities*/
+		
+		Campaign c1 = new Campaign(3, 8,0,1);
+		Campaign[] campaigns = new Campaign[1];
+		campaigns[0] = c1;
+		
+		User u1 = new User(4);
+		User[] users = new User[1];
+		users[0] = u1;
+		
+		boolean[][] connections = new boolean[1][1];
+		connections[0][0] = true;
+
+		Market market = new Market(users,campaigns,connections);
+		return market;
+	}
+	
+	public static Market market7(){
+		int numberC = 10;
+		Campaign[] campaigns = new Campaign[numberC];
+		for(int j=0;j<numberC;j++){
+			campaigns[j] = new Campaign(j*800 + 50, j*900 + 100 , j, (j<5) ? 2 : 1 ); 
+		}
+		int numberU = 12;
+		User[] users = new User[numberU];
+		for(int i=0;i<numberU;i++){
+			users[i] = new User(100*i);
+		}
+		boolean[][] connections = new boolean[numberU][numberC];
+		for(int i=0;i<numberU;i++){
+			for(int j=0;j<numberC;j++){
+				connections[i][j] = true;
+			}
+		}
+		return new Market(users,campaigns,connections);
+	}
+	
 	public static Market typicalTACMarket(){
-		Campaign c0 = new Campaign(4142,4622.0,0,2);
-		Campaign c1 = new Campaign(1920,671.0,1,2);
-		Campaign c2 = new Campaign(481,900.0,2,1);
+		Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),1.5,0,2);
+		//Campaign c0 = new Campaign(4142,4622.0,0,2);
+		Campaign c1 = new Campaign(1920,671.0,1,0.34,1,2);
+		Campaign c2 = new Campaign(481,900.0,1.0,1.7,2,1);
 		Campaign c3 = new Campaign(2478,6195.0,3,1);
-		Campaign c4 = new Campaign(259,387.0,4,1);
+		Campaign c4 = new Campaign(259,387.0,4,2);
 		Campaign c5 = new Campaign(1921,4802.0,5,1);
 		Campaign[] campaigns = new Campaign[6];
 		campaigns[0] = c0;

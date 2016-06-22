@@ -22,18 +22,8 @@ public class GreedyAllocation {
 	
 	protected Comparator<UserSupply> UserSupplyComparator;
 	
-	protected double reserve = 0.0;
-	
-	protected boolean swapUsers = false;
-	
 	public GreedyAllocation(Market market){
 		this.market = market;
-		this.CampaignComparator = new CampaignComparatorByRewardToImpressionsRatio();
-		this.UserSupplyComparator = new UsersSupplyComparatorByRemainingSupply(); 
-	}
-	public GreedyAllocation(Market market, Comparator<Campaign> CampaignComparator, Comparator<UserSupply> UserSupplyComparator, boolean swapUsers){
-		this.market = market;
-		this.swapUsers = swapUsers;
 		this.CampaignComparator = new CampaignComparatorByRewardToImpressionsRatio();
 		this.UserSupplyComparator = new UsersSupplyComparatorByRemainingSupply(); 
 	}
@@ -47,55 +37,51 @@ public class GreedyAllocation {
 		this.market = market;
 		this.CampaignComparator = CampaignComparator; 
 		this.UserSupplyComparator = UserSupplyComparator;
-		this.reserve = reserve;
+		/* Set the reserve of every campaign to be the same reserve price, received by the constructor.*/
+		for(int j=0;j<this.market.getNumberCampaigns();j++){
+			this.market.getCampaign(j).setReserve(reserve);
+		}
 	}
 	
 	public MarketAllocation Solve(){
 		/* First make a copy of the campaigns array and sort it by reward */
 		Campaign[] campaigns = new Campaign[this.market.getNumberCampaigns()];
 		for(int j=0;j<this.market.getNumberCampaigns();j++){
-			campaigns[j] = new Campaign(this.market.getCampaign(j).getDemand(),this.market.getCampaign(j).getReward() - this.market.getCampaign(j).getDemand() * this.reserve,j);
+			campaigns[j] = new Campaign(this.market.getCampaign(j).getDemand(),this.market.getCampaign(j).getReward() - this.market.getCampaign(j).getDemand() * this.market.getCampaign(j).getReserve(),j);
 		}
 		Arrays.sort(campaigns, this.CampaignComparator); //Sort campaigns by the given comparator
 		int[][] greedyAllocation = new int[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
 		int[] totalAllocationFromUserSoFar = new int[this.market.getNumberUsers()];
+		/* Allocate each campaign, if possible, one at a time */
 		for(int j=0;j<this.market.getNumberCampaigns();j++){
 			if(campaigns[j].getReward() < 0) continue; //Ignore campaigns with zero or negative reward.
-			//Backpointer of the campaign points to the campaign in the original market
-			//System.out.println(campaigns[j].getBackpointer() + " = " + campaigns[j].getReward());
 			ArrayList<UserSupply> accessibleUsers = new ArrayList<UserSupply>();
 			int totalAvailableSupply = 0;
 			int totalAllocationToCampaignSoFar = 0;
 			for(int i=0;i<this.market.getNumberUsers();i++){ //Compute the accessible users to this campaign
-				if(this.market.isConnected(i, campaigns[j].getBackpointer()) && totalAllocationFromUserSoFar[i] < this.market.getUser(i).getSupply()){
-					totalAvailableSupply += this.market.getUser(i).getSupply() - totalAllocationFromUserSoFar[i];
+				/* z_ij computes the number of impressions available from user i to campaign j */
+				int z_ij = (int) Math.min(this.market.getUser(i).getSupply() - totalAllocationFromUserSoFar[i], Math.floor(this.market.getCampaign(campaigns[j].getBackpointer()).getLevel()*this.market.getUser(i).getSupply()));
+				if(this.market.isConnected(i, campaigns[j].getBackpointer()) &&  z_ij > 0){
+					totalAvailableSupply += z_ij;
 					accessibleUsers.add(new UserSupply(i,this.market.getUser(i).getSupply() - totalAllocationFromUserSoFar[i]));
 				}
 			}
-			//System.out.println(accessibleUsers);
 			Collections.sort(accessibleUsers, this.UserSupplyComparator);
-			if(this.swapUsers){
-				if(accessibleUsers.size()>1){
-					//Swap first two users
-					Collections.swap(accessibleUsers, 0, 1);
-				}				
-			}
-			//System.out.println(accessibleUsers);
 			if(totalAvailableSupply >= this.market.getCampaign(campaigns[j].getBackpointer()).getDemand()){
 				/* Try to allocate */
 				for (UserSupply user : accessibleUsers) {
-					int i = user.getId();
-					//System.out.println("Try to allocate user " + i + " to campaign " + campaigns[j].getBackpointer() + ", from " + (this.market.getUser(i).getSupply() - totalAllocationFromUserSoFar[i]) + " many left");
-					greedyAllocation[i][campaigns[j].getBackpointer()] = Math.min(this.market.getCampaign(campaigns[j].getBackpointer()).getDemand() - totalAllocationToCampaignSoFar, this.market.getUser(i).getSupply() - totalAllocationFromUserSoFar[i]);
-					totalAllocationFromUserSoFar[i] += greedyAllocation[i][campaigns[j].getBackpointer()];
-					totalAllocationToCampaignSoFar += greedyAllocation[i][campaigns[j].getBackpointer()];
-					if(totalAllocationToCampaignSoFar == this.market.getCampaign(campaigns[j].getBackpointer()).getDemand()){
+					int i = user.getId(); // User Index
+					int jIndex = campaigns[j].getBackpointer(); // Campaign Index
+					int z_ij = (int) Math.min(this.market.getUser(i).getSupply() - totalAllocationFromUserSoFar[i], Math.floor(this.market.getCampaign(jIndex).getLevel()*this.market.getUser(i).getSupply()));
+					greedyAllocation[i][jIndex] = Math.min(this.market.getCampaign(jIndex).getDemand() - totalAllocationToCampaignSoFar, z_ij);
+					totalAllocationFromUserSoFar[i] += greedyAllocation[i][jIndex];
+					totalAllocationToCampaignSoFar += greedyAllocation[i][jIndex];
+					if(totalAllocationToCampaignSoFar == this.market.getCampaign(jIndex).getDemand()){
 						break; //Break if the current campaign has been completely satisfied
 					}
 				}
 			}
 		}
-		//Printer.printMatrix(greedyAllocation);
 		return new MarketAllocation(this.market,greedyAllocation);
 	}
 }
