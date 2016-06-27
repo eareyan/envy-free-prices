@@ -7,6 +7,7 @@ import java.util.Random;
 import structures.Campaign;
 import structures.Market;
 import structures.User;
+import structures.exceptions.CampaignCreationException;
 
 public class RandomMarketFactory {
 	public static double defaultMaxReward = 10.0;
@@ -18,7 +19,7 @@ public class RandomMarketFactory {
 	/*
 	 * Creation of a fully parameterizable random market. 
 	 */
-	public static Market randomMarket(int numberUsers, int minSupplyPerUser, int maxSupplyPerUser, int numberCampaigns, int minDemandPerCampaign, int maxDemandPerCampaign, double minReward, double maxReward, double probabilityConnection){
+	public static Market randomMarket(int numberUsers, int minSupplyPerUser, int maxSupplyPerUser, int numberCampaigns, int minDemandPerCampaign, int maxDemandPerCampaign, double minReward, double maxReward, double probabilityConnection) throws CampaignCreationException{
 		//Create Users
 		Random generator = new Random();
 		User[] users = new User[numberUsers];
@@ -46,22 +47,22 @@ public class RandomMarketFactory {
 	 * Shortcut method to create a random market by just providing the number of users, campaigns, and
 	 * probability of connection. Other parameters are given by default (static members of this class).
 	 */
-	public static Market randomMarket(int numberUsers, int numberCampaigns, double probabilityConnections){
+	public static Market randomMarket(int numberUsers, int numberCampaigns, double probabilityConnections) throws CampaignCreationException{
 		return RandomMarketFactory.randomMarket(numberUsers, RandomMarketFactory.defaultMinSupplyPerUser ,RandomMarketFactory.defaultMaxSupplyPerUser,  numberCampaigns, RandomMarketFactory.defaultMinDemandPerCampaign , RandomMarketFactory.defaultMaxDemandPerCampaign, RandomMarketFactory.defaultMinReward, RandomMarketFactory.defaultMaxReward,  probabilityConnections);		
 	}
 	/*
 	 * Generate over demanded and over supplied markets
 	 */
-	public static Market generateOverDemandedMarket(int numberUsers, int numberCampaigns,double probabilityConnection, int b){
+	public static Market generateOverDemandedMarket(int numberUsers, int numberCampaigns,double probabilityConnection, int b) throws CampaignCreationException{
 		return RandomKMarket(numberUsers, numberCampaigns, probabilityConnection, b);
 	}
-	public static Market generateOverSuppliedMarket(int numberUsers, int numberCampaigns,double probabilityConnection, int b){
+	public static Market generateOverSuppliedMarket(int numberUsers, int numberCampaigns,double probabilityConnection, int b) throws CampaignCreationException{
 		return MarketFactory.transposeMarket(RandomKMarket(numberCampaigns, numberUsers, probabilityConnection, b));
 	}
 	/*
 	 * Generate a random market with a fixed supply to demand ratio.
 	 */
-	public static Market RandomKMarket(int numberUsers, int numberCampaigns, double probabilityConnection, int b){
+	public static Market RandomKMarket(int numberUsers, int numberCampaigns, double probabilityConnection, int b) throws CampaignCreationException{
 		Random generator = new Random();
 		User[] users = new User[numberUsers];
 		Campaign[] campaigns = new Campaign[numberCampaigns];

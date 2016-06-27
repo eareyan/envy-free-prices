@@ -1,7 +1,6 @@
 package experiments;
 
 import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
 
 import java.sql.SQLException;
 
@@ -13,6 +12,7 @@ import statistics.PricesStatistics;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
+import structures.exceptions.CampaignCreationException;
 import structures.factory.MarketFactory;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
@@ -33,7 +33,7 @@ public class fancy_demand extends Experiments{
 	
 	public boolean underdemand; //Boolean switch. True if underdemand, false otherwise.
 
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, CampaignCreationException{
 		String tablename ="" , unittablename = "";
 		if(this.underdemand){
 			tablename = "fancy_underdemand";
@@ -112,7 +112,7 @@ public class fancy_demand extends Experiments{
 				/*
 				 * Compute the efficient allocation, in this case, the ILP efficient alloc
 				 */
-				MarketAllocation efficient = new MarketAllocation(market,new SingleStepEfficientAllocationILP(market).Solve(new IloCplex()).get(0));
+				MarketAllocation efficient = new MarketAllocation(market,new SingleStepEfficientAllocationILP().Solve(market).getAllocation());
 				double valueOptAllocaction = efficient.value();
 				/*
 				 * Measure CK
@@ -185,7 +185,7 @@ public class fancy_demand extends Experiments{
 				 * Unit Supply
 				 */
 				Market unitSupplyMarket = MarketFactory.createUnitSupplyMarket(market);
-				MarketAllocation efficientUnit = new MarketAllocation(unitSupplyMarket,new SingleStepEfficientAllocationILP(unitSupplyMarket).Solve(new IloCplex()).get(0));
+				MarketAllocation efficientUnit = new MarketAllocation(unitSupplyMarket,new SingleStepEfficientAllocationILP().Solve(unitSupplyMarket).getAllocation());
 				double valueOptAllocactionUnit = efficientUnit.value();				
 				/*
 				 * Measure lpOPT

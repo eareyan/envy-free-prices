@@ -5,11 +5,12 @@ import algorithms.waterfall.WaterfallPrices;
 import structures.Campaign;
 import structures.Market;
 import structures.User;
+import structures.exceptions.CampaignCreationException;
 import util.Printer;
 
 public class Examples {
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws CampaignCreationException{
 		/* * Example where All Connected EVPApp performs better than plus 1 EVPApp in NON-Uniform, unit demand case */
 		double [][] valuationMatrix = new double[3][3];
 		
@@ -161,7 +162,7 @@ public class Examples {
 		
 	}
 	
-	public static Market market1(){
+	public static Market market1() throws CampaignCreationException{
 		/* Example where the first implementation of CK outputs envy prices*/
 		
 		Campaign c1 = new Campaign(5, 8.79);
@@ -189,7 +190,7 @@ public class Examples {
 		return market;
 	}
 	
-	public static Market market2(){
+	public static Market market2() throws CampaignCreationException{
 		Campaign c1 = new Campaign(10, 100, 0.5, 1.0, -1, -1);
 		Campaign c2 = new Campaign(9, 10, 1.0, 1.1, -1, -1);
 		Campaign[] campaigns = new Campaign[2];
@@ -211,7 +212,7 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market market3(){
+	public static Market market3() throws CampaignCreationException{
 		Campaign c1 = new Campaign(10, 1234);
 		Campaign c2 = new Campaign(454, 2856);
 		Campaign[] campaigns = new Campaign[2];
@@ -233,7 +234,7 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market market4(){
+	public static Market market4() throws CampaignCreationException{
 		Campaign c1 = new Campaign(50, 500);
 		Campaign[] campaigns = new Campaign[1];
 		campaigns[0] = c1;
@@ -252,7 +253,7 @@ public class Examples {
 	}
 	
 	
-	public static Market market5(){
+	public static Market market5() throws CampaignCreationException{
 		/* Example market with priorities*/
 		
 		Campaign c1 = new Campaign(5, 8, 0.4, 0.0, 0, 1);
@@ -286,7 +287,7 @@ public class Examples {
 		return market;
 	}	
 	
-	public static Market market6(){
+	public static Market market6() throws CampaignCreationException{
 		/* Example market with priorities*/
 		
 		Campaign c1 = new Campaign(3, 8,0,1);
@@ -304,7 +305,7 @@ public class Examples {
 		return market;
 	}
 	
-	public static Market market7(){
+	public static Market market7() throws CampaignCreationException{
 		int numberC = 10;
 		Campaign[] campaigns = new Campaign[numberC];
 		for(int j=0;j<numberC;j++){
@@ -324,14 +325,14 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market typicalTACMarket(){
-		Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),1.1,0,2);
-		//Campaign c0 = new Campaign(4142,4622.0,0,2);
-		Campaign c1 = new Campaign(1920,671.0,1,0.34,1,2);
-		Campaign c2 = new Campaign(481,900.0,1.0,1.7,2,1);
-		Campaign c3 = new Campaign(2478,6195.0,3,1);
-		Campaign c4 = new Campaign(259,387.0,4,2);
-		Campaign c5 = new Campaign(1921,4802.0,5,1);
+	public static Market typicalTACMarket() throws CampaignCreationException{
+		//Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),0.5,0,2);
+		Campaign c0 = new Campaign(4142, 4622.0, 1.0, 0.0, 0, 2, 3000);
+		Campaign c1 = new Campaign(1920, 671.0, 1, 0.34, 1, 2);
+		Campaign c2 = new Campaign(481, 900.0, 1.0, 1.7, 2, 1);
+		Campaign c3 = new Campaign(2478, 6195.0, 3, 1);
+		Campaign c4 = new Campaign(259, 387.0, 4, 2);
+		Campaign c5 = new Campaign(1921, 4802.0, 1.0, 0.0, 5, 2, 1000);
 		Campaign[] campaigns = new Campaign[6];
 		campaigns[0] = c0;
 		campaigns[1] = c1;

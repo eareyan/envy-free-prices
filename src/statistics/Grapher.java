@@ -248,11 +248,12 @@ public class Grapher {
 					M = RandomMarketFactory.generateOverDemandedMarket(numUsers, numCampa, p, b);
 				}
 				/* Compute the efficient allocation */
-				MarketAllocation efficient = new MarketAllocation(M,new SingleStepEfficientAllocationILP(M).Solve().get(0));
+				MarketAllocation efficient = new SingleStepEfficientAllocationILP().Solve(M);
 				double valueOptAllocaction = efficient.value();		
 
 				/* Compute allocation that respects reserve price */
-				MarketAllocation allocRespectReserve = new MarketAllocation(M,new SingleStepEfficientAllocationILP(M,reserve).Solve().get(0));
+				M.setReserveAllCampaigns(reserve);
+				MarketAllocation allocRespectReserve = new SingleStepEfficientAllocationILP().Solve(M);
 
 				/* Compute envy-free prices */
 				EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(allocRespectReserve);

@@ -64,6 +64,14 @@ public class Market {
     	return this.connections;
     }
     /*
+     * Set reserve of all campaigns
+     */
+    public void setReserveAllCampaigns(double reserve){
+    	for(int j=0;j<campaigns.length;j++){
+    		this.campaigns[j].setReserve(reserve);
+    	}
+    }
+    /*
      * add a single campaign
      */
     public void addCampaign(Campaign c, ArrayList<Integer> users){
@@ -178,12 +186,15 @@ public class Market {
 	protected String stringCampaignsInfo(){
 		String ret = "";
 		for(int j=0;j<this.getNumberCampaigns();j++){
-			ret += "\nR("+j+") = "+ this.campaigns[j].reward + ";\t I("+j+") = " + this.campaigns[j].demand + ";\t L("+j+") = " + this.campaigns[j].level + ";\t r("+j+") = " + this.campaigns[j].reserve;
+			ret += "\n" + String.format("%-20s %-20s %-20s %-20s","R("+j+") = "+ String.format("%.2f",this.campaigns[j].reward) + ";", "I("+j+") = " + this.campaigns[j].demand + ";","L("+j+") = " + String.format("%.2f",this.campaigns[j].level) + ";","r("+j+") = " + String.format("%.2f",this.campaigns[j].reserve));
 			if(this.campaigns[j].backpointer != -1){
-				ret += "\tBackpoints to: " + this.campaigns[j].backpointer;
+				ret += String.format(" %-20s", this.campaigns[j].backpointer);
 			}
 			if(this.campaigns[j].priority != -1){
-				ret += "\tPriority: " + this.campaigns[j].priority + ".";
+				ret += String.format(" %-12s", this.campaigns[j].priority);
+			}
+			if(this.campaigns[j].allocationSoFar >= 0){
+				ret += String.format(" %-20s", this.campaigns[j].allocationSoFar);
 			}
 		}
 		return ret;
@@ -210,7 +221,7 @@ public class Market {
     public String toString(){
     	return  "NbrCampaigns:\t"+this.getNumberCampaigns() + "\n" +
     			"NbrUsers:\t"+this.getNumberUsers() + "\n" +
-    			"Camp. Rewards \t Camp. Demand \t Level \te Reserve \t\tBackpointer \t\t\tPriority" + this.stringCampaignsInfo() + "\n" +
+    			String.format("%-20s %-20s %-20s %-20s %-20s %-12s %s", "Camp. Rewards", "Camp. Demand", "Level", "Reserve", "Backpointer","Priority","Alloc So Far") + this.stringCampaignsInfo() + "\n" +
     			"Users Supply" + this.stringUsersInfo() + "\n" +
     			"Connections Matrix:\t"+this.stringConnectionsMatrix();
     }

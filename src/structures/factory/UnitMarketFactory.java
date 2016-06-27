@@ -3,13 +3,14 @@ package structures.factory;
 import structures.Campaign;
 import structures.Market;
 import structures.User;
+import structures.exceptions.CampaignCreationException;
 
 public class UnitMarketFactory {
 	
 	/*
 	 * Create a singleton market from a valuation matrix
 	 */
-	public static Market createMarketFromValuationMatrix(double [][] valuationMatrix){
+	public static Market createMarketFromValuationMatrix(double [][] valuationMatrix) throws CampaignCreationException{
 		User[] users = new User[valuationMatrix.length];
 		for(int i=0;i<valuationMatrix.length;i++){
 			users[i] = new User(1);
@@ -37,14 +38,14 @@ public class UnitMarketFactory {
 	 * Shortcut method to create a unit demand random market by just providing the number of users, campaigns, and
 	 * probability of connection.
 	 */
-	public static Market randomUnitDemandMarket(int numberUsers, int numberCampaigns, double probabilityConnections){
+	public static Market randomUnitDemandMarket(int numberUsers, int numberCampaigns, double probabilityConnections) throws CampaignCreationException{
 		return RandomMarketFactory.randomMarket(numberUsers, 1 ,1,  numberCampaigns, 1 , 1, RandomMarketFactory.defaultMinReward, RandomMarketFactory.defaultMaxReward,  probabilityConnections);		
 	}	
 	
 	/*
 	 * Create a singleton market given all other parameters (connections matrix and rewards)
 	 */
-	public static Market singletonMarket(int numberUsers, int numberCampaigns, boolean[][] connections, double[] rewards){
+	public static Market singletonMarket(int numberUsers, int numberCampaigns, boolean[][] connections, double[] rewards) throws CampaignCreationException{
 		//Create Users
 		User[] users = new User[numberUsers];
 		for(int i=0;i<numberUsers;i++){

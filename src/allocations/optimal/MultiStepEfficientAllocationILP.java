@@ -9,8 +9,10 @@ import java.util.ArrayList;
 
 import allocations.error.AllocationErrorCodes;
 import allocations.error.AllocationException;
+import allocations.interfaces.AllocationAlgoInterface;
 import allocations.objectivefunction.ObjectiveFunction;
 import structures.Market;
+import structures.MarketAllocation;
 import util.Printer;
 
 /*
@@ -19,11 +21,7 @@ import util.Printer;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MultiStepEfficientAllocationILP {
-	/*
-	 * Market Object to be allocated
-	 */
-	protected Market market;
+public class MultiStepEfficientAllocationILP implements AllocationAlgoInterface{
 	/*
 	 * The step size
 	 */
@@ -47,8 +45,7 @@ public class MultiStepEfficientAllocationILP {
 	/*
 	 * Constructor receives a market, step size and objective function
 	 */
-	public MultiStepEfficientAllocationILP(Market market, int stepSize, ObjectiveFunction objectiveFunction) throws IloException, AllocationException{
-		this.market = market;
+	public MultiStepEfficientAllocationILP(int stepSize, ObjectiveFunction objectiveFunction) throws IloException, AllocationException{
 		this.stepSize = stepSize;
 		if(this.stepSize<=0){
 			throw new AllocationException(AllocationErrorCodes.STEP_NEGATIVE);
@@ -57,22 +54,9 @@ public class MultiStepEfficientAllocationILP {
 		this.cplex = new IloCplex();
 	}
 	/*
-	 * Constructor that also takes a reserve price.
-	 */
-	public MultiStepEfficientAllocationILP(Market market, int stepSize, ObjectiveFunction objectiveFunction, double reservePrice) throws IloException, AllocationException{
-		this(market, stepSize, objectiveFunction);
-		if(reservePrice<=0){
-			throw new AllocationException(AllocationErrorCodes.RESERVE_NEGATIVE);
-		}
-		/* Set the reserve of every campaign to be the same reserve price, received by the constructor.*/
-		for(int j=0;j<this.market.getNumberCampaigns();j++){
-			this.market.getCampaign(j).setReserve(reservePrice);
-		}		
-	}
-	/*
 	 * Solve function. Creates the ILP and returns all the solutions found in an array of integer matrices.
 	 */
-	public ArrayList<int[][]> Solve() throws AllocationException{
+	public MarketAllocation Solve(Market market) throws AllocationException{
 		try {
 			if(!this.verbose){ 
 				cplex.setOut(null);
@@ -91,21 +75,21 @@ public class MultiStepEfficientAllocationILP {
 			/* Initialize indicator variables and twins. We need, per campaign, as many as the number of steps.*/
 			ArrayList<IloNumVar[]> indicators = new ArrayList<IloNumVar[]>();
 			ArrayList<IloNumVar[]> twinIndicators = new ArrayList<IloNumVar[]>();
-			for(int j=0;j<this.market.getNumberCampaigns();j++){
-				indicators.add(j, cplex.boolVarArray(Math.floorDiv(this.market.getCampaign(j).getDemand(), stepSize)));
-				twinIndicators.add(j, cplex.boolVarArray(Math.floorDiv(this.market.getCampaign(j).getDemand(), stepSize)));
+			for(int j=0;j<market.getNumberCampaigns();j++){
+				indicators.add(j, cplex.boolVarArray(Math.floorDiv(market.getCampaign(j).getDemand(), stepSize)));
+				twinIndicators.add(j, cplex.boolVarArray(Math.floorDiv(market.getCampaign(j).getDemand(), stepSize)));
 			}
 			/* Initialize allocation variables. This is a matrix from which we are going to get the allocation.*/
-			IloNumVar[][] allocationMatrixVariable = new IloNumVar[this.market.getNumberUsers()][];
-			for (int i=0; i<this.market.getNumberUsers(); i++){
-				allocationMatrixVariable[i] = cplex.intVarArray(this.market.getNumberCampaigns(),0,Integer.MAX_VALUE);
+			IloNumVar[][] allocationMatrixVariable = new IloNumVar[market.getNumberUsers()][];
+			for (int i=0; i<market.getNumberUsers(); i++){
+				allocationMatrixVariable[i] = cplex.intVarArray(market.getNumberCampaigns(),0,Integer.MAX_VALUE);
 			}
 			/* Objective function*/
 			IloLinearNumExpr obj = this.cplex.linearNumExpr();
-			for (int j=0; j<this.market.getNumberCampaigns(); j++){
+			for (int j=0; j<market.getNumberCampaigns(); j++){
 				int currentStep = this.stepSize;
 				for(int k=0;k < indicators.get(j).length;k++){
-					obj.addTerm(this.objectiveFunction.getObjective(this.market.getCampaign(j).getReward(),this.market.getCampaign(j).getDemand(), currentStep) - this.market.getCampaign(j).getReserve()*currentStep, indicators.get(j)[k]);
+					obj.addTerm(this.objectiveFunction.getObjective(market.getCampaign(j).getReward(),market.getCampaign(j).getDemand(), currentStep) - market.getCampaign(j).getReserve()*currentStep, indicators.get(j)[k]);
 					currentStep += this.stepSize;
 				}
 			}
@@ -113,19 +97,19 @@ public class MultiStepEfficientAllocationILP {
 			/*
 			 * Constraint (1). Allocation from user cannot be more than supply.
 			 */
-			for (int i=0; i<this.market.getNumberUsers(); i++){
+			for (int i=0; i<market.getNumberUsers(); i++){
 				IloLinearNumExpr expr = cplex.linearNumExpr();
-				for (int j=0; j<this.market.getNumberCampaigns(); j++){
+				for (int j=0; j<market.getNumberCampaigns(); j++){
 					expr.addTerm(1.0,allocationMatrixVariable[i][j]);
 				}
-				this.cplex.addLe(expr,this.market.getUser(i).getSupply());
+				this.cplex.addLe(expr,market.getUser(i).getSupply());
 			}
 			/*
 			 * Constraint (2). Allocation from users not connected to campaigns should be zero.
 			 */
-			for(int i=0;i<this.market.getNumberUsers();i++){
-				for(int j=0;j<this.market.getNumberCampaigns();j++){
-					if(!this.market.isConnected(i, j)){
+			for(int i=0;i<market.getNumberUsers();i++){
+				for(int j=0;j<market.getNumberCampaigns();j++){
+					if(!market.isConnected(i, j)){
 						this.cplex.addEq(0,allocationMatrixVariable[i][j]);
 					}
 				}
@@ -133,7 +117,7 @@ public class MultiStepEfficientAllocationILP {
 			/*
 			 * Constraint (3). Rewards according to step size.
 			 */
-			for(int j=0;j<this.market.getNumberCampaigns();j++){
+			for(int j=0;j<market.getNumberCampaigns();j++){
 				int currentStep = this.stepSize;
 				for(int k=0;k < indicators.get(j).length;k++){
 					/* Control constraint: if the indicator y_j^k=1, then its twin must be zero. Otherwise, the twin is free. */
@@ -141,8 +125,8 @@ public class MultiStepEfficientAllocationILP {
 					/* Compute the total allocation to campaign j from all users. */
 					double coeff = 1.0/(double)currentStep;
 					IloLinearNumExpr sumOfAlloc = cplex.linearNumExpr();
-					for (int i=0; i<this.market.getNumberUsers(); i++){
-						if(this.market.isConnected(i, j)){
+					for (int i=0; i<market.getNumberUsers(); i++){
+						if(market.isConnected(i, j)){
 							sumOfAlloc.addTerm(coeff,allocationMatrixVariable[i][j]);
 						}
 					}
@@ -165,11 +149,11 @@ public class MultiStepEfficientAllocationILP {
 			/*
 			 * Constraint (4). The allocation is zero if all the indicators are zero.
 			 */
-			for(int j=0;j<this.market.getNumberCampaigns();j++){
+			for(int j=0;j<market.getNumberCampaigns();j++){
 				IloLinearNumExpr sumOfAlloc = cplex.linearNumExpr();
 				/*Allocation constraint*/
-				for (int i=0; i<this.market.getNumberUsers(); i++){
-					if(this.market.isConnected(i, j)){
+				for (int i=0; i<market.getNumberUsers(); i++){
+					if(market.isConnected(i, j)){
 						sumOfAlloc.addTerm(1.0,allocationMatrixVariable[i][j]);
 					}
 				}				
@@ -182,9 +166,9 @@ public class MultiStepEfficientAllocationILP {
 			/*
 			 * Constraint (5). Campaings can only see a number of users according to their level.
 			 */
-			for(int i=0;i<this.market.getNumberUsers();i++){
-				for(int j=0;j<this.market.getNumberCampaigns();j++){
-					this.cplex.addLe(allocationMatrixVariable[i][j],Math.floor(this.market.getCampaign(j).getLevel() * this.market.getUser(i).getSupply()));
+			for(int i=0;i<market.getNumberUsers();i++){
+				for(int j=0;j<market.getNumberCampaigns();j++){
+					this.cplex.addLe(allocationMatrixVariable[i][j],Math.floor(market.getCampaign(j).getLevel() * market.getUser(i).getSupply()));
 				}
 			}
 
@@ -203,7 +187,7 @@ public class MultiStepEfficientAllocationILP {
 					System.out.println("In total, " + (numsol + numsolreplaced) + " solutions were generated.");
 					System.out.println("Solution status = " + this.cplex.getStatus());
 			    	System.out.println("Solution value  = " + this.cplex.getObjValue());
-			    	for(int j=0;j<this.market.getNumberCampaigns();j++){
+			    	for(int j=0;j<market.getNumberCampaigns();j++){
 			    		System.out.println("Indicators for campaign " + j);
 			    		double[] indicatorSol = this.cplex.getValues(indicators.get(j));
 			    		for(int i=0;i<indicatorSol.length;i++){
@@ -224,14 +208,14 @@ public class MultiStepEfficientAllocationILP {
 	            	 * The solution should be a matrix of integers. However, CPLEX returns a matrix of doubles.
 	            	 * So we are going to have to cast this into integers.
 	            	 */
-	    			int[][] sol = new int[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
-	    			double[][] solDouble = new double[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
-	    			for (int i=0; i<this.market.getNumberUsers(); i++){
+	    			int[][] sol = new int[market.getNumberUsers()][market.getNumberCampaigns()];
+	    			double[][] solDouble = new double[market.getNumberUsers()][market.getNumberCampaigns()];
+	    			for (int i=0; i<market.getNumberUsers(); i++){
 	    				solDouble[i] = this.cplex.getValues(allocationMatrixVariable[i],l);
 	    				/*
 	    				 * Unfortunately in Java the only way to cast your array is to iterate through each element and cast them one by one
 	    				 */
-	    				for(int j=0;j<this.market.getNumberCampaigns(); j++){
+	    				for(int j=0;j<market.getNumberCampaigns(); j++){
 	    					sol[i][j] = (int) Math.round(solDouble[i][j]);
 	    				}
 	    			}
@@ -242,7 +226,7 @@ public class MultiStepEfficientAllocationILP {
 	    			}
 	            }
 	            this.cplex.end();
-	            return Solutions;				
+	            return new MarketAllocation(market,Solutions.get(0));				
 			}
 		} catch (IloException e) {
 			/* Report that CPLEX failed. */

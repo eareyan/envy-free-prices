@@ -11,6 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import statistics.PricesStatistics;
 import structures.Market;
 import structures.MarketPrices;
+import structures.exceptions.CampaignCreationException;
 import structures.factory.MarketAllocationFactory;
 import structures.factory.UnitMarketFactory;
 import unitdemand.Matching;
@@ -27,7 +28,7 @@ import util.NumberMethods;
  */
 public class unit_uniform_demand extends Experiments{
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, CampaignCreationException{
 		if(!dbLogger.checkIfUnitDemandRowExists("unit_uniform_demand",numUsers, numCampaigns, prob)){
 			System.out.println("\t Adding data ");		
 

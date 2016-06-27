@@ -11,6 +11,7 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.comparators.MarketPricesComparatorBySellerRevenue;
+import structures.exceptions.CampaignCreationException;
 import algorithms.pricing.EnvyFreePricesSolutionLP;
 import algorithms.pricing.EnvyFreePricesVectorLP;
 import allocations.error.AllocationException;
@@ -25,7 +26,7 @@ public class LPReservePrices {
 	
 	protected AllocationAlgorithm AllocAlgo;
 	
-	public LPReservePrices(Market market, AllocationAlgorithm AllocAlgo) throws IloException, AllocationException{
+	public LPReservePrices(Market market, AllocationAlgorithm AllocAlgo) throws IloException, AllocationException, CampaignCreationException{
 		this.market = market;
 		this.AllocAlgo = AllocAlgo;
 		/* The initial allocation has reserve price of 0. The solution is the plain flavor LP.*/
@@ -41,7 +42,7 @@ public class LPReservePrices {
 		setOfSolutions.add(initialSolution);
 	}
 	
-	public MarketPrices Solve() throws IloException, AllocationException{
+	public MarketPrices Solve() throws IloException, AllocationException, CampaignCreationException{
 		/* For debugging only.
 		System.out.println("Initial allocation:");
 		Printer.printMatrix(this.initialMarketAllocation.getAllocation());*/

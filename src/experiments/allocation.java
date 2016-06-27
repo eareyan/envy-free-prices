@@ -10,6 +10,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import structures.Market;
 import structures.MarketAllocation;
+import structures.exceptions.CampaignCreationException;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
 import allocations.error.AllocationException;
@@ -20,7 +21,7 @@ import allocations.optimal.MultiStepEfficientAllocationILP;
 @SuppressWarnings("unused")
 public class allocation extends Experiments{
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException {
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, CampaignCreationException {
 		if(!dbLogger.checkIfUnitDemandRowExists("allocation",numUsers, numCampaigns, prob)){
 			System.out.println("\t Add data ");
 			DescriptiveStatistics greedyToEfficient = new DescriptiveStatistics();
@@ -29,8 +30,8 @@ public class allocation extends Experiments{
 				/* Create a random Market*/
 				Market randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
 				/* Compute different allocations */
-				MarketAllocation efficient = new MarketAllocation(randomMarket,new MultiStepEfficientAllocationILP(randomMarket,1,new EffectiveReachRatio()).Solve().get(0));
-				MarketAllocation greedy = new GreedyMultiStepAllocation(randomMarket,1, new EffectiveReachRatio()).Solve();
+				MarketAllocation efficient = new MarketAllocation(randomMarket,new MultiStepEfficientAllocationILP(1,new EffectiveReachRatio()).Solve(randomMarket).getAllocation());
+				MarketAllocation greedy = new GreedyMultiStepAllocation(1, new EffectiveReachRatio()).Solve(randomMarket);
 				/* Compute statistics */
 				double greedyValue = greedy.value();
 				double efficientValue = efficient.value();

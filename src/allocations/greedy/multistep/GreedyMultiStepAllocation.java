@@ -10,6 +10,7 @@ import structures.Market;
 import structures.MarketAllocation;
 import allocations.error.AllocationErrorCodes;
 import allocations.error.AllocationException;
+import allocations.interfaces.AllocationAlgoInterface;
 import allocations.objectivefunction.ObjectiveFunction;
 
 /*
@@ -17,16 +18,15 @@ import allocations.objectivefunction.ObjectiveFunction;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyMultiStepAllocation {
-	/* Market Object which we are going to allocate.*/
-	protected Market market;
+public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 	/* stepSize. Impressions get allocated in multiples of this step only.*/
 	protected int stepSize;
 	/* objective function that indicates how good is to allocate one chunk of a campaign.*/
 	protected ObjectiveFunction f;
-	/*Constructor*/
-	public GreedyMultiStepAllocation(Market market, int stepSize, ObjectiveFunction f) throws AllocationException{
-		this.market = market;
+	/* Initial allocation: indicates, for each campaign, how many impressions were already allocated*/
+	protected int[] currentAllocation;
+	/*Constructor. Does not receive current allocation, so all campaigns start at zero allocation. */
+	public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f) throws AllocationException{
 		if(stepSize<=0){
 			throw new AllocationException(AllocationErrorCodes.STEP_NEGATIVE);
 		}
@@ -34,29 +34,31 @@ public class GreedyMultiStepAllocation {
 		this.f = f;
 	}
 	/* Solve method. Returns an allocation.*/
-	public MarketAllocation Solve(){
-		int[][] allocation = new int[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
-		/* First compute user supply.*/
-		int[] userSupply = new int[this.market.getNumberUsers()];
-		for(int i=0;i<this.market.getNumberUsers();i++){
-			userSupply[i] = this.market.getUser(i).getSupply();
+	public MarketAllocation Solve(Market market){
+		int[][] allocation = new int[market.getNumberUsers()][market.getNumberCampaigns()];
+		this.currentAllocation = new int[market.getNumberCampaigns()];
+		for(int j=0;j<market.getNumberCampaigns();j++){
+			this.currentAllocation[j] = market.getCampaign(j).getAllocationSoFar();
 		}
-		/* Allocation to each campaign begins at zero and increments as we go.*/
-		int[] currentAllocation = new int[this.market.getNumberCampaigns()];
+		/* First compute user supply.*/
+		int[] userSupply = new int[market.getNumberUsers()];
+		for(int i=0;i<market.getNumberUsers();i++){
+			userSupply[i] = market.getUser(i).getSupply();
+		}
 		boolean allocatedSome = true;
 		/* While we have allocated something, keep going.*/
 		while(allocatedSome){
 			/* Compute the chunks that we want to allocate.*/
 			ArrayList<chunk> currentChunks = new ArrayList<chunk>();
-			for(int j=0;j<this.market.getNumberCampaigns();j++){
-				if(currentAllocation[j] + this.stepSize <= this.market.getCampaign(j).getDemand()){
-					for(int i=0;i<this.market.getNumberUsers();i++){
+			for(int j=0;j<market.getNumberCampaigns();j++){
+				if(currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand()){
+					for(int i=0;i<market.getNumberUsers();i++){
 						/* The value of the chunk is the difference between the current step and the next step, minus reserve price for getting the extra impressions.*/
-						double value = this.f.getObjective(this.market.getCampaign(j).getReward(), this.market.getCampaign(j).getDemand(), currentAllocation[j] + this.stepSize) - this.f.getObjective(this.market.getCampaign(j).getReward(), this.market.getCampaign(j).getDemand(), currentAllocation[j]) - this.market.getCampaign(j).getReserve()*this.stepSize;
-						if(this.market.isConnected(i, j) && userSupply[i]>=this.stepSize && (Math.floor(this.market.getCampaign(j).getLevel()*this.market.getUser(i).getSupply()) - allocation[i][j] >= this.stepSize) && value >0){
+						double value = this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), currentAllocation[j] + this.stepSize) - this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), currentAllocation[j]) - market.getCampaign(j).getReserve()*this.stepSize;
+						if(market.isConnected(i, j) && userSupply[i]>=this.stepSize && (Math.floor(market.getCampaign(j).getLevel()*market.getUser(i).getSupply()) - allocation[i][j] >= this.stepSize) && value >0){
 							currentChunks.add(new chunk(
 									j,
-									this.market.getCampaign(j).getPriority(),
+									market.getCampaign(j).getPriority(),
 									value,
 									i,
 									userSupply[i]));
@@ -84,7 +86,7 @@ public class GreedyMultiStepAllocation {
 				allocatedSome = false;				
 			}
 		}
-	    return new MarketAllocation(this.market,allocation);
+	    return new MarketAllocation(market,allocation);
 	}
 	/*
 	 * This class represent a single chunk of impressions.

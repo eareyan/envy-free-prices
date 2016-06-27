@@ -5,6 +5,7 @@ import java.util.Random;
 import structures.Campaign;
 import structures.Market;
 import structures.User;
+import structures.exceptions.CampaignCreationException;
 
 /*
  * Markets can be created in different ways.
@@ -16,7 +17,7 @@ public class MarketFactory {
 	/*
 	 * Copies the given market without user i, deleting the corresponding row from connection matrix
 	 */
-	public static Market copyMarketWithoutUser(Market market, int userToDelete){
+	public static Market copyMarketWithoutUser(Market market, int userToDelete) throws CampaignCreationException{
 		//Create Users
 		User[] users = new User[market.getNumberUsers()-1];
 		int k = 0;
@@ -48,7 +49,7 @@ public class MarketFactory {
 	/*
 	 * Copies the given market without user i, deleting the corresponding row from connection matrix
 	 */
-	public static Market copyMarketWithoutCampaign(Market market, int campaignToDelete){
+	public static Market copyMarketWithoutCampaign(Market market, int campaignToDelete) throws CampaignCreationException{
 		//Create Users
 		User[] users = new User[market.getNumberUsers()];
 		for(int i=0;i<market.getNumberUsers();i++){
@@ -81,7 +82,7 @@ public class MarketFactory {
 	 * Adds a dummy campaign per item that demands impressions from that item at the given value
 	 * and is not connected to any other item
 	 */
-	public static Market augmentMarketWithReserve(Market M, double reserveValue, int reserveDemand){
+	public static Market augmentMarketWithReserve(Market M, double reserveValue, int reserveDemand) throws CampaignCreationException{
 		int totalNewCampaigns = M.getNumberCampaigns() + M.getNumberUsers();
 		Campaign[] campaigns = new Campaign[totalNewCampaigns];
 		for(int j=0;j<M.getNumberCampaigns();j++){
@@ -106,7 +107,7 @@ public class MarketFactory {
 	/*
 	 * Clones a market
 	 */
-	public static Market cloneMarket(Market market){
+	public static Market cloneMarket(Market market) throws CampaignCreationException{
 		User[] users = new User[market.getNumberUsers()];
 		for(int i=0;i<market.getNumberUsers();i++){
 			users[i] = new User(market.getUser(i).getSupply());
@@ -130,7 +131,7 @@ public class MarketFactory {
 	 * The connections are preserved, i.e. if (i,j) is connected in the original market, then
 	 * it will be in the transposed market.
 	 */
-	public static Market transposeMarket(Market market){
+	public static Market transposeMarket(Market market) throws CampaignCreationException{
 		User[] users = new User[market.getNumberCampaigns()];
 		for(int j=0;j<market.getNumberCampaigns();j++){
 			users[j] = new User(market.getCampaign(j).getDemand());
@@ -155,7 +156,7 @@ public class MarketFactory {
 	 * Subtract the rewards of all campaign by the parameter r times number of impressions.
 	 * Call this market with reserve price r.
 	 */
-	public static Market createReservePriceMarket(Market market, double r){
+	public static Market createReservePriceMarket(Market market, double r) throws CampaignCreationException{
 		Market clone = cloneMarket(market);
 		for(int j=0;j<clone.getNumberCampaigns();j++){
 			clone.getCampaign(j).setReward(market.getCampaign(j).getReward() - r*market.getCampaign(j).getDemand());

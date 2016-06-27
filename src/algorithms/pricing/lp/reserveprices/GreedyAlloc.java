@@ -2,6 +2,7 @@ package algorithms.pricing.lp.reserveprices;
 
 import structures.Market;
 import structures.MarketAllocation;
+import structures.exceptions.CampaignCreationException;
 import allocations.greedy.CampaignComparatorByRewardToImpressionsRatio;
 import allocations.greedy.GreedyAllocation;
 import allocations.greedy.UsersSupplyComparatorByRemainingSupply;
@@ -12,9 +13,10 @@ public class GreedyAlloc implements AllocationAlgorithm{
 		this.order = order;
 	}
 	@Override
-	public MarketAllocation getAllocWithReservePrice(Market market, double reserve) {
+	public MarketAllocation getAllocWithReservePrice(Market market, double reserve) throws CampaignCreationException {
 		//System.out.println("GreedyAlloc with reserve = " + reserve);
-		GreedyAllocation G = new GreedyAllocation(market,new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(this.order),reserve);
-		return G.Solve();
+		market.setReserveAllCampaigns(reserve);
+		GreedyAllocation G = new GreedyAllocation(new CampaignComparatorByRewardToImpressionsRatio(), new UsersSupplyComparatorByRemainingSupply(this.order));
+		return G.Solve(market);
 	}
 }
