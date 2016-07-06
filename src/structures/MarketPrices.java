@@ -1,10 +1,13 @@
 package structures;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import structures.exceptions.MarketPricesException;
 
 /*
  * In this class we have an allocated market and prices.
- * Prices could be a vector of prices or a matrix of prices.
+ * Prices are a vector of prices.
  * 
  * This class support common operations on prices for an allocated market,
  * regardless of the algorithm that produced the allocation and/or prices.
@@ -15,27 +18,22 @@ import java.text.DecimalFormat;
  */
 public class MarketPrices {
 	/*
-	 * Market Allocation Object. Contains a market object and an allocation (matrix of integers) 
+	 * Market Allocation Object. Contains a market object and an allocation (matrix of integers). 
 	 */
 	protected MarketAllocation marketAllocation;
 	/*
-	 * pricesMatrix[i][j] is the price for campaign j per impression in user class i
-	 */
-	protected double[][] pricesMatrix;
-	/*
-	 * priceVector[i] is the price per impression of user i
+	 * priceVector[i] is the price per impression of user i. 
 	 */
 	protected double[] pricesVector;
-	
+	/*
+	 * Basic Constructor. 
+	 */
 	public MarketPrices(){
 		
 	}
-	
-	public MarketPrices(MarketAllocation marketAllocation, double[][] pricesMatrix){
-		this.marketAllocation = marketAllocation;
-		this.pricesMatrix = pricesMatrix;
-	}
-
+	/*
+	 * Constructor that takes an allocation and a price vector. 
+	 */
 	public MarketPrices(MarketAllocation marketAllocation, double[] pricesVector){
 		this.marketAllocation = marketAllocation;
 		this.pricesVector = pricesVector;
@@ -53,34 +51,36 @@ public class MarketPrices {
 		return this.pricesVector[i];
 	}
 	/*
-	 * Seller revenue for price matrix
-	 * Seller revenue is defined as \sum_{i,j}x_{i,j}p_{i,j}
+	 * This function computes the seller revenue for the entire market.
+	 * Seller revenue is defined as: \sum_{i,j}x_{i,j}p_{i}
 	 */
-	public double sellerRevenuePriceMatrix(){
+	public double sellerRevenuePriceVector() throws MarketPricesException{
 		double value = 0;
-		for(int i=0;i<this.marketAllocation.allocation.length;i++){
-			for(int j=0;j<this.marketAllocation.allocation[0].length;j++){
-				value += this.marketAllocation.allocation[i][j] * this.pricesMatrix[i][j];
-			}
+		for(int j=0;j<this.marketAllocation.allocation[0].length;j++){
+			value += this.sellerRevenueFromCampaign(j);
 		}
 		return value;
 	}
-	
 	/*
-	 * Seller revenue for price vector
-	 * Seller revenue is defined as \sum_{i,j}x_{i,j}p_{i}
+	 * This function computes the seller revenue only for a list of campaigns L received as parameter.
+	 * Seller revenue is defined as: \forall j\inL \sum_{i}x_{i,j}p_{i}
 	 */
-
-	public double sellerRevenuePriceVector(){
+	public double sellerRevenuePriceVector(ArrayList<Integer> campaignIndices) throws MarketPricesException{
 		double value = 0;
-		if(this.pricesVector == null){
-			//throw new Exception("Ask for seller revenue using price vector but this price vector is null");
-			return 0.0;
+		for(Integer j:campaignIndices){
+			value += this.sellerRevenueFromCampaign(j);
 		}
+		return value;
+	}	
+	/*
+	 * This function computes the seller revenue for a given campaign
+	 * Seller revenue for a given campaign is defined as: \sum_{i}x_{i,j}p_{i}
+	 */
+	public double sellerRevenueFromCampaign(int j) throws MarketPricesException{
+		if(this.pricesVector == null) throw new MarketPricesException("Ask for seller revenue using price vector but the price vector is null");
+		double value = 0;
 		for(int i=0;i<this.marketAllocation.allocation.length;i++){
-			for(int j=0;j<this.marketAllocation.allocation[0].length;j++){
-				value += this.marketAllocation.allocation[i][j] * this.pricesVector[i];
-			}
+			value += this.marketAllocation.allocation[i][j] * this.pricesVector[i];
 		}
 		return value;
 	}
@@ -99,16 +99,6 @@ public class MarketPrices {
 	/*
 	 * Printers
 	 */
-	public void printPricesMatrix(){
-		DecimalFormat df = new DecimalFormat("#.00"); 
-		System.out.println("Prices Matrix: ");
-    	for(int i=0; i< this.pricesMatrix.length; i++){
-    		for(int j=0; j<this.pricesMatrix[0].length; j++){
-    			System.out.print(df.format(this.pricesMatrix[i][j]) + "\t");
-    		}
-    		System.out.println("");
-    	}
-	}
 	public void printPricesVector(){
 		DecimalFormat df = new DecimalFormat("#.00"); 
 		System.out.println("Prices Vector: ");
@@ -117,6 +107,11 @@ public class MarketPrices {
     	}	
 	}
 	public String toString(){
-		return "" + this.sellerRevenuePriceVector();
+		try {
+			return "" + this.sellerRevenuePriceVector();
+		} catch (MarketPricesException e) {
+			System.out.println("MarketPricesException = " + e.getMessage());
+		}
+		return null;
 	}
 }

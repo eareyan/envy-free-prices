@@ -5,6 +5,8 @@ import ilog.concert.IloException;
 import java.sql.SQLException;
 
 import structures.exceptions.CampaignCreationException;
+import structures.exceptions.MarketAllocationException;
+import structures.exceptions.MarketPricesException;
 import allocations.error.AllocationException;
 import log.SqlDB;
 
@@ -15,7 +17,7 @@ import log.SqlDB;
  */
 public abstract class Experiments {
 	
-	public void bulkTest(SqlDB dbLogger) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IloException, AllocationException, CampaignCreationException{
+	public void bulkTest(SqlDB dbLogger) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IloException, AllocationException, CampaignCreationException, MarketAllocationException, MarketPricesException{
 		
 		int numUsers = 21;
 		int numCampaigns = 21;
@@ -55,5 +57,5 @@ public abstract class Experiments {
 	 * This method should also check if we have that result first before running the
 	 * experiment.
 	 */
-	abstract public void runOneExperiment(int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger)  throws SQLException, IloException, AllocationException, CampaignCreationException;
+	abstract public void runOneExperiment(int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger)  throws SQLException, IloException, AllocationException, CampaignCreationException, MarketAllocationException, MarketPricesException;
 }

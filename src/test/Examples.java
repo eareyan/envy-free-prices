@@ -6,11 +6,12 @@ import structures.Campaign;
 import structures.Market;
 import structures.User;
 import structures.exceptions.CampaignCreationException;
+import structures.exceptions.MarketAllocationException;
 import util.Printer;
 
 public class Examples {
 	
-	public static void main(String[] args) throws CampaignCreationException{
+	public static void main(String[] args) throws CampaignCreationException, MarketAllocationException{
 		/* * Example where All Connected EVPApp performs better than plus 1 EVPApp in NON-Uniform, unit demand case */
 		double [][] valuationMatrix = new double[3][3];
 		
@@ -173,26 +174,26 @@ public class Examples {
 		campaigns[1] = c2;
 		campaigns[2] = c3;
 		
-		User u1 = new User(12);
-		User u2 = new User(2);
+		User u1 = new User(5);
+		User u2 = new User(5);
 		User[] users = new User[2];
 		users[0] = u1;
 		users[1] = u2;
 		
 		boolean[][] connections = new boolean[2][3];
-		connections[0][0] = true;
+		connections[0][0] = false;
 		
-		connections[0][1] = true;
+		connections[0][1] = false;
 		
-		connections[1][0] = true;		
+		connections[1][0] = false;		
 		connections[1][1] = true;		
 		Market market = new Market(users,campaigns,connections);
 		return market;
 	}
 	
 	public static Market market2() throws CampaignCreationException{
-		Campaign c1 = new Campaign(10, 100, 0.5, 1.0, -1, -1);
-		Campaign c2 = new Campaign(9, 10, 1.0, 1.1, -1, -1);
+		Campaign c1 = new Campaign(10, 100, 0.5, 1.0, -1, -1, 10);
+		Campaign c2 = new Campaign(9, 10, 1.0, 0.0, -1, -1, 8);
 		Campaign[] campaigns = new Campaign[2];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
@@ -327,12 +328,12 @@ public class Examples {
 	
 	public static Market typicalTACMarket() throws CampaignCreationException{
 		//Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),0.5,0,2);
-		Campaign c0 = new Campaign(4142, 4622.0, 1.0, 0.0, 0, 2, 3000);
-		Campaign c1 = new Campaign(1920, 671.0, 1, 0.34, 1, 2);
-		Campaign c2 = new Campaign(481, 900.0, 1.0, 1.7, 2, 1);
-		Campaign c3 = new Campaign(2478, 6195.0, 3, 1);
+		Campaign c0 = new Campaign(4142, 4622.0, 1.0, 0.0, 0, 2, 4000);
+		Campaign c1 = new Campaign(1920, 671.0, 1, 0.08, 1, 2, 0);
+		Campaign c2 = new Campaign(481, 900.0, 1.0, 0.0, 2, 1, 479);
+		Campaign c3 = new Campaign(2478, 6195.0, 1.0, 0.0,  3, 1, 100);
 		Campaign c4 = new Campaign(259, 387.0, 4, 2);
-		Campaign c5 = new Campaign(1921, 4802.0, 1.0, 0.0, 5, 2, 1000);
+		Campaign c5 = new Campaign(1921, 4802.0, 1.0, 0.0, 5, 2, 0);
 		Campaign[] campaigns = new Campaign[6];
 		campaigns[0] = c0;
 		campaigns[1] = c1;

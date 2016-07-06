@@ -2,6 +2,7 @@ package algorithms.pricing;
 
 import structures.MarketAllocation;
 import structures.MarketPrices;
+import structures.exceptions.MarketPricesException;
 
 /*
  * This class stores the resulting envy-free prices from LP.
@@ -29,12 +30,6 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 		this.optimalValue = optimalValue;
 	}
 	
-	public EnvyFreePricesSolutionLP(MarketAllocation marketAllocation, double[][] pricesMatrix, String Status, double optimalValue){
-		super(marketAllocation, pricesMatrix);
-		this.Status = Status;
-		this.optimalValue = optimalValue;
-	}
-	
 	public String getStatus(){
 		return this.Status;
 	}
@@ -44,6 +39,11 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 	}
 	
 	public String toString(){
-		return  "Revenue:\t"+this.sellerRevenuePriceVector()+ "-" + this.Status + "\n";
+		try {
+			return  "Revenue:\t"+this.sellerRevenuePriceVector()+ "-" + this.Status + "\n";
+		} catch (MarketPricesException e) {
+			System.out.println("MarketPricesException = " + e.getMessage());
+		}
+		return null;
 	}
 }

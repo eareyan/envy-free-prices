@@ -186,16 +186,14 @@ public class Market {
 	protected String stringCampaignsInfo(){
 		String ret = "";
 		for(int j=0;j<this.getNumberCampaigns();j++){
-			ret += "\n" + String.format("%-20s %-20s %-20s %-20s","R("+j+") = "+ String.format("%.2f",this.campaigns[j].reward) + ";", "I("+j+") = " + this.campaigns[j].demand + ";","L("+j+") = " + String.format("%.2f",this.campaigns[j].level) + ";","r("+j+") = " + String.format("%.2f",this.campaigns[j].reserve));
-			if(this.campaigns[j].backpointer != -1){
-				ret += String.format(" %-20s", this.campaigns[j].backpointer);
-			}
-			if(this.campaigns[j].priority != -1){
-				ret += String.format(" %-12s", this.campaigns[j].priority);
-			}
-			if(this.campaigns[j].allocationSoFar >= 0){
-				ret += String.format(" %-20s", this.campaigns[j].allocationSoFar);
-			}
+			ret += "\n" + String.format("%-20s %-20s %-20s %-20s %-20s %-12s %-20s",
+					"R("+j+") = "+ String.format("%.2f",this.campaigns[j].reward) + ";", 
+					"I("+j+") = " + this.campaigns[j].demand + ";",
+					"L("+j+") = " + String.format("%.2f",this.campaigns[j].level) + ";",
+					"r("+j+") = " + String.format("%.2f",this.campaigns[j].reserve),
+					this.campaigns[j].backpointer,
+					this.campaigns[j].priority ,
+					this.campaigns[j].allocationSoFar);
 		}
 		return ret;
 	}

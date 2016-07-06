@@ -11,6 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.CampaignCreationException;
+import structures.exceptions.MarketAllocationException;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
 import allocations.error.AllocationException;
@@ -21,7 +22,7 @@ import allocations.optimal.MultiStepEfficientAllocationILP;
 @SuppressWarnings("unused")
 public class allocation extends Experiments{
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, CampaignCreationException {
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, CampaignCreationException, MarketAllocationException {
 		if(!dbLogger.checkIfUnitDemandRowExists("allocation",numUsers, numCampaigns, prob)){
 			System.out.println("\t Add data ");
 			DescriptiveStatistics greedyToEfficient = new DescriptiveStatistics();

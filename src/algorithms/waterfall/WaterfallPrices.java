@@ -10,14 +10,15 @@ import structures.MarketPrices;
  */
 public class WaterfallPrices extends MarketPrices{
 	
-	public WaterfallPrices(MarketAllocation marketAllocation, double[][] pricesMatrix){
-		super(marketAllocation,pricesMatrix);
-	}
+	protected double[][] pricesMatrix;
 	
+	public WaterfallPrices(MarketAllocation marketAllocation, double[][] pricesMatrix){
+		this.marketAllocation = marketAllocation;
+		this.pricesMatrix = pricesMatrix;
+	}
 	/*
 	 * This method computes the sum of the errors on the compact condition
 	 */
-	
 	public double computeViolations(){
 		double error = 0.0;
 		/*

@@ -93,6 +93,9 @@ public class Campaign {
 	public void setReward(double reward){
 		this.reward = reward;
 	}
+	public void setDemand(int demand){
+		this.demand = demand;
+	}
 	public void setReserve(double reserve){
 		this.reserve = reserve;
 	}

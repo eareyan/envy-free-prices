@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import allocations.error.AllocationErrorCodes;
 import allocations.error.AllocationException;
 import allocations.interfaces.AllocationAlgoInterface;
+import allocations.objectivefunction.ObjectiveFunction;
+import allocations.objectivefunction.SingleStepFunction;
 import structures.Market;
 import structures.MarketAllocation;
 import util.Printer;
@@ -62,7 +64,7 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
 			 */
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 			for (int j=0; j<market.getNumberCampaigns(); j++){
-				obj.addTerm(market.getCampaign(j).getReward() - market.getCampaign(j).getReserve()*market.getCampaign(j).getDemand(), indicatorVariable[j]);
+				obj.addTerm(market.getCampaign(j).getReward() - market.getCampaign(j).getReserve()*(market.getCampaign(j).getDemand() - market.getCampaign(j).getAllocationSoFar()), indicatorVariable[j]);
 			}
 			//System.out.println(obj);
 			cplex.addMaximize(obj);
@@ -70,7 +72,7 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
 			 * Constraint (1). Allocation satisfies campaign. 
 			 */
 			for (int j=0; j<market.getNumberCampaigns(); j++){
-				double coeff = 1.0/(double)market.getCampaign(j).getDemand();
+				double coeff = 1.0 / ((double)(market.getCampaign(j).getDemand() - market.getCampaign(j).getAllocationSoFar()));
 				IloLinearNumExpr expr = cplex.linearNumExpr();
 				for (int i=0; i<market.getNumberUsers(); i++){
 					if(market.isConnected(i, j)){
@@ -148,7 +150,7 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
 	    			}
 	            }
 	            cplex.end();
-	            return new MarketAllocation(market,Solutions.get(0));
+	            return new MarketAllocation(market, Solutions.get(0), this.getObjectiveFunction());
 			}
 		} catch (IloException e) {
 			/* Report that CPLEX failed. */
@@ -157,5 +159,13 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
 		}
 		/* If we ever do reach this point, then we don't really know what happened. */
 		throw new AllocationException(AllocationErrorCodes.UNKNOWN_ERROR);
+	}
+	/*
+	 * This algorithm optimizes a single setp function.
+	 * @see allocations.interfaces.AllocationAlgoInterface#getObjectiveFunction()
+	 */
+	@Override
+	public ObjectiveFunction getObjectiveFunction() {
+		return new SingleStepFunction();
 	}
 }

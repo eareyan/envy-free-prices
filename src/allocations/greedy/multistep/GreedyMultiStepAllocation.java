@@ -25,6 +25,8 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 	protected ObjectiveFunction f;
 	/* Initial allocation: indicates, for each campaign, how many impressions were already allocated*/
 	protected int[] currentAllocation;
+	/* Boolean that indicates whether to allocate by prioritizing our campaigns or not */
+	protected boolean campaignPriorityOrdering = true;
 	/*Constructor. Does not receive current allocation, so all campaigns start at zero allocation. */
 	public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f) throws AllocationException{
 		if(stepSize<=0){
@@ -32,6 +34,10 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 		}
 		this.stepSize = stepSize;
 		this.f = f;
+	}
+	public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f, boolean campaignPriorityOrdering) throws AllocationException{
+		this(stepSize, f);
+		this.campaignPriorityOrdering = campaignPriorityOrdering;
 	}
 	/* Solve method. Returns an allocation.*/
 	public MarketAllocation Solve(Market market){
@@ -51,11 +57,13 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 			/* Compute the chunks that we want to allocate.*/
 			ArrayList<chunk> currentChunks = new ArrayList<chunk>();
 			for(int j=0;j<market.getNumberCampaigns();j++){
-				if(currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand()){
+				if(this.currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand()){
 					for(int i=0;i<market.getNumberUsers();i++){
 						/* The value of the chunk is the difference between the current step and the next step, minus reserve price for getting the extra impressions.*/
+						//TODO: revise the way we subtract reserve here. It doesn't seem to be the same as the other algorithms.
 						double value = this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), currentAllocation[j] + this.stepSize) - this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), currentAllocation[j]) - market.getCampaign(j).getReserve()*this.stepSize;
 						if(market.isConnected(i, j) && userSupply[i]>=this.stepSize && (Math.floor(market.getCampaign(j).getLevel()*market.getUser(i).getSupply()) - allocation[i][j] >= this.stepSize) && value >0){
+							//System.out.println("->->" + j + "," + this.currentAllocation[j]);
 							currentChunks.add(new chunk(
 									j,
 									market.getCampaign(j).getPriority(),
@@ -66,10 +74,16 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 					}
 				}
 			}
+			//System.out.println(currentChunks);
 			if(currentChunks.size()>0){
-				/* Order the chunks, first by priority, second by value.*/
-				Comparator<chunk> comparator = Comparator.comparing(chunk -> chunk.campaignPriority);
-			    comparator = comparator.thenComparing(Comparator.comparing(chunk -> chunk.value));
+				/* First check if we want to order by campaign priority or not.*/
+				Comparator<chunk> comparator;
+				if(this.campaignPriorityOrdering){
+					comparator = Comparator.comparing(chunk -> chunk.campaignPriority);
+					comparator = comparator.thenComparing(Comparator.comparing(chunk -> chunk.value));
+				}else{
+					comparator = Comparator.comparing(chunk -> chunk.value);
+				}
 			    comparator = comparator.thenComparing(Comparator.comparing(chunk -> chunk.remainingUserSupply));
 			    comparator = comparator.reversed(); /* The default sorting is ascending but we want descending. */
 			    Stream<chunk> chunckStream = currentChunks.stream().sorted(comparator);
@@ -80,13 +94,13 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 			    int uIndex = sortedChunks.get(0).userId;
 			    allocation[uIndex][cIndex] += this.stepSize;
     			userSupply[uIndex] -= this.stepSize;
-    			currentAllocation[cIndex] += this.stepSize;
+    			this.currentAllocation[cIndex] += this.stepSize;
 			}else{
 				/* The first chunk is always allocated. Thus, if we had at least one chunk, we know it was allocated. */
 				allocatedSome = false;				
 			}
 		}
-	    return new MarketAllocation(market,allocation);
+	    return new MarketAllocation(market, allocation, this.f);
 	}
 	/*
 	 * This class represent a single chunk of impressions.
@@ -112,5 +126,9 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 		public String toString(){
 			return "(id = "+this.campaignId+",prio = "+this.campaignPriority+", f = "+this.value+", u.id = "+this.userId+", remaining = "+this.remainingUserSupply+")";
 		}
+	}
+	@Override
+	public ObjectiveFunction getObjectiveFunction() {
+		return this.f;
 	}
 }

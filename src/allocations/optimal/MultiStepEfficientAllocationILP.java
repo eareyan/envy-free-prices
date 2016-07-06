@@ -236,4 +236,9 @@ public class MultiStepEfficientAllocationILP implements AllocationAlgoInterface{
 		/* If we ever do reach this point, then we don't really know what happened. */
 		throw new AllocationException(AllocationErrorCodes.UNKNOWN_ERROR);
 	}
+	@Override
+	public ObjectiveFunction getObjectiveFunction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

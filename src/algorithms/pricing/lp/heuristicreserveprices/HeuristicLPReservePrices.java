@@ -10,6 +10,7 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.comparators.MarketPricesComparatorBySellerRevenue;
+import structures.exceptions.MarketPricesException;
 import util.Printer;
 import algorithms.pricing.EnvyFreePricesSolutionLP;
 import algorithms.pricing.EnvyFreePricesVectorLP;
@@ -50,7 +51,7 @@ public class HeuristicLPReservePrices {
 		setOfSolutions.add(initialSolution);
 	}
 	
-	public MarketPrices Solve() throws IloException{
+	public MarketPrices Solve() throws IloException, MarketPricesException{
 		//System.out.println("LP with reserve Price");
 		/* * Compute Initial Prices * */
 		/* * Prints for debugging purposes */

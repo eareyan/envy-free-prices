@@ -1,29 +1,43 @@
 package structures;
 
+import java.util.ArrayList;
+
+import structures.exceptions.MarketAllocationException;
+import allocations.objectivefunction.ObjectiveFunction;
+
 /*
  * This class associates a Market with an Allocation.
- * The idea is that an allocation is a feature associated 
- * with a market and thus, it should be a separate object.
+ * The idea is that an allocation is an object associated 
+ * with a market and thus, it should be a separate from it.
  * 
- * Also, an allocation is the result of some algorithm
+ * Also, an allocation is the result of some algorithm.
  * 
  * @author Enrique Areyan Viqueira
  */
 public class MarketAllocation {
-	
+	/* Market that was allocated. */
 	protected Market market;
-	
+	/* Allocation for the market. */
 	protected int[][] allocation;
-		
+	/* Objective function. */
+	protected ObjectiveFunction f;
+	/*
+	 * Basic constructor. Takes a Market and an allocation. 
+	 */
 	public MarketAllocation(Market m, int[][] allocation){
 		this.market = m;
-		//this.allocation = this.cleanMatrix(allocation); //This cleaning has been taken care of in the ILPs directly.
 		this.allocation = allocation;
+	}
+	/*
+	 * Second constructor. Takes a Market, an allocation, and an objective function.
+	 */
+	public MarketAllocation(Market m, int[][] allocation, ObjectiveFunction f){
+		this(m,allocation);
+		this.f = f;
 	}
 	/*
 	 * Getters
 	 */
-	
 	public Market getMarket(){
 		return this.market;
 	}
@@ -34,22 +48,34 @@ public class MarketAllocation {
 		return this.allocation[i][j];
 	}	
 	/*
-	 * Get value of allocation. The value of an allocation is defined as the
-	 * sum of all the campaigns that are fulfilled by the allocation.
+	 * Get value of allocation. The value of an allocation is the sum
+	 * of rewards obtained by the allocation across all campaigns.
+	 * This value depends on the objective function being used.
 	 */
-	public double value(){
-		int allocation;
+	public double value() throws MarketAllocationException{
 		double totalReward = 0.0;
-		/* Loop through each campaign to check if it is satisfied*/
+		/* Loop through each campaign to check if it is satisfied. */
 		for(int j=0;j<this.market.getNumberCampaigns();j++){
-			allocation = 0;
-			for(int i=0;i<this.market.getNumberUsers();i++){
-				allocation += this.allocation[i][j]; /* add allocation from each user*/
-			}
-			if(allocation >= this.market.getCampaign(j).getDemand()){
-				/* Campaign was satisfied, add this reward */
-				totalReward += this.market.getCampaign(j).getReward();
-			}
+			/* Compute the extra reward attained by campaign j under the current allocation. */
+			totalReward += this.value(j);
+		}
+		return totalReward;
+	}
+	/*
+	 * Computes the value of the allocation for campaign j. 
+	 */
+	public double value(int j) throws MarketAllocationException{
+		/* Make sure we have an objective function to be able to compute the value of the allocation. */
+		if(this.f == null) throw new MarketAllocationException("An objective function must be defined to compute the value of an allocation");
+		return this.f.getObjective(this.market.campaigns[j].getReward(), this.market.campaigns[j].getDemand(), this.getBundleNumber(j) + this.market.campaigns[j].getAllocationSoFar()) - this.f.getObjective(this.market.campaigns[j].getReward(), this.market.campaigns[j].getDemand(), this.market.campaigns[j].getAllocationSoFar());
+	}
+	/*
+	 * Computes the value of the allocation for all campaigns in the given input list
+	 */
+	public double value(ArrayList<Integer> campaignIndices) throws MarketAllocationException{
+		double totalReward = 0.0;
+		for(Integer j:campaignIndices){
+			totalReward += this.value(j);
 		}
 		return totalReward;
 	}
@@ -91,43 +117,5 @@ public class MarketAllocation {
      */
     public void updateAllocationEntry(int i,int j,int alloc){
     	this.allocation[i][j] = alloc;
-    }
-	/*
-	 * This method sets the columns of the matrix to zero if a campaign is not 
-	 * completely satisfied. This is in line with the way in which all the conditions
-	 * and the analysis has been done so far. This method avoids a matrix where a 
-	 * campaign might get some allocation when in fact it is not satisfied.
-	 */
-	protected int[][] cleanMatrix(int[][] efficientAllocation){
-		int totalAllocation = 0;
-		for(int j=0;j<this.market.getNumberCampaigns();j++){
-			for(int i=0;i<this.market.getNumberUsers();i++){
-				totalAllocation += efficientAllocation[i][j];
-			}
-			if(totalAllocation < this.market.getCampaign(j).getDemand()){//This campaign is not satisfied
-				for(int i=0;i<this.market.getNumberUsers();i++){
-					efficientAllocation[i][j] = 0;
-				}
-			}
-			totalAllocation = 0;
-		}
-		return efficientAllocation;
-	}    
-    /*
-     * Helper function to print the allocation matrix
-     */
-    public String stringAllocationMatrix(){
-    	if(this.allocation != null){    	
-    		String ret = "Allocation Matrix:\t";
-    		for(int i=0;i<this.market.getNumberUsers();i++){
-    			ret += "\n";
-    			for(int j=0;j<this.market.getNumberCampaigns();j++){
-    				ret += "\t"+this.allocation[i][j] ;
-    			}	
-    		}
-    		return ret+"\n";
-    	}else{
-    		return "There is no allocation for this market";
-    	}
-    }	
+    } 	
 }
