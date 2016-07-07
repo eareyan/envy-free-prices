@@ -3,6 +3,8 @@ package test;
 //import ilog.concert.IloException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -39,6 +41,7 @@ import algorithms.waterfall.WaterfallPrices;
 import allocations.error.AllocationException;
 import allocations.greedy.GreedyAllocation;
 import allocations.greedy.multistep.GreedyMultiStepAllocation;
+import allocations.greedy.multistep.GreedyMultiStepAllocation;
 import allocations.objectivefunction.EffectiveReachRatio;
 import allocations.objectivefunction.IdentityObjectiveFunction;
 import allocations.optimal.MultiStepEfficientAllocationILP;
@@ -53,12 +56,15 @@ import experiments.RunParameters;
 public class Main {
 	
 	public static void main(String args[]) throws AllocationException, CampaignCreationException, MarketAllocationException, IloException, MarketPricesException{
-		Market M = Examples.market1();
+		//Market M = Examples.typicalTACMarket();
+		//Market M = Examples.market7();
+		Market M = Examples.typicalTACMarket();
 		System.out.println(M);
-		MarketAllocation x = new SingleStepEfficientAllocationILP().Solve(M);
+		//MarketAllocation x = new SingleStepEfficientAllocationILP().Solve(M);
 		//MarketAllocation x = new GreedyAllocation().Solve(M);
-		//MarketAllocation x = new GreedyMultiStepAllocation(1,new EffectiveReachRatio()).Solve(M);
+		MarketAllocation x = new GreedyMultiStepAllocation(1,new EffectiveReachRatio()).Solve(M);
 		Printer.printMatrix(x.getAllocation());
+		System.out.println("---");
 		/*System.out.println(x.value());
 		System.out.println(x.value(new ArrayList<Integer>(){{add(1);}}));
 		System.out.println(x.value(new ArrayList<Integer>(){{add(0);add(1);}}));*/
@@ -67,12 +73,13 @@ public class Main {
 		//efpvlp.setWalrasianConditions(false);
 		EnvyFreePricesSolutionLP prices = efpvlp.Solve();
 		
-		Printer.printVector(prices.getPriceVector());
+		/*Printer.printVector(prices.getPriceVector());
 		System.out.println(prices.sellerRevenuePriceVector());
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(0);}}));
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(1);}}));
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(2);}}));
-		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(0);add(2);}}));
+		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(0);add(2);}}));*/
+
 		
 	}
 	
@@ -96,5 +103,5 @@ public class Main {
 		Printer.printMatrix(x.getAllocation());
 		System.out.println("*** new market ");
 		System.out.println(x.getMarket());
-	}
+	}	
 }

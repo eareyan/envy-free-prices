@@ -2,9 +2,7 @@ package allocations.greedy.multistep;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.PriorityQueue;
 
 import structures.Market;
 import structures.MarketAllocation;
@@ -25,8 +23,6 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 	protected ObjectiveFunction f;
 	/* Initial allocation: indicates, for each campaign, how many impressions were already allocated*/
 	protected int[] currentAllocation;
-	/* Boolean that indicates whether to allocate by prioritizing our campaigns or not */
-	protected boolean campaignPriorityOrdering = true;
 	/*Constructor. Does not receive current allocation, so all campaigns start at zero allocation. */
 	public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f) throws AllocationException{
 		if(stepSize<=0){
@@ -35,98 +31,121 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface{
 		this.stepSize = stepSize;
 		this.f = f;
 	}
-	public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f, boolean campaignPriorityOrdering) throws AllocationException{
-		this(stepSize, f);
-		this.campaignPriorityOrdering = campaignPriorityOrdering;
-	}
 	/* Solve method. Returns an allocation.*/
 	public MarketAllocation Solve(Market market){
+		/* Initial structures. */
 		int[][] allocation = new int[market.getNumberUsers()][market.getNumberCampaigns()];
 		this.currentAllocation = new int[market.getNumberCampaigns()];
 		for(int j=0;j<market.getNumberCampaigns();j++){
 			this.currentAllocation[j] = market.getCampaign(j).getAllocationSoFar();
 		}
-		/* First compute user supply.*/
-		int[] userSupply = new int[market.getNumberUsers()];
+		/* First, compute user queue supply. A user is added to the queue if it can supply at least the step size. */
+		PriorityQueue<userSupply> usersQueue = new PriorityQueue<userSupply>(new UserSupplyComparator());
 		for(int i=0;i<market.getNumberUsers();i++){
-			userSupply[i] = market.getUser(i).getSupply();
-		}
-		boolean allocatedSome = true;
-		/* While we have allocated something, keep going.*/
-		while(allocatedSome){
-			/* Compute the chunks that we want to allocate.*/
-			ArrayList<chunk> currentChunks = new ArrayList<chunk>();
-			for(int j=0;j<market.getNumberCampaigns();j++){
-				if(this.currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand()){
-					for(int i=0;i<market.getNumberUsers();i++){
-						/* The value of the chunk is the difference between the current step and the next step, minus reserve price for getting the extra impressions.*/
-						//TODO: revise the way we subtract reserve here. It doesn't seem to be the same as the other algorithms.
-						double value = this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), currentAllocation[j] + this.stepSize) - this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), currentAllocation[j]) - market.getCampaign(j).getReserve()*this.stepSize;
-						if(market.isConnected(i, j) && userSupply[i]>=this.stepSize && (Math.floor(market.getCampaign(j).getLevel()*market.getUser(i).getSupply()) - allocation[i][j] >= this.stepSize) && value >0){
-							//System.out.println("->->" + j + "," + this.currentAllocation[j]);
-							currentChunks.add(new chunk(
-									j,
-									market.getCampaign(j).getPriority(),
-									value,
-									i,
-									userSupply[i]));
-						}
-					}
-				}
-			}
-			//System.out.println(currentChunks);
-			if(currentChunks.size()>0){
-				/* First check if we want to order by campaign priority or not.*/
-				Comparator<chunk> comparator;
-				if(this.campaignPriorityOrdering){
-					comparator = Comparator.comparing(chunk -> chunk.campaignPriority);
-					comparator = comparator.thenComparing(Comparator.comparing(chunk -> chunk.value));
-				}else{
-					comparator = Comparator.comparing(chunk -> chunk.value);
-				}
-			    comparator = comparator.thenComparing(Comparator.comparing(chunk -> chunk.remainingUserSupply));
-			    comparator = comparator.reversed(); /* The default sorting is ascending but we want descending. */
-			    Stream<chunk> chunckStream = currentChunks.stream().sorted(comparator);
-			    List<chunk> sortedChunks= chunckStream.collect(Collectors.toList());
-			    /* Debug Print: */
-			    //System.out.println(sortedChunks);
-			    int cIndex = sortedChunks.get(0).campaignId;
-			    int uIndex = sortedChunks.get(0).userId;
-			    allocation[uIndex][cIndex] += this.stepSize;
-    			userSupply[uIndex] -= this.stepSize;
-    			this.currentAllocation[cIndex] += this.stepSize;
-			}else{
-				/* The first chunk is always allocated. Thus, if we had at least one chunk, we know it was allocated. */
-				allocatedSome = false;				
+			if(market.getUser(i).getSupply() >= this.stepSize){
+				usersQueue.add(new userSupply(i,market.getUser(i).getSupply()));
 			}
 		}
+		/* Second, compute campaign queue. A campaign is added to the queue if it has a positive value and has not been fully allocated. */
+		PriorityQueue<campaignValue> campaignQueue = new PriorityQueue<campaignValue>(new CampaignValueComparator());
+		for(int j=0;j<market.getNumberCampaigns();j++){
+			double value = this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), this.currentAllocation[j] + this.stepSize) - this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), this.currentAllocation[j]) - (market.getCampaign(j).getReserve() * this.stepSize);
+			if(this.currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand() && value > 0){
+				campaignQueue.add(new campaignValue(j,value));
+			}
+		}
+		boolean userNotFound = true;
+		int j;
+		int i;
+		campaignValue campaign;
+		while((campaign = campaignQueue.poll()) != null){
+			ArrayList<userSupply> auxUserSupplyList = new ArrayList<userSupply>(); 
+			j = campaign.getIndex();
+			userSupply user;
+			while(userNotFound && (user = usersQueue.poll()) != null){ /* Looking for a user connected to this campaign.*/
+				i = user.getIndex();
+				if(market.isConnected(i, j) && (Math.floor(market.getCampaign(j).getLevel()*market.getUser(i).getSupply()) - allocation[i][j] >= this.stepSize)){
+					/* This user is connected to this campaign, allocate it */
+					allocation[i][j] += this.stepSize;
+					this.currentAllocation[j] += this.stepSize;
+					user.decrementSupply(this.stepSize);
+					userNotFound = false;
+				}
+				if(user.getSupply() >= this.stepSize){ /* This user still has some to give*/
+					auxUserSupplyList.add(user);
+				}
+			}
+			/* Add users back to the queue */
+			for(userSupply u:auxUserSupplyList) usersQueue.add(u);
+			/* If we did found a user connected to this campaign and the campaign still requires some, then compute its value. */
+			if(!userNotFound && this.currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand()){
+				double value = this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), this.currentAllocation[j] + this.stepSize) - this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), this.currentAllocation[j]) - market.getCampaign(j).getReserve()*this.stepSize;
+				if(value > 0){ /* If value of the campaign is positive, then allocate. */
+					campaign.updateValue(value);
+					campaignQueue.add(campaign);
+				}
+			}
+			userNotFound = true;
+		}
+		
 	    return new MarketAllocation(market, allocation, this.f);
 	}
-	/*
-	 * This class represent a single chunk of impressions.
-	 * Specifically, a chunk is a tuple (campaignId,campaignPriority,value,userId,remainingUserSupply)
-	 * that represents a chunk of impressions to allocate from a user to a campaign.
-	 * We take these chunks and order them before allocation happens.
-	 */
-	private class chunk{
-		protected int campaignId;
-		protected int campaignPriority;
-		protected double value;
-		protected int userId;
-		protected int remainingUserSupply;
-		
-		public chunk(int id, int priority,double value, int userId, int remainingUserSupply){
-			this.campaignId = id;
-			this.campaignPriority = priority;
-			this.value = value;
-			this.userId = userId;
-			this.remainingUserSupply = remainingUserSupply;
+	public class userSupply{
+		protected int i;
+		protected int supply;
+		public userSupply(int i,int supply){
+			this.i = i;
+			this.supply = supply;
 		}
-		
+		public int getIndex(){
+			return this.i;
+		}
+		public int getSupply(){
+			return this.supply;
+		}
+		public void decrementSupply(int supplyDecrement){
+			this.supply -= supplyDecrement;
+		}
 		public String toString(){
-			return "(id = "+this.campaignId+",prio = "+this.campaignPriority+", f = "+this.value+", u.id = "+this.userId+", remaining = "+this.remainingUserSupply+")";
+			return "("+this.i+","+this.supply+")";
 		}
 	}
+	public class UserSupplyComparator implements Comparator<userSupply>{
+		@Override
+		public int compare(userSupply u1, userSupply u2) {
+			if(u1.getSupply() < u2.getSupply()) return 1;
+			if(u1.getSupply() > u2.getSupply()) return -1;
+			return 0;
+		}
+	}
+	public class campaignValue{
+		protected int j;
+		protected double value;
+		public campaignValue(int j, double value){
+			this.j = j;
+			this.value = value;
+		}
+		public int getIndex(){
+			return this.j;
+		}
+		public double getValue(){
+			return this.value;
+		}
+		public void updateValue(double value){
+			this.value = value;
+		}
+		public String toString(){
+			return "("+this.j + "," + this.value + ")";
+		}
+	}
+	public class CampaignValueComparator implements Comparator<campaignValue>{
+		@Override
+		public int compare(campaignValue c1, campaignValue c2) {
+			if(c1.getValue() < c2.getValue()) return 1;
+			if(c1.getValue() > c2.getValue()) return -1;
+			return 0;
+		}
+	}	
 	@Override
 	public ObjectiveFunction getObjectiveFunction() {
 		return this.f;
