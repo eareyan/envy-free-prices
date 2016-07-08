@@ -20,6 +20,10 @@ public class User {
 	public User(int supply){
 		this.supply = supply;
 	}
+	public User(int supply, double reservePrice){
+		this(supply);
+		this.reservePrice = reservePrice;
+	}
 	/*
 	 * Getters
 	 */
