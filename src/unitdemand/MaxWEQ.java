@@ -38,8 +38,8 @@ public class MaxWEQ {
 		double maxWeightCompleteV = matchingCompleteV.getValueOfMatching();
 		//System.out.println("w(V) = " + maxWeightCompleteV);
 		for(int i=0;i<this.valuationMatrix.length;i++){
-			prices[i] =Math.round((maxWeightCompleteV - Matching.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching()) * 100000.0) / 100000.0;
-			//prices[i] =maxWeightCompleteV - Matching.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching();
+			//prices[i] =Math.round((maxWeightCompleteV - Matching.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching()) * 100000.0) / 100000.0;
+			prices[i] =maxWeightCompleteV - Matching.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching();
 			/*System.out.println("\t Matrix without row "+i);
 			Printer.printMatrix(this.valuationMatrixWithNoi(i));
 			System.out.println("w(V_i) = " + this.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching());

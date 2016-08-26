@@ -57,7 +57,7 @@ public class Main {
 	
 	public static void main(String args[]) throws AllocationException, CampaignCreationException, MarketAllocationException, IloException, MarketPricesException{
 		//Market M = Examples.typicalTACMarket();
-		//Market M = Examples.market7();
+		/*Market M = Examples.market7();
 		Market M = Examples.typicalTACMarket();
 		System.out.println(M);
 		//MarketAllocation x = new SingleStepEfficientAllocationILP().Solve(M);
@@ -67,7 +67,7 @@ public class Main {
 		System.out.println("---");
 		/*System.out.println(x.value());
 		System.out.println(x.value(new ArrayList<Integer>(){{add(1);}}));
-		System.out.println(x.value(new ArrayList<Integer>(){{add(0);add(1);}}));*/
+		System.out.println(x.value(new ArrayList<Integer>(){{add(0);add(1);}}));
 		
 		EnvyFreePricesVectorLP efpvlp = new EnvyFreePricesVectorLP(x,true);
 		//efpvlp.setWalrasianConditions(false);
@@ -79,7 +79,17 @@ public class Main {
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(1);}}));
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(2);}}));
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(0);add(2);}}));*/
-
+		
+		Market M = Examples.market8();
+		System.out.println(M);
+		MarketAllocation MA = new SingleStepEfficientAllocationILP().Solve(M);
+		Printer.printMatrix(MA.getAllocation());
+		EnvyFreePricesVectorLP EFPVLP = new EnvyFreePricesVectorLP(MA);
+		EFPVLP.setWalrasianConditions(false);
+		EFPVLP.createLP();
+		EnvyFreePricesSolutionLP Prices = EFPVLP.Solve();
+		Printer.printVector(Prices.getPriceVector());
+		
 		
 	}
 	

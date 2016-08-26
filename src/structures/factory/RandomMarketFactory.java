@@ -153,8 +153,8 @@ public class RandomMarketFactory {
 		for(int i=0;i<n;i++){
 			for(int j=0;j<m;j++){
 				//valuationMatrix[i][j] = (generator.nextDouble() <= prob) ? (generator.nextDouble() * (maxReward - minReward) + minReward) : Double.NEGATIVE_INFINITY;
-				//valuationMatrix[i][j] = (Math.random() <= prob) ? (Math.random() * (maxReward - minReward) + minReward) : Double.NEGATIVE_INFINITY;
-				valuationMatrix[i][j] =Math.random();
+				valuationMatrix[i][j] = (Math.random() <= prob) ? (Math.random() * (maxReward - minReward) + minReward) : Double.NEGATIVE_INFINITY;
+				//valuationMatrix[i][j] = Math.random();
 			}
 		}
 		return valuationMatrix;

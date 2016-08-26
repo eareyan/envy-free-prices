@@ -20,6 +20,51 @@ import allocations.optimal.SingleStepEfficientAllocationILP;
 
 public class Grapher {
 	
+	
+	public static void gradientAscent(){
+		System.out.println("gradientAscent");
+		double reserve = 0.0;
+		double gamma = 0.01;
+		int numberOfSamples = 1000;
+		int numberOfGradientIterations = 1000 , currentGradientIteration = 0;
+		while(currentGradientIteration < numberOfGradientIterations){
+			double sum = 0.0;
+			for(int k=0;k<numberOfSamples;k++){
+				double u11 = Math.random();
+				double u12 = Math.random();
+				double u21 = Math.random();
+				double u22 = Math.random();
+				if(((u11*((u11 - reserve >= 0) ? 1 : 0)) + (u22*((u22 - reserve >= 0) ? 1 : 0))) > ((u12*((u12 - reserve >= 0) ? 1 : 0)) + (u21*((u21 - reserve >= 0) ? 1 : 0)))){
+					//System.out.println("\t identity");
+					/* Identity permutation wins*/
+					sum += (u11*((u11 - reserve >= 0) ? 1 : 0));// + (u22*((u22 - reserve >= 0) ? 1 : 0));
+				}else{
+					//System.out.println("\t transposition");
+					/* Transposition wins*/
+					sum += (u12*((u12 - reserve >= 0) ? 1 : 0));// + (u21*((u21 - reserve >= 0) ? 1 : 0)); 
+				}
+			}
+			System.out.println("\t\t\t" + (sum / numberOfSamples));
+			//reserve = reserve + gamma * ( (1.0-(sum / numberOfSamples)) );
+			reserve = reserve + gamma * ( 1.0 - (sum / numberOfSamples) );
+			currentGradientIteration++;
+			System.out.println(currentGradientIteration + " = " + reserve);
+		}
+
+		/*int samples = 1000;
+		double sum = 0.0;
+		reserve = 0.0;
+		for(int k=0;k<samples;k++){
+			double u11 = Math.random();
+			double u12 = Math.random();
+			double u21 = Math.random();
+			double u22 = Math.random();
+			sum +=  Math.max((u11*((u11 - reserve >= 0) ? 1 : 0)) + (u22*((u22 - reserve >= 0) ? 1 : 0)) , (u12*((u12 - reserve >= 0) ? 1 : 0)) + (u21*((u21 - reserve >= 0) ? 1 : 0)));
+		}
+		System.out.println("Estimate = " + sum /(double) samples);*/
+	}
+	
+	
 	static double constant = 1.0;
 	static int numberPoints = 10000;
 	
@@ -50,12 +95,15 @@ public class Grapher {
 		return Math.random();
 	}
 	
+	
 	public static void main(String args[]){
+		Grapher.gradientAscent();
+		System.exit(0);
 		System.out.println("Grapher");
 		//DescriptiveStatistics revenue = new DescriptiveStatistics();
 		
-		double welfare = 0.0;
-		double acum = 0.0;
+		double welfare = 0.0, expectedSellerRevenue = 0.0;
+		double expectedW = 0.0, expectedW_i = 0.0;
 		for(int k=0;k<numberPoints;k++){
 
 
@@ -71,9 +119,13 @@ public class Grapher {
 			double v1 = Math.max(u11+u22+u33, u12+u21+u33);
 			double v2 = Math.max(u12+u23+u31, u13+u22+u31);
 			double v3 = Math.max(u13+u21+u32, u11+u23+u32);
-			acum += Math.max(Math.max(v1,v2),v3);	
+			//acum += Math.max(Math.max(v1,v2),v3);
+			expectedW += Math.max(u11+u22,u12+u21);
 			
-			double[][] X = {{u11,u12,u13},{u21,u22,u23},{u31,u32,u33}};
+			expectedW_i += Math.max(u11,u12);
+			
+			//double[][] X = {{u11,u12,u13},{u21,u22,u23},{u31,u32,u33}};
+			double[][] X = {{u11,u12},{u21,u22}};
 			
 			//double[][] X = RandomMarketFactory.getValuationMatrix(3, 3, 1.0,0.0,constant);
 			
@@ -92,6 +144,7 @@ public class Grapher {
 			MaxWEQ maxWEQAlgo = new MaxWEQ(X);
 			Matching matching = maxWEQAlgo.Solve();
 			welfare += matching.getValueOfMatching();
+			expectedSellerRevenue += matching.getSellerRevenue();
 			/*Printer.printMatrix(X);
 			System.out.println("***");
 			Printer.printMatrix(matching.getMatching());
@@ -108,8 +161,10 @@ public class Grapher {
 		}
 		//System.out.println("TOTAL = " + revenue.getMean());
 		System.out.println("TOTAL Welfare= " + welfare / numberPoints);
-		System.out.println("Acum = " + acum / numberPoints);
-		System.out.println((welfare - acum) / numberPoints);
+		System.out.println("Acum = " + expectedW / numberPoints);
+		System.out.println((welfare - expectedW) / numberPoints);
+		System.out.println(expectedW_i / numberPoints);
+		System.out.println(expectedSellerRevenue / numberPoints);
 		
 	}
 	public static void main2(String args[]){
@@ -137,6 +192,65 @@ public class Grapher {
 		System.out.println("There are "+newMatching.numberOfEnvyCampaigns()+ " envy campaigns");
 		
 	}
+	
+	public static void main777(String args[]){
+		
+		double L = 0.0;
+		double R = 10.0;
+		double M = (R - L) / 10.0;
+		
+		int k = 0;
+		while(k < 100 && R-L > 0){
+			System.out.println(L + "," + M + "," + R);
+			System.out.println("\t" + (R-L));
+			//if(parabola(M)> parabola(L)){
+			if(expectedRevenue(M)> expectedRevenue(L)){
+				L = M;
+				M = M + (R - M) / 10.0;
+			}else{
+				R = M;
+				M = L + (M - L) / 10.0;
+			}
+			k++;
+		}
+	}
+	
+	public static double expectedRevenue(double reserve){
+		int numberOfSamples = 1000;
+		double sellerRevenue = 0.0;
+		DescriptiveStatistics revenue = new DescriptiveStatistics();
+		/* Obtained as many samples as we want */
+		for(int j=0;j<numberOfSamples;j++){
+			/* generate a random market */
+			double[][] X = RandomMarketFactory.getValuationMatrix(10, 10, 0.75);
+			/* compute the value of the optimal allocation*/
+			double valueOptAllocaction = Matching.computeMaximumWeightMatchingValue(X).getValueOfMatching();
+			/* compute the allocation that respects reserve price*/
+			double[][] XReserve = RandomMarketFactory.getValuationReserve(X, reserve);
+			/* Run MaxWEQ on the allocation that respect reserve*/
+			MaxWEQ maxWEQAlgo = new MaxWEQ(XReserve);
+			Matching matchingWithReserve = maxWEQAlgo.Solve();
+			/* Update the prices to reflect the true prices */
+			double[] newPrices = new double[matchingWithReserve.getPrices().length]; 
+			for(int k=0;k<matchingWithReserve.getPrices().length;k++){
+				newPrices[k] = matchingWithReserve.getPrices()[k] + reserve;
+			}
+			/* Create a new matching with the original valuation matrix, the matching and new prices*/
+			Matching newMatching = new Matching(X,matchingWithReserve.getMatching(),newPrices);
+			sellerRevenue = newMatching.getSellerRevenue();
+			if(valueOptAllocaction == 0){
+				revenue.addValue(0.0);
+			}else{
+				//revenue.addValue((double) sellerRevenue / valueOptAllocaction);
+				revenue.addValue((double) sellerRevenue);
+			}
+		}
+		return revenue.getMean();
+	}
+	
+	public static double parabola(double x){
+		return -1.0*x*(x-20.0);
+	}
 	/*
 	 * Function for plotting unit demand graphs.
 	 * A graph here means a plot of the seller revenue as a function of the reserve price.
@@ -149,22 +263,22 @@ public class Grapher {
 	 * 		5) Compute the seller revenue from the matching obtained by MaxWEQ on the reserve matrix and the updated prices
 	 * Repeat this process many times to get an estimate for the mean seller revenue.
 	 */
-	public static void main1(String args[]) throws IOException{
+	public static void main55(String args[]) throws IOException{
 		System.out.println("Unit-demand testing");
 		/*
 		 * Basic Parameters received by command line
 		 */
 		int numberOfPoints = 401;		//We know we need exactly 401 points until we are sure to get 0 seller revenue.
-		int numberOfSamples = 1000;
-		int numUsers = Integer.parseInt(args[0]);
-		int numCampa = Integer.parseInt(args[1]);
-		double p = Double.parseDouble(args[2]);
+		int numberOfSamples = 500;
+		int numUsers = 10;//Integer.parseInt(args[0]);
+		int numCampa = 10;//Integer.parseInt(args[1]);
+		double p = 0.25;//Double.parseDouble(args[2]);
 		/* Start at reserve 0.0 */
 		double reserve = 0.0;
-		FileWriter fw = new FileWriter("/home/eareyanv/workspace/graphs/unitdemand-"+numberOfPoints+"-"+numberOfSamples+"-"+numUsers+"-"+numCampa+"-"+p+".csv", true);
-		BufferedWriter bw = new BufferedWriter(fw);
-	    @SuppressWarnings("resource")
-		PrintWriter out = new PrintWriter(bw);
+		//FileWriter fw = new FileWriter("/home/eareyanv/workspace/graphs/unitdemand-"+numberOfPoints+"-"+numberOfSamples+"-"+numUsers+"-"+numCampa+"-"+p+".csv", true);
+		//BufferedWriter bw = new BufferedWriter(fw);
+	    //@SuppressWarnings("resource")
+		//PrintWriter out = new PrintWriter(bw);
 	    /* For each number of points we want */
 		for(int i=0;i<numberOfPoints;i++){
 			double sellerRevenue = 0.0;
@@ -197,8 +311,8 @@ public class Grapher {
 			}
 			/* Report average */
 			System.out.println("(r,s) = (" + reserve +"," + revenue.getMean() + ")");
-			out.println(reserve +"," + revenue.getMean());
-			out.flush();
+			//out.println(reserve +"," + revenue.getMean());
+			//out.flush();
 			reserve += 0.025;
 		}
 	}

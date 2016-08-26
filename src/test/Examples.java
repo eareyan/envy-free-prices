@@ -326,6 +326,32 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
+	public static Market market8() throws CampaignCreationException{
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = new Campaign(10,100.0);
+		campaigns[1] = new Campaign(10,200.0);
+		campaigns[2] = new Campaign(10,300.0);
+		
+		User[] users = new User[4];
+		users[0] = new User(10);
+		users[1] = new User(10);
+		users[2] = new User(10);
+		users[3] = new User(10);
+		
+		boolean[][] connections = new boolean[4][3];
+		connections[0][0] = true;
+		//connections[0][1] = true;
+		
+		connections[1][1] = true;
+
+		connections[2][0] = true;
+		//connections[2][1] = true;
+
+		connections[3][2] = true;
+		
+		return new Market(users,campaigns,connections);
+}
+	
 	public static Market typicalTACMarket() throws CampaignCreationException{
 		//Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),0.5,0,2);
 		Campaign c0 = new Campaign(4142, 4622.0, 1.0, 0.0, 0, 2, 4000);
