@@ -43,6 +43,15 @@ public class Printer {
 			System.out.print("\n");
 		}
    }
+	public static void printVector(boolean[] vector){
+		for(int i=0;i<vector.length;i++){
+			if(vector[i]){
+				System.out.println("\t yes");
+			}else{
+				System.out.println("\t no");
+			}
+		}
+	}
 	public static void printVector(double[] vector){
 		DecimalFormat df = new DecimalFormat("#.000000"); 
 		for(int i=0;i<vector.length;i++){

@@ -2,12 +2,15 @@ package structures.factory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Random;
+import java.util.Set;
 
 import structures.Campaign;
 import structures.Market;
 import structures.User;
 import structures.exceptions.CampaignCreationException;
+import util.Printer;
 
 public class RandomMarketFactory {
 	public static double defaultMaxReward = 10.0;
@@ -175,5 +178,44 @@ public class RandomMarketFactory {
 			}
 		}
 		return XReserve;
+	}
+	
+	/*
+	 * Create a single-minded market
+	 */
+	public static Market createSingleMindedMarket(int n, int m) throws CampaignCreationException{
+		User[] users = new User[n];
+		for(int i=0;i<n;i++){
+			users[i] = new User(1);
+		}		
+		Random generator = new Random();
+		Campaign[] campaigns = new Campaign[m];
+		for(int j=0;j<m;j++){
+			campaigns[j] = new Campaign(generator.nextInt(m) + 1, generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);
+		}
+		boolean[][] connections = new boolean[n][m];
+		for(int j = 0; j < m; j++){
+			int demand = campaigns[j].getDemand();
+			/* Each bidder connects exactly with I_j users*/
+			Set<Integer> connectTo = RandomMarketFactory.randomNumbers(demand, n);
+			System.out.println("Bidder " + j + " connect to "  + connectTo);		
+			for(Integer i : connectTo){
+				connections[i][j] = true;
+			}
+		}
+		return new Market(users,campaigns,connections);
+	}
+	
+	public static Set<Integer> randomNumbers(int n, int max){
+		Random rng = new Random(); // Ideally just create one instance globally
+		// Note: use LinkedHashSet to maintain insertion order
+		Set<Integer> generated = new LinkedHashSet<Integer>();
+		while (generated.size() < n)
+		{
+		    Integer next = rng.nextInt(max);
+		    // As we're adding to a set, this will automatically do a containment check
+		    generated.add(next);
+		}
+		return generated;
 	}
 }

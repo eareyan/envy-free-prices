@@ -20,8 +20,13 @@ import allocations.optimal.SingleStepEfficientAllocationILP;
 
 public class Grapher {
 	
+	public static void probabilityItemAllocated(){
+		
+	}
+	
 	
 	public static void gradientAscent(){
+		
 		System.out.println("gradientAscent");
 		double reserve = 0.0;
 		double gamma = 0.01;
@@ -46,6 +51,9 @@ public class Grapher {
 			}
 			System.out.println("\t\t\t" + (sum / numberOfSamples));
 			//reserve = reserve + gamma * ( (1.0-(sum / numberOfSamples)) );
+			 /*
+			  * The problem here is that I am treating the delta function as an indicator...
+			  * */
 			reserve = reserve + gamma * ( 1.0 - (sum / numberOfSamples) );
 			currentGradientIteration++;
 			System.out.println(currentGradientIteration + " = " + reserve);
@@ -87,84 +95,61 @@ public class Grapher {
 		}
 		System.out.println("Acum = " + acum / numberPoints);
 	}
-	public static double randInt(){
-		/*Random r = new Random();
-		int Low = 1;
-		int High = 10;
-		return r.nextInt(High-Low) + Low;	*/
-		return Math.random();
-	}
-	
-	
+
 	public static void main(String args[]){
-		Grapher.gradientAscent();
-		System.exit(0);
+		//Grapher.gradientAscent();
+		//System.exit(0);
 		System.out.println("Grapher");
 		//DescriptiveStatistics revenue = new DescriptiveStatistics();
 		
 		double welfare = 0.0, expectedSellerRevenue = 0.0;
 		double expectedW = 0.0, expectedW_i = 0.0;
+		double reserve = 0.0;
 		for(int k=0;k<numberPoints;k++){
-
-
-			double u11 = randInt();
-			double u12 = randInt();
-			double u13 = randInt();
-			double u21 = randInt();
-			double u22 = randInt();
-			double u23 = randInt();
-			double u31 = randInt();
-			double u32 = randInt();
-			double u33 = randInt();
-			double v1 = Math.max(u11+u22+u33, u12+u21+u33);
-			double v2 = Math.max(u12+u23+u31, u13+u22+u31);
-			double v3 = Math.max(u13+u21+u32, u11+u23+u32);
-			//acum += Math.max(Math.max(v1,v2),v3);
-			expectedW += Math.max(u11+u22,u12+u21);
+			/* Draw uniform i.i.d valuations for a 3x3 market. */
+			//double u11 = Math.random();
+			//double u12 = Math.random();
+			//double u13 = Math.random();
+			//double u21 = Math.random();
+			//double u22 = Math.random();
+			//double u23 = Math.random();
+			//double u31 = Math.random();
+			//double u32 = Math.random();
+			//double u33 = Math.random();
+			//double v1 = Math.max(u11+u22+u33, u12+u21+u33);
+			//double v2 = Math.max(u12+u23+u31, u13+u22+u31);
+			//double v3 = Math.max(u13+u21+u32, u11+u23+u32);
+			//expectedW += Math.max(Math.max(v1,v2),v3);
 			
-			expectedW_i += Math.max(u11,u12);
+			double u11 = (Math.random() <= 0.5) ? 1 : 2;
+			double u12 = (Math.random() <= 0.5) ? 1 : 2;
+			double u21 = (Math.random() <= 0.5) ? 1 : 2;
+			double u22 = (Math.random() <= 0.5) ? 1 : 2;
 			
+			expectedW += Math.max( u11 * ((u11 - reserve >= 0) ? 1 : 0) + u22 * ((u22 - reserve >= 0) ? 1 : 0) , u12 * ((u12 - reserve >= 0) ? 1 : 0) + u21 * ((u21 - reserve >= 0) ? 1 : 0)); 
+			/* Set the valuation matrix. */
 			//double[][] X = {{u11,u12,u13},{u21,u22,u23},{u31,u32,u33}};
-			double[][] X = {{u11,u12},{u21,u22}};
-			
-			//double[][] X = RandomMarketFactory.getValuationMatrix(3, 3, 1.0,0.0,constant);
-			
-			/*System.out.println("u11 = " + u11);
-			System.out.println("u12 = " + u12);
-			System.out.println("u13 = " + u13);
-
-			System.out.println("u21 = " + u21);
-			System.out.println("u22 = " + u22);
-			System.out.println("u23 = " + u23);
-
-			System.out.println("u31 = " + u31);
-			System.out.println("u32 = " + u32);
-			System.out.println("u33 = " + u33);*/
-
+			double[][] X = {{u11,u12} , {u21,u22}};
+			/* Compute using MaxWEQ. */
 			MaxWEQ maxWEQAlgo = new MaxWEQ(X);
 			Matching matching = maxWEQAlgo.Solve();
 			welfare += matching.getValueOfMatching();
 			expectedSellerRevenue += matching.getSellerRevenue();
-			/*Printer.printMatrix(X);
-			System.out.println("***");
-			Printer.printMatrix(matching.getMatching());
-			/*System.out.println("---");
-			Printer.printMatrix(X);
-			System.out.println("---");
-			System.out.println(matching.getValueOfMatching());
-			Printer.printMatrix(matching.getMatching());
-			System.out.println("---");
-			Printer.printVector(matching.getPrices());
-			/*System.out.println(matching.getSellerRevenue());
-			revenue.addValue(matchingWithReserve.getSellerRevenue());*/
 			
+			/* Compute which permutation won: */
+			if(u11 * ((u11 - reserve >= 0) ? 1 : 0) + u22 * ((u22 - reserve >= 0) ? 1 : 0) >= u12 * ((u12 - reserve >= 0) ? 1 : 0) + u21 * ((u21 - reserve >= 0) ? 1 : 0)){
+				/* Identity permutation wins */
+				expectedW_i += u11 * ((u11 - reserve >= 0) ? 1 : 0);
+			}else{
+				/* Transposition wins*/
+				expectedW_i += u12 * ((u12 - reserve >= 0) ? 1 : 0) ;
+			}
 		}
-		//System.out.println("TOTAL = " + revenue.getMean());
-		System.out.println("TOTAL Welfare= " + welfare / numberPoints);
-		System.out.println("Acum = " + expectedW / numberPoints);
-		System.out.println((welfare - expectedW) / numberPoints);
-		System.out.println(expectedW_i / numberPoints);
-		System.out.println(expectedSellerRevenue / numberPoints);
+		System.out.println("TOTAL Welfare \t = " + welfare / numberPoints);
+		System.out.println("Acum \t = " + expectedW / numberPoints);
+		
+		System.out.println("expectedW_i \t = " + 2.0 * expectedW_i * 0.0625);
+		System.out.println("expectedSellerRevenue \t = " + expectedSellerRevenue / numberPoints);
 		
 	}
 	public static void main2(String args[]){

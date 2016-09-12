@@ -4,12 +4,16 @@ package test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
+import singleminded.ApproxWE;
 import statistics.PricesStatistics;
 import structures.Campaign;
 import structures.Market;
@@ -80,7 +84,7 @@ public class Main {
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(2);}}));
 		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(0);add(2);}}));*/
 		
-		Market M = Examples.market8();
+		/*Market M = Examples.market8();
 		System.out.println(M);
 		MarketAllocation MA = new SingleStepEfficientAllocationILP().Solve(M);
 		Printer.printMatrix(MA.getAllocation());
@@ -88,8 +92,13 @@ public class Main {
 		EFPVLP.setWalrasianConditions(false);
 		EFPVLP.createLP();
 		EnvyFreePricesSolutionLP Prices = EFPVLP.Solve();
-		Printer.printVector(Prices.getPriceVector());
+		Printer.printVector(Prices.getPriceVector());*/
 		
+		ApproxWE algo = new ApproxWE();
+		algo.Solve();
+		
+		Market X = RandomMarketFactory.createSingleMindedMarket(10,5);
+		System.out.println(X);
 		
 	}
 	
