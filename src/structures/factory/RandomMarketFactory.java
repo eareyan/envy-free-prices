@@ -10,7 +10,6 @@ import structures.Campaign;
 import structures.Market;
 import structures.User;
 import structures.exceptions.CampaignCreationException;
-import util.Printer;
 
 public class RandomMarketFactory {
 	public static double defaultMaxReward = 10.0;
@@ -185,7 +184,7 @@ public class RandomMarketFactory {
 	 */
 	public static Market createSingleMindedMarket(int n, int m) throws CampaignCreationException{
 		User[] users = new User[n];
-		for(int i=0;i<n;i++){
+		for(int i = 0; i < n; i++){
 			users[i] = new User(1);
 		}		
 		Random generator = new Random();

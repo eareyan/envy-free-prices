@@ -32,6 +32,14 @@ public class SqlDB {
     public void closeConnection(Connection conn) throws SQLException{
     	this.conn.close();
     }
+    
+    public boolean checkIfSingleMindedRowExists(String tablename, int n, int m) throws SQLException{
+        String sql = "SELECT * FROM "+tablename+" WHERE n = ? AND m = ?";
+        PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
+        preparedStatement.setInt(1, n);
+        preparedStatement.setInt(2, m);
+        return ((ResultSet) preparedStatement.executeQuery()).next();    	
+    }
     public boolean checkIfUnitDemandRowExists(String tablename,int n, int m, double p) throws SQLException{
         String sql = "SELECT * FROM "+tablename+" WHERE n = ? AND m = ? AND p = ?";
         PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
@@ -192,5 +200,26 @@ public class SqlDB {
         preparedStatement.setDouble(24, lpG2WE2);
 
         preparedStatement.execute();
-	}	
+	}
+	
+	public void saveSingleMinded(String table_name, int n, int m, 
+									double approxWelfare, double approxRevenue, double approxEF, double approxWE, double approxTime,
+									double greedyWelfare, double greedyRevenue, double greedyEF, double greedyWE, double greedyTime) throws SQLException{
+		String sql = "INSERT INTO "+table_name+" (n,m,approxWelfare,approxRevenue,approxEF,approxWE,approxTime,greedyWelfare,greedyRevenue,greedyEF,greedyWE,greedyTime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
+        preparedStatement.setInt(1, n);
+        preparedStatement.setInt(2, m);
+        preparedStatement.setDouble(3, approxWelfare);
+        preparedStatement.setDouble(4, approxRevenue);
+        preparedStatement.setDouble(5, approxEF);
+        preparedStatement.setDouble(6, approxWE);
+        preparedStatement.setDouble(7, approxTime);
+        preparedStatement.setDouble(8, greedyWelfare);
+        preparedStatement.setDouble(9, greedyRevenue);
+        preparedStatement.setDouble(10, greedyEF);
+        preparedStatement.setDouble(11, greedyWE);
+        preparedStatement.setDouble(12, greedyTime);
+
+        preparedStatement.execute();
+	}
 }

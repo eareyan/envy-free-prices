@@ -31,6 +31,7 @@ import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
 import unitdemand.evpapprox.EVPApproximation;
+import util.NumberMethods;
 import util.Printer;
 import algorithms.ascendingauction.AscendingAuction;
 import algorithms.ascendingauction.AscendingAuctionModified;
@@ -48,6 +49,7 @@ import allocations.greedy.multistep.GreedyMultiStepAllocation;
 import allocations.greedy.multistep.GreedyMultiStepAllocation;
 import allocations.objectivefunction.EffectiveReachRatio;
 import allocations.objectivefunction.IdentityObjectiveFunction;
+import allocations.objectivefunction.SingleStepFunction;
 import allocations.optimal.MultiStepEfficientAllocationILP;
 import allocations.optimal.SingleStepEfficientAllocationILP;
 import experiments.RunParameters;
@@ -60,63 +62,93 @@ import experiments.RunParameters;
 public class Main {
 	
 	public static void main(String args[]) throws AllocationException, CampaignCreationException, MarketAllocationException, IloException, MarketPricesException{
-		//Market M = Examples.typicalTACMarket();
-		/*Market M = Examples.market7();
-		Market M = Examples.typicalTACMarket();
-		System.out.println(M);
-		//MarketAllocation x = new SingleStepEfficientAllocationILP().Solve(M);
-		//MarketAllocation x = new GreedyAllocation().Solve(M);
-		MarketAllocation x = new GreedyMultiStepAllocation(1,new EffectiveReachRatio()).Solve(M);
-		Printer.printMatrix(x.getAllocation());
-		System.out.println("---");
-		/*System.out.println(x.value());
-		System.out.println(x.value(new ArrayList<Integer>(){{add(1);}}));
-		System.out.println(x.value(new ArrayList<Integer>(){{add(0);add(1);}}));
-		
-		EnvyFreePricesVectorLP efpvlp = new EnvyFreePricesVectorLP(x,true);
-		//efpvlp.setWalrasianConditions(false);
-		EnvyFreePricesSolutionLP prices = efpvlp.Solve();
-		
-		/*Printer.printVector(prices.getPriceVector());
-		System.out.println(prices.sellerRevenuePriceVector());
-		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(0);}}));
-		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(1);}}));
-		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(2);}}));
-		System.out.println(prices.sellerRevenuePriceVector(new ArrayList<Integer>(){{add(0);add(2);}}));*/
-		
-		/*Market M = Examples.market8();
-		System.out.println(M);
-		MarketAllocation MA = new SingleStepEfficientAllocationILP().Solve(M);
-		Printer.printMatrix(MA.getAllocation());
-		EnvyFreePricesVectorLP EFPVLP = new EnvyFreePricesVectorLP(MA);
-		EFPVLP.setWalrasianConditions(false);
-		EFPVLP.createLP();
-		EnvyFreePricesSolutionLP Prices = EFPVLP.Solve();
-		Printer.printVector(Prices.getPriceVector());*/
 		
 		int numberOfEnvy = 0;
-		while(numberOfEnvy <= 0){
-			Market M = RandomMarketFactory.createSingleMindedMarket(3,4);
-			System.out.println(M);
-			ApproxWE algo = new ApproxWE(M);
-			MarketPrices y = algo.Solve();
-			Printer.printMatrix(y.getMarketAllocation().getAllocation());
-			Printer.printVector(y.getPriceVector());
-			PricesStatistics ps = new PricesStatistics(y);
-			numberOfEnvy = ps.numberOfEnvyCampaigns();
-			System.out.println("Number of Envy Campaigns " + numberOfEnvy);
+		long startTime , endTime ;
+		for(int i = 1; i < 10 ; i ++){
+			for(int j = 1 ; j < 10; j++){
+				DescriptiveStatistics approxRevenue = new DescriptiveStatistics();
+				DescriptiveStatistics approxWelfare = new DescriptiveStatistics();
+				DescriptiveStatistics approxEF = new DescriptiveStatistics();
+				DescriptiveStatistics approxWE = new DescriptiveStatistics();
+				DescriptiveStatistics approxTime = new DescriptiveStatistics();
+				
+				DescriptiveStatistics greedyRevenue = new DescriptiveStatistics();
+				DescriptiveStatistics greedyWelfare = new DescriptiveStatistics();
+				DescriptiveStatistics greedyEF = new DescriptiveStatistics();
+				DescriptiveStatistics greedyWE = new DescriptiveStatistics();
+				DescriptiveStatistics greedyTime = new DescriptiveStatistics();
+				
+				for(int k = 0; k <100; k ++){
+					/* Generate Single-minded random market */
+					Market M = RandomMarketFactory.createSingleMindedMarket(i,j);
+					//System.out.println(M);
+					
+					/* Efficient Allocation */
+					//System.out.println("===== Efficient Alloc ======");
+					MarketAllocation efficientAlloc = new MarketAllocation(M, new SingleStepEfficientAllocationILP().Solve(M).getAllocation(), new SingleStepFunction());
+					//Printer.printMatrix(efficientAlloc.getAllocation());
+					//System.out.println("efficientWelfare = " + efficientAlloc.value());
+					double optimalWelfare = efficientAlloc.value();
+					
+					/* run approx WE algo */
+					//System.out.println("===== ApproxWE ======");
+					startTime = System.nanoTime();
+					MarketPrices approxWEResult = new ApproxWE(M).Solve();
+					endTime = System.nanoTime();
+					//Printer.printMatrix(approxWEResult.getMarketAllocation().getAllocation());
+					//Printer.printVector(y.getPriceVector());
+					PricesStatistics psApprox = new PricesStatistics(approxWEResult);
+					//numberOfEnvy = ps.numberOfEnvyCampaigns();
+					//System.out.println("Number of Envy Campaigns " + numberOfEnvy);
+					//Printer.printVector(ps.computeWalrasianViolations());
+					//System.out.println("Seller revenue " + y.sellerRevenuePriceVector());
+					//System.out.println("approx welfare = " + y.getMarketAllocation().value());
+					approxWelfare.addValue(NumberMethods.getRatio(approxWEResult.getMarketAllocation().value() , optimalWelfare));
+					approxRevenue.addValue(NumberMethods.getRatio(approxWEResult.sellerRevenuePriceVector() ,  optimalWelfare));
+					approxEF.addValue((double) psApprox.numberOfEnvyCampaigns() / j);
+					approxWE.addValue((double) psApprox.computeWalrasianViolations()[0] / i);
+					approxTime.addValue(endTime - startTime);
+					
+					/* Single-Step Greedy + LP */
+					//System.out.println("===== Greedy+LP ======");
+					startTime = System.nanoTime();
+					int[][] greedyAlloc = new GreedyAllocation().Solve(M).getAllocation();
+					endTime = System.nanoTime();
+					//--LP
+					EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(new MarketAllocation(M,greedyAlloc));
+					efp.setWalrasianConditions(false);
+					efp.createLP();
+					EnvyFreePricesSolutionLP lpResult = efp.Solve();
+					MarketPrices greedyResult = new MarketPrices(new MarketAllocation(M, greedyAlloc, new SingleStepFunction()),lpResult.getPriceVector());
+					PricesStatistics psGreedy = new PricesStatistics(greedyResult);
+					//Printer.printMatrix(greedyAlloc);
+					//numberOfEnvy = ps2.numberOfEnvyCampaigns();
+					//Printer.printVector(z.getPriceVector());
+					//System.out.println("Number of Envy Campaigns " + numberOfEnvy);
+					//Printer.printVector(ps2.computeWalrasianViolations());
+					//System.out.println("Seller revenue " + w.sellerRevenuePriceVector());
+					//System.out.println("greedy welfare = " + greedyResult.getMarketAllocation().value());
+					greedyWelfare.addValue(NumberMethods.getRatio(greedyResult.getMarketAllocation().value() , optimalWelfare));
+					greedyRevenue.addValue(NumberMethods.getRatio(greedyResult.sellerRevenuePriceVector() , optimalWelfare));
+					greedyEF.addValue((double) psGreedy.numberOfEnvyCampaigns() / j);
+					greedyWE.addValue((double) psGreedy.computeWalrasianViolations()[0] / i);
+					greedyTime.addValue(endTime - startTime);
+				}
+				System.out.println(String.format("%s %20s %20s %20s %20s %20s %20s %20s %20s %20s", 
+													"(" + i  + "," + j + ") = (" , 
+													approxWelfare.getMean() + "," , 
+													approxRevenue.getMean() + "," , 
+													approxEF.getMean() + "," ,
+													approxWE.getMean() + "," ,
+													approxTime.getMean() / 1000000 + ") - (" ,  
+													greedyWelfare.getMean() + "," , 
+													greedyRevenue.getMean() + "," , 
+													greedyEF.getMean() + "," , 
+													greedyWE.getMean() + "," + 
+													greedyTime.getMean() / 1000000 + ")"));
+			}
 		}
-		/*Market M = Examples.singleMinded2();
-		System.out.println(M);
-		ApproxWE algo = new ApproxWE(M);
-		MarketPrices y = algo.Solve();
-		Printer.printMatrix(y.getMarketAllocation().getAllocation());
-		Printer.printVector(y.getPriceVector());
-		PricesStatistics ps = new PricesStatistics(y);
-		numberOfEnvy = ps.numberOfEnvyCampaigns();
-		System.out.println("Number of Envy Campaigns " + numberOfEnvy);
-		
-		Printer.printMatrix(y.getMarketAllocation().getMarket().getConnections());*/
 	}
 	
 	public static void main2(String args[]) throws IloException, AllocationException, CampaignCreationException{

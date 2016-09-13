@@ -85,6 +85,8 @@ public class RunParameters{
 			return new fancy_overdemand();
 		}else if(type.equals("allocation")){
 			return new allocation();
+		}else if(type.equals("singleminded")){
+			return new single_minded();
 		}else{
 			throw new Exception("Unknown demand type");
 		}

@@ -34,15 +34,20 @@ public class PricesStatistics {
     	double costCheapestBundle = 0.0;
     	int impressionsNeeded = this.marketAllocation.getMarket().getCampaign(campaignIndex).getDemand();
     	while (impressionsNeeded > 0 && userList.size() != 0){
+    		/*
+    		 * Get first user from the list and remove it.
+    		 */
     		UserPrices userPriceObject = userList.get(0);
     		userList.remove(0);
-    		System.out.println("***" + userPriceObject + "***");
     		int userIndex = userPriceObject.getUserIndex(), userSupply = this.marketAllocation.getMarket().getUser(userIndex).getSupply();
+    		/*
+    		 * If the campaign wants this user
+    		 */
 			if(this.marketAllocation.getMarket().isConnected(userIndex, campaignIndex)){
-				if(userSupply >= impressionsNeeded){
+				if(userSupply >= impressionsNeeded){ /* Take only as many users as you need. */
 					costCheapestBundle += impressionsNeeded * this.pricesVector[userIndex];
 					impressionsNeeded = 0;
-				}else{
+				}else{ /* Greedily take all of the users. */
 					costCheapestBundle +=  userSupply * this.pricesVector[userIndex];
 					impressionsNeeded -= userSupply;
 				}
@@ -63,11 +68,8 @@ public class PricesStatistics {
     		 */
     		if(this.marketAllocation.getBundleNumber(campaignIndex) >= this.marketAllocation.getMarket().getCampaign(campaignIndex).getDemand()){
     			/* Case (1) */
-    			System.out.println("flag 1");
     			return (this.marketPrices.getBundleCost(campaignIndex) - costCheapestBundle >= PricesStatistics.epsilon);
     		}else{
-    			System.out.println("flag 2");
-    			System.out.println("\t" + (this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward() - costCheapestBundle));
     			/* Case (2) */
     			return (this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward() - costCheapestBundle < PricesStatistics.epsilon); 
     		}
@@ -83,20 +85,18 @@ public class PricesStatistics {
     	 */
     	int numUsers = this.marketAllocation.getMarket().getNumberUsers();
     	ArrayList<UserPrices> listOfUsers = new ArrayList<UserPrices>();
-    	System.out.println("numUsers = " + numUsers);
-		for(int i=0;i<numUsers;i++){
+    	for(int i=0;i<numUsers;i++){
 			 listOfUsers.add(new UserPrices(i,this.pricesVector[i]));
 		}
 		Collections.sort(listOfUsers, new UserPriceComparator());
-		System.out.println("ordered queue" + listOfUsers);
-    	/*
+		/*
     	 * Check that each campaign is envy-free for the previously constructed queue.
     	 */
 		int counter = 0;
     	for(int j=0;j<this.marketAllocation.getMarket().getNumberCampaigns();j++){
-    		System.out.println("**** check if " + j + " is envy");
+    		//System.out.println("**** check if " + j + " is envy");
     		if(!this.isCampaignEnvyFree(new ArrayList<UserPrices>(listOfUsers), j)){//Pass a copy of the queue each time...
-    			System.out.println("Campaign " + j + " is envy");
+    			//System.out.println("\t --- > Campaign " + j + " is envy");
     			counter++;
     		}
     	}

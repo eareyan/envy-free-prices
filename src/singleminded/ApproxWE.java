@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import allocations.objectivefunction.SingleStepFunction;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
-import util.Printer;
 
 /*
  * This class implements the approximation WE algorithm for single-minded bidders
@@ -35,11 +35,13 @@ public class ApproxWE {
 		this.M = M;
 		this.numberOfBidders = this.M.getNumberCampaigns();
 		this.numberOfItems = this.M.getNumberUsers();
+		/* Make an ArrayList of BidderReward so that we can ordered. */
 		this.Rewards = new ArrayList<BidderReward>();
 		for(int j = 0; j < this.M.getNumberCampaigns(); j++){
 			this.Rewards.add(new BidderReward(j,this.M.getCampaign(j).getReward()));
 		}
 		Collections.sort(Rewards, this.UserRewardComparator);
+		/* Make a copy of the connections matrix so that we don't change the original matrix. */
 		this.A = new boolean[this.numberOfItems][this.numberOfBidders];
 		for(int i = 0; i < numberOfItems; i++) {
 			this.A[i] = Arrays.copyOf(this.M.getConnections()[i], this.M.getConnections()[i].length);
@@ -50,8 +52,6 @@ public class ApproxWE {
 	}
 
 	public MarketPrices Solve(){
-		
-		Printer.printMatrix(this.A);
 		
 		while(!matrixAllFalse(A)){
 			/*
@@ -115,7 +115,7 @@ public class ApproxWE {
 			Printer.printMatrix(X);
 			System.out.println("-----");*/
 		}
-		return new MarketPrices(new MarketAllocation(this.M,this.X),this.p);
+		return new MarketPrices(new MarketAllocation(this.M,this.X, new SingleStepFunction()),this.p);
 	}
 	/*
 	 * This function returns true if all the
