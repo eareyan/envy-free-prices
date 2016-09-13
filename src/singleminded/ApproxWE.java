@@ -1,5 +1,13 @@
 package singleminded;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import structures.Market;
+import structures.MarketAllocation;
+import structures.MarketPrices;
 import util.Printer;
 
 /*
@@ -9,19 +17,36 @@ import util.Printer;
  */
 
 public class ApproxWE {
+	/* Market is the input market. This needs to be a singleton market. */
+	protected Market M;
+	/* A is the boolean matrix encoding the single-minded preferences over items. */
+	protected boolean[][] A;
+	protected int numberOfBidders;
+	protected int numberOfItems;
+	/* The list of Rewards keeps tracks of all bidders rewards. */
+	protected List<BidderReward> Rewards;
+	
+	protected int[][] X; 
+	protected double[] p;
+	protected boolean[] allocVector; 
+	
+	public ApproxWE(Market M){
+		this.M = M;
+		this.A = this.M.getConnections();
+		this.numberOfBidders = this.A[0].length;
+		this.numberOfItems = this.A.length;
+		this.Rewards = new ArrayList<BidderReward>();
+		for(int j = 0; j < this.M.getNumberCampaigns(); j++){
+			this.Rewards.add(new BidderReward(j,this.M.getCampaign(j).getReward()));
+		}
+		Collections.sort(Rewards, this.UserRewardComparator);
+		System.out.println(Rewards);
+		this.X = new int[numberOfItems][numberOfBidders];
+		this.p = new double[numberOfItems];
+		this.allocVector = new boolean[numberOfBidders];
+	}
 
-	public void Solve(){
-		
-		boolean[][] A = new boolean[][]{{true,	true,	true,	true},
-										{true,	true,	true,	true},
-										{true,	true,	true,	true}
-										};
-		int numberOfBidders = A[0].length;
-		int numberOfItems = A.length;
-		double[] R = new double[]{101.0, 100.0, 20.0, 10.0};
-		
-		boolean[] X = new boolean[numberOfBidders];
-		double[] p = new double[numberOfItems];
+	public MarketPrices Solve(){
 		
 		while(!matrixAllFalse(A)){
 			/*
@@ -42,26 +67,27 @@ public class ApproxWE {
 			 * Find the bidder with highest budget that wants the most popular item 
 			 */
 			int winner = -1;
-			for(int j = 0; j < numberOfBidders; j++){
-				if(A[mostPopularItem][j]){
-					winner = j;
+			for(BidderReward bidder: Rewards){
+				if(A[mostPopularItem][bidder.getIndex()]){
+					/*
+					 * Assign prices and bundle
+					 */
+					winner = bidder.getIndex();
+					allocVector[winner] = true;
+					p[mostPopularItem] = bidder.getReward();
+					Rewards.remove(bidder); //This bidder is satisfy, remove it 
 					break;
 				}
 			}
-			/*
-			 * Assign prices and bundle
-			 */
-			p[mostPopularItem] = R[winner];
-			X[winner] = true;
-			Printer.printMatrix(A);
-			System.out.println("The most popular item is " + mostPopularItem + ", assigned it to " + winner + " at price " + p[mostPopularItem]);
+			//Printer.printMatrix(A);
+			//System.out.println("The most popular item is " + mostPopularItem + ", assigned it to " + winner + " at price " + p[mostPopularItem]);
 			/*
 			 * Remove any conflicts
 			 */
 			for(int i = 0; i < numberOfItems; i++){
-				if(A[i][winner]){
-					for(int j = 0 ; j < numberOfBidders; j++){
-						if(j != winner && A[i][j]){
+				if(A[i][winner]){ // The winner claimed item i
+					for(int j = 0 ; j < numberOfBidders; j++){ //Loop through all bidders
+						if(j != winner && A[i][j]){ //This bidder is not a winner and wanted item i. He can't have it, so remove this bidder.
 							for(int iPrime = 0; iPrime < numberOfItems; iPrime ++){
 								A[iPrime][j] = false;
 							}
@@ -69,14 +95,22 @@ public class ApproxWE {
 					}
 				}
 			}
-			//Remove winner
+			/*
+			 * Remove winner
+			 */
 			for(int i = 0; i < numberOfItems; i++){
-				A[i][winner] = false;
+				this.X[i][winner] = (this.A[i][winner]) ? 1 : 0;
+				this.A[i][winner] = false;
 			}
+			/*
+			System.out.println("-----");
 			Printer.printMatrix(A);
 			Printer.printVector(p);
-			Printer.printVector(X);
+			Printer.printVector(allocVector);
+			Printer.printMatrix(X);
+			System.out.println("-----");*/
 		}
+		return new MarketPrices(new MarketAllocation(this.M,this.X),this.p);
 	}
 	/*
 	 * This function returns true if all the
@@ -93,4 +127,32 @@ public class ApproxWE {
 		}
 		return result;
 	}
+	
+	private class BidderReward {
+		protected int j;
+		protected double reward;
+		
+		public BidderReward(int j, double reward){
+			this.j = j ;
+			this.reward = reward;
+		}
+		
+		public int getIndex(){
+			return this.j;
+		}
+		
+		public double getReward(){
+			return this.reward;
+		}	
+		
+		public String toString(){
+			return "("+this.j+","+this.reward+")";
+		}
+	}
+	
+	public final Comparator<BidderReward> UserRewardComparator = new Comparator<BidderReward>() {
+		public int compare(BidderReward u1, BidderReward u2){
+			return Double.compare(u2.getReward(), u1.getReward());
+		}
+	};
 }
