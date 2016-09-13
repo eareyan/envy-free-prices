@@ -94,12 +94,29 @@ public class Main {
 		EnvyFreePricesSolutionLP Prices = EFPVLP.Solve();
 		Printer.printVector(Prices.getPriceVector());*/
 		
-		ApproxWE algo = new ApproxWE();
-		algo.Solve();
+		int numberOfEnvy = 0;
+		while(numberOfEnvy <= 0){
+			Market M = RandomMarketFactory.createSingleMindedMarket(3,4);
+			System.out.println(M);
+			ApproxWE algo = new ApproxWE(M);
+			MarketPrices y = algo.Solve();
+			Printer.printMatrix(y.getMarketAllocation().getAllocation());
+			Printer.printVector(y.getPriceVector());
+			PricesStatistics ps = new PricesStatistics(y);
+			numberOfEnvy = ps.numberOfEnvyCampaigns();
+			System.out.println("Number of Envy Campaigns " + numberOfEnvy);
+		}
+		/*Market M = Examples.singleMinded2();
+		System.out.println(M);
+		ApproxWE algo = new ApproxWE(M);
+		MarketPrices y = algo.Solve();
+		Printer.printMatrix(y.getMarketAllocation().getAllocation());
+		Printer.printVector(y.getPriceVector());
+		PricesStatistics ps = new PricesStatistics(y);
+		numberOfEnvy = ps.numberOfEnvyCampaigns();
+		System.out.println("Number of Envy Campaigns " + numberOfEnvy);
 		
-		Market X = RandomMarketFactory.createSingleMindedMarket(10,5);
-		System.out.println(X);
-		
+		Printer.printMatrix(y.getMarketAllocation().getMarket().getConnections());*/
 	}
 	
 	public static void main2(String args[]) throws IloException, AllocationException, CampaignCreationException{

@@ -1,7 +1,8 @@
 package statistics;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.PriorityQueue;
 
 import structures.MarketAllocation;
 import structures.MarketPrices;
@@ -14,7 +15,7 @@ public class PricesStatistics {
 	
 	protected double[] pricesVector;
 	
-	protected static double epsilon = 0.5;
+	protected static double epsilon = 0.0;
 	
 	
 	public PricesStatistics(MarketPrices marketPrices){
@@ -22,13 +23,20 @@ public class PricesStatistics {
 		this.marketAllocation = this.marketPrices.getMarketAllocation();
 		this.pricesVector = this.marketPrices.getPriceVector();
 	}
-	
-    public boolean isCampaignEnvyFree(PriorityQueue<UserPrices> queue, int campaignIndex){
-    	//System.out.println("Heuristic for campaign:" + campaignIndex + ", check this many users:" + queue.size());
+	/*
+	 * This function takes a list of UserPrice object -these are tuples (i,p_i)-
+	 * and a campaign index and returns whether or not there exists a bundle 
+	 * that is cheaper to the currently assigned bundle.
+	 * 
+	 */
+    public boolean isCampaignEnvyFree(ArrayList<UserPrices> userList, int campaignIndex){
+    	//System.out.println("Heuristic for campaign:" + campaignIndex + ", check this many users:" + userList.size());
     	double costCheapestBundle = 0.0;
     	int impressionsNeeded = this.marketAllocation.getMarket().getCampaign(campaignIndex).getDemand();
-    	while (impressionsNeeded > 0 && queue.size() != 0){
-    		UserPrices userPriceObject = queue.remove();
+    	while (impressionsNeeded > 0 && userList.size() != 0){
+    		UserPrices userPriceObject = userList.get(0);
+    		userList.remove(0);
+    		System.out.println("***" + userPriceObject + "***");
     		int userIndex = userPriceObject.getUserIndex(), userSupply = this.marketAllocation.getMarket().getUser(userIndex).getSupply();
 			if(this.marketAllocation.getMarket().isConnected(userIndex, campaignIndex)){
 				if(userSupply >= impressionsNeeded){
@@ -40,26 +48,28 @@ public class PricesStatistics {
 				}
 			}
 		}
-    	//System.out.println("\timpressionsNeeded = "+impressionsNeeded);
-    	if(impressionsNeeded > 0){ //If you cannot be satisfied, you are immediately envy-free
+    	if (impressionsNeeded > 0){ //If you cannot be satisfied, you are immediately envy-free
     		return true;
     	}else{
         	/*System.out.println("\tcost of cheapest bundle = "+costCheapestBundle);
         	System.out.println("\tcost of current  bundle = "+this.marketPrices.getBundleCost(campaignIndex));
         	System.out.println("\tnbr  of current  bundle = "+this.marketAllocation.getBundleNumber(campaignIndex));
-        	System.out.println("\treward of this campaign = "+this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward());*/
-    		if(this.marketAllocation.getBundleNumber(campaignIndex) >= this.marketAllocation.getMarket().getCampaign(campaignIndex).getDemand()){//This campaign was satisfied
-    			if(this.marketPrices.getBundleCost(campaignIndex) - costCheapestBundle > PricesStatistics.epsilon){
-    				//System.out.println("cost = "+cost);
-    				//System.out.println("current cost = "+getBundleCost(campaignIndex));
-    				return false;
-    			}
-    			return true;
-    		}else{//the campaign was not satisfied
-    			if(this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward() - costCheapestBundle > PricesStatistics.epsilon ){
-    				return false;
-    			}
-    			return true;
+        	System.out.println("\treward of this campaign = "+this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward());
+        	System.out.println("\timpressionsNeeded = " + impressionsNeeded);*/
+    		/*
+    		 * There are two cases in which a campaign can be envy:
+    		 * (1) This campaign was satisfied but there exists a cheaper bundle.
+    		 * (2) The campaign was not satisfied and there exists a bundle in its demand set.
+    		 */
+    		if(this.marketAllocation.getBundleNumber(campaignIndex) >= this.marketAllocation.getMarket().getCampaign(campaignIndex).getDemand()){
+    			/* Case (1) */
+    			System.out.println("flag 1");
+    			return (this.marketPrices.getBundleCost(campaignIndex) - costCheapestBundle >= PricesStatistics.epsilon);
+    		}else{
+    			System.out.println("flag 2");
+    			System.out.println("\t" + (this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward() - costCheapestBundle));
+    			/* Case (2) */
+    			return (this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward() - costCheapestBundle < PricesStatistics.epsilon); 
     		}
     	}
     }
@@ -72,18 +82,21 @@ public class PricesStatistics {
     	 * Construct a priority queue with users where the priority is price in ascending order.
     	 */
     	int numUsers = this.marketAllocation.getMarket().getNumberUsers();
-    	PriorityQueue<UserPrices> queue = new PriorityQueue<UserPrices>(numUsers, new UserPriceComparator());
+    	ArrayList<UserPrices> listOfUsers = new ArrayList<UserPrices>();
+    	System.out.println("numUsers = " + numUsers);
 		for(int i=0;i<numUsers;i++){
-			 queue.add(new UserPrices(i,this.pricesVector[i]));
+			 listOfUsers.add(new UserPrices(i,this.pricesVector[i]));
 		}
-		//System.out.println(queue);
+		Collections.sort(listOfUsers, new UserPriceComparator());
+		System.out.println("ordered queue" + listOfUsers);
     	/*
     	 * Check that each campaign is envy-free for the previously constructed queue.
     	 */
 		int counter = 0;
     	for(int j=0;j<this.marketAllocation.getMarket().getNumberCampaigns();j++){
-    		if(!this.isCampaignEnvyFree(new PriorityQueue<UserPrices>(queue), j)){//Pass a copy of the queue each time...
-    			//System.out.println("Campaign " + j + " is envy");
+    		System.out.println("**** check if " + j + " is envy");
+    		if(!this.isCampaignEnvyFree(new ArrayList<UserPrices>(listOfUsers), j)){//Pass a copy of the queue each time...
+    			System.out.println("Campaign " + j + " is envy");
     			counter++;
     		}
     	}
@@ -129,7 +142,7 @@ public class PricesStatistics {
     		/*
     		 * Order objects by ascending price
     		 */
-    		return (int) (o1.getPrice() - o2.getPrice());
+    		return Double.compare(o1.getPrice(), o2.getPrice());
     	}
     }	
 }

@@ -198,7 +198,7 @@ public class RandomMarketFactory {
 			int demand = campaigns[j].getDemand();
 			/* Each bidder connects exactly with I_j users*/
 			Set<Integer> connectTo = RandomMarketFactory.randomNumbers(demand, n);
-			System.out.println("Bidder " + j + " connect to "  + connectTo);		
+			//System.out.println("Bidder " + j + " connect to "  + connectTo);		
 			for(Integer i : connectTo){
 				connections[i][j] = true;
 			}
@@ -212,6 +212,7 @@ public class RandomMarketFactory {
 		Set<Integer> generated = new LinkedHashSet<Integer>();
 		while (generated.size() < n)
 		{
+			System.out.println(generated.size() + "," + n);
 		    Integer next = rng.nextInt(max);
 		    // As we're adding to a set, this will automatically do a containment check
 		    generated.add(next);

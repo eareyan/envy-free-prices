@@ -409,4 +409,52 @@ public class Examples {
 
 		return new Market(users,campaigns,connections);
 	}
+	
+	public static Market singleMinded() throws CampaignCreationException{
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = new Campaign(3,5.35);
+		campaigns[1] = new Campaign(1,3.42);
+		campaigns[2] = new Campaign(1,8.99);
+		
+		User[] users = new User[3];
+		users[0] = new User(1);
+		users[1] = new User(1);
+		users[2] = new User(1);
+		
+		boolean[][] connections = new boolean[3][3];
+		connections[0][0] = true;
+		connections[0][2] = true;
+		
+		connections[1][0] = true;
+		connections[1][1] = true;
+
+		connections[2][0] = true;
+		
+		return new Market(users,campaigns,connections);
+	}
+	
+	public static Market singleMinded2() throws CampaignCreationException{
+		Campaign[] campaigns = new Campaign[3];
+		campaigns[0] = new Campaign(1, 4.39);
+		campaigns[1] = new Campaign(3, 2.48);
+		campaigns[2] = new Campaign(1, 9.79);
+		
+		User[] users = new User[4];
+		users[0] = new User(1);
+		users[1] = new User(1);
+		users[2] = new User(1);
+		users[3] = new User(1);
+		
+		boolean[][] connections = new boolean[4][3];
+		
+		connections[0][1] = true;
+		
+		connections[2][0] = true;
+		connections[2][1] = true;
+		
+		connections[3][1] = true;
+		connections[3][2] = true;
+		
+		return new Market(users,campaigns,connections);
+	}
 }

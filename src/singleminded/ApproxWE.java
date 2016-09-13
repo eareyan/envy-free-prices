@@ -1,6 +1,7 @@
 package singleminded;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,21 +33,25 @@ public class ApproxWE {
 	
 	public ApproxWE(Market M){
 		this.M = M;
-		this.A = this.M.getConnections();
-		this.numberOfBidders = this.A[0].length;
-		this.numberOfItems = this.A.length;
+		this.numberOfBidders = this.M.getNumberCampaigns();
+		this.numberOfItems = this.M.getNumberUsers();
 		this.Rewards = new ArrayList<BidderReward>();
 		for(int j = 0; j < this.M.getNumberCampaigns(); j++){
 			this.Rewards.add(new BidderReward(j,this.M.getCampaign(j).getReward()));
 		}
 		Collections.sort(Rewards, this.UserRewardComparator);
-		System.out.println(Rewards);
+		this.A = new boolean[this.numberOfItems][this.numberOfBidders];
+		for(int i = 0; i < numberOfItems; i++) {
+			this.A[i] = Arrays.copyOf(this.M.getConnections()[i], this.M.getConnections()[i].length);
+		}
 		this.X = new int[numberOfItems][numberOfBidders];
 		this.p = new double[numberOfItems];
 		this.allocVector = new boolean[numberOfBidders];
 	}
 
 	public MarketPrices Solve(){
+		
+		Printer.printMatrix(this.A);
 		
 		while(!matrixAllFalse(A)){
 			/*
