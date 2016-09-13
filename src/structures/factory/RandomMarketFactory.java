@@ -191,7 +191,7 @@ public class RandomMarketFactory {
 		Random generator = new Random();
 		Campaign[] campaigns = new Campaign[m];
 		for(int j=0;j<m;j++){
-			campaigns[j] = new Campaign(generator.nextInt(m) + 1, generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);
+			campaigns[j] = new Campaign(generator.nextInt(n) + 1, generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);
 		}
 		boolean[][] connections = new boolean[n][m];
 		for(int j = 0; j < m; j++){
@@ -207,15 +207,24 @@ public class RandomMarketFactory {
 	}
 	
 	public static Set<Integer> randomNumbers(int n, int max){
-		Random rng = new Random(); // Ideally just create one instance globally
-		// Note: use LinkedHashSet to maintain insertion order
 		Set<Integer> generated = new LinkedHashSet<Integer>();
-		while (generated.size() < n)
-		{
-			System.out.println(generated.size() + "," + n);
-		    Integer next = rng.nextInt(max);
-		    // As we're adding to a set, this will automatically do a containment check
-		    generated.add(next);
+		if(n >= max){
+			/*
+			 * If we want more numbers than the max, it means
+			 * we want all numbers from 1...max.
+			 */
+			for(int i = 0; i < max; i++){
+				generated.add(i);
+			}
+			return generated;
+		}else{
+			Random rng = new Random(); // Ideally just create one instance globally. Note: use LinkedHashSet to maintain insertion order
+			while (generated.size() < n){
+				//System.out.println("11");
+				Integer next = rng.nextInt(max);
+				//As we're adding to a set, this will automatically do a containment check
+				generated.add(next);
+			}
 		}
 		return generated;
 	}
