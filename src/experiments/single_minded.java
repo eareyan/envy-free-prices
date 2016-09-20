@@ -4,9 +4,10 @@ import ilog.concert.IloException;
 
 import java.sql.SQLException;
 
+import log.SqlDB;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import log.SqlDB;
 import singleminded.ApproxWE;
 import statistics.PricesStatistics;
 import structures.Market;
@@ -15,7 +16,7 @@ import structures.MarketPrices;
 import structures.exceptions.CampaignCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketPricesException;
-import structures.factory.RandomMarketFactory;
+import structures.factory.SingleMindedMarketFactory;
 import util.NumberMethods;
 import algorithms.pricing.EnvyFreePricesSolutionLP;
 import algorithms.pricing.EnvyFreePricesVectorLP;
@@ -48,7 +49,7 @@ public class single_minded extends Experiments{
 			
 			for(int k = 0; k < RunParameters.numTrials; k ++){
 				/* Generate Single-minded random market */
-				Market M = RandomMarketFactory.createSingleMindedMarket(numUsers , numCampaigns);
+				Market M = SingleMindedMarketFactory.createSingleMindedMarket(numUsers , numCampaigns);
 				//System.out.println(M);
 				
 				/* Efficient Allocation */

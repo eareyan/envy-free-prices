@@ -2,15 +2,19 @@ package structures.factory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Random;
-import java.util.Set;
 
 import structures.Campaign;
 import structures.Market;
 import structures.User;
 import structures.exceptions.CampaignCreationException;
 
+/*
+ * Markets can be created in different ways.
+ * This class implements logic to create Random Market Objects.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class RandomMarketFactory {
 	public static double defaultMaxReward = 10.0;
 	public static double defaultMinReward = 1.0;
@@ -144,87 +148,5 @@ public class RandomMarketFactory {
 		}
 		//System.out.println(finalList);
 		return finalList;
-	}
-	
-	/*
-	 * Produces a random valuation matrix V_ij, where valuations are within the default range
-	 */
-	public static double[][] getValuationMatrix(int n,int m, double prob,double minReward,double maxReward) {
-		//Random generator = new Random();
-		double[][] valuationMatrix = new double[n][m];
-		for(int i=0;i<n;i++){
-			for(int j=0;j<m;j++){
-				//valuationMatrix[i][j] = (generator.nextDouble() <= prob) ? (generator.nextDouble() * (maxReward - minReward) + minReward) : Double.NEGATIVE_INFINITY;
-				valuationMatrix[i][j] = (Math.random() <= prob) ? (Math.random() * (maxReward - minReward) + minReward) : Double.NEGATIVE_INFINITY;
-				//valuationMatrix[i][j] = Math.random();
-			}
-		}
-		return valuationMatrix;
-	}
-	public static double[][] getValuationMatrix(int n,int m,double prob){
-		return getValuationMatrix(n,m,prob,RandomMarketFactory.defaultMinReward,RandomMarketFactory.defaultMaxReward);
-	}
-	/*
-	 * Given a valuation matrix V_ij, returns a valuation V_ij' that respects resever price r.
-	 * Respect in this context means that any valuation below r becomes -infinity and all others are
-	 * decreased by r. You can think of this operation as "shiftting" the matrix by r.
-	 */
-	public static double[][] getValuationReserve(double[][] X,double r){
-		double[][] XReserve = new double[X.length][X[0].length]; 
-		for(int i=0;i<X.length;i++){
-			for(int j=0;j<X[0].length;j++){
-				XReserve[i][j] = (X[i][j] - r <= 0) ? Double.NEGATIVE_INFINITY : X[i][j] - r ;
-			}
-		}
-		return XReserve;
-	}
-	
-	/*
-	 * Create a single-minded market
-	 */
-	public static Market createSingleMindedMarket(int n, int m) throws CampaignCreationException{
-		User[] users = new User[n];
-		for(int i = 0; i < n; i++){
-			users[i] = new User(1);
-		}		
-		Random generator = new Random();
-		Campaign[] campaigns = new Campaign[m];
-		for(int j=0;j<m;j++){
-			campaigns[j] = new Campaign(generator.nextInt(n) + 1, generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);
-		}
-		boolean[][] connections = new boolean[n][m];
-		for(int j = 0; j < m; j++){
-			int demand = campaigns[j].getDemand();
-			/* Each bidder connects exactly with I_j users*/
-			Set<Integer> connectTo = RandomMarketFactory.randomNumbers(demand, n);
-			//System.out.println("Bidder " + j + " connect to "  + connectTo);		
-			for(Integer i : connectTo){
-				connections[i][j] = true;
-			}
-		}
-		return new Market(users,campaigns,connections);
-	}
-	
-	public static Set<Integer> randomNumbers(int n, int max){
-		Set<Integer> generated = new LinkedHashSet<Integer>();
-		if(n >= max){
-			/*
-			 * If we want more numbers than the max, it means
-			 * we want all numbers from 1...max.
-			 */
-			for(int i = 0; i < max; i++){
-				generated.add(i);
-			}
-			return generated;
-		}else{
-			Random rng = new Random(); // Ideally just create one instance globally. Note: use LinkedHashSet to maintain insertion order
-			while (generated.size() < n){
-				//System.out.println("11");
-				Integer next = rng.nextInt(max);
-				//As we're adding to a set, this will automatically do a containment check
-				generated.add(next);
-			}
-		}
-		return generated;
 	}
 }

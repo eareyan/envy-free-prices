@@ -205,3 +205,51 @@ SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,
 SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,ck2Time,ck2WE1,ck2WE2 FROM fancy_overdemand;
 SELECT n,m,p, lprevenue, evprevenue FROM unit_uniform_demand WHERE lprevenue > evprevenue;
 
+SELECT 	AVG(approxWelfare) AS approxWelfare, 
+	AVG(approxRevenue) AS approxRevenue,
+	AVG(approxEF) AS approxEF,
+	AVG(approxWE) AS approxWE,
+	AVG(approxTime) AS approxTime,
+	AVG(greedyWelfare) AS greedyWelfare, 
+	AVG(greedyRevenue) AS greedyRevenue,
+	AVG(greedyEF) AS greedyEF,
+	AVG(greedyWE) AS greedyWE,
+	AVG(greedyTime) AS greedyTime
+	FROM singleminded;
+
+SELECT 	round(AVG(approxWelfare)::numeric,2) AS approxWelfare, 
+	round(AVG(approxEF)::numeric,2) AS approxEF,
+	round(AVG(approxTime)::numeric,2) AS approxTime,
+	round(AVG(greedyWelfare)::numeric,2) AS greedyWelfare, 
+	round(AVG(greedyEF)::numeric,2) AS greedyEF,
+	round(AVG(greedyTime)::numeric,2) AS greedyTime
+	FROM singleminded;
+
+SELECT 	round(AVG(approxWelfare)::numeric,2) AS approxWelfare, 
+	round(AVG(approxEF)::numeric,2) AS approxEF,
+	round(AVG(approxTime)::numeric,2) AS approxTime,
+	round(AVG(greedyWelfare)::numeric,2) AS greedyWelfare, 
+	round(AVG(greedyEF)::numeric,2) AS greedyEF,
+	round(AVG(greedyTime)::numeric,2) AS greedyTime
+	FROM singleminded
+	WHERE n<=m;
+
+
+SELECT 	AVG(approxWelfare) AS approxWelfare, 
+	AVG(approxEF) AS approxEF,
+	AVG(approxTime) AS approxTime,
+	AVG(greedyWelfare) AS greedyWelfare, 
+	AVG(greedyEF) AS greedyEF,
+	AVG(greedyTime) AS greedyTime
+	FROM singleminded
+	WHERE n>m;
+
+SELECT 	AVG(approxWelfare) AS approxWelfare, 
+	AVG(approxEF) AS approxEF,
+	AVG(approxTime) AS approxTime,
+	AVG(greedyWelfare) AS greedyWelfare, 
+	AVG(greedyEF) AS greedyEF,
+	AVG(greedyTime) AS greedyTime
+	FROM singleminded
+	WHERE n<=m;
+

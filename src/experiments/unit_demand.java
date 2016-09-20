@@ -6,7 +6,7 @@ import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import structures.factory.RandomMarketFactory;
+import structures.factory.UnitMarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import unitdemand.evpapprox.AllConnectedDummies;
@@ -45,7 +45,7 @@ public class unit_demand extends Experiments{
 
 			long startTime , endTime ;
 			for(int t=0;t<RunParameters.numTrials;t++){
-				double[][] valuationMatrix = RandomMarketFactory.getValuationMatrix(numUsers, numCampaigns, prob) ;
+				double[][] valuationMatrix = UnitMarketFactory.getValuationMatrix(numUsers, numCampaigns, prob) ;
 				/*
 				 * Compute the efficient allocation, in this case, the maximum weight matching.
 				 */
