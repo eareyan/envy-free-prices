@@ -14,6 +14,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import singleminded.ApproxWE;
+import singleminded.ApproxWEReserve;
 import statistics.PricesStatistics;
 import structures.Campaign;
 import structures.Market;
@@ -22,6 +23,7 @@ import structures.MarketPrices;
 import structures.User;
 import structures.exceptions.CampaignCreationException;
 import structures.exceptions.MarketAllocationException;
+import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketPricesException;
 import structures.factory.UnitMarketAllocationFactory;
 import structures.factory.MarketFactory;
@@ -62,13 +64,28 @@ import experiments.RunParameters;
 public class Main {
 	
 	
-	public static void main(String args[]) throws CampaignCreationException {
-		System.out.println("Create single minded market");
-		Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(3, 4);
+	public static void main(String args[]) throws CampaignCreationException, AllocationException, IloException, MarketCreationException, MarketPricesException {
+		System.out.println("*************** Create single minded market ***************");
+		Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(4, 5);
 		System.out.println(M);
-				
-		System.out.println(SingleMindedMarketFactory.discountSingleMindedMarket(M, 1.0));
-		
+		MarketPrices approxWEResult = new ApproxWE(M).Solve();
+		Printer.printMatrix(approxWEResult.getMarketAllocation().getAllocation());
+		Printer.printVector(approxWEResult.getPriceVector());
+    System.out.println(approxWEResult.sellerRevenuePriceVector());
+    /*System.out.println("*************** Dicount single minded market ***************");
+		Market discountedM = SingleMindedMarketFactory.discountSingleMindedMarket(M, 2.0);
+		System.out.println(discountedM);
+    MarketPrices discountedApproxWEResult = new ApproxWE(discountedM).Solve();
+    Printer.printMatrix(discountedApproxWEResult.getMarketAllocation().getAllocation());
+    Printer.printVector(discountedApproxWEResult.getPriceVector());*/
+    //MarketAllocation aprxWEReserve = new ApproxWEReserve().getAllocWithReservePrice(M, 2.0);
+    //Printer.printMatrix(aprxWEReserve.getAllocation());
+    
+    LPReservePrices lpRP = new LPReservePrices(M, new ApproxWEReserve());
+		MarketPrices x = lpRP.Solve();
+		Printer.printMatrix(x.getMarketAllocation().getAllocation());
+		Printer.printVector(x.getPriceVector());
+		System.out.println(x.sellerRevenuePriceVector());
 		
 	}
 	

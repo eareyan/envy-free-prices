@@ -6,14 +6,15 @@ package structures.exceptions;
  * @author Enrique Areyan Viqueira
  */
 @SuppressWarnings("serial")
-public class CampaignCreationException extends Exception {
-
+public class MarketCreationException extends Exception {
+  
   /**
    * Constructor.
+   * 
    * @param info - exception information.
    */
-  public CampaignCreationException(String info) {
+  public MarketCreationException(String info) {
     super(info);
   }
-  
+
 }

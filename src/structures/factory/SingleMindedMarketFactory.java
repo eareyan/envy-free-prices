@@ -9,6 +9,7 @@ import structures.Campaign;
 import structures.Market;
 import structures.User;
 import structures.exceptions.CampaignCreationException;
+import structures.exceptions.MarketCreationException;
 
 /**
  * This class implements methods to create single-minded markets.
@@ -57,27 +58,28 @@ public class SingleMindedMarketFactory {
    * @param M - a market object.
    * @param reserve - a reserve price.
    * @return a single-minded market.
+   * @throws MarketCreationException in case the reserve is too high and no campaign survived.
    */
   public static Market discountSingleMindedMarket(Market M, double reserve) {
     // Construct a map of the campaigns that "survive" the reserve price
     HashMap<Integer, Campaign> remainingCampaigns = new HashMap<Integer, Campaign>();
     for (int j = 0; j < M.getNumberCampaigns(); j++) {
       if (M.getCampaign(j).getReward() - reserve * M.getCampaign(j).getDemand() >= 0) {
+        //System.out.println("Difference for " + j + " is " + (M.getCampaign(j).getReward() - reserve * M.getCampaign(j).getDemand()));
         remainingCampaigns.put(j, M.getCampaign(j));
       }
     }
     // Construct a new market only with "surviving" campaigns
-    Campaign[] campaigns = new Campaign[remainingCampaigns.size()];
-    int j = 0;
-    boolean[][] connections = new boolean[M.getNumberUsers()][remainingCampaigns.size()];
-    for (HashMap.Entry<Integer, Campaign> entry : remainingCampaigns.entrySet()) {
-      Integer key = entry.getKey();
-      Campaign value = entry.getValue();
-      campaigns[j] = value;
-      for (int i = 0; i < M.getNumberUsers(); i++) {
-        connections[i][j] = M.getConnections()[i][key];
+    Campaign[] campaigns = new Campaign[M.getNumberCampaigns()];
+    boolean[][] connections = new boolean[M.getNumberUsers()][M.getNumberCampaigns()];
+    for (int j = 0; j < M.getNumberCampaigns(); j++) {
+      campaigns[j] = M.getCampaign(j);
+      Campaign campaign = remainingCampaigns.get(j);
+      if (campaign != null) {
+        for (int i = 0; i < M.getNumberUsers(); i++) {
+          connections[i][j] = M.getConnections()[i][j];
+        }
       }
-      j++;
     }
     return new Market(M.getUsers(), campaigns, connections);
   }

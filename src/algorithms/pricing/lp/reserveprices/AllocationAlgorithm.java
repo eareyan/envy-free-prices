@@ -4,6 +4,7 @@ import allocations.error.AllocationException;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.CampaignCreationException;
+import structures.exceptions.MarketCreationException;
 
 /**
  * Interface. Should be implemented by a class
@@ -20,6 +21,7 @@ public interface AllocationAlgorithm {
    * @return a MarketAllocation object.
    * @throws AllocationException when an allocation algorithm failed.
    * @throws CampaignCreationException when an allocation algorithm failed.
+   * @throws MarketCreationException when an error occured creating a market.
    */
   public MarketAllocation getAllocWithReservePrice(Market market, double reserve) throws AllocationException, CampaignCreationException;
   

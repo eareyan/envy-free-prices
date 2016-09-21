@@ -12,6 +12,7 @@ import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.comparators.MarketPricesComparatorBySellerRevenue;
 import structures.exceptions.CampaignCreationException;
+import util.Printer;
 import algorithms.pricing.EnvyFreePricesSolutionLP;
 import algorithms.pricing.EnvyFreePricesVectorLP;
 import allocations.error.AllocationException;
@@ -23,9 +24,24 @@ import allocations.error.AllocationException;
  */
 public class LPReservePrices {
 
+  /**
+   * Market object.
+   */
   protected Market market;
+  
+  /**
+   * MarketAllocation object.
+   */
   protected MarketAllocation initialMarketAllocation;
+  
+  /**
+   * ArrayList of MarketPrices.
+   */
   protected ArrayList<MarketPrices> setOfSolutions;
+  
+  /**
+   * AllocationAlgorithm object. 
+   */
   protected AllocationAlgorithm AllocAlgo;
 
   /**
@@ -33,9 +49,9 @@ public class LPReservePrices {
    * 
    * @param market - market on which to find a revenue-max solution
    * @param AllocAlgo - which allocation algorithm to use
-   * @throws IloException - if the LP fails
-   * @throws AllocationException - if the allocation algorithm fails
-   * @throws CampaignCreationException - possibly thrown by the allocation algorithm
+   * @throws IloException if the LP fails
+   * @throws AllocationException if the allocation algorithm fails
+   * @throws CampaignCreationException possibly thrown by the allocation algorithm
    */
   public LPReservePrices(Market market, AllocationAlgorithm AllocAlgo) throws IloException, AllocationException, CampaignCreationException {
     this.market = market;
@@ -54,10 +70,10 @@ public class LPReservePrices {
   }
 
   /**
-   * 
-   * @throws IloException
-   * @throws AllocationException
-   * @throws CampaignCreationException
+   * Solve method. 
+   * @throws IloException in case the LP failed.
+   * @throws AllocationException in case the Allocation algorithm failed.
+   * @throws CampaignCreationException possibly thrown by the allocation algorithm
    * @return a MarketPrices object.
    */
   public MarketPrices Solve() throws IloException, AllocationException, CampaignCreationException {
@@ -69,10 +85,12 @@ public class LPReservePrices {
     for (int i = 0; i < this.market.getNumberUsers(); i++) {
       for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
         if (this.initialMarketAllocation.getAllocation()[i][j] > 0) { 
-          //For all x_{ij} > 0.
+          // For all x_{ij} > 0.
           double reserve = this.market.getCampaign(j).getReward() / this.initialMarketAllocation.getAllocation()[i][j];
+          //System.out.println("---------- candidate reserve price = " + reserve);
           // Solve for an allocation that respects the reserve price R_j / x_{ij}.
-          int[][] allocRespectReserve = this.AllocAlgo.getAllocWithReservePrice(market, reserve).getAllocation();
+          int[][] allocRespectReserve;
+          allocRespectReserve = this.AllocAlgo.getAllocWithReservePrice(market, reserve).getAllocation();
           // Run LP with reserve prices.
           EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(new MarketAllocation(this.market, allocRespectReserve));
           efp.setMarketClearanceConditions(false);
@@ -81,21 +99,23 @@ public class LPReservePrices {
           efp.setReservePrices(reservePrices);
           setOfSolutions.add(efp.Solve());
           /*
-           * Only for debugging System.out.println("Reserve: x["+i+"]["+j+"] = "
-           * + this.initialMarketAllocation.getAllocation()[i][j]);
+           * Only for debugging
+           * System.out.println("Reserve: x["+i+"]["+j+"] = " +
+           * this.initialMarketAllocation.getAllocation()[i][j]);
            * System.out.println
            * ("R_"+j+"/ x_{"+i+""+j+"} = "+this.market.getCampaign
            * (j).getReward() + " / " +
-           * this.initialMarketAllocation.getAllocation()[i][j] +" = "+reserve);
-           * Printer.printMatrix(allocRespectReserve);
+           * this.initialMarketAllocation.getAllocation()[i][j]
+           * +" = "+reserve); Printer.printMatrix(allocRespectReserve);
            * System.out.println(efp.Solve().getStatus());
            * Printer.printVector(efp.Solve().getPriceVector());
            */
         }
       }
     }
+    //System.out.println(setOfSolutions);
     Collections.sort(setOfSolutions, new MarketPricesComparatorBySellerRevenue());
-    // System.out.println(setOfSolutions);
+    //System.out.println(setOfSolutions);
     /*
      * For debugging purposes only: System.out.println(setOfSolutions);
      * for(MarketPrices sol:setOfSolutions){ System.out.println("Solution-->");
