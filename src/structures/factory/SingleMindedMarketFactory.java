@@ -1,5 +1,6 @@
 package structures.factory;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
@@ -48,12 +49,27 @@ public class SingleMindedMarketFactory {
 	 * 			are dropped out.
 	 */
 	public static Market discountSingleMindedMarket(Market M, double reserve) {
+		//Construct a map of the campaigns that "survive" the reserve price
+		HashMap<Integer,Campaign> remainingCampaigns = new HashMap<Integer,Campaign>();
 		for(int j = 0; j < M.getNumberCampaigns(); j++){
-			if(M.getCampaign(j).getReward() - reserve * M.getCampaign(j).getDemand() < 0 ) {
-				System.out.println("Drop campaign " + j);
+			if(M.getCampaign(j).getReward() - reserve * M.getCampaign(j).getDemand() >= 0 ) {
+				remainingCampaigns.put(j, M.getCampaign(j));
 			}
 		}
-		return null;
+		//Construct a new market only with "surviving" campaigns
+		Campaign[] campaigns = new Campaign[remainingCampaigns.size()];
+		int j = 0;
+		boolean[][] connections = new boolean[M.getNumberUsers()][remainingCampaigns.size()];
+		for (HashMap.Entry<Integer, Campaign> entry : remainingCampaigns.entrySet()) {
+			Integer key = entry.getKey();
+			Campaign value = entry.getValue();
+			campaigns[j] = value;
+			for(int i = 0; i < M.getNumberUsers(); i++){
+				connections[i][j] = M.getConnections()[i][key];
+			}
+			j++;
+		}
+		return new Market(M.getUsers(),campaigns,connections);
 	}
 	
 	/*
