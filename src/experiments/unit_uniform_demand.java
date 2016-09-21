@@ -14,7 +14,7 @@ import structures.MarketPrices;
 import structures.exceptions.CampaignCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketPricesException;
-import structures.factory.MarketAllocationFactory;
+import structures.factory.UnitMarketAllocationFactory;
 import structures.factory.UnitMarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
@@ -61,7 +61,7 @@ public class unit_uniform_demand extends Experiments{
 			long startTime , endTime ;
 			for(int t=0;t<RunParameters.numTrials;t++){
 				Market market = UnitMarketFactory.randomUnitDemandMarket(numUsers, numCampaigns, prob);
-				double [][] valuationMatrix = MarketAllocationFactory.getValuationMatrixFromMarket(market);
+				double [][] valuationMatrix = UnitMarketAllocationFactory.getValuationMatrixFromMarket(market);
 				/*
 				 * Compute the efficient allocation, in this case, the maximum weight matching.
 				 */
@@ -119,7 +119,7 @@ public class unit_uniform_demand extends Experiments{
 				lpTime.addValue(endTime - startTime);
 				PricesStatistics p = new PricesStatistics(lpSol);
 				lpWE1.addValue((double) p.numberOfEnvyCampaigns() / numCampaigns);
-				lpWE2.addValue((double) p.computeWalrasianViolations()[0] / numUsers);
+				lpWE2.addValue((double) p.computeMarketClearanceViolations()[0] / numUsers);
 
 			}
 			/* log results in database */

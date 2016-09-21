@@ -357,7 +357,7 @@ public class Grapher {
 
 				/* Compute envy-free prices */
 				EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(allocRespectReserve);
-				efp.setWalrasianConditions(false);
+				efp.setMarketClearanceConditions(false);
 				efp.createLP();
 				Arrays.fill(reservePrices, reserve);
 				efp.setReservePrices(reservePrices);

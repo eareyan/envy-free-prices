@@ -129,7 +129,7 @@ public class fancy_demand extends Experiments{
 				ckTime.addValue(endTime - startTime);
 				PricesStatistics ckStat = new PricesStatistics(ckSol);
 				ckWE1.addValue((double) ckStat.numberOfEnvyCampaigns() / numCampaigns);
-				ckWE2.addValue((double) ckStat.computeWalrasianViolations()[0] / numUsers);
+				ckWE2.addValue((double) ckStat.computeMarketClearanceViolations()[0] / numUsers);
 				/*
 				 * Measure lpOPT
 				 */
@@ -142,7 +142,7 @@ public class fancy_demand extends Experiments{
 				lpOptTime.addValue(endTime - startTime);
 				PricesStatistics lpOPTStat = new PricesStatistics(lpOPTSol);
 				lpOptWE1.addValue((double) lpOPTStat.numberOfEnvyCampaigns() / numCampaigns);
-				lpOptWE2.addValue((double) lpOPTStat.computeWalrasianViolations()[0] / numUsers);
+				lpOptWE2.addValue((double) lpOPTStat.computeMarketClearanceViolations()[0] / numUsers);
 				/*
 				 * Measure lpWF
 				 */
@@ -155,7 +155,7 @@ public class fancy_demand extends Experiments{
 				lpWFTime.addValue(endTime - startTime);
 				PricesStatistics lpWFStat = new PricesStatistics(lpWFSol);
 				lpWFWE1.addValue((double) lpWFStat.numberOfEnvyCampaigns() / numCampaigns);
-				lpWFWE2.addValue((double) lpWFStat.computeWalrasianViolations()[0] / numUsers);
+				lpWFWE2.addValue((double) lpWFStat.computeMarketClearanceViolations()[0] / numUsers);
 				/*
 				 * Measure lpG1
 				 */
@@ -168,7 +168,7 @@ public class fancy_demand extends Experiments{
 				lpG1Time.addValue(endTime - startTime);
 				PricesStatistics lpG1Stat = new PricesStatistics(lpG1Sol);
 				lpG1WE1.addValue((double) lpG1Stat.numberOfEnvyCampaigns() / numCampaigns);
-				lpG1WE2.addValue((double) lpG1Stat.computeWalrasianViolations()[0] / numUsers);
+				lpG1WE2.addValue((double) lpG1Stat.computeMarketClearanceViolations()[0] / numUsers);
 				/*
 				 * Measure lpG1
 				 */
@@ -181,7 +181,7 @@ public class fancy_demand extends Experiments{
 				lpG2Time.addValue(endTime - startTime);
 				PricesStatistics lpG2Stat = new PricesStatistics(lpG2Sol);
 				lpG2WE1.addValue((double) lpG2Stat.numberOfEnvyCampaigns() / numCampaigns);
-				lpG2WE2.addValue((double) lpG2Stat.computeWalrasianViolations()[0] / numUsers);	
+				lpG2WE2.addValue((double) lpG2Stat.computeMarketClearanceViolations()[0] / numUsers);	
 				
 				/****
 				 * Unit Supply
@@ -201,7 +201,7 @@ public class fancy_demand extends Experiments{
 				lpUnitOptTime.addValue(endTime - startTime);
 				PricesStatistics lpOPTUnitStat = new PricesStatistics(lpOPTUnitSol);
 				lpUnitOptWE1.addValue((double) lpOPTUnitStat.numberOfEnvyCampaigns() / numCampaigns);
-				lpUnitOptWE2.addValue((double) lpOPTUnitStat.computeWalrasianViolations()[0] / numUsers);
+				lpUnitOptWE2.addValue((double) lpOPTUnitStat.computeMarketClearanceViolations()[0] / numUsers);
 				/*
 				 * Measure lpWF
 				 */
@@ -214,7 +214,7 @@ public class fancy_demand extends Experiments{
 				lpUnitWFTime.addValue(endTime - startTime);
 				PricesStatistics lpUnitWFStat = new PricesStatistics(lpUnitWFSol);
 				lpUnitWFWE1.addValue((double) lpUnitWFStat.numberOfEnvyCampaigns() / numCampaigns);
-				lpUnitWFWE2.addValue((double) lpUnitWFStat.computeWalrasianViolations()[0] / numUsers);
+				lpUnitWFWE2.addValue((double) lpUnitWFStat.computeMarketClearanceViolations()[0] / numUsers);
 				/*
 				 * Measure lpG1
 				 */
@@ -227,7 +227,7 @@ public class fancy_demand extends Experiments{
 				lpUnitG1Time.addValue(endTime - startTime);
 				PricesStatistics lpUnitG1Stat = new PricesStatistics(lpUnitG1Sol);
 				lpUnitG1WE1.addValue((double) lpUnitG1Stat.numberOfEnvyCampaigns() / numCampaigns);
-				lpUnitG1WE2.addValue((double) lpUnitG1Stat.computeWalrasianViolations()[0] / numUsers);
+				lpUnitG1WE2.addValue((double) lpUnitG1Stat.computeMarketClearanceViolations()[0] / numUsers);
 				/*
 				 * Measure lpG1
 				 */
@@ -240,7 +240,7 @@ public class fancy_demand extends Experiments{
 				lpUnitG2Time.addValue(endTime - startTime);
 				PricesStatistics lpUnitG2Stat = new PricesStatistics(lpUnitG2Sol);
 				lpUnitG2WE1.addValue((double) lpUnitG2Stat.numberOfEnvyCampaigns() / numCampaigns);
-				lpUnitG2WE2.addValue((double) lpUnitG2Stat.computeWalrasianViolations()[0] / numUsers);					
+				lpUnitG2WE2.addValue((double) lpUnitG2Stat.computeMarketClearanceViolations()[0] / numUsers);					
 				
 				
 			}

@@ -5,7 +5,22 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.CampaignCreationException;
 
+/**
+ * Interface. Should be implemented by a class
+ * that defines an allocation algorithm to be used with LPReservePrices.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public interface AllocationAlgorithm {
-	
-	public MarketAllocation getAllocWithReservePrice(Market market, double reserve) throws AllocationException, CampaignCreationException; 
+
+  /**
+   * This method should be extended to implement an allocation algorithm.
+   * @param market - market object.
+   * @param reserve - reserve price.
+   * @return a MarketAllocation object.
+   * @throws AllocationException when an allocation algorithm failed.
+   * @throws CampaignCreationException when an allocation algorithm failed.
+   */
+  public MarketAllocation getAllocWithReservePrice(Market market, double reserve) throws AllocationException, CampaignCreationException;
+  
 }

@@ -23,7 +23,7 @@ import structures.User;
 import structures.exceptions.CampaignCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketPricesException;
-import structures.factory.MarketAllocationFactory;
+import structures.factory.UnitMarketAllocationFactory;
 import structures.factory.MarketFactory;
 import structures.factory.RandomMarketFactory;
 import structures.factory.SingleMindedMarketFactory;
@@ -35,7 +35,6 @@ import unitdemand.evpapprox.EVPApproximation;
 import util.NumberMethods;
 import util.Printer;
 import algorithms.ascendingauction.AscendingAuction;
-import algorithms.ascendingauction.AscendingAuctionModified;
 import algorithms.pricing.EnvyFreePricesSolutionLP;
 import algorithms.pricing.EnvyFreePricesVectorLP;
 import algorithms.pricing.lp.reserveprices.EfficientAlloc;
@@ -65,10 +64,10 @@ public class Main {
 	
 	public static void main(String args[]) throws CampaignCreationException {
 		System.out.println("Create single minded market");
-		Market M = SingleMindedMarketFactory.createSingleMindedMarket(3, 4);
+		Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(3, 4);
 		System.out.println(M);
 				
-		SingleMindedMarketFactory.discountSingleMindedMarket(M, 1.0);
+		System.out.println(SingleMindedMarketFactory.discountSingleMindedMarket(M, 1.0));
 		
 		
 	}
@@ -96,7 +95,7 @@ public class Main {
 				
 				for(int k = 0; k <1; k ++){
 					/* Generate Single-minded random market */
-					Market M = SingleMindedMarketFactory.createSingleMindedMarket(3,3);
+					Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(3,3);
 					System.out.println(M);
 					
 					/* Efficient Allocation */
@@ -133,7 +132,7 @@ public class Main {
 					endTime = System.nanoTime();
 					//--LP
 					EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(new MarketAllocation(M,greedyAlloc));
-					efp.setWalrasianConditions(false);
+					efp.setMarketClearanceConditions(false);
 					efp.createLP();
 					EnvyFreePricesSolutionLP lpResult = efp.Solve();
 					MarketPrices greedyResult = new MarketPrices(new MarketAllocation(M, greedyAlloc, new SingleStepFunction()),lpResult.getPriceVector());

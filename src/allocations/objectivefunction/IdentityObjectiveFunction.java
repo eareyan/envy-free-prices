@@ -1,7 +1,17 @@
 package allocations.objectivefunction;
 
-public class IdentityObjectiveFunction implements ObjectiveFunction{
-	public double getObjective(double reward, double total, double x){
-		return (x<=total)?(reward/total)*x : reward; 
-	}
+/**
+ * Identity function.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
+public class IdentityObjectiveFunction implements ObjectiveFunction {
+  
+  /**
+   * Implements an identity objective function. 
+   */
+  public double getObjective(double reward, double total, double x) {
+    return (x <= total) ? (reward / total) * x : reward;
+  }
+  
 }

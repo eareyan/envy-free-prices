@@ -49,7 +49,7 @@ public class single_minded extends Experiments{
 			
 			for(int k = 0; k < RunParameters.numTrials; k ++){
 				/* Generate Single-minded random market */
-				Market M = SingleMindedMarketFactory.createSingleMindedMarket(numUsers , numCampaigns);
+				Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(numUsers , numCampaigns);
 				//System.out.println(M);
 				
 				/* Efficient Allocation */
@@ -75,7 +75,7 @@ public class single_minded extends Experiments{
 				approxWelfare.addValue(NumberMethods.getRatio(approxWEResult.getMarketAllocation().value() , optimalWelfare));
 				approxRevenue.addValue(NumberMethods.getRatio(approxWEResult.sellerRevenuePriceVector() ,  optimalWelfare));
 				approxEF.addValue((double) psApprox.numberOfEnvyCampaigns() / numCampaigns);
-				approxWE.addValue((double) psApprox.computeWalrasianViolations()[0] / numUsers);
+				approxWE.addValue((double) psApprox.computeMarketClearanceViolations()[0] / numUsers);
 				approxTime.addValue(endTime - startTime);
 				
 				/* Single-Step Greedy + LP */
@@ -85,7 +85,7 @@ public class single_minded extends Experiments{
 				endTime = System.nanoTime();
 				//--LP
 				EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(new MarketAllocation(M,greedyAlloc));
-				efp.setWalrasianConditions(false);
+				efp.setMarketClearanceConditions(false);
 				efp.createLP();
 				EnvyFreePricesSolutionLP lpResult = efp.Solve();
 				MarketPrices greedyResult = new MarketPrices(new MarketAllocation(M, greedyAlloc, new SingleStepFunction()),lpResult.getPriceVector());
@@ -100,7 +100,7 @@ public class single_minded extends Experiments{
 				greedyWelfare.addValue(NumberMethods.getRatio(greedyResult.getMarketAllocation().value() , optimalWelfare));
 				greedyRevenue.addValue(NumberMethods.getRatio(greedyResult.sellerRevenuePriceVector() , optimalWelfare));
 				greedyEF.addValue((double) psGreedy.numberOfEnvyCampaigns() / numCampaigns);
-				greedyWE.addValue((double) psGreedy.computeWalrasianViolations()[0] / numUsers);
+				greedyWE.addValue((double) psGreedy.computeMarketClearanceViolations()[0] / numUsers);
 				greedyTime.addValue(endTime - startTime);
 			}
 			dbLogger.saveSingleMinded("singleminded", numUsers, numCampaigns, 
