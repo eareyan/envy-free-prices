@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-import structures.Campaign;
+import structures.Bidder;
 import structures.Market;
-import structures.User;
-import structures.exceptions.CampaignCreationException;
+import structures.Goods;
+import structures.exceptions.BidderCreationException;
 
 /**
  * Markets can be created in different ways.
@@ -36,22 +36,22 @@ public class RandomMarketFactory {
    * @param maxReward - upper bound on the reward of a campaign.
    * @param probabilityConnection - probability of a connection.
    * @return a Market object.
-   * @throws CampaignCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a campaign could not be created.
    */
   public static Market randomMarket(int numberUsers, int minSupplyPerUser,
       int maxSupplyPerUser, int numberCampaigns, int minDemandPerCampaign,
       int maxDemandPerCampaign, double minReward, double maxReward,
-      double probabilityConnection) throws CampaignCreationException {
+      double probabilityConnection) throws BidderCreationException {
     // Create Users
     Random generator = new Random();
-    User[] users = new User[numberUsers];
+    Goods[] users = new Goods[numberUsers];
     for (int i = 0; i < numberUsers; i++) {
-      users[i] = new User(generator.nextInt((maxSupplyPerUser - minSupplyPerUser) + 1) + minSupplyPerUser);
+      users[i] = new Goods(generator.nextInt((maxSupplyPerUser - minSupplyPerUser) + 1) + minSupplyPerUser);
     }
     // Create Campaigns
-    Campaign[] campaigns = new Campaign[numberCampaigns];
+    Bidder[] campaigns = new Bidder[numberCampaigns];
     for (int j = 0; j < numberCampaigns; j++) {
-      campaigns[j] = new Campaign(
+      campaigns[j] = new Bidder(
           generator.nextInt((maxDemandPerCampaign - minDemandPerCampaign) + 1) + minDemandPerCampaign, 
           generator.nextDouble() * (maxReward - minReward) + minReward);
     }
@@ -77,10 +77,10 @@ public class RandomMarketFactory {
    * @param numberCampaigns - number of campaigns.
    * @param probabilityConnections - probability of a connection.
    * @return a Market object.
-   * @throws CampaignCreationException
+   * @throws BidderCreationException
    */
   public static Market randomMarket(int numberUsers, int numberCampaigns,
-      double probabilityConnections) throws CampaignCreationException {
+      double probabilityConnections) throws BidderCreationException {
     return RandomMarketFactory.randomMarket(numberUsers,
         RandomMarketFactory.defaultMinSupplyPerUser,
         RandomMarketFactory.defaultMaxSupplyPerUser, numberCampaigns,
@@ -98,11 +98,11 @@ public class RandomMarketFactory {
    * @param probabilityConnection - probability of a connection.
    * @param b - supply to demand ratio.
    * @return a Market object.
-   * @throws CampaignCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a campaign could not be created.
    */
   public static Market generateOverDemandedMarket(int numberUsers,
       int numberCampaigns, double probabilityConnection, int b)
-      throws CampaignCreationException {
+      throws BidderCreationException {
     return RandomKMarket(numberUsers, numberCampaigns, probabilityConnection, b);
   }
 
@@ -114,11 +114,11 @@ public class RandomMarketFactory {
    * @param probabilityConnection - probability of a connection.
    * @param b - supply to demand ratio.
    * @return a Market object.
-   * @throws CampaignCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a campaign could not be created.
    */
   public static Market generateOverSuppliedMarket(int numberUsers,
       int numberCampaigns, double probabilityConnection, int b)
-      throws CampaignCreationException {
+      throws BidderCreationException {
     return MarketFactory.transposeMarket(RandomKMarket(numberCampaigns, numberUsers, probabilityConnection, b));
   }
   
@@ -130,13 +130,13 @@ public class RandomMarketFactory {
    * @param probabilityConnection - probability of a connection.
    * @param b - supply to demand ratio.
    * @return a Market object.
-   * @throws CampaignCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a campaign could not be created.
    */
   public static Market RandomKMarket(int numberUsers, int numberCampaigns,
-      double probabilityConnection, int b) throws CampaignCreationException {
+      double probabilityConnection, int b) throws BidderCreationException {
     Random generator = new Random();
-    User[] users = new User[numberUsers];
-    Campaign[] campaigns = new Campaign[numberCampaigns];
+    Goods[] users = new Goods[numberUsers];
+    Bidder[] campaigns = new Bidder[numberCampaigns];
     int[] campaignConnectedToUser = new int[numberUsers];
     boolean[][] connections = new boolean[numberUsers][numberCampaigns];
     for (int i = 0; i < numberUsers; i++) {
@@ -174,10 +174,10 @@ public class RandomMarketFactory {
       }
     }
     for (int i = 0; i < numberUsers; i++) {
-      users[i] = new User(finalSupply[i]);
+      users[i] = new Goods(finalSupply[i]);
     }
     for (int j = 0; j < numberCampaigns; j++) {
-      campaigns[j] = new Campaign(
+      campaigns[j] = new Bidder(
           finalDemands[j],
           generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);
     }

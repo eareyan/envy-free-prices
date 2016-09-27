@@ -14,7 +14,7 @@ import structures.comparators.MarketPricesComparatorBySellerRevenue;
 import structures.factory.UnitMarketAllocationFactory;
 import unitdemand.Link;
 import util.Printer;
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 
 /**
  * Implements LP with reserve for unit-demand markets.
@@ -47,7 +47,7 @@ public class UnitLPReservePrices {
     // Printer.printMatrix(valuationMatrix);
     ArrayList<Link> valuations = Link.getEdgeValuations(valuationMatrix);
     valuations.add(new Link(-1, 0.0)); // Add valuation of zero
-    double[] reservePrices = new double[this.market.getNumberUsers()];
+    double[] reservePrices = new double[this.market.getNumberGoods()];
     ArrayList<MarketPrices> setOfSolutions = new ArrayList<MarketPrices>();
     for (Link valueLink : valuations) {// For each link
       IloCplex iloObject = new IloCplex();
@@ -60,7 +60,7 @@ public class UnitLPReservePrices {
       System.out.println("Alloc for reserve " + valueLink.getJ());
       Printer.printMatrix(marketAlloc.getAllocation());
       // Feed new allocation with initial market to LP and set reserve prices. 
-      EnvyFreePricesVectorLP LP = new EnvyFreePricesVectorLP(marketAlloc, iloObject);
+      RestrictedEnvyFreePricesLP LP = new RestrictedEnvyFreePricesLP(marketAlloc, iloObject);
       LP.setMarketClearanceConditions(false);
       LP.createLP();
       LP.generateMarketClearanceConditionsWithReserve(valueLink.getValue());

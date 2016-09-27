@@ -3,7 +3,7 @@ package algorithms.pricing.lp.reserveprices;
 import allocations.error.AllocationException;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.exceptions.CampaignCreationException;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketCreationException;
 
 /**
@@ -20,9 +20,9 @@ public interface AllocationAlgorithm {
    * @param reserve - reserve price.
    * @return a MarketAllocation object.
    * @throws AllocationException when an allocation algorithm failed.
-   * @throws CampaignCreationException when an allocation algorithm failed.
+   * @throws BidderCreationException when an allocation algorithm failed.
    * @throws MarketCreationException when an error occured creating a market.
    */
-  public MarketAllocation getAllocWithReservePrice(Market market, double reserve) throws AllocationException, CampaignCreationException;
+  public MarketAllocation getAllocWithReservePrice(Market market, double reserve) throws AllocationException, BidderCreationException;
   
 }

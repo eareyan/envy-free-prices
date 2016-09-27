@@ -15,8 +15,8 @@ import structures.factory.UnitMarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import util.Printer;
-import algorithms.pricing.EnvyFreePricesSolutionLP;
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import allocations.optimal.SingleStepEfficientAllocationILP;
 
 public class Grapher {
@@ -356,12 +356,12 @@ public class Grapher {
 				MarketAllocation allocRespectReserve = new SingleStepEfficientAllocationILP().Solve(M);
 
 				/* Compute envy-free prices */
-				EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(allocRespectReserve);
+				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(allocRespectReserve);
 				efp.setMarketClearanceConditions(false);
 				efp.createLP();
 				Arrays.fill(reservePrices, reserve);
 				efp.setReservePrices(reservePrices);
-				EnvyFreePricesSolutionLP sol = efp.Solve();
+				RestrictedEnvyFreePricesLPSolution sol = efp.Solve();
 				if(sol.getStatus().equals("Infeasible")){
 					sellerRevenue = 0.0;
 				}else{

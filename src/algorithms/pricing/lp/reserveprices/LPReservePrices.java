@@ -11,10 +11,9 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
 import structures.comparators.MarketPricesComparatorBySellerRevenue;
-import structures.exceptions.CampaignCreationException;
-import util.Printer;
-import algorithms.pricing.EnvyFreePricesSolutionLP;
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import structures.exceptions.BidderCreationException;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import allocations.error.AllocationException;
 
 /**
@@ -51,48 +50,49 @@ public class LPReservePrices {
    * @param AllocAlgo - which allocation algorithm to use
    * @throws IloException if the LP fails
    * @throws AllocationException if the allocation algorithm fails
-   * @throws CampaignCreationException possibly thrown by the allocation algorithm
+   * @throws BidderCreationException possibly thrown by the allocation algorithm
    */
-  public LPReservePrices(Market market, AllocationAlgorithm AllocAlgo) throws IloException, AllocationException, CampaignCreationException {
+  public LPReservePrices(Market market, AllocationAlgorithm AllocAlgo) throws IloException, AllocationException, BidderCreationException {
     this.market = market;
     this.AllocAlgo = AllocAlgo;
     // The initial allocation has reserve price of 0. The solution is the plain flavor LP.
     this.initialMarketAllocation = this.AllocAlgo.getAllocWithReservePrice(this.market, 0.0);
     this.setOfSolutions = new ArrayList<MarketPrices>();
     // Create the first LP with no reserves.
-    EnvyFreePricesVectorLP initialLP = new EnvyFreePricesVectorLP(this.initialMarketAllocation, new IloCplex());
+    RestrictedEnvyFreePricesLP initialLP = new RestrictedEnvyFreePricesLP(this.initialMarketAllocation, new IloCplex());
     initialLP.setMarketClearanceConditions(false);
     initialLP.createLP();
-    EnvyFreePricesSolutionLP initialSolution = initialLP.Solve();
+    RestrictedEnvyFreePricesLPSolution initialSolution = initialLP.Solve();
     this.setOfSolutions = new ArrayList<MarketPrices>();
     //Add initial solution to set of solutions, so that we have a baseline with reserve prices all zero.
     setOfSolutions.add(initialSolution);
   }
 
   /**
-   * Solve method. 
+   * Solve method.
+   * 
    * @throws IloException in case the LP failed.
    * @throws AllocationException in case the Allocation algorithm failed.
-   * @throws CampaignCreationException possibly thrown by the allocation algorithm
+   * @throws BidderCreationException possibly thrown by the allocation algorithm
    * @return a MarketPrices object.
    */
-  public MarketPrices Solve() throws IloException, AllocationException, CampaignCreationException {
+  public MarketPrices Solve() throws IloException, AllocationException, BidderCreationException {
     /*
      * For debugging only. System.out.println("Initial allocation:");
      * Printer.printMatrix(this.initialMarketAllocation.getAllocation());
      */
-    double[] reservePrices = new double[this.market.getNumberUsers()];
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
-      for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
+    double[] reservePrices = new double[this.market.getNumberGoods()];
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
+      for (int j = 0; j < this.market.getNumberBidders(); j++) {
         if (this.initialMarketAllocation.getAllocation()[i][j] > 0) { 
           // For all x_{ij} > 0.
-          double reserve = this.market.getCampaign(j).getReward() / this.initialMarketAllocation.getAllocation()[i][j];
+          double reserve = this.market.getBidder(j).getReward() / this.initialMarketAllocation.getAllocation()[i][j];
           //System.out.println("---------- candidate reserve price = " + reserve);
           // Solve for an allocation that respects the reserve price R_j / x_{ij}.
           int[][] allocRespectReserve;
           allocRespectReserve = this.AllocAlgo.getAllocWithReservePrice(market, reserve).getAllocation();
           // Run LP with reserve prices.
-          EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(new MarketAllocation(this.market, allocRespectReserve));
+          RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new MarketAllocation(this.market, allocRespectReserve));
           efp.setMarketClearanceConditions(false);
           efp.createLP();
           Arrays.fill(reservePrices, reserve);

@@ -12,8 +12,8 @@ import structures.MarketPrices;
 import structures.comparators.MarketPricesComparatorBySellerRevenue;
 import structures.exceptions.MarketPricesException;
 import util.Printer;
-import algorithms.pricing.EnvyFreePricesSolutionLP;
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import algorithms.pricing.lp.heuristicreserveprices.interfaces.SelectUsers;
 import algorithms.pricing.lp.heuristicreserveprices.interfaces.SetReservePrices;
 
@@ -49,10 +49,10 @@ public class HeuristicLPReservePrices {
     this.setReservePricesObject = setReservePricesObject;
     this.initialMarketAllocation = initialMarketAllocation;
     // Create the first LP with no reserves.
-    EnvyFreePricesVectorLP initialLP = new EnvyFreePricesVectorLP(this.initialMarketAllocation, new IloCplex());
+    RestrictedEnvyFreePricesLP initialLP = new RestrictedEnvyFreePricesLP(this.initialMarketAllocation, new IloCplex());
     initialLP.setMarketClearanceConditions(false);
     initialLP.createLP();
-    EnvyFreePricesSolutionLP initialSolution = initialLP.Solve();
+    RestrictedEnvyFreePricesLPSolution initialSolution = initialLP.Solve();
     this.initialPrices = initialSolution.getPriceVector();
     this.setOfSolutions = new ArrayList<MarketPrices>();
     // Add initial solution to set of solutions, so that we have a baseline with reserve prices all zero. 
@@ -65,16 +65,16 @@ public class HeuristicLPReservePrices {
     // Prints for debugging purposes. 
     Printer.printMatrix(this.initialMarketAllocation.getAllocation());
     Printer.printVector(this.initialPrices);
-    System.out.println(new EnvyFreePricesVectorLP(this.initialMarketAllocation, new IloCplex(), true).Solve().sellerRevenuePriceVector());
+    System.out.println(new RestrictedEnvyFreePricesLP(this.initialMarketAllocation, new IloCplex(), true).Solve().sellerRevenuePriceVector());
 
     // For each x_{ij}.
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
-      for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
+      for (int j = 0; j < this.market.getNumberBidders(); j++) {
         //If x_{ij} > 0.
         if (this.initialMarketAllocation.getAllocation()[i][j] > 0) {
           // System.out.println("x["+i+"]["+j+"] = " +
           // this.initialMarketAllocation.getAllocation()[i][j]);
-          EnvyFreePricesVectorLP efpLP = new EnvyFreePricesVectorLP(
+          RestrictedEnvyFreePricesLP efpLP = new RestrictedEnvyFreePricesLP(
               new MarketAllocation(this.market,
                   this.copyInitialAllocationMatrixWihtoutCampaignJ(j)),
               new IloCplex());
@@ -86,7 +86,7 @@ public class HeuristicLPReservePrices {
             this.setReservePricesObject.setReservePrices(userIndex, j, efpLP,
                 this.initialPrices, this.market, this.initialMarketAllocation);
           }
-          EnvyFreePricesSolutionLP sol = efpLP.Solve();
+          RestrictedEnvyFreePricesLPSolution sol = efpLP.Solve();
           // If we obtained an optimal solution from this LP.
           if (sol.getStatus().equals("Optimal")) {
             System.out.println("LP was " + sol.getStatus());
@@ -121,16 +121,16 @@ public class HeuristicLPReservePrices {
    * @param sol - an EnvyFreePricesSolutionLP object
    * @return an EnvyFreePricesSolutionLP object, possibly with reallocated campaigns.
    */
-  protected EnvyFreePricesSolutionLP tryReallocate(int j, EnvyFreePricesSolutionLP sol) {
+  protected RestrictedEnvyFreePricesLPSolution tryReallocate(int j, RestrictedEnvyFreePricesLPSolution sol) {
     // System.out.println("Reallocating campaign " + j);
     double currentcost = 0.0;
     boolean compactcondition = true;
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
       currentcost += sol.getPriceVectorComponent(i) * this.initialMarketAllocation.getAllocation()[i][j];
       if (this.initialMarketAllocation.getAllocation()[i][j] > 0) {
-        for (int k = 0; k < this.market.getNumberUsers(); k++) {
+        for (int k = 0; k < this.market.getNumberGoods(); k++) {
           if (this.market.isConnected(k, j)) {
-            if (this.initialMarketAllocation.getAllocation()[k][j] < this.market.getUser(k).getSupply()
+            if (this.initialMarketAllocation.getAllocation()[k][j] < this.market.getGood(k).getSupply()
                 && sol.getPriceVectorComponent(i) > sol.getPriceVectorComponent(k)) {
               compactcondition = false;
             }
@@ -139,14 +139,14 @@ public class HeuristicLPReservePrices {
       }
     }
     // If it makes Sense to reallocate.
-    if (currentcost <= this.market.getCampaign(j).getReward() && compactcondition) { 
+    if (currentcost <= this.market.getBidder(j).getReward() && compactcondition) { 
       System.out.println("MAKES SENSE TO RE-ALLOCATE!!!");
-      for (int i = 0; i < this.market.getNumberUsers(); i++) {
+      for (int i = 0; i < this.market.getNumberGoods(); i++) {
         sol.getMarketAllocation().updateAllocationEntry(i, j, this.initialMarketAllocation.getAllocation()[i][j]);
       }
     } else {
       // Only for debugging purposes.
-      if (currentcost > this.market.getCampaign(j).getReward()) {
+      if (currentcost > this.market.getBidder(j).getReward()) {
         System.out.println("\t\t --- >I.R. failed");
       }
       if (!compactcondition) {
@@ -163,9 +163,9 @@ public class HeuristicLPReservePrices {
    * @return a copy of the initial allocation without campaign campaignIndex
    */
   protected int[][] copyInitialAllocationMatrixWihtoutCampaignJ(int campaignIndex) {
-    int[][] newAllocation = new int[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
-      for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
+    int[][] newAllocation = new int[this.market.getNumberGoods()][this.market.getNumberBidders()];
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
+      for (int j = 0; j < this.market.getNumberBidders(); j++) {
         if (j != campaignIndex) {
           newAllocation[i][j] = this.initialMarketAllocation.getAllocation()[i][j];
         } else {

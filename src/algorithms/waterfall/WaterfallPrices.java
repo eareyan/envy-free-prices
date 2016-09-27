@@ -32,14 +32,14 @@ public class WaterfallPrices extends MarketPrices {
   public double computeViolations() {
     double error = 0.0;
     // For each i,j
-    for (int i = 0; i < this.marketAllocation.getMarket().getNumberUsers(); i++) {
-      for (int j = 0; j < this.marketAllocation.getMarket().getNumberCampaigns(); j++) {
+    for (int i = 0; i < this.marketAllocation.getMarket().getNumberGoods(); i++) {
+      for (int j = 0; j < this.marketAllocation.getMarket().getNumberBidders(); j++) {
         // If something is allocated
         if (this.marketAllocation.getAllocation()[i][j] > 0) {
           // For all users k, check if k is connected to i and k is not exhausted by j.
-          for (int k = 0; k < this.marketAllocation.getMarket().getNumberUsers(); k++) {
+          for (int k = 0; k < this.marketAllocation.getMarket().getNumberGoods(); k++) {
             if (this.marketAllocation.getMarket().isConnected(k, j)
-                && this.marketAllocation.getAllocation()[k][j] < this.getMarketAllocation().getMarket().getUser(k).getSupply()) {
+                && this.marketAllocation.getAllocation()[k][j] < this.getMarketAllocation().getMarket().getGood(k).getSupply()) {
               // Finally, check if there is a violation in the prices.
               if (this.pricesMatrix[i][j] > this.pricesMatrix[k][j]) {
                 error += this.pricesMatrix[i][j] - this.pricesMatrix[k][j];

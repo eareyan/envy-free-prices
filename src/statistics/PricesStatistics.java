@@ -56,12 +56,12 @@ public class PricesStatistics {
     // System.out.println("Heuristic for campaign:" + campaignIndex +
     // ", check this many users:" + userList.size());
     double costCheapestBundle = 0.0;
-    int impressionsNeeded = this.marketAllocation.getMarket().getCampaign(campaignIndex).getDemand();
+    int impressionsNeeded = this.marketAllocation.getMarket().getBidder(campaignIndex).getDemand();
     while (impressionsNeeded > 0 && userList.size() != 0) {
       // Get first user from the list and remove it.
       UserPrices userPriceObject = userList.get(0);
       userList.remove(0);
-      int userIndex = userPriceObject.getUserIndex(), userSupply = this.marketAllocation.getMarket().getUser(userIndex).getSupply();
+      int userIndex = userPriceObject.getUserIndex(), userSupply = this.marketAllocation.getMarket().getGood(userIndex).getSupply();
       // If the campaign wants this user
       if (this.marketAllocation.getMarket().isConnected(userIndex,campaignIndex)) {
         if (userSupply >= impressionsNeeded) { 
@@ -96,12 +96,12 @@ public class PricesStatistics {
        * was satisfied but there exists a cheaper bundle. (2) The campaign was
        * not satisfied and there exists a bundle in its demand set.
        */
-      if (this.marketAllocation.getBundleNumber(campaignIndex) >= this.marketAllocation.getMarket().getCampaign(campaignIndex).getDemand()) {
+      if (this.marketAllocation.getBundleNumber(campaignIndex) >= this.marketAllocation.getMarket().getBidder(campaignIndex).getDemand()) {
         // Case (1)
         return (this.marketPrices.getBundleCost(campaignIndex) - costCheapestBundle >= PricesStatistics.epsilon);
       } else {
         // Case (2)
-        return (this.marketAllocation.getMarket().getCampaign(campaignIndex).getReward() - costCheapestBundle < PricesStatistics.epsilon);
+        return (this.marketAllocation.getMarket().getBidder(campaignIndex).getReward() - costCheapestBundle < PricesStatistics.epsilon);
       }
     }
   }
@@ -113,7 +113,7 @@ public class PricesStatistics {
   public int numberOfEnvyCampaigns() {
     // System.out.println("Check Heuristic For Envy-free-ness");
     // Construct a priority queue with users where the priority is price in ascending order.
-    int numUsers = this.marketAllocation.getMarket().getNumberUsers();
+    int numUsers = this.marketAllocation.getMarket().getNumberGoods();
     ArrayList<UserPrices> listOfUsers = new ArrayList<UserPrices>();
     for (int i = 0; i < numUsers; i++) {
       listOfUsers.add(new UserPrices(i, this.pricesVector[i]));
@@ -121,7 +121,7 @@ public class PricesStatistics {
     Collections.sort(listOfUsers, new UserPriceComparator());
     // Check that each campaign is envy-free w.r.t the previously constructed queue.
     int counter = 0;
-    for (int j = 0; j < this.marketAllocation.getMarket().getNumberCampaigns(); j++) {
+    for (int j = 0; j < this.marketAllocation.getMarket().getNumberBidders(); j++) {
       // System.out.println("**** check if " + j + " is envy");
       if (!this.isCampaignEnvyFree(new ArrayList<UserPrices>(listOfUsers), j)) {
         // Pass a copy of the queue each time.
@@ -142,9 +142,9 @@ public class PricesStatistics {
     int violations = 0;
     double totalPricesOfUsers = 0.0;
     double totalPricesOfViolatingUsers = 0.0;
-    for (int i = 0; i < this.marketAllocation.getMarket().getNumberUsers(); i++) {
+    for (int i = 0; i < this.marketAllocation.getMarket().getNumberGoods(); i++) {
       totalPricesOfUsers += this.pricesVector[i];
-      if (this.marketAllocation.allocationFromUser(i) == 0 && this.pricesVector[i] > 0) {
+      if (this.marketAllocation.allocationFromGood(i) == 0 && this.pricesVector[i] > 0) {
         violations++;
         totalPricesOfViolatingUsers += this.pricesVector[i];
       }

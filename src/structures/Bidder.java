@@ -1,21 +1,23 @@
 package structures;
 
-import structures.exceptions.CampaignCreationException;
+import structures.exceptions.BidderCreationException;
 
 /**
- * Represents a single campaign.
+ * Represents a single bidder.
+ * A bidder here refers to a size-interchangeable bidder
+ * (see paper for definition).
  * 
  * @author Enrique Areyan Viqueira
  */
-public class Campaign {
+public class Bidder {
   
   /**
-   * Demand of this campaign.
+   * Demand of this bidder.
    */
   protected int demand;
   
   /**
-   * Reward of this campaign.
+   * Reward of this bidder.
    */
   protected double reward;
   
@@ -46,36 +48,36 @@ public class Campaign {
 
   /**
    * Constructor.
-   * @param demand - the campaign demand.
-   * @param reward - the campaign reward.
-   * @throws CampaignCreationException in case the campaign could not be created.
+   * @param demand - the bidder demand.
+   * @param reward - the bidder reward.
+   * @throws BidderCreationException in case the bidder could not be created.
    */
-  public Campaign(int demand, double reward) throws CampaignCreationException {
+  public Bidder(int demand, double reward) throws BidderCreationException {
     if (demand <= 0) {
-      throw new CampaignCreationException(
-          "The demand of a campaign must be a positive integer");
+      throw new BidderCreationException(
+          "The demand of a bidder must be a positive integer");
     }
     this.demand = demand;
     if (reward <= 0) {
-      throw new CampaignCreationException(
-          "The reward of a campaign must be a positive double");
+      throw new BidderCreationException(
+          "The reward of a bidder must be a positive double");
     }
     this.reward = reward;
   }
 
   /**
    * Constructor.
-   * @param demand - the campaign demand.
-   * @param reward - the campaign reward.
+   * @param demand - the bidder demand.
+   * @param reward - the bidder reward.
    * @param level - the campaign level.
    * @param reserve - the campaign reserve.
-   * @throws CampaignCreationException in case the campaign could not be created.
+   * @throws BidderCreationException in case the campaign could not be created.
    */
-  public Campaign(int demand, double reward, double level, double reserve)
-      throws CampaignCreationException {
+  public Bidder(int demand, double reward, double level, double reserve)
+      throws BidderCreationException {
     this(demand, reward);
     if (reserve < 0.0) {
-      throw new CampaignCreationException(
+      throw new BidderCreationException(
           "The reserve price of a campaign must be a positive double at least zero");
     }
     this.level = level;
@@ -84,27 +86,27 @@ public class Campaign {
 
   /**
    * Constructor.
-   * @param demand - the campaign demand.
-   * @param reward - the campaign reward.
+   * @param demand - the bidder demand.
+   * @param reward - the bidder reward.
    * @param backpointer - the campaign backpointer.
-   * @throws CampaignCreationException in case the campaign could not be created.
+   * @throws BidderCreationException in case the campaign could not be created.
    */
-  public Campaign(int demand, double reward, int backpointer)
-      throws CampaignCreationException {
+  public Bidder(int demand, double reward, int backpointer)
+      throws BidderCreationException {
     this(demand, reward);
     this.backpointer = backpointer;
   }
 
   /**
    * Constructor.
-   * @param demand - the campaign demand.
-   * @param reward - the campaign reward.
+   * @param demand - the bidder demand.
+   * @param reward - the bidder reward.
    * @param backpointer - the campaign backpointer.
    * @param priority - the campaign priority.
-   * @throws CampaignCreationException in case the campaign could not be created.
+   * @throws BidderCreationException in case the campaign could not be created.
    */
-  public Campaign(int demand, double reward, int backpointer, int priority)
-      throws CampaignCreationException {
+  public Bidder(int demand, double reward, int backpointer, int priority)
+      throws BidderCreationException {
     this(demand, reward, backpointer);
     this.priority = priority;
   }
@@ -117,9 +119,9 @@ public class Campaign {
    * @param reserve - the campaign reserve.
    * @param backpointer - the campaign backpointer.
    * @param priority - the campaign priority.
-   * @throws CampaignCreationException in case the campaign could not be created.
+   * @throws BidderCreationException in case the campaign could not be created.
    */
-  public Campaign(int demand, double reward, double level, double reserve, int backpointer, int priority) throws CampaignCreationException {
+  public Bidder(int demand, double reward, double level, double reserve, int backpointer, int priority) throws BidderCreationException {
     this(demand, reward, backpointer, priority);
     this.level = level;
     this.reserve = reserve;
@@ -134,12 +136,12 @@ public class Campaign {
    * @param backpointer - the campaign backpointer.
    * @param priority - the campaign priority.
    * @param allocationSoFar - the campaign allocation so far.
-   * @throws CampaignCreationException in case the campaign could not be created.
+   * @throws BidderCreationException in case the campaign could not be created.
    */
-  public Campaign(int demand, double reward, double level, double reserve, int backpointer, int priority, int allocationSoFar) throws CampaignCreationException {
+  public Bidder(int demand, double reward, double level, double reserve, int backpointer, int priority, int allocationSoFar) throws BidderCreationException {
     this(demand, reward, level, reserve, backpointer, priority);
     if (allocationSoFar < 0) {
-      throw new CampaignCreationException(
+      throw new BidderCreationException(
           "The allocation so far must be a positive (possibly zero) integer");
     }
     this.allocationSoFar = allocationSoFar;
@@ -147,7 +149,7 @@ public class Campaign {
   
   /**
    * Getter.
-   * @return this campaign demand.
+   * @return this bidder demand.
    */
   public int getDemand() {
     return this.demand;
@@ -155,7 +157,7 @@ public class Campaign {
 
   /**
    * Getter.
-   * @return this campaign reward.
+   * @return this bidder reward.
    */
   public double getReward() {
     return this.reward;
@@ -203,7 +205,7 @@ public class Campaign {
   
   /**
    * Setter.
-   * @param reward - campaign reward.
+   * @param reward - bidder reward.
    */
   public void setReward(double reward) {
     this.reward = reward;
@@ -211,7 +213,7 @@ public class Campaign {
 
   /**
    * Setter.
-   * @param demand - campaign demand.
+   * @param demand - bidder demand.
    */
   public void setDemand(int demand) {
     this.demand = demand;

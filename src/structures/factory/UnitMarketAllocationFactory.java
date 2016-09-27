@@ -22,11 +22,11 @@ public class UnitMarketAllocationFactory {
    * @return a matrix of valuations.
    */
   public static double[][] getValuationMatrixFromMarket(Market market) {
-    double[][] costMatrix = new double[market.getNumberUsers()][market.getNumberCampaigns()];
-    for (int i = 0; i < market.getNumberUsers(); i++) {
-      for (int j = 0; j < market.getNumberCampaigns(); j++) {
+    double[][] costMatrix = new double[market.getNumberGoods()][market.getNumberBidders()];
+    for (int i = 0; i < market.getNumberGoods(); i++) {
+      for (int j = 0; j < market.getNumberBidders(); j++) {
         if (market.isConnected(i, j)) {
-          costMatrix[i][j] = market.getCampaign(j).getReward();
+          costMatrix[i][j] = market.getBidder(j).getReward();
         } else {
           costMatrix[i][j] = Double.NEGATIVE_INFINITY;
         }

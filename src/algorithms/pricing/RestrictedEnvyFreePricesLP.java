@@ -12,12 +12,14 @@ import structures.MarketAllocation;
 import util.NumberMethods;
 
 /**
- * LP to find a single vector of envy-free prices.
- * Implements Compact Condition and Individual Rationality.
+ * LP to find restricted envy-free prices. Implements Compact Condition and
+ * Individual Rationality. Optionally, reserve prices can be given for goods. A
+ * restricted Walrasian Equilibrium and a restricted Walrasian Equilibrium with
+ * reserve can also be found by using the Market Clearance conditions.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class EnvyFreePricesVectorLP {
+public class RestrictedEnvyFreePricesLP {
   
   /**
    * Boolean to control whether or not to output information.
@@ -47,10 +49,11 @@ public class EnvyFreePricesVectorLP {
 
   /**
    * Constructor receives an allocated market and creates the IloCplex object.
+   * 
    * @param allocatedMarket - a MarketAllocation object.
    * @throws IloException in case the LP failed.
    */
-  public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket)
+  public RestrictedEnvyFreePricesLP(MarketAllocation allocatedMarket)
       throws IloException {
     this.allocatedMarket = allocatedMarket;
     this.cplex = new IloCplex();
@@ -59,11 +62,12 @@ public class EnvyFreePricesVectorLP {
   /**
    * Constructor receives an allocated Market M, and a boolean to indicate if we
    * want to create the LP.
+   * 
    * @param allocatedMarket - a MarketAllocation object.
    * @param createLP - a boolean to indicate if we want to create the LP.
    * @throws IloException in case the LP failed.
    */
-  public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket,
+  public RestrictedEnvyFreePricesLP(MarketAllocation allocatedMarket,
       boolean createLP) throws IloException {
     this.allocatedMarket = allocatedMarket;
     this.cplex = new IloCplex();
@@ -74,10 +78,11 @@ public class EnvyFreePricesVectorLP {
   
   /**
    * Constructor receives an allocated market and an IloCplex Object.
+   * 
    * @param allocatedMarket - a MarketAllocation object.
    * @param iloObject - an IloCplex object.
    */
-  public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket,
+  public RestrictedEnvyFreePricesLP(MarketAllocation allocatedMarket,
       IloCplex iloObject) {
     this.allocatedMarket = allocatedMarket;
     this.cplex = iloObject;
@@ -86,11 +91,12 @@ public class EnvyFreePricesVectorLP {
   /**
    * Constructor receives an allocated Market M, and IloCplex Object, and a
    * boolean to indicate if we want to create the LP.
+   * 
    * @param allocatedMarket - a MarketAllocation object.
    * @param iloObject - an IloCplex object.
    * @param createLP - a boolean to indicate if we want to create the LP.
    */
-  public EnvyFreePricesVectorLP(MarketAllocation allocatedMarket,
+  public RestrictedEnvyFreePricesLP(MarketAllocation allocatedMarket,
       IloCplex iloObject, boolean createLP) {
     this.allocatedMarket = allocatedMarket;
     this.cplex = iloObject;
@@ -100,7 +106,8 @@ public class EnvyFreePricesVectorLP {
   }
   
   /**
-   * Setter. Set/Unset market clearance conditions
+   * Setter. Set/Unset market clearance conditions.
+   * 
    * @param set - boolean. If true, set market clearance Conditions. Else, unset.
    */
   public void setMarketClearanceConditions(boolean set) {
@@ -109,25 +116,26 @@ public class EnvyFreePricesVectorLP {
   
   /**
    * This method generate the compact conditions.
+   * 
    * @throws IloException in case the LP failed.
    */
   protected void generateCompactConditions() throws IloException {
     if (this.verbose) {
-      System.out.println("--- Start generate Compact Conditions ---");
+      System.out.println("--- Start to generate Compact Conditions ---");
     }
-    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++) {
-      for (int j = 0; j < this.allocatedMarket.getMarket().getNumberCampaigns(); j++) {
+    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
+      for (int j = 0; j < this.allocatedMarket.getMarket().getNumberBidders(); j++) {
         if (this.allocatedMarket.getAllocation()[i][j] > 0) {
           if (this.verbose) {
             System.out.println("Entry: " + i + "," + j);
           }
           //In this case we have to add a condition for the compact condition.
-          for (int k = 0; k < this.allocatedMarket.getMarket().getNumberUsers(); k++) {
-            // If you are connected to this campaign and you don't get all of this campaign.
-            if (i != k && this.allocatedMarket.getMarket().isConnected(k, j) && this.allocatedMarket.getAllocation()[k][j] < this.allocatedMarket.getMarket().getUser(k).getSupply()) {
+          for (int k = 0; k < this.allocatedMarket.getMarket().getNumberGoods(); k++) {
+            // If good k is connected to bidder j, and good k does not supply all of its items to bidder j.
+            if (i != k && this.allocatedMarket.getMarket().isConnected(k, j) && this.allocatedMarket.getAllocation()[k][j] < this.allocatedMarket.getMarket().getGood(k).getSupply()) {
               if (this.verbose) {
-                System.out.println("Add compact condition for user " + k
-                    + " on campaign " + j + ", where x_{" + k + j + "} = "
+                System.out.println("Add compact condition for good " + k
+                    + " on bidder " + j + ", where x_{" + k + j + "} = "
                     + this.allocatedMarket.getAllocation()[k][j]);
                 System.out.println("\t Price(" + i + ") <= Price(" + k + ")");
               }
@@ -147,21 +155,22 @@ public class EnvyFreePricesVectorLP {
    * This method generates the individual rationality conditions.
    * The individual rationality condition states that winners do not pay
    * more than their reward.
+   * 
    * @throws IloException in case the LP failed.
    */
   protected void generateIndividualRationalityConditions() throws IloException {
-    for (int j = 0; j < this.allocatedMarket.getMarket().getNumberCampaigns(); j++) {
-      if (!this.allocatedMarket.isCampaignBundleZero(j)) {
+    for (int j = 0; j < this.allocatedMarket.getMarket().getNumberBidders(); j++) {
+      if (!this.allocatedMarket.isBidderBundleZero(j)) {
         IloLinearNumExpr lhs = cplex.linearNumExpr();
         int counter = 0;
-        for (int i = 0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++) {
+        for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
           if (this.allocatedMarket.getAllocation()[i][j] > 0) {
             lhs.addTerm(this.allocatedMarket.getAllocation()[i][j], this.prices[i]);
             counter += this.allocatedMarket.getAllocation()[i][j];
           }
         }
-        if (counter >= this.allocatedMarket.getMarket().getCampaign(j).getDemand()) {
-          this.linearConstrains.add(cplex.addLe(lhs, this.allocatedMarket.getMarket().getCampaign(j).getReward()));
+        if (counter >= this.allocatedMarket.getMarket().getBidder(j).getDemand()) {
+          this.linearConstrains.add(cplex.addLe(lhs, this.allocatedMarket.getMarket().getBidder(j).getReward()));
         } else {
           this.linearConstrains.add(cplex.addLe(lhs, 0));
         }
@@ -171,13 +180,14 @@ public class EnvyFreePricesVectorLP {
   
   /**
    * This method implements conditions so that the vector of prices is not
-   * unbounded. We will simply constrain the price of a user to be that of the
+   * unbounded. We will simply constrain the price of a good to be that of the
    * highest reward of the market.
+   * 
    * @throws IloException in case the LP failed
    */
   protected void generateBoundConditions() throws IloException {
     double highestReward = this.allocatedMarket.getMarket().getHighestReward();
-    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++) {
+    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
       this.linearConstrains.add(this.cplex.addLe(this.prices[i], Math.ceil(highestReward)));
     }
   }
@@ -185,11 +195,12 @@ public class EnvyFreePricesVectorLP {
   /**
    * This method generates the market clearance conditions.
    * This conditions states that prices of unallocated classes must be zero.
+   * 
    * @throws IloException - in case the LP failed.
    */
   protected void generateMarketClearanceConditions() throws IloException {
-    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++) {
-      if (this.allocatedMarket.allocationFromUser(i) == 0) {
+    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
+      if (this.allocatedMarket.allocationFromGood(i) == 0) {
         this.linearConstrains.add(this.cplex.addLe(this.prices[i], 0.0));
         this.linearConstrains.add(this.cplex.addGe(this.prices[i], 0.0));
       }
@@ -199,12 +210,13 @@ public class EnvyFreePricesVectorLP {
   /**
    * This method generates the market clearance condition with reserve prices.
    * This conditions state that unallocated items must be priced at the reserve.
+   * 
    * @param reserve - reserve price
    * @throws IloException in case the LP failed
    */
   public void generateMarketClearanceConditionsWithReserve(double reserve) throws IloException {
-    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++) {
-      if (this.allocatedMarket.allocationFromUser(i) == 0) {
+    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
+      if (this.allocatedMarket.allocationFromGood(i) == 0) {
         this.linearConstrains.add(this.cplex.addLe(this.prices[i], reserve));
         this.linearConstrains.add(this.cplex.addGe(this.prices[i], reserve));
       }
@@ -212,17 +224,18 @@ public class EnvyFreePricesVectorLP {
   }
   
   /**
-   * Set reserve prices for all user classes
+   * Set reserve prices for all goods.
+   * 
    * @param reservePrices - an array of reserve prices.
    */
   public void setReservePrices(double[] reservePrices) {
-    if (reservePrices.length != this.allocatedMarket.getMarket().getNumberUsers()) {
-      System.out.println("Reserve Prices vector must be of same length as number of users");
+    if (reservePrices.length != this.allocatedMarket.getMarket().getNumberGoods()) {
+      System.out.println("Reserve Prices vector must be of same length as number of goods");
       System.exit(-1);
     }
     try {
       for (int i = 0; i < reservePrices.length; i++) {
-        // System.out.println("Set reserve price of user " + i + " to " +
+        // System.out.println("Set reserve price of good " + i + " to " +
         // reservePrices[i]);
         this.linearConstrains.add(this.cplex.addGe(this.prices[i], reservePrices[i]));
       }
@@ -233,14 +246,15 @@ public class EnvyFreePricesVectorLP {
   }
   
   /**
-   * Set Reserve price for user class i.
-   * @param i - user index.
+   * Set Reserve price for good i.
+   * 
+   * @param i - good index.
    * @param reservePrice - reserve price.
    */
-  public void setReservePriceForUser(int i, double reservePrice) {
+  public void setReservePriceForGood(int i, double reservePrice) {
     try {
       if (this.verbose) {
-        System.out.println("Setting Reserve Price of " + reservePrice + " for user class " + i);
+        System.out.println("Setting Reserve Price of " + reservePrice + " for good " + i);
       }
       this.linearConstrains.add(this.cplex.addGe(this.prices[i], reservePrice));
     } catch (IloException e) {
@@ -262,11 +276,11 @@ public class EnvyFreePricesVectorLP {
       this.linearConstrains = new ArrayList<IloRange>();
       cplex.setParam(IloCplex.BooleanParam.PreInd, false);
       // Create the variables. Vector of prices.
-      this.prices = this.cplex.numVarArray(this.allocatedMarket.getMarket().getNumberUsers(), 0.0, Double.MAX_VALUE);
+      this.prices = this.cplex.numVarArray(this.allocatedMarket.getMarket().getNumberGoods(), 0.0, Double.MAX_VALUE);
       // Create the objective function, i.e., the sum of all the prices.
       IloLinearNumExpr objective = cplex.linearNumExpr();
-      for (int i = 0; i < this.allocatedMarket.getMarket().getNumberUsers(); i++) {
-        for (int j = 0; j < this.allocatedMarket.getMarket().getNumberCampaigns(); j++) {
+      for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
+        for (int j = 0; j < this.allocatedMarket.getMarket().getNumberBidders(); j++) {
           objective.addTerm(this.allocatedMarket.getAllocation()[i][j], this.prices[i]);
         }
       }
@@ -285,18 +299,19 @@ public class EnvyFreePricesVectorLP {
   
   /**
    * This method solves the LP.
+   * 
    * @return an EnvyFreePricesSolutionLP object with the solution of the LP.
    */
-  public EnvyFreePricesSolutionLP Solve() {
+  public RestrictedEnvyFreePricesLPSolution Solve() {
     double[] LP_Prices = {};
-    EnvyFreePricesSolutionLP Solution = new EnvyFreePricesSolutionLP();
+    RestrictedEnvyFreePricesLPSolution Solution = new RestrictedEnvyFreePricesLPSolution();
     try {
       // Solve the LP.
       if (this.cplex.solve()) {
         LP_Prices = NumberMethods.roundPrices(this.cplex.getValues(this.prices));
-        Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket, LP_Prices, this.cplex.getStatus().toString(), this.cplex.getObjValue());
+        Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket, LP_Prices, this.cplex.getStatus().toString(), this.cplex.getObjValue());
       } else {
-        Solution = new EnvyFreePricesSolutionLP(this.allocatedMarket, this.cplex.getStatus().toString());
+        Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket, this.cplex.getStatus().toString());
       }
       if (this.verbose) {
         System.out.println("Solution status = " + this.cplex.getStatus());

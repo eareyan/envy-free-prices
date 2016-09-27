@@ -1,9 +1,9 @@
 package structures.factory;
 
-import structures.Campaign;
+import structures.Bidder;
 import structures.Market;
-import structures.User;
-import structures.exceptions.CampaignCreationException;
+import structures.Goods;
+import structures.exceptions.BidderCreationException;
 
 /**
  * This class implements methods to create unit-demand markets.
@@ -16,14 +16,14 @@ public class UnitMarketFactory {
    * Create a singleton market from a valuation matrix.
    * @param valuationMatrix - a matrix of valuations.
    * @return a Market object.
-   * @throws CampaignCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a campaign could not be created.
    */
-  public static Market createMarketFromValuationMatrix(double[][] valuationMatrix) throws CampaignCreationException {
-    User[] users = new User[valuationMatrix.length];
+  public static Market createMarketFromValuationMatrix(double[][] valuationMatrix) throws BidderCreationException {
+    Goods[] users = new Goods[valuationMatrix.length];
     for (int i = 0; i < valuationMatrix.length; i++) {
-      users[i] = new User(1);
+      users[i] = new Goods(1);
     }
-    Campaign[] campaigns = new Campaign[valuationMatrix[0].length];
+    Bidder[] campaigns = new Bidder[valuationMatrix[0].length];
     for (int j = 0; j < valuationMatrix[0].length; j++) {
       double reward = Double.NEGATIVE_INFINITY;
       for (int i = 0; i < valuationMatrix.length; i++) {
@@ -32,7 +32,7 @@ public class UnitMarketFactory {
           break;
         }
       }
-      campaigns[j] = new Campaign(1, reward);
+      campaigns[j] = new Bidder(1, reward);
     }
     boolean[][] connections = new boolean[valuationMatrix.length][valuationMatrix[0].length];
     for (int i = 0; i < valuationMatrix.length; i++) {
@@ -51,9 +51,9 @@ public class UnitMarketFactory {
    * @param numberCampaigns - number of campaigns.
    * @param probabilityConnections - probability of a connection being present.
    * @return a Market object.
-   * @throws CampaignCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a campaign could not be created.
    */
-  public static Market randomUnitDemandMarket(int numberUsers, int numberCampaigns, double probabilityConnections) throws CampaignCreationException {
+  public static Market randomUnitDemandMarket(int numberUsers, int numberCampaigns, double probabilityConnections) throws BidderCreationException {
     return RandomMarketFactory.randomMarket(numberUsers, 1, 1, numberCampaigns,
         1, 1, RandomMarketFactory.defaultMinReward,
         RandomMarketFactory.defaultMaxReward, probabilityConnections);
@@ -67,18 +67,18 @@ public class UnitMarketFactory {
    * @param connections - matrix of connections.
    * @param rewards - vector of campaigns rewards.
    * @return a Market object.
-   * @throws CampaignCreationException
+   * @throws BidderCreationException
    */
-  public static Market singletonMarket(int numberUsers, int numberCampaigns, boolean[][] connections, double[] rewards) throws CampaignCreationException {
+  public static Market singletonMarket(int numberUsers, int numberCampaigns, boolean[][] connections, double[] rewards) throws BidderCreationException {
     // Create Users
-    User[] users = new User[numberUsers];
+    Goods[] users = new Goods[numberUsers];
     for (int i = 0; i < numberUsers; i++) {
-      users[i] = new User(1);
+      users[i] = new Goods(1);
     }
     // Create Campaigns
-    Campaign[] campaigns = new Campaign[numberCampaigns];
+    Bidder[] campaigns = new Bidder[numberCampaigns];
     for (int j = 0; j < numberCampaigns; j++) {
-      campaigns[j] = new Campaign(1, rewards[j]);
+      campaigns[j] = new Bidder(1, rewards[j]);
     }
     return new Market(users, campaigns, connections);
   }

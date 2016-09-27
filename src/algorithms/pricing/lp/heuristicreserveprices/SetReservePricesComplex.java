@@ -1,6 +1,6 @@
 package algorithms.pricing.lp.heuristicreserveprices;
 
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import algorithms.pricing.lp.heuristicreserveprices.interfaces.SetReservePrices;
 import structures.Market;
 import structures.MarketAllocation;
@@ -19,22 +19,22 @@ public class SetReservePricesComplex implements SetReservePrices {
    * 
    * @see
    * algorithms.lp.reserveprices.AbstractLPReservePrices#setReservePrices(int,
-   * int, algorithms.EnvyFreePricesVectorLP, double[])
+   * int, algorithms.RestrictedEnvyFreePricesLP, double[])
    */
   @Override
-  public void setReservePrices(int i, int j, EnvyFreePricesVectorLP LP, double[] initialPrices, Market market, MarketAllocation initialMarketAllocation) {
+  public void setReservePrices(int i, int j, RestrictedEnvyFreePricesLP LP, double[] initialPrices, Market market, MarketAllocation initialMarketAllocation) {
     System.out.println("Set reserve for user "
         + i
         + ", of: "
-        + (market.getCampaign(j).getReward() / market.getCampaign(j)
+        + (market.getBidder(j).getReward() / market.getBidder(j)
             .getDemand()));
     double spentOnOtherUsers = 0.0;
-    for (int iPrime = 0; iPrime < market.getNumberUsers(); iPrime++) {
+    for (int iPrime = 0; iPrime < market.getNumberGoods(); iPrime++) {
       if (iPrime != i) {
         spentOnOtherUsers += initialPrices[iPrime] * initialMarketAllocation.getAllocation()[iPrime][j];
       }
     }
-    LP.setReservePriceForUser(i, (market.getCampaign(j).getReward() - spentOnOtherUsers) / initialMarketAllocation.getAllocation()[i][j]);
+    LP.setReservePriceForGood(i, (market.getBidder(j).getReward() - spentOnOtherUsers) / initialMarketAllocation.getAllocation()[i][j]);
     System.out.println("\t\t spentOnOtherUsers = " + spentOnOtherUsers);
   }
   

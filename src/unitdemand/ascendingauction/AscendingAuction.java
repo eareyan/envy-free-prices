@@ -34,6 +34,7 @@ public class AscendingAuction {
 
   /**
    * Constructor.
+   * 
    * @param valuationMatrix - a matrix of valuations.
    */
   public AscendingAuction(double[][] valuationMatrix) {
@@ -44,6 +45,7 @@ public class AscendingAuction {
 
   /**
    * Solve method. Runs the auction.
+   * 
    * @return a Matching object.
    */
   public Matching Solve() {

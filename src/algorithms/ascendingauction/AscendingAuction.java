@@ -9,8 +9,8 @@ import structures.MarketPrices;
 
 /**
  * Implements an ascending auction.
- * This class returns an allocation and prices so that every campaign is envy-free 
- * (up to epsilon) and a user class that is completely unallocated has price zero.
+ * This class returns an allocation and prices so that every bidder is envy-free 
+ * (up to epsilon) and a good that is completely unallocated has price zero.
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -26,33 +26,35 @@ public class AscendingAuction {
 
   /**
    * Constructor.
+   * 
    * @param market - the market object in which to run the auction.
    */
   public AscendingAuction(Market market) {
     this.market = market;
-    this.prices = new double[this.market.getNumberUsers()];
-    this.allocation = new int[this.market.getNumberUsers()][this.market
-        .getNumberCampaigns()];
+    this.prices = new double[this.market.getNumberGoods()];
+    this.allocation = new int[this.market.getNumberGoods()][this.market
+        .getNumberBidders()];
   }
 
   /**
    * This method runs the auction.
+   * 
    * @return a MarketPrices object with the result of the auction.
    */
   public MarketPrices Solve() {
-    ArrayList<UserPrice> currentPrices = new ArrayList<UserPrice>(this.market.getNumberUsers());
+    ArrayList<UserPrice> currentPrices = new ArrayList<UserPrice>(this.market.getNumberGoods());
     // Initial structures.
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
       currentPrices.add(new UserPrice(i, 0.0));
     }
     ArrayList<Integer> unallocatedCampaigns = new ArrayList<Integer>();
-    ArrayList<ArrayList<BundleEntry>> listOfUsers = new ArrayList<ArrayList<BundleEntry>>(this.market.getNumberCampaigns());
-    for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
+    ArrayList<ArrayList<BundleEntry>> listOfUsers = new ArrayList<ArrayList<BundleEntry>>(this.market.getNumberBidders());
+    for (int j = 0; j < this.market.getNumberBidders(); j++) {
       //Initially all campaigns are unallocated.
       unallocatedCampaigns.add(j);
       // Populate the list of users that campaigns have access to.
       ArrayList<BundleEntry> listOfUsersForCampaign = new ArrayList<BundleEntry>();
-      for (int i = 0; i < this.market.getNumberUsers(); i++) {
+      for (int i = 0; i < this.market.getNumberGoods(); i++) {
         if (this.market.isConnected(i, j)) {
           listOfUsersForCampaign.add(new BundleEntry(i, 0));
         }
@@ -85,21 +87,21 @@ public class AscendingAuction {
           // System.out.println("\t\tx[i][j] = x["+userId + "][" +campaignId + "] = " + entry.getX());
           // Allocate this many.
           this.allocation[userId][campaignId] = entry.getX();
-          for (int l = 0; l < this.market.getNumberCampaigns(); l++) {
+          for (int l = 0; l < this.market.getNumberBidders(); l++) {
             allocToUser += this.allocation[userId][l];
           }
           // Check if we haven't exceed the total supply of this user
-          if (allocToUser > this.market.getUser(userId).getSupply()) {
+          if (allocToUser > this.market.getGood(userId).getSupply()) {
             // We need to unallocate campaigns now since we have exceeded supply!
             // System.out.println("We need to unallocate campaigns from user " +
             // userId+", current alloc = " + allocToUser + ", max = " +
             // this.market.getUser(userId).getSupply());
             this.updatePrices(currentPrices, userId);
-            for (int l = 0; l < this.market.getNumberCampaigns(); l++) {
+            for (int l = 0; l < this.market.getNumberBidders(); l++) {
               if (l != campaignId && this.allocation[userId][l] > 0) {
                 // Completely unallocate another campaign also allocated to this user.
                 allocToUser -= this.allocation[userId][l];
-                for (int i = 0; i < this.market.getNumberUsers(); i++) {
+                for (int i = 0; i < this.market.getNumberGoods(); i++) {
                   this.allocation[i][l] = 0;
                 }
                 unallocatedCampaigns.add(new Integer(l));
@@ -138,6 +140,7 @@ public class AscendingAuction {
   
   /**
    * This method stores the final prices vector.
+   * 
    * @param prices - an arraylist of UserPrice objects.
    */
   public void storeFinalPrices(ArrayList<UserPrice> prices) {
@@ -148,11 +151,12 @@ public class AscendingAuction {
   
   /**
    * Given the list of prices and a user index i, increment P_i by epsilon.
+   * 
    * @param prices - ArrayList of UserPrice objects
    * @param i - user id
    */
   public void updatePrices(ArrayList<UserPrice> prices, int i) {
-    for (int k = 0; k < this.market.getNumberUsers(); k++) {
+    for (int k = 0; k < this.market.getNumberGoods(); k++) {
       if (prices.get(k).getI() == i) {
         prices.get(k).updatePrice(
             prices.get(k).getPrice() + AscendingAuction.epsilon);
@@ -163,6 +167,7 @@ public class AscendingAuction {
   /**
    * Receives the current prices and a campaign index and returns 
    * the utility maximizer bundle for that campaign.
+   * 
    * @param currentPrices - ArrayList of UserPrice objects.
    * @param j - campaign index.
    * @return the utility maximizer bundle (a list of BundleEntry objects).
@@ -176,19 +181,19 @@ public class AscendingAuction {
       i = u.getI();
       priceOfUser = u.getPrice();
       if (this.market.isConnected(i, j)) {
-        currentSizeOfBundle = this.market.getCampaign(j).getDemand() - sizeOfBundle;
-        if (currentSizeOfBundle < this.market.getUser(i).getSupply()) {
+        currentSizeOfBundle = this.market.getBidder(j).getDemand() - sizeOfBundle;
+        if (currentSizeOfBundle < this.market.getGood(i).getSupply()) {
           // priceOfBundle += currentSizeOfBundle * (priceOfUser +
           // AscendingAuction.epsilon);
           priceOfBundle += currentSizeOfBundle * priceOfUser;
           sizeOfBundle += currentSizeOfBundle;
           bundle.add(new BundleEntry(i, currentSizeOfBundle));
         } else { // Bump price by epsilon only if we exhaust a market
-          priceOfBundle += this.market.getUser(i).getSupply() * (priceOfUser + AscendingAuction.epsilon);
-          sizeOfBundle += this.market.getUser(i).getSupply();
-          bundle.add(new BundleEntry(i, this.market.getUser(i).getSupply()));
+          priceOfBundle += this.market.getGood(i).getSupply() * (priceOfUser + AscendingAuction.epsilon);
+          sizeOfBundle += this.market.getGood(i).getSupply();
+          bundle.add(new BundleEntry(i, this.market.getGood(i).getSupply()));
         }
-        if (sizeOfBundle == this.market.getCampaign(j).getDemand() && priceOfBundle <= this.market.getCampaign(j).getReward()) {
+        if (sizeOfBundle == this.market.getBidder(j).getDemand() && priceOfBundle <= this.market.getBidder(j).getReward()) {
           return bundle;
         }
       }

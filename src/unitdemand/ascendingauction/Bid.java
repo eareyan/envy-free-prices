@@ -45,6 +45,7 @@ public class Bid {
 	
 	/**
 	 * Getter.
+	 * 
 	 * @return campaign index.
 	 */
 	public int getCampaign(){
@@ -53,6 +54,7 @@ public class Bid {
 	
 	/**
 	 * Getter.
+	 * 
 	 * @return bid.
 	 */
 	public double getBid(){

@@ -67,12 +67,12 @@ public class ApproxWE {
    */
   public ApproxWE(Market M) {
     this.M = M;
-    this.numberOfBidders = this.M.getNumberCampaigns();
-    this.numberOfItems = this.M.getNumberUsers();
+    this.numberOfBidders = this.M.getNumberBidders();
+    this.numberOfItems = this.M.getNumberGoods();
     // Make an ArrayList of BidderReward so that we can ordered.
     this.Rewards = new ArrayList<BidderReward>();
-    for (int j = 0; j < this.M.getNumberCampaigns(); j++) {
-      this.Rewards.add(new BidderReward(j, this.M.getCampaign(j).getReward()));
+    for (int j = 0; j < this.M.getNumberBidders(); j++) {
+      this.Rewards.add(new BidderReward(j, this.M.getBidder(j).getReward()));
     }
     Collections.sort(Rewards, this.UserRewardComparator);
     // Make a copy of the connections matrix so that we don't change the original matrix.

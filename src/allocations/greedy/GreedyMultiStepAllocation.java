@@ -1,4 +1,4 @@
-package allocations.greedy.multistep;
+package allocations.greedy;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,6 +6,8 @@ import java.util.PriorityQueue;
 
 import structures.Market;
 import structures.MarketAllocation;
+import structures.aux.GoodSupply;
+import structures.aux.GoodsSupplyComparatorBySupply;
 import allocations.error.AllocationErrorCodes;
 import allocations.error.AllocationException;
 import allocations.interfaces.AllocationAlgoInterface;
@@ -56,20 +58,20 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
    */
   public MarketAllocation Solve(Market market) {
     // Initial structures.
-    int[][] allocation = new int[market.getNumberUsers()][market
-        .getNumberCampaigns()];
-    this.currentAllocation = new int[market.getNumberCampaigns()];
-    for (int j = 0; j < market.getNumberCampaigns(); j++) {
-      this.currentAllocation[j] = market.getCampaign(j).getAllocationSoFar();
+    int[][] allocation = new int[market.getNumberGoods()][market
+        .getNumberBidders()];
+    this.currentAllocation = new int[market.getNumberBidders()];
+    for (int j = 0; j < market.getNumberBidders(); j++) {
+      this.currentAllocation[j] = market.getBidder(j).getAllocationSoFar();
     }
     /*
      * First, compute user queue supply. A user is added to the queue if it can
      * supply at least the step size.
      */
-    PriorityQueue<userSupply> usersQueue = new PriorityQueue<userSupply>(new UserSupplyComparator());
-    for (int i = 0; i < market.getNumberUsers(); i++) {
-      if (market.getUser(i).getSupply() >= this.stepSize) {
-        usersQueue.add(new userSupply(i, market.getUser(i).getSupply()));
+    PriorityQueue<GoodSupply> usersQueue = new PriorityQueue<GoodSupply>(new GoodsSupplyComparatorBySupply(-1));
+    for (int i = 0; i < market.getNumberGoods(); i++) {
+      if (market.getGood(i).getSupply() >= this.stepSize) {
+        usersQueue.add(new GoodSupply(i, market.getGood(i).getSupply()));
       }
     }
     /*
@@ -77,14 +79,14 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
      * has a positive value and has not been fully allocated.
      */
     PriorityQueue<campaignValue> campaignQueue = new PriorityQueue<campaignValue>(new CampaignValueComparator());
-    for (int j = 0; j < market.getNumberCampaigns(); j++) {
-      double value = this.f.getObjective(market.getCampaign(j).getReward(),
-          market.getCampaign(j).getDemand(), this.currentAllocation[j]
+    for (int j = 0; j < market.getNumberBidders(); j++) {
+      double value = this.f.getObjective(market.getBidder(j).getReward(),
+          market.getBidder(j).getDemand(), this.currentAllocation[j]
               + this.stepSize)
-          - this.f.getObjective(market.getCampaign(j).getReward(), market
-              .getCampaign(j).getDemand(), this.currentAllocation[j])
-          - (market.getCampaign(j).getReserve() * this.stepSize);
-      if (this.currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand() && value > 0) {
+          - this.f.getObjective(market.getBidder(j).getReward(), market
+              .getBidder(j).getDemand(), this.currentAllocation[j])
+          - (market.getBidder(j).getReserve() * this.stepSize);
+      if (this.currentAllocation[j] + this.stepSize <= market.getBidder(j).getDemand() && value > 0) {
         campaignQueue.add(new campaignValue(j, value));
       }
     }
@@ -93,13 +95,13 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
     int i;
     campaignValue campaign;
     while ((campaign = campaignQueue.poll()) != null) {
-      ArrayList<userSupply> auxUserSupplyList = new ArrayList<userSupply>();
+      ArrayList<GoodSupply> auxUserSupplyList = new ArrayList<GoodSupply>();
       j = campaign.getIndex();
-      userSupply user;
+      GoodSupply user;
       // Looking for a user connected to this campaign.
       while (userNotFound && (user = usersQueue.poll()) != null) { 
-        i = user.getIndex();
-        if (market.isConnected(i, j) && (Math.floor(market.getCampaign(j).getLevel() * market.getUser(i).getSupply()) - allocation[i][j] >= this.stepSize)) {
+        i = user.getId();
+        if (market.isConnected(i, j) && (Math.floor(market.getBidder(j).getLevel() * market.getGood(i).getSupply()) - allocation[i][j] >= this.stepSize)) {
           // This user is connected to this campaign, allocate it.
           allocation[i][j] += this.stepSize;
           this.currentAllocation[j] += this.stepSize;
@@ -112,16 +114,16 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
         }
       }
       // Add users back to the queue.
-      for (userSupply u : auxUserSupplyList) {
+      for (GoodSupply u : auxUserSupplyList) {
         usersQueue.add(u);
       }
       /*
        * If we did found a user connected to this campaign and the campaign
        * still requires some, then compute its value.
        */
-      if (!userNotFound && this.currentAllocation[j] + this.stepSize <= market.getCampaign(j).getDemand()) {
-        double value = this.f.getObjective(market.getCampaign(j).getReward(),market.getCampaign(j).getDemand(), this.currentAllocation[j] + this.stepSize)
-            - this.f.getObjective(market.getCampaign(j).getReward(), market.getCampaign(j).getDemand(), this.currentAllocation[j]) - market.getCampaign(j).getReserve() * this.stepSize;
+      if (!userNotFound && this.currentAllocation[j] + this.stepSize <= market.getBidder(j).getDemand()) {
+        double value = this.f.getObjective(market.getBidder(j).getReward(),market.getBidder(j).getDemand(), this.currentAllocation[j] + this.stepSize)
+            - this.f.getObjective(market.getBidder(j).getReward(), market.getBidder(j).getDemand(), this.currentAllocation[j]) - market.getBidder(j).getReserve() * this.stepSize;
         if (value > 0) { // If value of the campaign is positive, then allocate.
           campaign.updateValue(value);
           campaignQueue.add(campaign);
@@ -130,81 +132,6 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
       userNotFound = true;
     }
     return new MarketAllocation(market, allocation, this.f);
-  }
-
-  /**
-   * This auxiliary class represents a user and its supply.
-   * 
-   * @author Enrique Areyan Viqueira
-   */
-  public class userSupply {
-    
-    /**
-     * User index.
-     */
-    protected int i;
-    
-    /**
-     * User supply.
-     */
-    protected int supply;
-
-    /**
-     * Constructor.
-     * @param i - user index.
-     * @param supply - user supply.
-     */
-    public userSupply(int i, int supply) {
-      this.i = i;
-      this.supply = supply;
-    }
-
-    /**
-     * Getter.
-     * @return user index.
-     */
-    public int getIndex() {
-      return this.i;
-    }
-
-    /**
-     * Getter.
-     * @return user supply.
-     */
-    public int getSupply() {
-      return this.supply;
-    }
-
-    /**
-     * Decrements this user supply.
-     * @param supplyDecrement - by how much to decrement this user supply.
-     */
-    public void decrementSupply(int supplyDecrement) {
-      this.supply -= supplyDecrement;
-    }
-
-    @Override
-    public String toString() {
-      return "(" + this.i + "," + this.supply + ")";
-    }
-    
-  }
-
-  /**
-   * Implements comparator to compare user by supply.
-   * @author Enrique Areyan Viqueira
-   */
-  public class UserSupplyComparator implements Comparator<userSupply> {
-    @Override
-    public int compare(userSupply u1, userSupply u2) {
-      if (u1.getSupply() < u2.getSupply()) {
-        return 1;
-      } else if (u1.getSupply() > u2.getSupply()) {
-        return -1;
-      } else {
-        return 0;
-      }
-    }
   }
 
   /**

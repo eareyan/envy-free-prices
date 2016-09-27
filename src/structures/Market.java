@@ -3,7 +3,7 @@ package structures;
 import java.util.ArrayList;
 
 /**
- * A market is a bipartite graph with Users connected to Campaigns. 
+ * A market is a bipartite graph with Bidders connected to Goods. 
  * This class implements a market object and related basic functionality.
  * 
  * @author Enrique Areyan Viqueira
@@ -11,93 +11,93 @@ import java.util.ArrayList;
 public class Market {
 
   /**
-   * Array of Users.
+   * Array of Goods.
    */
-  protected User[] users;
+  protected Goods[] goods;
 
   /**
-   * Array of Campaigns.
+   * Array of Bidders.
    */
-  protected Campaign[] campaigns;
+  protected Bidder[] bidders;
 
   /**
-   * Boolean matrix indicating which campaign is connected to which user.
+   * Boolean matrix indicating which bidder is connected to which goods.
    */
   protected boolean[][] connections;
 
   /**
-   * Highest reward among all campaigns. Implemented as a singleton.
+   * Highest reward among all bidders. Implemented as a singleton.
    */
   protected double highestReward = -1.0;
 
   /**
    * Constructor for a Market. This constructor is the most fundamental one. 
-   * It receives campaigns, users and connections.
+   * It receives bidders, goods and connections.
    * 
-   * @param users - array of User objects.
-   * @param campaigns - array of Campaign objects.
+   * @param goods - array of Goods objects.
+   * @param bidders - array of Bidder objects.
    * @param connections - matrix of booleans.
    */
-  public Market(User[] users, Campaign[] campaigns, boolean[][] connections) {
-    this.users = users;
-    this.campaigns = campaigns;
+  public Market(Goods[] goods, Bidder[] bidders, boolean[][] connections) {
+    this.goods = goods;
+    this.bidders = bidders;
     this.connections = connections;
   }
 
   /**
-   * Gets the array of campaigns.
+   * Gets the array of bidders.
    * 
-   * @return an array of Campaign objects.
+   * @return an array of Bidder objects.
    */
-  public Campaign[] getCampaigns() {
-    return this.campaigns;
+  public Bidder[] getBidders() {
+    return this.bidders;
   }
 
   /**
-   * Gets a specific campaign.
+   * Gets a specific bidder.
    * 
-   * @param j - the index of the campaign.
-   * @return the jth Campaign object.
+   * @param j - the index of the bidder.
+   * @return the jth Bidder object.
    */
-  public Campaign getCampaign(int j) {
-    return this.campaigns[j];
+  public Bidder getBidder(int j) {
+    return this.bidders[j];
   }
 
   /**
-   * Get the array of users.
+   * Get the array of goods.
    * 
-   * @return an array of User objects.
+   * @return an array of Goods objects.
    */
-  public User[] getUsers() {
-    return this.users;
+  public Goods[] getGoods() {
+    return this.goods;
   }
 
   /**
-   * Gets a specific user.
+   * Gets a specific good.
    * 
-   * @param i - the index of the user.
-   * @return the ith user.
+   * @param i - the index of the good.
+   * @return the ith good.
    */
-  public User getUser(int i) {
-    return this.users[i];
+  public Goods getGood(int i) {
+    return this.goods[i];
   }
 
   /**
-   * Gets the number of users.
+   * Gets the number of goods.
    * 
-   * @return the number of users.
+   * @return the number of goods.
    */
-  public int getNumberUsers() {
-    return this.users.length;
+  public int getNumberGoods() {
+    return this.goods.length;
   }
 
   /**
-   * Gets the number of campaigns.
+   * Gets the number of bidders.
    * 
-   * @return the number of campaigns.
+   * @return the number of bidders.
    */
-  public int getNumberCampaigns() {
-    return this.campaigns.length;
+  public int getNumberBidders() {
+    return this.bidders.length;
   }
 
   /**
@@ -115,48 +115,47 @@ public class Market {
    * @param reserve - reserve price
    */
   public void setReserveAllCampaigns(double reserve) {
-    for (int j = 0; j < campaigns.length; j++) {
-      this.campaigns[j].setReserve(reserve);
+    for (int j = 0; j < bidders.length; j++) {
+      this.bidders[j].setReserve(reserve);
     }
   }
 
   /**
-   * Adds a campaign to the Market.
+   * Adds a bidder to the Market.
    * 
-   * @param newCampaign - a campaign object.
-   * @param usersIndices - an ArrayList of integers containing the users indices.
+   * @param newBidder - a bidder object.
+   * @param goodsIndices - an ArrayList of integers containing the goods indices.
    */
-  public void addCampaign(Campaign newCampaign, ArrayList<Integer> usersIndices) {
-    // Add the new campaign to the array of existing campaigns.
-    Campaign[] newCampaigns = new Campaign[this.getNumberCampaigns() + 1];
-    System.arraycopy(this.campaigns, 0, newCampaigns, 0,
-        this.getNumberCampaigns());
-    newCampaigns[this.getNumberCampaigns()] = newCampaign;
-    this.campaigns = newCampaigns;
-    // Add this new campaign's connections
-    boolean[][] newConnections = new boolean[this.getNumberUsers()][this.getNumberCampaigns()];
-    for (int i = 0; i < this.getNumberUsers(); i++) {
-      for (int j = 0; j < this.getNumberCampaigns() - 1; j++) {
+  public void addBidder(Bidder newBidder, ArrayList<Integer> goodsIndices) {
+    // Add the new bidder to the array of existing bidders.
+    Bidder[] newBidders = new Bidder[this.getNumberBidders() + 1];
+    System.arraycopy(this.bidders, 0, newBidders, 0, this.getNumberBidders());
+    newBidders[this.getNumberBidders()] = newBidder;
+    this.bidders = newBidders;
+    // Add the new bidder's connections
+    boolean[][] newConnections = new boolean[this.getNumberGoods()][this.getNumberBidders()];
+    for (int i = 0; i < this.getNumberGoods(); i++) {
+      for (int j = 0; j < this.getNumberBidders() - 1; j++) {
         newConnections[i][j] = this.connections[i][j];
       }
     }
-    for (Integer userid : usersIndices) {
-      newConnections[userid][this.getNumberCampaigns() - 1] = true;
+    for (Integer goodid : goodsIndices) {
+      newConnections[goodid][this.getNumberBidders() - 1] = true;
     }
     this.connections = newConnections;
   }
 
   /**
-   * Computes the highest reward among all campaigns in the market.
+   * Computes the highest reward among all bidders in the market.
    * 
-   * @return the max value of rewards among all campaigns.
+   * @return the max value of rewards among all bidders.
    */
   public double getHighestReward() {
     if (this.highestReward == -1.0) {
       double temp = -1.0;
-      for (int j = 0; j < this.getNumberCampaigns(); j++) {
-        if (this.getCampaign(j).getReward() > temp) {
-          temp = this.getCampaign(j).getReward();
+      for (int j = 0; j < this.getNumberBidders(); j++) {
+        if (this.getBidder(j).getReward() > temp) {
+          temp = this.getBidder(j).getReward();
         }
       }
       this.highestReward = temp;
@@ -165,13 +164,13 @@ public class Market {
   }
 
   /**
-   * This method answers the question: does user i has any connections at all?
+   * This method answers the question: does good i has any connections at all?
    * 
-   * @param i - the index of a user.
-   * @return true if user i has at least once connection.
+   * @param i - the index of a good.
+   * @return true if good i has at least once connection.
    */
-  public boolean hasConnectionsUser(int i) {
-    for (int j = 0; j < this.getNumberCampaigns(); j++) {
+  public boolean hasConnectionsGood(int i) {
+    for (int j = 0; j < this.getNumberBidders(); j++) {
       if (this.isConnected(i, j)) {
         return true;
       }
@@ -180,13 +179,13 @@ public class Market {
   }
 
   /**
-   * This method answers the question: does campaign j has any connections at all?
+   * This method answers the question: does bidder j has any connections at all?
    * 
-   * @param j - the index of a campaign
-   * @return true if campaign j has at least one connection.
+   * @param j - the index of a bidder
+   * @return true if bidder j has at least one connection.
    */
-  public boolean hasConnectionsCampaign(int j) {
-    for (int i = 0; i < this.getNumberUsers(); i++) {
+  public boolean hasConnectionsBidder(int j) {
+    for (int i = 0; i < this.getNumberGoods(); i++) {
       if (this.isConnected(i, j)) {
         return true;
       }
@@ -195,54 +194,54 @@ public class Market {
   }
 
   /**
-   * This method computes all users connected to campaign j.
+   * This method computes all goods connected to bidder j.
    * 
-   * @param j - the index of a campaign.
-   * @return an ArrayList of indices of users to which campaign j is connected.
+   * @param j - the index of a bidder.
+   * @return an ArrayList of indices of goods to which bidder j is connected.
    */
-  public ArrayList<Integer> getListConnectedUsers(int j) {
-    ArrayList<Integer> listOfUsers = new ArrayList<Integer>();
-    for (int i = 0; i < this.getNumberUsers(); i++) {
+  public ArrayList<Integer> getListConnectedGoods(int j) {
+    ArrayList<Integer> listOfGoods = new ArrayList<Integer>();
+    for (int i = 0; i < this.getNumberGoods(); i++) {
       if (this.isConnected(i, j)) {
-        listOfUsers.add(i);
+        listOfGoods.add(i);
       }
     }
-    return listOfUsers;
+    return listOfGoods;
   }
 
   /**
-   * This method answers the question: is user i connected to campaign j?
+   * This method answers the question: is good i connected to bidder j?
    * 
-   * @param i - a user index
-   * @param j - a campaign index
-   * @return true if user i is connected to campaign j
+   * @param i - a good index
+   * @param j - a bidder index
+   * @return true if good i is connected to bidder j
    */
   public boolean isConnected(int i, int j) {
     return this.connections[i][j];
   }
 
   /**
-   * This method computes the total number of users supplied by the market.
+   * This method computes the total number of goods supplied by the market.
    * 
-   * @return the total number of users supplied in the market, i.e., \sum_i N_i.
+   * @return the total number of goods supplied in the market, i.e., \sum_i N_i.
    */
   public int getTotalSupply() {
     int totalSupply = 0;
-    for (int i = 0; i < this.getNumberUsers(); i++) {
-      totalSupply += this.getUser(i).getSupply();
+    for (int i = 0; i < this.getNumberGoods(); i++) {
+      totalSupply += this.getGood(i).getSupply();
     }
     return totalSupply;
   }
 
   /**
-   * This method computes the total number of users demanded by the market.
+   * This method computes the total number of goods demanded by the market.
    * 
-   * @return the total number of users demanded in the market, i.e., \sum_j I_j
+   * @return the total number of goods demanded in the market, i.e., \sum_j I_j
    */
   public int getTotalDemand() {
     int totalDemand = 0;
-    for (int j = 0; j < this.getNumberCampaigns(); j++) {
-      totalDemand += this.getCampaign(j).getDemand();
+    for (int j = 0; j < this.getNumberBidders(); j++) {
+      totalDemand += this.getBidder(j).getDemand();
     }
     return totalDemand;
   }
@@ -259,12 +258,12 @@ public class Market {
   /**
    * Printer. Representation of objects as strings.
    * 
-   * @return a string representation of the information of users in the market
+   * @return a string representation of the information of goods in the market
    */
-  protected String stringUsersInfo() {
+  protected String stringGoodsInfo() {
     String ret = "";
-    for (int i = 0; i < this.getNumberUsers(); i++) {
-      ret += "\nN(" + i + ") = " + this.users[i].supply;
+    for (int i = 0; i < this.getNumberGoods(); i++) {
+      ret += "\nN(" + i + ") = " + this.goods[i].supply;
     }
     return ret;
   }
@@ -272,23 +271,23 @@ public class Market {
   /**
    * Printer. Representation of objects as strings.
    * 
-   * @return a string representation of the information of campaigns in the market
+   * @return a string representation of the information of bidders in the market
    */
-  protected String stringCampaignsInfo() {
+  protected String stringBiddersInfo() {
     String ret = "";
-    for (int j = 0; j < this.getNumberCampaigns(); j++) {
+    for (int j = 0; j < this.getNumberBidders(); j++) {
       ret += "\n"
           + String.format(
               "%-20s %-20s %-20s %-20s %-20s %-12s %-20s",
               "R(" + j + ") = "
-                  + String.format("%.2f", this.campaigns[j].reward) + ";",
-              "I(" + j + ") = " + this.campaigns[j].demand + ";",
+                  + String.format("%.2f", this.bidders[j].reward) + ";",
+              "I(" + j + ") = " + this.bidders[j].demand + ";",
               "L(" + j + ") = "
-                  + String.format("%.2f", this.campaigns[j].level) + ";",
+                  + String.format("%.2f", this.bidders[j].level) + ";",
               "r(" + j + ") = "
-                  + String.format("%.2f", this.campaigns[j].reserve),
-              this.campaigns[j].backpointer, this.campaigns[j].priority,
-              this.campaigns[j].allocationSoFar);
+                  + String.format("%.2f", this.bidders[j].reserve),
+              this.bidders[j].backpointer, this.bidders[j].priority,
+              this.bidders[j].allocationSoFar);
     }
     return ret;
   }
@@ -301,9 +300,9 @@ public class Market {
   protected String stringConnectionsMatrix() {
     if (this.connections != null) {
       String ret = "";
-      for (int i = 0; i < this.getNumberUsers(); i++) {
+      for (int i = 0; i < this.getNumberGoods(); i++) {
         ret += "\n";
-        for (int j = 0; j < this.getNumberCampaigns(); j++) {
+        for (int j = 0; j < this.getNumberBidders(); j++) {
           if (this.isConnected(i, j)) {
             ret += "\t yes";
           } else {
@@ -319,16 +318,16 @@ public class Market {
 
   @Override
   public String toString() {
-    return "NbrCampaigns:\t"
-        + this.getNumberCampaigns()
+    return "NbrBidders:\t"
+        + this.getNumberBidders()
         + "\n"
-        + "NbrUsers:\t"
-        + this.getNumberUsers()
+        + "NbrGoods:\t"
+        + this.getNumberGoods()
         + "\n"
         + String.format("%-20s %-20s %-20s %-20s %-20s %-12s %s",
-            "Camp. Rewards", "Camp. Demand", "Level", "Reserve", "Backpointer",
-            "Priority", "Alloc So Far") + this.stringCampaignsInfo() + "\n"
-        + "Users Supply" + this.stringUsersInfo() + "\n"
+            "Bidders Rewards", "Bidders Demand", "Level", "Reserve", "Backpointer",
+            "Priority", "Alloc So Far") + this.stringBiddersInfo() + "\n"
+        + "Goods Supply" + this.stringGoodsInfo() + "\n"
         + "Connections Matrix:\t" + this.stringConnectionsMatrix();
   }
   

@@ -5,10 +5,10 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
-import structures.Campaign;
+import structures.Bidder;
 import structures.Market;
-import structures.User;
-import structures.exceptions.CampaignCreationException;
+import structures.Goods;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketCreationException;
 
 /**
@@ -23,17 +23,17 @@ public class SingleMindedMarketFactory {
    * @param n - number of items.
    * @param m - number of bidders.
    * @return a single minded market.
-   * @throws CampaignCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a campaign could not be created.
    */
-  public static Market createRandomSingleMindedMarket(int n, int m) throws CampaignCreationException {
-    User[] users = new User[n];
+  public static Market createRandomSingleMindedMarket(int n, int m) throws BidderCreationException {
+    Goods[] users = new Goods[n];
     for (int i = 0; i < n; i++) {
-      users[i] = new User(1);
+      users[i] = new Goods(1);
     }
     Random generator = new Random();
-    Campaign[] campaigns = new Campaign[m];
+    Bidder[] campaigns = new Bidder[m];
     for (int j = 0; j < m; j++) {
-      campaigns[j] = new Campaign(
+      campaigns[j] = new Bidder(
           generator.nextInt(n) + 1,
           generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);
     }
@@ -62,26 +62,26 @@ public class SingleMindedMarketFactory {
    */
   public static Market discountSingleMindedMarket(Market M, double reserve) {
     // Construct a map of the campaigns that "survive" the reserve price
-    HashMap<Integer, Campaign> remainingCampaigns = new HashMap<Integer, Campaign>();
-    for (int j = 0; j < M.getNumberCampaigns(); j++) {
-      if (M.getCampaign(j).getReward() - reserve * M.getCampaign(j).getDemand() >= 0) {
+    HashMap<Integer, Bidder> remainingCampaigns = new HashMap<Integer, Bidder>();
+    for (int j = 0; j < M.getNumberBidders(); j++) {
+      if (M.getBidder(j).getReward() - reserve * M.getBidder(j).getDemand() >= 0) {
         //System.out.println("Difference for " + j + " is " + (M.getCampaign(j).getReward() - reserve * M.getCampaign(j).getDemand()));
-        remainingCampaigns.put(j, M.getCampaign(j));
+        remainingCampaigns.put(j, M.getBidder(j));
       }
     }
     // Construct a new market only with "surviving" campaigns
-    Campaign[] campaigns = new Campaign[M.getNumberCampaigns()];
-    boolean[][] connections = new boolean[M.getNumberUsers()][M.getNumberCampaigns()];
-    for (int j = 0; j < M.getNumberCampaigns(); j++) {
-      campaigns[j] = M.getCampaign(j);
-      Campaign campaign = remainingCampaigns.get(j);
+    Bidder[] campaigns = new Bidder[M.getNumberBidders()];
+    boolean[][] connections = new boolean[M.getNumberGoods()][M.getNumberBidders()];
+    for (int j = 0; j < M.getNumberBidders(); j++) {
+      campaigns[j] = M.getBidder(j);
+      Bidder campaign = remainingCampaigns.get(j);
       if (campaign != null) {
-        for (int i = 0; i < M.getNumberUsers(); i++) {
+        for (int i = 0; i < M.getNumberGoods(); i++) {
           connections[i][j] = M.getConnections()[i][j];
         }
       }
     }
-    return new Market(M.getUsers(), campaigns, connections);
+    return new Market(M.getGoods(), campaigns, connections);
   }
   
   /**

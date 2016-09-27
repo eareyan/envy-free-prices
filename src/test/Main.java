@@ -16,12 +16,12 @@ import ilog.cplex.IloCplex;
 import singleminded.ApproxWE;
 import singleminded.ApproxWEReserve;
 import statistics.PricesStatistics;
-import structures.Campaign;
+import structures.Bidder;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
-import structures.User;
-import structures.exceptions.CampaignCreationException;
+import structures.Goods;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketPricesException;
@@ -37,8 +37,8 @@ import unitdemand.evpapprox.EVPApproximation;
 import util.NumberMethods;
 import util.Printer;
 import algorithms.ascendingauction.AscendingAuction;
-import algorithms.pricing.EnvyFreePricesSolutionLP;
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import algorithms.pricing.lp.reserveprices.EfficientAlloc;
 import algorithms.pricing.lp.reserveprices.GreedyAlloc;
 import algorithms.pricing.lp.reserveprices.LPReservePrices;
@@ -47,8 +47,7 @@ import algorithms.waterfall.Waterfall;
 import algorithms.waterfall.WaterfallPrices;
 import allocations.error.AllocationException;
 import allocations.greedy.GreedyAllocation;
-import allocations.greedy.multistep.GreedyMultiStepAllocation;
-import allocations.greedy.multistep.GreedyMultiStepAllocation;
+import allocations.greedy.GreedyMultiStepAllocation;
 import allocations.objectivefunction.EffectiveReachRatio;
 import allocations.objectivefunction.IdentityObjectiveFunction;
 import allocations.objectivefunction.SingleStepFunction;
@@ -63,8 +62,20 @@ import experiments.RunParameters;
 @SuppressWarnings("unused")
 public class Main {
 	
-	
-	public static void main(String args[]) throws CampaignCreationException, AllocationException, IloException, MarketCreationException, MarketPricesException {
+	public static void main(String[] args) throws BidderCreationException, AllocationException{
+	  GreedyAllocation greedy = new GreedyAllocation(-1);
+	  Market M = Examples.typicalTACMarket();
+	  //Market M = Examples.market7();
+    //GreedyMultiStepAllocation greedy = new GreedyMultiStepAllocation(10, new EffectiveReachRatio());
+	  MarketAllocation x = greedy.Solve(M);
+	  System.out.println(M);
+	  Printer.printMatrix(x.getAllocation());
+	  
+	  
+	}
+  
+  
+	public static void main7(String args[]) throws BidderCreationException, AllocationException, IloException, MarketCreationException, MarketPricesException {
 		System.out.println("*************** Create single minded market ***************");
 		Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(4, 5);
 		System.out.println(M);
@@ -92,7 +103,7 @@ public class Main {
 	
 	
 	
-	public static void main3(String args[]) throws AllocationException, CampaignCreationException, MarketAllocationException, IloException, MarketPricesException{
+	public static void main3(String args[]) throws AllocationException, BidderCreationException, MarketAllocationException, IloException, MarketPricesException{
 		
 		int numberOfEnvy = 0;
 		long startTime , endTime ;
@@ -148,10 +159,10 @@ public class Main {
 					int[][] greedyAlloc = new GreedyAllocation().Solve(M).getAllocation();
 					endTime = System.nanoTime();
 					//--LP
-					EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(new MarketAllocation(M,greedyAlloc));
+					RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new MarketAllocation(M,greedyAlloc));
 					efp.setMarketClearanceConditions(false);
 					efp.createLP();
-					EnvyFreePricesSolutionLP lpResult = efp.Solve();
+					RestrictedEnvyFreePricesLPSolution lpResult = efp.Solve();
 					MarketPrices greedyResult = new MarketPrices(new MarketAllocation(M, greedyAlloc, new SingleStepFunction()),lpResult.getPriceVector());
 					PricesStatistics psGreedy = new PricesStatistics(greedyResult);
 					//Printer.printMatrix(greedyAlloc);
@@ -183,7 +194,7 @@ public class Main {
 		//}
 	}
 	
-	public static void main2(String args[]) throws IloException, AllocationException, CampaignCreationException{
+	public static void main2(String args[]) throws IloException, AllocationException, BidderCreationException{
 		//Market M = Examples.market2();
 		Market M = Examples.typicalTACMarket();
 		System.out.println(M);

@@ -6,13 +6,13 @@ package structures.exceptions;
  * @author Enrique Areyan Viqueira
  */
 @SuppressWarnings("serial")
-public class CampaignCreationException extends Exception {
+public class BidderCreationException extends Exception {
 
   /**
    * Constructor.
    * @param info - exception information.
    */
-  public CampaignCreationException(String info) {
+  public BidderCreationException(String info) {
     super(info);
   }
   

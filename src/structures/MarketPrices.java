@@ -24,7 +24,7 @@ public class MarketPrices {
   protected MarketAllocation marketAllocation;
   
   /**
-   * priceVector[i] is the price per impression of user i.
+   * priceVector[i] is the price per item of good i.
    */
   protected double[] pricesVector;
 
@@ -63,8 +63,8 @@ public class MarketPrices {
 
   /**
    * Getter.
-   * @param i - a user index.
-   * @return the price of user i.
+   * @param i - a good index.
+   * @return the price of good i.
    */
   public double getPriceVectorComponent(int i) {
     return this.pricesVector[i];
@@ -79,33 +79,32 @@ public class MarketPrices {
   public double sellerRevenuePriceVector() throws MarketPricesException {
     double value = 0;
     for (int j = 0; j < this.marketAllocation.allocation[0].length; j++) {
-      value += this.sellerRevenueFromCampaign(j);
+      value += this.sellerRevenueFromBidder(j);
     }
     return value;
   }
   
   /**
-   * This function computes the seller revenue only for a list of campaigns L.
-   * @param campaignIndices - an ArrayList of campaigns.
-   * @return the seller revenue from campaigns in campaignIndices
+   * This function computes the seller revenue only for a given list of bidders.
+   * @param biddersIndices - an ArrayList of bidders indices.
+   * @return the seller revenue from bidders in biddersIndices
    * @throws MarketPricesException in case the price vector is null.
    */
-  public double sellerRevenuePriceVector(ArrayList<Integer> campaignIndices)
-      throws MarketPricesException {
+  public double sellerRevenuePriceVector(ArrayList<Integer> biddersIndices) throws MarketPricesException {
     double value = 0;
-    for (Integer j : campaignIndices) {
-      value += this.sellerRevenueFromCampaign(j);
+    for (Integer j : biddersIndices) {
+      value += this.sellerRevenueFromBidder(j);
     }
     return value;
   }
   
   /**
-   * This function computes the seller revenue for a given campaign.
-   * @param j - a campaign index.
-   * @return the seller revenue from campaign j.
+   * This function computes the seller revenue for a given bidder.
+   * @param j - a bidder index.
+   * @return the seller revenue from bidder j.
    * @throws MarketPricesException in case the price vector is null.
    */
-  public double sellerRevenueFromCampaign(int j) throws MarketPricesException {
+  public double sellerRevenueFromBidder(int j) throws MarketPricesException {
     if (this.pricesVector == null){
       throw new MarketPricesException("Ask for seller revenue using price vector but the price vector is null");
     }
@@ -117,13 +116,13 @@ public class MarketPrices {
   }
   
   /**
-   * Get current bundle cost for a campaign
-   * @param j - a campaign index.
+   * Get current bundle cost for a bidder.
+   * @param j - a bidder index.
    * @return j bundle cost.
    */
   public double getBundleCost(int j) {
     double cost = 0.0;
-    for (int i = 0; i < this.marketAllocation.getMarket().getNumberUsers(); i++) {
+    for (int i = 0; i < this.marketAllocation.getMarket().getNumberGoods(); i++) {
       if (this.marketAllocation.allocation[i][j] > 0) {
         cost += this.marketAllocation.allocation[i][j] * this.pricesVector[i];
       }

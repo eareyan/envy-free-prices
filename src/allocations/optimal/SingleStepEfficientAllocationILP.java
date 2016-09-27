@@ -66,25 +66,25 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
       cplex.setParam(IloCplex.DoubleParam.SolnPoolGap, 0.0);
       cplex.setParam(IloCplex.IntParam.PopulateLim, SingleStepEfficientAllocationILP.numSolutions);
       // variables
-      IloNumVar[] indicatorVariable = cplex.boolVarArray(market.getNumberCampaigns());
-      IloNumVar[][] allocationMatrixVariable = new IloNumVar[market.getNumberUsers()][];
-      for (int i = 0; i < market.getNumberUsers(); i++) {
+      IloNumVar[] indicatorVariable = cplex.boolVarArray(market.getNumberBidders());
+      IloNumVar[][] allocationMatrixVariable = new IloNumVar[market.getNumberGoods()][];
+      for (int i = 0; i < market.getNumberGoods(); i++) {
         allocationMatrixVariable[i] = cplex.intVarArray(
-            market.getNumberCampaigns(), 0, Integer.MAX_VALUE);
+            market.getNumberBidders(), 0, Integer.MAX_VALUE);
       }
       // LP objective function.
       IloLinearNumExpr obj = cplex.linearNumExpr();
-      for (int j = 0; j < market.getNumberCampaigns(); j++) {
-        obj.addTerm(market.getCampaign(j).getReward() - market.getCampaign(j).getReserve() * (market.getCampaign(j).getDemand() - market.getCampaign(j).getAllocationSoFar()), indicatorVariable[j]);
+      for (int j = 0; j < market.getNumberBidders(); j++) {
+        obj.addTerm(market.getBidder(j).getReward() - market.getBidder(j).getReserve() * (market.getBidder(j).getDemand() - market.getBidder(j).getAllocationSoFar()), indicatorVariable[j]);
       }
       // System.out.println(obj);
       cplex.addMaximize(obj);
       // Constraint (1). Allocation satisfies campaign.
-      for (int j = 0; j < market.getNumberCampaigns(); j++) {
-        double coeff = 1.0 / ((double) (market.getCampaign(j).getDemand() - market
-            .getCampaign(j).getAllocationSoFar()));
+      for (int j = 0; j < market.getNumberBidders(); j++) {
+        double coeff = 1.0 / ((double) (market.getBidder(j).getDemand() - market
+            .getBidder(j).getAllocationSoFar()));
         IloLinearNumExpr expr = cplex.linearNumExpr();
-        for (int i = 0; i < market.getNumberUsers(); i++) {
+        for (int i = 0; i < market.getNumberGoods(); i++) {
           if (market.isConnected(i, j)) {
             expr.addTerm(coeff, allocationMatrixVariable[i][j]);
           } else {
@@ -95,20 +95,20 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
         cplex.addLe(expr, indicatorVariable[j]);
       }
       // Constrain (2). Allocation from user can not be more than supply.
-      for (int i = 0; i < market.getNumberUsers(); i++) {
+      for (int i = 0; i < market.getNumberGoods(); i++) {
         IloLinearNumExpr expr = cplex.linearNumExpr();
-        for (int j = 0; j < market.getNumberCampaigns(); j++) {
+        for (int j = 0; j < market.getNumberBidders(); j++) {
           expr.addTerm(1.0, allocationMatrixVariable[i][j]);
         }
-        cplex.addLe(expr, market.getUser(i).getSupply());
+        cplex.addLe(expr, market.getGood(i).getSupply());
       }
       // Constrain (3). Campaigns have access to at most as many users as given by their level
-      for (int i = 0; i < market.getNumberUsers(); i++) {
-        for (int j = 0; j < market.getNumberCampaigns(); j++) {
+      for (int i = 0; i < market.getNumberGoods(); i++) {
+        for (int j = 0; j < market.getNumberBidders(); j++) {
           cplex.addLe(
               allocationMatrixVariable[i][j],
-              Math.floor(market.getCampaign(j).getLevel()
-                  * market.getUser(i).getSupply()));
+              Math.floor(market.getBidder(j).getLevel()
+                  * market.getGood(i).getSupply()));
         }
       }
       // Solve the problem and get many solutions.
@@ -133,15 +133,15 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
            * a matrix of doubles. So we are going to have to cast this into
            * integers.
            */
-          int[][] sol = new int[market.getNumberUsers()][market.getNumberCampaigns()];
-          double[][] solDouble = new double[market.getNumberUsers()][market.getNumberCampaigns()];
-          for (int i = 0; i < market.getNumberUsers(); i++) {
+          int[][] sol = new int[market.getNumberGoods()][market.getNumberBidders()];
+          double[][] solDouble = new double[market.getNumberGoods()][market.getNumberBidders()];
+          for (int i = 0; i < market.getNumberGoods(); i++) {
             solDouble[i] = cplex.getValues(allocationMatrixVariable[i], l);
             /*
              * Unfortunately in Java the only way to cast your array is to
              * iterate through each element and cast them one by one
              */
-            for (int j = 0; j < market.getNumberCampaigns(); j++) {
+            for (int j = 0; j < market.getNumberBidders(); j++) {
               sol[i][j] = (int) Math.round(solDouble[i][j]);
             }
           }
@@ -149,7 +149,7 @@ public class SingleStepEfficientAllocationILP implements AllocationAlgoInterface
           if (verbose) {
             Printer.printMatrix(sol);
             System.out.println();
-            for (int j = 0; j < market.getNumberCampaigns(); j++) {
+            for (int j = 0; j < market.getNumberBidders(); j++) {
               System.out.println(cplex.getValue(indicatorVariable[j], l));
             }
           }

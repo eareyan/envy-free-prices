@@ -13,13 +13,13 @@ import statistics.PricesStatistics;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
-import structures.exceptions.CampaignCreationException;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketPricesException;
 import structures.factory.SingleMindedMarketFactory;
 import util.NumberMethods;
-import algorithms.pricing.EnvyFreePricesSolutionLP;
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import allocations.error.AllocationException;
 import allocations.greedy.GreedyAllocation;
 import allocations.objectivefunction.SingleStepFunction;
@@ -29,7 +29,7 @@ public class single_minded extends Experiments{
 
 	@Override
 	public void runOneExperiment(	int numUsers, int numCampaigns, double prob,
-									int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, CampaignCreationException, MarketAllocationException, MarketPricesException {
+									int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, BidderCreationException, MarketAllocationException, MarketPricesException {
 	
 	
 		if(!dbLogger.checkIfSingleMindedRowExists("singleminded", numUsers, numCampaigns)){
@@ -84,10 +84,10 @@ public class single_minded extends Experiments{
 				int[][] greedyAlloc = new GreedyAllocation().Solve(M).getAllocation();
 				endTime = System.nanoTime();
 				//--LP
-				EnvyFreePricesVectorLP efp = new EnvyFreePricesVectorLP(new MarketAllocation(M,greedyAlloc));
+				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new MarketAllocation(M,greedyAlloc));
 				efp.setMarketClearanceConditions(false);
 				efp.createLP();
-				EnvyFreePricesSolutionLP lpResult = efp.Solve();
+				RestrictedEnvyFreePricesLPSolution lpResult = efp.Solve();
 				MarketPrices greedyResult = new MarketPrices(new MarketAllocation(M, greedyAlloc, new SingleStepFunction()),lpResult.getPriceVector());
 				PricesStatistics psGreedy = new PricesStatistics(greedyResult);
 				//Printer.printMatrix(greedyAlloc);

@@ -21,6 +21,7 @@ public class BundleEntry {
 
   /**
    * Constructor.
+   * 
    * @param i - user id.
    * @param x - allocation from user i.
    */
@@ -31,6 +32,7 @@ public class BundleEntry {
   
   /**
    * Getter.
+   * 
    * @return - user id
    */
   public int getI() {
@@ -39,6 +41,7 @@ public class BundleEntry {
   
   /**
    * Getter.
+   * 
    * @return - x, the allocation from user i. 
    */
   public int getX() {

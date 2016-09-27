@@ -64,26 +64,26 @@ public class Waterfall {
    */
   public WaterfallPrices Solve() {
     // Initialize structures to return results
-    double[][] bids = new double[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
-    double[][] prices = new double[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
-    int[][] allocation = new int[this.market.getNumberUsers()][this.market.getNumberCampaigns()];
+    double[][] bids = new double[this.market.getNumberGoods()][this.market.getNumberBidders()];
+    double[][] prices = new double[this.market.getNumberGoods()][this.market.getNumberBidders()];
+    int[][] allocation = new int[this.market.getNumberGoods()][this.market.getNumberBidders()];
     //Initialize the supply
-    int[] supply = new int[this.market.getNumberUsers()];
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
-      supply[i] = this.market.getUser(i).getSupply();
+    int[] supply = new int[this.market.getNumberGoods()];
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
+      supply[i] = this.market.getGood(i).getSupply();
     }
     // Initialize demand and budget
-    int[] demand = new int[this.market.getNumberCampaigns()];
-    double[] budget = new double[this.market.getNumberCampaigns()];
-    for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
-      demand[j] = this.market.getCampaign(j).getDemand();
-      budget[j] = this.market.getCampaign(j).getReward();
+    int[] demand = new int[this.market.getNumberBidders()];
+    double[] budget = new double[this.market.getNumberBidders()];
+    for (int j = 0; j < this.market.getNumberBidders(); j++) {
+      demand[j] = this.market.getBidder(j).getDemand();
+      budget[j] = this.market.getBidder(j).getReward();
     }
     // Find out which campaigns actually have connections and have enough to pay for reserve prices.
     ArrayList<Integer> Campaigns = new ArrayList<Integer>();
-    for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
-      if (this.market.hasConnectionsCampaign(j)
-          && (this.market.getCampaign(j).getReward() - this.market.getCampaign(j).getDemand()* this.reserve) > 0) {
+    for (int j = 0; j < this.market.getNumberBidders(); j++) {
+      if (this.market.hasConnectionsBidder(j)
+          && (this.market.getBidder(j).getReward() - this.market.getBidder(j).getDemand()* this.reserve) > 0) {
         Campaigns.add(j);
       }
     }
@@ -98,7 +98,7 @@ public class Waterfall {
         // Add campaign to set of feasible campaigns only if it is actually feasible
         if (isSatisfiable(Campaigns.get(l), supply, demand)) {
           feasibleCampaigns.add(Campaigns.get(l));
-          for (int i = 0; i < this.market.getNumberUsers(); i++) {
+          for (int i = 0; i < this.market.getNumberGoods(); i++) {
             if (!(supply[i] == 0) && !Users.contains(i)
                 && this.market.isConnected(i, Campaigns.get(l))) {
               Users.add(i);
@@ -117,7 +117,7 @@ public class Waterfall {
       ArrayList<Bid> SecondHighestBids = new ArrayList<Bid>();
       for (int k = 0; k < Users.size(); k++) {
         ArrayList<Bid> bidVector = new ArrayList<Bid>();
-        bidVector.add(new Bid(this.market.getUser(Users.get(k)).getReservePrice(), Users.get(k), -1));
+        bidVector.add(new Bid(this.market.getGood(Users.get(k)).getReservePrice(), Users.get(k), -1));
         for (int l = 0; l < feasibleCampaigns.size(); l++) {
           if (this.market.isConnected(Users.get(k), feasibleCampaigns.get(l))) {
             // System.out.println("(" + Users.get(k) + "," +
@@ -203,7 +203,7 @@ public class Waterfall {
    */
   public boolean isSatisfiable(int j, int[] supply, int[] demand) {
     int currentDemand = demand[j];
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
       if (this.market.isConnected(i, j)) {
         currentDemand -= supply[i];
       }

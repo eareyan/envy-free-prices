@@ -5,7 +5,7 @@ import allocations.error.AllocationException;
 import allocations.objectivefunction.ObjectiveFunction;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.exceptions.CampaignCreationException;
+import structures.exceptions.BidderCreationException;
 
 /**
  * This interface defines an allocation algorithm.
@@ -27,7 +27,7 @@ public interface AllocationAlgoInterface {
    * return a MarketAllocation object.
    */
   public MarketAllocation Solve(Market market) throws IloException,
-      AllocationException, CampaignCreationException;
+      AllocationException, BidderCreationException;
 
   /**
    * This method defines the objective function that was used to allocate the

@@ -7,10 +7,12 @@ import allocations.objectivefunction.ObjectiveFunction;
 
 /**
  * This class associates a Market with an Allocation.
- * The idea is that an allocation is an object associated 
- * with a market and thus, it should be a separate from it.
+ * The idea is that an Allocation is an object associated 
+ * but separate from a Market.
  * 
- * Also, an allocation is the result of some algorithm.
+ * An allocation is the result of some allocation algorithm.
+ * This class provides a common class for any allocation
+ * algorithm to report its results.
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -25,8 +27,10 @@ public class MarketAllocation {
    * Allocation for the market.
    */
   protected int[][] allocation;
+  
   /**
-   * Objective function.
+   * Objective function. This is the function that the allocation
+   * algorithm reported as having used to perfom its allocation.
    */
   protected ObjectiveFunction f;
   
@@ -69,9 +73,9 @@ public class MarketAllocation {
 
   /**
    * Getter.
-   * @param i - user index.
-   * @param j - campaign index.
-   * @return the allocation from user i to campaign j.
+   * @param i - good index.
+   * @param j - bidder index.
+   * @return the allocation from good i to bidder j.
    */
   public int getAllocation(int i, int j) {
     return this.allocation[i][j];
@@ -79,26 +83,27 @@ public class MarketAllocation {
   
   /**
    * Get value of allocation. The value of an allocation is the sum of rewards
-   * obtained by the allocation across all campaigns. This value depends on the
+   * obtained by the allocation across all bidders. This value depends on the
    * objective function being used.
    * 
-   * @return the value of an allocation, i.e., the sum of rewards of allocated campaigns.
+   * @return the value of an allocation, i.e., the sum of rewards of allocated bidders.
    * @throws MarketAllocationException in case there is a null allocation 
    */
   public double value() throws MarketAllocationException {
     double totalReward = 0.0;
-    // Loop through each campaign to check if it is satisfied.
-    for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
-      // Compute the extra reward attained by campaign j under the current allocation.
+    // Loop through each bidder to check if it is satisfied.
+    for (int j = 0; j < this.market.getNumberBidders(); j++) {
+      // Compute the extra reward attained by bidder j under the current allocation.
       totalReward += this.marginalValue(j);
     }
     return totalReward;
   }
   
   /**
-   * Computes the marginal value of the allocation for campaign j.
-   * @param j - campaign index.
-   * @return the marginal value of campaign j.
+   * Computes the marginal value of the allocation for bidder j.
+   * 
+   * @param j - bidder index.
+   * @return the marginal value of bidder j.
    * @throws MarketAllocationException
    */
   public double marginalValue(int j) throws MarketAllocationException {
@@ -106,33 +111,35 @@ public class MarketAllocation {
     if (this.f == null){
       throw new MarketAllocationException("An objective function must be defined to compute the value of an allocation");
     } else {
-      return this.f.getObjective(this.market.campaigns[j].getReward(), this.market.campaigns[j].getDemand(), this.getBundleNumber(j) + this.market.campaigns[j].getAllocationSoFar())
-          - this.f.getObjective(this.market.campaigns[j].getReward(), this.market.campaigns[j].getDemand(), this.market.campaigns[j].getAllocationSoFar());
+      return this.f.getObjective(this.market.bidders[j].getReward(), this.market.bidders[j].getDemand(), this.getBundleNumber(j) + this.market.bidders[j].getAllocationSoFar())
+          - this.f.getObjective(this.market.bidders[j].getReward(), this.market.bidders[j].getDemand(), this.market.bidders[j].getAllocationSoFar());
     }
   }
   
   /**
    * Computes the sum of marginal values of the allocation 
-   * for all campaigns in the given input list.
-   * @param campaignIndices - an ArrayList of campaign indices.
-   * @return the sum of marginal values of campaigns in campaignIndices
+   * for all bidder in the given input list.
+   * 
+   * @param biddersIndices - an ArrayList of bidder indices.
+   * @return the sum of marginal values of bidders in biddersIndices
    * @throws MarketAllocationException in case an objective function is not defined.
    */
-  public double marginalValue(ArrayList<Integer> campaignIndices) throws MarketAllocationException {
+  public double marginalValue(ArrayList<Integer> biddersIndices) throws MarketAllocationException {
     double totalReward = 0.0;
-    for (Integer j : campaignIndices) {
+    for (Integer j : biddersIndices) {
       totalReward += this.marginalValue(j);
     }
     return totalReward;
   }
   
   /**
-   * Checks if a campaign is assign something at all.
-   * @param j - campaign index.
-   * @return true if j was allocated at least one user.
+   * Checks if a bidder is assigned something at all.
+   * 
+   * @param j - bidder index.
+   * @return true if j was allocated at least one good.
    */
-  public boolean isCampaignBundleZero(int j) {
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
+  public boolean isBidderBundleZero(int j) {
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
       if (this.allocation[i][j] > 0) {
         return false;
       }
@@ -141,26 +148,26 @@ public class MarketAllocation {
   }
   
   /**
-   * Computes the number of impressions from user i that were allocated.
-   * @param i - a user index.
-   * @return the number of impressions from user i that were allocated.
+   * Computes the number of items from good i that were allocated.
+   * @param i - a good index.
+   * @return the number of items from good i that were allocated.
    */
-  public int allocationFromUser(int i) {
+  public int allocationFromGood(int i) {
     int totalAllocation = 0;
-    for (int j = 0; j < this.market.getNumberCampaigns(); j++) {
+    for (int j = 0; j < this.market.getNumberBidders(); j++) {
       totalAllocation += this.allocation[i][j];
     }
     return totalAllocation;
   }
   
   /**
-   * Get current bundle number for campaign j
-   * @param j - a campaign index.
-   * @return the number of users allocated to j.
+   * Get current bundle number for bidder j.
+   * @param j - a bidder index.
+   * @return the number of goods allocated to j.
    */
   public int getBundleNumber(int j) {
     int totalAllocation = 0;
-    for (int i = 0; i < this.market.getNumberUsers(); i++) {
+    for (int i = 0; i < this.market.getNumberGoods(); i++) {
       if (this.allocation[i][j] > 0) {
         totalAllocation += this.allocation[i][j];
       }
@@ -170,8 +177,8 @@ public class MarketAllocation {
   
   /**
    * Updates an allocation.
-   * @param i - a user index.
-   * @param j - a campaign index.
+   * @param i - a good index.
+   * @param j - a bidder index.
    * @param alloc - the new allocation from i to j.
    */
   public void updateAllocationEntry(int i, int j, int alloc) {

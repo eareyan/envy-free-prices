@@ -20,7 +20,8 @@ public class UserPrice {
   protected double price;
 
   /**
-   * Constructor. 
+   * Constructor.
+   * 
    * @param i - the user index.
    * @param price - the user price.
    */
@@ -31,6 +32,7 @@ public class UserPrice {
   
   /**
    * Getter.
+   * 
    * @return user id.
    */
   public int getI() {
@@ -39,6 +41,7 @@ public class UserPrice {
   
   /**
    * Getter.
+   * 
    * @return user price.
    */
   public double getPrice() {
@@ -46,7 +49,8 @@ public class UserPrice {
   }
   
   /**
-   * Updates the user price
+   * Updates the user price.
+   * 
    * @param price - new user price
    */
   public void updatePrice(double price) {

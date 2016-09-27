@@ -2,7 +2,7 @@ package algorithms.pricing.lp.heuristicreserveprices.interfaces;
 
 import structures.Market;
 import structures.MarketAllocation;
-import algorithms.pricing.EnvyFreePricesVectorLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
 
 /**
  * This interface SetReservePrices defines one method setReservePrices.
@@ -21,5 +21,5 @@ public interface SetReservePrices {
    * @param market - a market object.
    * @param initialMarketAllocation - a MarketAllocation object.
    */
-  public void setReservePrices(int i, int j, EnvyFreePricesVectorLP LP, double[] initialPrices, Market market, MarketAllocation initialMarketAllocation);
+  public void setReservePrices(int i, int j, RestrictedEnvyFreePricesLP LP, double[] initialPrices, Market market, MarketAllocation initialMarketAllocation);
 }

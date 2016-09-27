@@ -22,7 +22,7 @@ public class SelectOnlyConnectedUsers implements SelectUsers {
   @Override
   public ArrayList<Integer> selectUsers(int j, Market market) {
     ArrayList<Integer> users = new ArrayList<Integer>();
-    for (int i = 0; i < market.getNumberUsers(); i++) {
+    for (int i = 0; i < market.getNumberGoods(); i++) {
       if (market.isConnected(i, j)) {
         users.add(i);
       }

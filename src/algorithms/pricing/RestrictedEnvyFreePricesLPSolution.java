@@ -10,7 +10,7 @@ import structures.exceptions.MarketPricesException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class EnvyFreePricesSolutionLP extends MarketPrices {
+public class RestrictedEnvyFreePricesLPSolution extends MarketPrices {
   
   /**
    * Status of the LP.
@@ -25,17 +25,18 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
   /**
    * Constructor. Receives no parameters.
    */
-  public EnvyFreePricesSolutionLP() {
+  public RestrictedEnvyFreePricesLPSolution() {
     super();
     this.Status = "Empty";
   }
 
   /**
    * Constructor.
+   * 
    * @param marketAllocation - a marketAllocation object.
    * @param Status - a string representing the status of the LP.
    */
-  public EnvyFreePricesSolutionLP(MarketAllocation marketAllocation, String Status) {
+  public RestrictedEnvyFreePricesLPSolution(MarketAllocation marketAllocation, String Status) {
     super();
     this.marketAllocation = marketAllocation;
     this.Status = Status;
@@ -43,12 +44,13 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 
   /**
    * Constructor.
+   * 
    * @param marketAllocation - a marketAllocation object.
    * @param pricesVector - a vector of double containing the prices of users classes.
    * @param Status - a string representing the status of the LP.
    * @param optimalValue - the value (seller revenue) from LP.
    */
-  public EnvyFreePricesSolutionLP(MarketAllocation marketAllocation, double[] pricesVector, String Status, double optimalValue) {
+  public RestrictedEnvyFreePricesLPSolution(MarketAllocation marketAllocation, double[] pricesVector, String Status, double optimalValue) {
     super(marketAllocation, pricesVector);
     this.Status = Status;
     this.optimalValue = optimalValue;
@@ -56,6 +58,7 @@ public class EnvyFreePricesSolutionLP extends MarketPrices {
 
   /**
    * Getter.
+   * 
    * @return a string containing the LP status.
    */
   public String getStatus() {

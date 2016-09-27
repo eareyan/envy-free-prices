@@ -4,7 +4,7 @@ import ilog.concert.IloException;
 
 import java.sql.SQLException;
 
-import structures.exceptions.CampaignCreationException;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketPricesException;
 import allocations.error.AllocationException;
@@ -26,13 +26,13 @@ public abstract class Experiments {
    * @throws ClassNotFoundException
    * @throws IloException
    * @throws AllocationException
-   * @throws CampaignCreationException
+   * @throws BidderCreationException
    * @throws MarketAllocationException
    * @throws MarketPricesException
    */
   public void bulkTest(SqlDB dbLogger) throws SQLException,
       InstantiationException, IllegalAccessException, ClassNotFoundException,
-      IloException, AllocationException, CampaignCreationException,
+      IloException, AllocationException, BidderCreationException,
       MarketAllocationException, MarketPricesException {
 
     int numUsers = 21;
@@ -87,12 +87,12 @@ public abstract class Experiments {
    * @throws SQLException
    * @throws IloException
    * @throws AllocationException
-   * @throws CampaignCreationException
+   * @throws BidderCreationException
    * @throws MarketAllocationException
    * @throws MarketPricesException
    */
   abstract public void runOneExperiment(int numUsers, int numCampaigns,
       double prob, int b, SqlDB dbLogger) throws SQLException, IloException,
-      AllocationException, CampaignCreationException,
+      AllocationException, BidderCreationException,
       MarketAllocationException, MarketPricesException;
 }

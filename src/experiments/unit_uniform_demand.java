@@ -11,7 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import statistics.PricesStatistics;
 import structures.Market;
 import structures.MarketPrices;
-import structures.exceptions.CampaignCreationException;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketPricesException;
 import structures.factory.UnitMarketAllocationFactory;
@@ -30,7 +30,7 @@ import util.NumberMethods;
  */
 public class unit_uniform_demand extends Experiments{
 	
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, CampaignCreationException, MarketAllocationException, MarketPricesException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, BidderCreationException, MarketAllocationException, MarketPricesException{
 		if(!dbLogger.checkIfUnitDemandRowExists("unit_uniform_demand",numUsers, numCampaigns, prob)){
 			System.out.println("\t Adding data ");		
 

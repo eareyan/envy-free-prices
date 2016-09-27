@@ -22,6 +22,7 @@ public class Bundle {
 
   /**
    * Constructor.
+   * 
    * @param j
    * @param bundle
    */
@@ -32,6 +33,7 @@ public class Bundle {
   
   /**
    * Getter.
+   * 
    * @return the campaign index.
    */
   public int getJ() {
@@ -40,6 +42,7 @@ public class Bundle {
   
   /**
    * Getter.
+   * 
    * @return the bundle
    */
   public ArrayList<BundleEntry> getBundle() {

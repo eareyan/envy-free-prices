@@ -1,14 +1,14 @@
 package structures;
 
 /**
- * Represents a single user.
+ * Represents a single kind of goods.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class User {
+public class Goods {
   
   /**
-   * Supply of this user
+   * Goods supply.
    */
   protected int supply;
   
@@ -20,23 +20,23 @@ public class User {
   /**
    * Constructor
    */
-  public User(int supply) {
+  public Goods(int supply) {
     this.supply = supply;
   }
 
   /**
    * Constructor.
-   * @param supply - integer corresponding to the user supply.
-   * @param reservePrice - the user reserve price.
+   * @param supply - integer corresponding to the goods supply.
+   * @param reservePrice - the goods reserve price.
    */
-  public User(int supply, double reservePrice) {
+  public Goods(int supply, double reservePrice) {
     this(supply);
     this.reservePrice = reservePrice;
   }
   
   /**
    * Getter.
-   * @return the user supply.
+   * @return the goods supply.
    */
   public int getSupply() {
     return this.supply;
@@ -44,7 +44,7 @@ public class User {
 
   /**
    * Getter.
-   * @return the user reserve price.
+   * @return the goods reserve price.
    */
   public double getReservePrice() {
     return this.reservePrice;

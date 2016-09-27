@@ -12,7 +12,7 @@ import statistics.PricesStatistics;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketPrices;
-import structures.exceptions.CampaignCreationException;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketPricesException;
 import structures.factory.MarketFactory;
@@ -35,7 +35,7 @@ public class fancy_demand extends Experiments{
 	
 	public boolean underdemand; //Boolean switch. True if underdemand, false otherwise.
 
-	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, CampaignCreationException, MarketAllocationException, MarketPricesException{
+	public void runOneExperiment(int numUsers,int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, BidderCreationException, MarketAllocationException, MarketPricesException{
 		String tablename ="" , unittablename = "";
 		if(this.underdemand){
 			tablename = "fancy_underdemand";

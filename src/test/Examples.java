@@ -2,16 +2,16 @@ package test;
 
 import algorithms.waterfall.Waterfall;
 import algorithms.waterfall.WaterfallPrices;
-import structures.Campaign;
+import structures.Bidder;
 import structures.Market;
-import structures.User;
-import structures.exceptions.CampaignCreationException;
+import structures.Goods;
+import structures.exceptions.BidderCreationException;
 import structures.exceptions.MarketAllocationException;
 import util.Printer;
 
 public class Examples {
 	
-	public static void main(String[] args) throws CampaignCreationException, MarketAllocationException{
+	public static void main(String[] args) throws BidderCreationException, MarketAllocationException{
 		/* * Example where All Connected EVPApp performs better than plus 1 EVPApp in NON-Uniform, unit demand case */
 		double [][] valuationMatrix = new double[3][3];
 		
@@ -90,17 +90,17 @@ public class Examples {
 		Market market = new Market(users,campaigns,connections);
 		
 		/* Example where real envy-free prices do not exists */
-		Campaign c1 = new Campaign(2, 25);
-		Campaign c2 = new Campaign(3, 45);
-		Campaign c3 = new Campaign(2, 25);
-		Campaign[] campaigns = new Campaign[3];
+		Bidder c1 = new Bidder(2, 25);
+		Bidder c2 = new Bidder(3, 45);
+		Bidder c3 = new Bidder(2, 25);
+		Bidder[] campaigns = new Bidder[3];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
 		campaigns[2] = c3;
 		
-		User u1 = new User(2);
-		User u2 = new User(2);
-		User[] users = new User[2];
+		Goods u1 = new Goods(2);
+		Goods u2 = new Goods(2);
+		Goods[] users = new Goods[2];
 		users[0] = u1;
 		users[1] = u2;
 		
@@ -120,13 +120,13 @@ public class Examples {
 		int numUser = 5;
 		
 		numUser = numCamp;
-		Campaign[] campaigns1 = new Campaign[numCamp];
+		Bidder[] campaigns1 = new Bidder[numCamp];
 		for(int j=0;j<numCamp;j++){
-			campaigns1[j] = new Campaign(2  /* demand */ ,2*(numCamp - j)/* reward */);
+			campaigns1[j] = new Bidder(2  /* demand */ ,2*(numCamp - j)/* reward */);
 		}
-		User[] users1 = new User[numUser];
+		Goods[] users1 = new Goods[numUser];
 		for(int i=0;i<numUser;i++){
-			users1[i] = new User(1);
+			users1[i] = new Goods(1);
 		}
 		boolean[][] connections1 = new boolean[numUser][numCamp];
 		int counter = 0;
@@ -163,20 +163,20 @@ public class Examples {
 		
 	}
 	
-	public static Market market1() throws CampaignCreationException{
+	public static Market market1() throws BidderCreationException{
 		/* Example where the first implementation of CK outputs envy prices*/
 		
-		Campaign c1 = new Campaign(5, 8.79);
-		Campaign c2 = new Campaign(5, 6.45);
-		Campaign c3 = new Campaign(4, 3.47);
-		Campaign[] campaigns = new Campaign[3];
+		Bidder c1 = new Bidder(5, 8.79);
+		Bidder c2 = new Bidder(5, 6.45);
+		Bidder c3 = new Bidder(4, 3.47);
+		Bidder[] campaigns = new Bidder[3];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
 		campaigns[2] = c3;
 		
-		User u1 = new User(5);
-		User u2 = new User(5);
-		User[] users = new User[2];
+		Goods u1 = new Goods(5);
+		Goods u2 = new Goods(5);
+		Goods[] users = new Goods[2];
 		users[0] = u1;
 		users[1] = u2;
 		
@@ -191,16 +191,16 @@ public class Examples {
 		return market;
 	}
 	
-	public static Market market2() throws CampaignCreationException{
-		Campaign c1 = new Campaign(10, 100, 0.5, 1.0, -1, -1, 10);
-		Campaign c2 = new Campaign(9, 10, 1.0, 0.0, -1, -1, 8);
-		Campaign[] campaigns = new Campaign[2];
+	public static Market market2() throws BidderCreationException{
+		Bidder c1 = new Bidder(10, 100, 0.5, 1.0, -1, -1, 10);
+		Bidder c2 = new Bidder(9, 10, 1.0, 0.0, -1, -1, 8);
+		Bidder[] campaigns = new Bidder[2];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
 		
-		User u1 = new User(10);
-		User u2 = new User(5);
-		User[] users = new User[2];
+		Goods u1 = new Goods(10);
+		Goods u2 = new Goods(5);
+		Goods[] users = new Goods[2];
 		users[0] = u1;
 		users[1] = u2;
 
@@ -213,16 +213,16 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market market3() throws CampaignCreationException{
-		Campaign c1 = new Campaign(10, 1234);
-		Campaign c2 = new Campaign(454, 2856);
-		Campaign[] campaigns = new Campaign[2];
+	public static Market market3() throws BidderCreationException{
+		Bidder c1 = new Bidder(10, 1234);
+		Bidder c2 = new Bidder(454, 2856);
+		Bidder[] campaigns = new Bidder[2];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
 		
-		User u1 = new User(25);
-		User u2 = new User(25);
-		User[] users = new User[2];
+		Goods u1 = new Goods(25);
+		Goods u2 = new Goods(25);
+		Goods[] users = new Goods[2];
 		users[0] = u1;
 		users[1] = u2;
 
@@ -235,14 +235,14 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market market4() throws CampaignCreationException{
-		Campaign c1 = new Campaign(50, 500);
-		Campaign[] campaigns = new Campaign[1];
+	public static Market market4() throws BidderCreationException{
+		Bidder c1 = new Bidder(50, 500);
+		Bidder[] campaigns = new Bidder[1];
 		campaigns[0] = c1;
 		
-		User u1 = new User(25);
-		User u2 = new User(25);
-		User[] users = new User[2];
+		Goods u1 = new Goods(25);
+		Goods u2 = new Goods(25);
+		Goods[] users = new Goods[2];
 		users[0] = u1;
 		users[1] = u2;
 
@@ -254,22 +254,22 @@ public class Examples {
 	}
 	
 	
-	public static Market market5() throws CampaignCreationException{
+	public static Market market5() throws BidderCreationException{
 		/* Example market with priorities*/
 		
-		Campaign c1 = new Campaign(5, 8, 0.4, 0.0, 0, 1);
-		Campaign c2 = new Campaign(5, 6, 0.49,0.0, 0, 1);
-		Campaign c3 = new Campaign(5, 3, 1.0, 0.0, 0, 2);
-		Campaign c4 = new Campaign(5, 1, 1.0, 0.0, 0, 2);
-		Campaign[] campaigns = new Campaign[4];
+		Bidder c1 = new Bidder(5, 8, 0.4, 0.0, 0, 1);
+		Bidder c2 = new Bidder(5, 6, 0.49,0.0, 0, 1);
+		Bidder c3 = new Bidder(5, 3, 1.0, 0.0, 0, 2);
+		Bidder c4 = new Bidder(5, 1, 1.0, 0.0, 0, 2);
+		Bidder[] campaigns = new Bidder[4];
 		campaigns[0] = c1;
 		campaigns[1] = c2;
 		campaigns[2] = c3;
 		campaigns[3] = c4;
 		
-		User u1 = new User(4);
-		User u2 = new User(6);
-		User[] users = new User[2];
+		Goods u1 = new Goods(4);
+		Goods u2 = new Goods(6);
+		Goods[] users = new Goods[2];
 		users[0] = u1;
 		users[1] = u2;
 		
@@ -288,15 +288,15 @@ public class Examples {
 		return market;
 	}	
 	
-	public static Market market6() throws CampaignCreationException{
+	public static Market market6() throws BidderCreationException{
 		/* Example market with priorities*/
 		
-		Campaign c1 = new Campaign(3, 8,0,1);
-		Campaign[] campaigns = new Campaign[1];
+		Bidder c1 = new Bidder(3, 8,0,1);
+		Bidder[] campaigns = new Bidder[1];
 		campaigns[0] = c1;
 		
-		User u1 = new User(4);
-		User[] users = new User[1];
+		Goods u1 = new Goods(4);
+		Goods[] users = new Goods[1];
 		users[0] = u1;
 		
 		boolean[][] connections = new boolean[1][1];
@@ -306,16 +306,16 @@ public class Examples {
 		return market;
 	}
 	
-	public static Market market7() throws CampaignCreationException{
+	public static Market market7() throws BidderCreationException{
 		int numberC = 10;
-		Campaign[] campaigns = new Campaign[numberC];
+		Bidder[] campaigns = new Bidder[numberC];
 		for(int j=0;j<numberC;j++){
-			campaigns[j] = new Campaign(j*800 + 50, j*900 + 100 , j, (j<5) ? 2 : 1 ); 
+			campaigns[j] = new Bidder(j*800 + 50, j*900 + 100 , j, (j<5) ? 2 : 1 ); 
 		}
 		int numberU = 12;
-		User[] users = new User[numberU];
+		Goods[] users = new Goods[numberU];
 		for(int i=0;i<numberU;i++){
-			users[i] = new User(100*i);
+			users[i] = new Goods(100*i);
 		}
 		boolean[][] connections = new boolean[numberU][numberC];
 		for(int i=0;i<numberU;i++){
@@ -326,17 +326,17 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market market8() throws CampaignCreationException{
-		Campaign[] campaigns = new Campaign[3];
-		campaigns[0] = new Campaign(10,100.0);
-		campaigns[1] = new Campaign(10,200.0);
-		campaigns[2] = new Campaign(10,300.0);
+	public static Market market8() throws BidderCreationException{
+		Bidder[] campaigns = new Bidder[3];
+		campaigns[0] = new Bidder(10,100.0);
+		campaigns[1] = new Bidder(10,200.0);
+		campaigns[2] = new Bidder(10,300.0);
 		
-		User[] users = new User[4];
-		users[0] = new User(10);
-		users[1] = new User(10);
-		users[2] = new User(10);
-		users[3] = new User(10);
+		Goods[] users = new Goods[4];
+		users[0] = new Goods(10);
+		users[1] = new Goods(10);
+		users[2] = new Goods(10);
+		users[3] = new Goods(10);
 		
 		boolean[][] connections = new boolean[4][3];
 		connections[0][0] = true;
@@ -352,15 +352,15 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 }
 	
-	public static Market typicalTACMarket() throws CampaignCreationException{
+	public static Market typicalTACMarket() throws BidderCreationException{
 		//Campaign c0 = new Campaign(4142,4622.0,Math.pow(0.9,10),0.5,0,2);
-		Campaign c0 = new Campaign(4142, 4622.0, 1.0, 0.0, 0, 2, 4000);
-		Campaign c1 = new Campaign(1920, 671.0, 1, 0.08, 1, 2, 0);
-		Campaign c2 = new Campaign(481, 900.0, 1.0, 0.0, 2, 1, 479);
-		Campaign c3 = new Campaign(2478, 6195.0, 1.0, 0.0,  3, 1, 100);
-		Campaign c4 = new Campaign(259, 387.0, 4, 2);
-		Campaign c5 = new Campaign(1921, 4802.0, 1.0, 0.0, 5, 2, 0);
-		Campaign[] campaigns = new Campaign[6];
+		Bidder c0 = new Bidder(4142, 4622.0, 1.0, 0.0, 0, 2, 4000);
+		Bidder c1 = new Bidder(1920, 671.0, 1, 0.08, 1, 2, 0);
+		Bidder c2 = new Bidder(481, 900.0, 1.0, 0.0, 2, 1, 479);
+		Bidder c3 = new Bidder(2478, 6195.0, 1.0, 0.0,  3, 1, 100);
+		Bidder c4 = new Bidder(259, 387.0, 4, 2);
+		Bidder c5 = new Bidder(1921, 4802.0, 1.0, 0.0, 5, 2, 0);
+		Bidder[] campaigns = new Bidder[6];
 		campaigns[0] = c0;
 		campaigns[1] = c1;
 		campaigns[2] = c2;
@@ -368,15 +368,15 @@ public class Examples {
 		campaigns[4] = c4;
 		campaigns[5] = c5;
 		
-		User u0 = new User(2812);
-		User u1 = new User(3410);
-		User u2 = new User(735);
-		User u3 = new User(1148);
-		User u4 = new User(2549);
-		User u5 = new User(578);
-		User u6 = new User(2608);
-		User u7 = new User(364);
-		User[] users = new User[8];
+		Goods u0 = new Goods(2812);
+		Goods u1 = new Goods(3410);
+		Goods u2 = new Goods(735);
+		Goods u3 = new Goods(1148);
+		Goods u4 = new Goods(2549);
+		Goods u5 = new Goods(578);
+		Goods u6 = new Goods(2608);
+		Goods u7 = new Goods(364);
+		Goods[] users = new Goods[8];
 		users[0] = u0;
 		users[1] = u1;
 		users[2] = u2;
@@ -410,16 +410,16 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market singleMinded() throws CampaignCreationException{
-		Campaign[] campaigns = new Campaign[3];
-		campaigns[0] = new Campaign(3,5.35);
-		campaigns[1] = new Campaign(1,3.42);
-		campaigns[2] = new Campaign(1,8.99);
+	public static Market singleMinded() throws BidderCreationException{
+		Bidder[] campaigns = new Bidder[3];
+		campaigns[0] = new Bidder(3,5.35);
+		campaigns[1] = new Bidder(1,3.42);
+		campaigns[2] = new Bidder(1,8.99);
 		
-		User[] users = new User[3];
-		users[0] = new User(1);
-		users[1] = new User(1);
-		users[2] = new User(1);
+		Goods[] users = new Goods[3];
+		users[0] = new Goods(1);
+		users[1] = new Goods(1);
+		users[2] = new Goods(1);
 		
 		boolean[][] connections = new boolean[3][3];
 		connections[0][0] = true;
@@ -433,17 +433,17 @@ public class Examples {
 		return new Market(users,campaigns,connections);
 	}
 	
-	public static Market singleMinded2() throws CampaignCreationException{
-		Campaign[] campaigns = new Campaign[3];
-		campaigns[0] = new Campaign(1, 4.39);
-		campaigns[1] = new Campaign(3, 2.48);
-		campaigns[2] = new Campaign(1, 9.79);
+	public static Market singleMinded2() throws BidderCreationException{
+		Bidder[] campaigns = new Bidder[3];
+		campaigns[0] = new Bidder(1, 4.39);
+		campaigns[1] = new Bidder(3, 2.48);
+		campaigns[2] = new Bidder(1, 9.79);
 		
-		User[] users = new User[4];
-		users[0] = new User(1);
-		users[1] = new User(1);
-		users[2] = new User(1);
-		users[3] = new User(1);
+		Goods[] users = new Goods[4];
+		users[0] = new Goods(1);
+		users[1] = new Goods(1);
+		users[2] = new Goods(1);
+		users[3] = new Goods(1);
 		
 		boolean[][] connections = new boolean[4][3];
 		
