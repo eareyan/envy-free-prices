@@ -14,7 +14,7 @@ import util.Printer;
 abstract public class AbstractMaxWEQReservePrices {
 
   /**
-   * valuation matrix. Provides a valuation v_ij of user i by campaign j.
+   * valuation matrix. Provides a valuation v_ij of good i by bidder j.
    */
   protected double[][] valuationMatrix;
   
@@ -54,7 +54,7 @@ abstract public class AbstractMaxWEQReservePrices {
    * The method solve runs MaxWEQ on the augmented valuation matrix and then
    * deduces a matching.
    * 
-   * @param j - a campaign index.
+   * @param j - a bidder index.
    * @return a Matching object.
    */
   public Matching Solve(int j) {
@@ -84,7 +84,7 @@ abstract public class AbstractMaxWEQReservePrices {
    * This method is to be extended by an implemented class. The idea is that a
    * valuation matrix can be extended with dummies in many different ways.
    * 
-   * @param j - a campaign index.
+   * @param j - a bidder index.
    * @return a matrix of valuations.
    */
   abstract public double[][] augmentValuationMatrix(int j);
@@ -123,14 +123,14 @@ abstract public class AbstractMaxWEQReservePrices {
       if (!itemAllocated) { // item i is not allocated
         // System.out.println("item #"+i+", is NOT allocated.. let us try to allocated it");
         for (int j = 0; j < this.valuationMatrix[0].length; j++) {
-          boolean campaignAllocated = false;
+          boolean bidderAllocated = false;
           for (int i1 = 0; i1 < this.valuationMatrix.length; i1++) {
             if (matching[i1][j] == 1) {
-              campaignAllocated = true;
+              bidderAllocated = true;
             }
           }
-          if (!campaignAllocated) {// campaign j is not allocated
-            // System.out.println("Campaign #"+j+", is not allocated anything");
+          if (!bidderAllocated) {// bidder j is not allocated
+            // System.out.println("Bidder #"+j+", is not allocated anything");
             // System.out.println("\t*** " + this.valuationMatrix[i][j]);
             // System.out.println("\t*** " + prices[i]);
             /*

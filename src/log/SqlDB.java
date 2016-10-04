@@ -190,53 +190,6 @@ public class SqlDB {
     preparedStatement.execute();
   }
 
-  public void save_fancy_demand(String table_name, int n, int m, double p,
-      int b, double ckEfficiency, double ckRevenue, double ckTime,
-      double ckWE1, double ckWE2, double lpOptEfficiency, double lpOptRevenue,
-      double lpOptTime, double lpOptWE1, double lpOptWE2,
-      double lpWFEfficiency, double lpWFRevenue, double lpWFTime,
-      double lpWFWE1, double lpWFWE2, double lpG1Efficiency,
-      double lpG1Revenue, double lpG1Time, double lpG1WE1, double lpG1WE2,
-      double lpG2Efficiency, double lpG2Revenue, double lpG2Time,
-      double lpG2WE1, double lpG2WE2) throws SQLException {
-    String sql = "INSERT INTO "
-        + table_name
-        + " (n,m,p,b,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,lpOptEfficiency,lpOptRevenue,lpOptTime,lpOptWE1,lpOptWE2,lpWFEfficiency,lpWFRevenue,lpWFTime,lpWFWE1,lpWFWE2,lpG1Efficiency,lpG1Revenue,lpG1Time,lpG1WE1,lpG1WE2,lpG2Efficiency,lpG2Revenue,lpG2Time,lpG2WE1,lpG2WE2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    PreparedStatement preparedStatement = (PreparedStatement) conn
-        .prepareStatement(sql);
-    preparedStatement.setInt(1, n);
-    preparedStatement.setInt(2, m);
-    preparedStatement.setDouble(3, p);
-    preparedStatement.setInt(4, b);
-    preparedStatement.setDouble(5, ckEfficiency);
-    preparedStatement.setDouble(6, ckRevenue);
-    preparedStatement.setDouble(7, ckTime);
-    preparedStatement.setDouble(8, ckWE1);
-    preparedStatement.setDouble(9, ckWE2);
-    preparedStatement.setDouble(10, lpOptEfficiency);
-    preparedStatement.setDouble(11, lpOptRevenue);
-    preparedStatement.setDouble(12, lpOptTime);
-    preparedStatement.setDouble(13, lpOptWE1);
-    preparedStatement.setDouble(14, lpOptWE2);
-    preparedStatement.setDouble(15, lpWFEfficiency);
-    preparedStatement.setDouble(16, lpWFRevenue);
-    preparedStatement.setDouble(17, lpWFTime);
-    preparedStatement.setDouble(18, lpWFWE1);
-    preparedStatement.setDouble(19, lpWFWE2);
-    preparedStatement.setDouble(20, lpG1Efficiency);
-    preparedStatement.setDouble(21, lpG1Revenue);
-    preparedStatement.setDouble(22, lpG1Time);
-    preparedStatement.setDouble(23, lpG1WE1);
-    preparedStatement.setDouble(24, lpG1WE2);
-    preparedStatement.setDouble(25, lpG2Efficiency);
-    preparedStatement.setDouble(26, lpG2Revenue);
-    preparedStatement.setDouble(27, lpG2Time);
-    preparedStatement.setDouble(28, lpG2WE1);
-    preparedStatement.setDouble(29, lpG2WE2);
-
-    preparedStatement.execute();
-  }
-
   public void save_fancy_unitsupply(String table_name, int n, int m, double p,
       int b, double lpOptEfficiency, double lpOptRevenue, double lpOptTime,
       double lpOptWE1, double lpOptWE2, double lpWFEfficiency,

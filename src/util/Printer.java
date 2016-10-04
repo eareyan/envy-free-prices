@@ -2,6 +2,14 @@ package util;
 
 import java.text.DecimalFormat;
 
+import statistics.PricesStatistics;
+import structures.Bidder;
+import structures.Goods;
+import structures.Market;
+import structures.MarketOutcome;
+import structures.exceptions.MarketAllocationException;
+import structures.exceptions.MarketOutcomeException;
+
 /**
  * Library with common methods for printing information to the standard output.
  * 
@@ -112,6 +120,44 @@ public class Printer {
       System.out.print(vector[i] + "\t");
     }
     System.out.print("\n");
+  }
+  
+  /**
+   * Takes a market and prints basic information. 
+   * 
+   * @param M
+   */
+  public static void PrintMarketInfo(Market<Goods, Bidder<Goods>> M) {
+    System.out.println(M);
+    System.out.println("Highest Reward = " + M.getHighestReward());
+    System.out.println("Total Demand = " + M.getTotalDemand());
+    System.out.println("Total Supply = " + M.getTotalSupply());
+    System.out.println("S/D = " +  M.getSupplyToDemandRatio());    
+  }
+  
+  /**
+   * Takes a market outcome and prints basic information. 
+   * 
+   * @param outcome
+   * @throws MarketOutcomeException
+   * @throws MarketAllocationException
+   */
+  public static void PrintOutcomeInfo(MarketOutcome<Goods,Bidder<Goods>> outcome) throws MarketOutcomeException, MarketAllocationException{
+    /* Statistics for the allocation.*/
+    outcome.getMarketAllocation().printAllocation();
+    outcome.printPrices();
+    System.out.println("Seller Revenue = " + outcome.sellerRevenue());
+    System.out.println("Value = " + outcome.getMarketAllocation().value());
+    for(Goods good : outcome.getMarketAllocation().getMarket().getGoods()){
+      System.out.println("G = " + outcome.getMarketAllocation().allocationFromGood(good));
+    }
+    for(Bidder<Goods> bidder : outcome.getMarketAllocation().getMarket().getBidders()){
+      System.out.println("B = " + outcome.getMarketAllocation().allocationToBidder(bidder) + " " + outcome.getMarketAllocation().isBidderBundleZero(bidder));
+    }
+    /* Statistics for the prices. */
+    PricesStatistics<Goods, Bidder<Goods>> pricesStatistics = new PricesStatistics<Goods, Bidder<Goods>>(outcome);
+    System.out.println("MC Violations : " + pricesStatistics.computeMarketClearanceViolations()[0] + "," + pricesStatistics.computeMarketClearanceViolations()[1]);
+    System.out.println("EF violations : " + pricesStatistics.numberOfEnvyBidders());
   }
   
 }

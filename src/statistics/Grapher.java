@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import structures.Bidder;
+import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.factory.RandomMarketFactory;
@@ -17,7 +19,7 @@ import unitdemand.MaxWEQ;
 import util.Printer;
 import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
 import algorithms.pricing.RestrictedEnvyFreePricesLP;
-import allocations.optimal.SingleStepEfficientAllocationILP;
+import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 public class Grapher {
 	
@@ -175,7 +177,7 @@ public class Grapher {
 		Printer.printVector(newMatching.getPrices());		
 		System.out.println("sellerRevenue w/o reserve= " + matchingWithReserve.getSellerRevenue());
 		System.out.println("sellerRevenue w reserve= " + newMatching.getSellerRevenue());
-		System.out.println("There are "+newMatching.numberOfEnvyCampaigns()+ " envy campaigns");
+		System.out.println("There are "+newMatching.numberOfEnvyBidders()+ " envy campaigns");
 		
 	}
 	
@@ -340,7 +342,7 @@ public class Grapher {
 			DescriptiveStatistics revenue = new DescriptiveStatistics();
 			for(int j=0;j<numberOfSamples;j++){
 				/* Sample a Market */
-				Market M;
+				Market<Goods, Bidder<Goods>> M;
 				/* Determine if it is an underdemanded or overdemanded market and produce the market accordingly. */
 				if(overunderdemand == 0){
 					M = RandomMarketFactory.generateOverSuppliedMarket(numUsers, numCampa, p, b);
@@ -348,12 +350,11 @@ public class Grapher {
 					M = RandomMarketFactory.generateOverDemandedMarket(numUsers, numCampa, p, b);
 				}
 				/* Compute the efficient allocation */
-				MarketAllocation efficient = new SingleStepEfficientAllocationILP().Solve(M);
+				MarketAllocation<Goods, Bidder<Goods>> efficient = new SingleStepWelfareMaxAllocationILP().Solve(M);
 				double valueOptAllocaction = efficient.value();		
 
 				/* Compute allocation that respects reserve price */
-				M.setReserveAllCampaigns(reserve);
-				MarketAllocation allocRespectReserve = new SingleStepEfficientAllocationILP().Solve(M);
+				MarketAllocation<Goods, Bidder<Goods>> allocRespectReserve = new SingleStepWelfareMaxAllocationILP().Solve(M);
 
 				/* Compute envy-free prices */
 				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(allocRespectReserve);
@@ -365,7 +366,7 @@ public class Grapher {
 				if(sol.getStatus().equals("Infeasible")){
 					sellerRevenue = 0.0;
 				}else{
-					sellerRevenue = sol.sellerRevenuePriceVector();
+					sellerRevenue = sol.sellerRevenue();
 				}
 				revenue.addValue((double) sellerRevenue / valueOptAllocaction);
 			}

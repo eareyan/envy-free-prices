@@ -10,26 +10,30 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import singleminded.ApproxWE;
 import statistics.PricesStatistics;
+import structures.Bidder;
+import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketPrices;
+import structures.MarketOutcome;
+import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
+import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
-import structures.exceptions.MarketPricesException;
+import structures.exceptions.MarketCreationException;
+import structures.exceptions.MarketOutcomeException;
 import structures.factory.SingleMindedMarketFactory;
 import util.NumberMethods;
-import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
 import algorithms.pricing.RestrictedEnvyFreePricesLP;
-import allocations.error.AllocationException;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
-import allocations.objectivefunction.SingleStepFunction;
-import allocations.optimal.SingleStepEfficientAllocationILP;
+import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 public class single_minded extends Experiments{
 
 	@Override
 	public void runOneExperiment(	int numUsers, int numCampaigns, double prob,
-									int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, BidderCreationException, MarketAllocationException, MarketPricesException {
+									int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException {
 	
 	
 		if(!dbLogger.checkIfSingleMindedRowExists("singleminded", numUsers, numCampaigns)){
@@ -49,12 +53,12 @@ public class single_minded extends Experiments{
 			
 			for(int k = 0; k < RunParameters.numTrials; k ++){
 				/* Generate Single-minded random market */
-				Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(numUsers , numCampaigns);
+				Market<Goods, Bidder<Goods>> M = SingleMindedMarketFactory.createRandomSingleMindedMarket(numUsers , numCampaigns);
 				//System.out.println(M);
 				
 				/* Efficient Allocation */
 				//System.out.println("===== Efficient Alloc ======");
-				MarketAllocation efficientAlloc = new MarketAllocation(M, new SingleStepEfficientAllocationILP().Solve(M).getAllocation(), new SingleStepFunction());
+				MarketAllocation<Goods, Bidder<Goods>> efficientAlloc = new SingleStepWelfareMaxAllocationILP().Solve(M);
 				//Printer.printMatrix(efficientAlloc.getAllocation());
 				//System.out.println("efficientWelfare = " + efficientAlloc.value());
 				double optimalWelfare = efficientAlloc.value();
@@ -62,44 +66,29 @@ public class single_minded extends Experiments{
 				/* run approx WE algo */
 				//System.out.println("===== ApproxWE ======");
 				startTime = System.nanoTime();
-				MarketPrices approxWEResult = new ApproxWE(M).Solve();
+				MarketOutcome<Goods, Bidder<Goods>> approxWEResult = new ApproxWE(M).Solve();
 				endTime = System.nanoTime();
-				//Printer.printMatrix(approxWEResult.getMarketAllocation().getAllocation());
-				//Printer.printVector(y.getPriceVector());
-				PricesStatistics psApprox = new PricesStatistics(approxWEResult);
-				//numberOfEnvy = ps.numberOfEnvyCampaigns();
-				//System.out.println("Number of Envy Campaigns " + numberOfEnvy);
-				//Printer.printVector(ps.computeWalrasianViolations());
-				//System.out.println("Seller revenue " + y.sellerRevenuePriceVector());
-				//System.out.println("approx welfare = " + y.getMarketAllocation().value());
+				PricesStatistics<Goods, Bidder<Goods>> psApprox = new PricesStatistics<Goods, Bidder<Goods>>(approxWEResult);
+
 				approxWelfare.addValue(NumberMethods.getRatio(approxWEResult.getMarketAllocation().value() , optimalWelfare));
-				approxRevenue.addValue(NumberMethods.getRatio(approxWEResult.sellerRevenuePriceVector() ,  optimalWelfare));
-				approxEF.addValue((double) psApprox.numberOfEnvyCampaigns() / numCampaigns);
+				approxRevenue.addValue(NumberMethods.getRatio(approxWEResult.sellerRevenue() ,  optimalWelfare));
+				approxEF.addValue((double) psApprox.numberOfEnvyBidders() / numCampaigns);
 				approxWE.addValue((double) psApprox.computeMarketClearanceViolations()[0] / numUsers);
 				approxTime.addValue(endTime - startTime);
 				
 				/* Single-Step Greedy + LP */
 				//System.out.println("===== Greedy+LP ======");
 				startTime = System.nanoTime();
-				int[][] greedyAlloc = new GreedyAllocation().Solve(M).getAllocation();
 				endTime = System.nanoTime();
 				//--LP
-				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new MarketAllocation(M,greedyAlloc));
+				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new GreedyAllocation().Solve(M));
 				efp.setMarketClearanceConditions(false);
 				efp.createLP();
 				RestrictedEnvyFreePricesLPSolution lpResult = efp.Solve();
-				MarketPrices greedyResult = new MarketPrices(new MarketAllocation(M, greedyAlloc, new SingleStepFunction()),lpResult.getPriceVector());
-				PricesStatistics psGreedy = new PricesStatistics(greedyResult);
-				//Printer.printMatrix(greedyAlloc);
-				//numberOfEnvy = ps2.numberOfEnvyCampaigns();
-				//Printer.printVector(z.getPriceVector());
-				//System.out.println("Number of Envy Campaigns " + numberOfEnvy);
-				//Printer.printVector(ps2.computeWalrasianViolations());
-				//System.out.println("Seller revenue " + w.sellerRevenuePriceVector());
-				//System.out.println("greedy welfare = " + greedyResult.getMarketAllocation().value());
-				greedyWelfare.addValue(NumberMethods.getRatio(greedyResult.getMarketAllocation().value() , optimalWelfare));
-				greedyRevenue.addValue(NumberMethods.getRatio(greedyResult.sellerRevenuePriceVector() , optimalWelfare));
-				greedyEF.addValue((double) psGreedy.numberOfEnvyCampaigns() / numCampaigns);
+				PricesStatistics<Goods, Bidder<Goods>> psGreedy = new PricesStatistics<Goods, Bidder<Goods>>(lpResult); 
+				greedyWelfare.addValue(NumberMethods.getRatio(lpResult.getMarketAllocation().value() , optimalWelfare));
+				greedyRevenue.addValue(NumberMethods.getRatio(lpResult.sellerRevenue() , optimalWelfare));
+				greedyEF.addValue((double) psGreedy.numberOfEnvyBidders() / numCampaigns);
 				greedyWE.addValue((double) psGreedy.computeMarketClearanceViolations()[0] / numUsers);
 				greedyTime.addValue(endTime - startTime);
 			}

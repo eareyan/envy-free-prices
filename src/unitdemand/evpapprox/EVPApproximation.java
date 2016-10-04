@@ -20,7 +20,7 @@ import util.Printer;
 public class EVPApproximation {
   
   /**
-   * valuation matrix. Provides a valuation v_ij of user i by campaign j.
+   * valuation matrix. Provides a valuation v_ij of good i by bidder j.
    */
   protected double[][] valuationMatrix;
   
@@ -55,7 +55,7 @@ public class EVPApproximation {
     ArrayList<Matching> setOfSolutionMatchings = new ArrayList<Matching>();
     // For each item, run MaxWEQ_r with reserve prices given by the valuation. 
     for (Link valueLink : valuations) {
-      System.out.println("================= reserve price from campaign (" + valueLink.getJ() + ") = " + valueLink.getValue() + "++++++++++");
+      System.out.println("================= reserve price from bidder (" + valueLink.getJ() + ") = " + valueLink.getValue() + "++++++++++");
       Arrays.fill(reservePrices, valueLink.getValue());
       this.MWRP.setReservePrices(reservePrices);
       Matching x = this.MWRP.Solve(valueLink.getJ());

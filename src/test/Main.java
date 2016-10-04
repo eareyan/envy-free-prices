@@ -1,218 +1,146 @@
 package test;
 
-//import ilog.concert.IloException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.PriorityQueue;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
+
+import java.util.ArrayList;
+
 import singleminded.ApproxWE;
-import singleminded.ApproxWEReserve;
 import statistics.PricesStatistics;
 import structures.Bidder;
+import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketPrices;
-import structures.Goods;
+import structures.MarketOutcome;
+import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
+import structures.exceptions.GoodsCreationException;
+import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
-import structures.exceptions.MarketPricesException;
-import structures.factory.UnitMarketAllocationFactory;
-import structures.factory.MarketFactory;
+import structures.exceptions.MarketOutcomeException;
 import structures.factory.RandomMarketFactory;
 import structures.factory.SingleMindedMarketFactory;
-import structures.factory.UnitMarketFactory;
-import unitdemand.Matching;
-import unitdemand.MaxWEQ;
-import unitdemand.evpapprox.AllConnectedDummies;
-import unitdemand.evpapprox.EVPApproximation;
-import util.NumberMethods;
+import structures.factory.UnitMarketAllocationFactory;
 import util.Printer;
-import algorithms.ascendingauction.AscendingAuction;
-import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
 import algorithms.pricing.RestrictedEnvyFreePricesLP;
-import algorithms.pricing.lp.reserveprices.EfficientAlloc;
-import algorithms.pricing.lp.reserveprices.GreedyAlloc;
-import algorithms.pricing.lp.reserveprices.LPReservePrices;
-import algorithms.pricing.lp.reserveprices.WFAlloc;
-import algorithms.waterfall.Waterfall;
-import algorithms.waterfall.WaterfallPrices;
-import allocations.error.AllocationException;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.reserveprices.RevMaxHeuristic;
+import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
-import allocations.greedy.GreedyMultiStepAllocation;
-import allocations.objectivefunction.EffectiveReachRatio;
-import allocations.objectivefunction.IdentityObjectiveFunction;
-import allocations.objectivefunction.SingleStepFunction;
-import allocations.optimal.MultiStepEfficientAllocationILP;
-import allocations.optimal.SingleStepEfficientAllocationILP;
-import experiments.RunParameters;
+import allocations.interfaces.AllocationAlgoInterface;
+
 /*
  * Main class. Use for testing purposes.
  * 
  * @author Enrique Areyan Viqueira
  */
-@SuppressWarnings("unused")
 public class Main {
-	
-	public static void main(String[] args) throws BidderCreationException, AllocationException{
-	  GreedyAllocation greedy = new GreedyAllocation(-1);
-	  Market M = Examples.typicalTACMarket();
-	  //Market M = Examples.market7();
-    //GreedyMultiStepAllocation greedy = new GreedyMultiStepAllocation(10, new EffectiveReachRatio());
-	  MarketAllocation x = greedy.Solve(M);
-	  System.out.println(M);
-	  Printer.printMatrix(x.getAllocation());
-	  
-	  
-	}
-  
-  
-	public static void main7(String args[]) throws BidderCreationException, AllocationException, IloException, MarketCreationException, MarketPricesException {
-		System.out.println("*************** Create single minded market ***************");
-		Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(4, 5);
-		System.out.println(M);
-		MarketPrices approxWEResult = new ApproxWE(M).Solve();
-		Printer.printMatrix(approxWEResult.getMarketAllocation().getAllocation());
-		Printer.printVector(approxWEResult.getPriceVector());
-    System.out.println(approxWEResult.sellerRevenuePriceVector());
-    /*System.out.println("*************** Dicount single minded market ***************");
-		Market discountedM = SingleMindedMarketFactory.discountSingleMindedMarket(M, 2.0);
-		System.out.println(discountedM);
-    MarketPrices discountedApproxWEResult = new ApproxWE(discountedM).Solve();
-    Printer.printMatrix(discountedApproxWEResult.getMarketAllocation().getAllocation());
-    Printer.printVector(discountedApproxWEResult.getPriceVector());*/
-    //MarketAllocation aprxWEReserve = new ApproxWEReserve().getAllocWithReservePrice(M, 2.0);
-    //Printer.printMatrix(aprxWEReserve.getAllocation());
+
+
+  /**
+   * Testing all kinds of markets.
+   * @throws MarketCreationException 
+   */
+  public static void main(String[] args) throws IloException, BidderCreationException, AllocationAlgoException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException {
+
+    ArrayList<Market<Goods,Bidder<Goods>>> marketList = new ArrayList<Market<Goods,Bidder<Goods>>>();
+    marketList.add(SizeInterchangeableMarkets.market0());
+    marketList.add(SizeInterchangeableMarkets.market1());
+    marketList.add(SizeInterchangeableMarkets.market2());
+    marketList.add(SizeInterchangeableMarkets.market3());
+    marketList.add(SizeInterchangeableMarkets.market4());
+    marketList.add(SizeInterchangeableMarkets.market6());
+    marketList.add(SizeInterchangeableMarkets.market7());
+    marketList.add(RandomMarketFactory.randomMarket(3, 5, 0.5));
+    marketList.add(RandomMarketFactory.RandomKMarket(4, 4, 1.0, 2));
+    marketList.add(SingleMindedMarketFactory.createRandomSingleMindedMarket(4, 3));
+    marketList.add(SingleMindedMarketFactory.createRandomSingleMindedMarket(3, 4));
+    marketList.add(SizeInterchangeableMarkets.market8());
+    marketList.add(SingleMindedMarkets.singleMinded0());
+    marketList.add(SingleMindedMarkets.singleMinded1());
+    //marketList.add(RandomMarketFactory.randomMarket(20, 20, 0.25));
     
-    LPReservePrices lpRP = new LPReservePrices(M, new ApproxWEReserve());
-		MarketPrices x = lpRP.Solve();
-		Printer.printMatrix(x.getMarketAllocation().getAllocation());
-		Printer.printVector(x.getPriceVector());
-		System.out.println(x.sellerRevenuePriceVector());
-		
-	}
-	
-	
-	
-	
-	public static void main3(String args[]) throws AllocationException, BidderCreationException, MarketAllocationException, IloException, MarketPricesException{
-		
-		int numberOfEnvy = 0;
-		long startTime , endTime ;
-		//for(int i = 1; i < 10 ; i ++){
-			//for(int j = 1 ; j < 10; j++){
-				DescriptiveStatistics approxRevenue = new DescriptiveStatistics();
-				DescriptiveStatistics approxWelfare = new DescriptiveStatistics();
-				DescriptiveStatistics approxEF = new DescriptiveStatistics();
-				DescriptiveStatistics approxWE = new DescriptiveStatistics();
-				DescriptiveStatistics approxTime = new DescriptiveStatistics();
-				
-				DescriptiveStatistics greedyRevenue = new DescriptiveStatistics();
-				DescriptiveStatistics greedyWelfare = new DescriptiveStatistics();
-				DescriptiveStatistics greedyEF = new DescriptiveStatistics();
-				DescriptiveStatistics greedyWE = new DescriptiveStatistics();
-				DescriptiveStatistics greedyTime = new DescriptiveStatistics();
-				
-				for(int k = 0; k <1; k ++){
-					/* Generate Single-minded random market */
-					Market M = SingleMindedMarketFactory.createRandomSingleMindedMarket(3,3);
-					System.out.println(M);
-					
-					/* Efficient Allocation */
-					//System.out.println("===== Efficient Alloc ======");
-					MarketAllocation efficientAlloc = new MarketAllocation(M, new SingleStepEfficientAllocationILP().Solve(M).getAllocation(), new SingleStepFunction());
-					
-					//Printer.printMatrix(efficientAlloc.getAllocation());
-					//System.out.println("efficientWelfare = " + efficientAlloc.value());
-					double optimalWelfare = efficientAlloc.value();
-					
-					/* run approx WE algo */
-					//System.out.println("===== ApproxWE ======");
-					startTime = System.nanoTime();
-					MarketPrices approxWEResult = new ApproxWE(M).Solve();
-					endTime = System.nanoTime();
-					//Printer.printMatrix(approxWEResult.getMarketAllocation().getAllocation());
-					//Printer.printVector(y.getPriceVector());
-					PricesStatistics psApprox = new PricesStatistics(approxWEResult);
-					//numberOfEnvy = ps.numberOfEnvyCampaigns();
-					//System.out.println("Number of Envy Campaigns " + numberOfEnvy);
-					//Printer.printVector(ps.computeWalrasianViolations());
-					//System.out.println("Seller revenue " + y.sellerRevenuePriceVector());
-					//System.out.println("approx welfare = " + y.getMarketAllocation().value());
-					/*approxWelfare.addValue(NumberMethods.getRatio(approxWEResult.getMarketAllocation().value() , optimalWelfare));
-					approxRevenue.addValue(NumberMethods.getRatio(approxWEResult.sellerRevenuePriceVector() ,  optimalWelfare));
-					approxEF.addValue((double) psApprox.numberOfEnvyCampaigns() / j);
-					approxWE.addValue((double) psApprox.computeWalrasianViolations()[0] / i);
-					approxTime.addValue(endTime - startTime);*/
-					
-					/* Single-Step Greedy + LP */
-					//System.out.println("===== Greedy+LP ======");
-					startTime = System.nanoTime();
-					int[][] greedyAlloc = new GreedyAllocation().Solve(M).getAllocation();
-					endTime = System.nanoTime();
-					//--LP
-					RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new MarketAllocation(M,greedyAlloc));
-					efp.setMarketClearanceConditions(false);
-					efp.createLP();
-					RestrictedEnvyFreePricesLPSolution lpResult = efp.Solve();
-					MarketPrices greedyResult = new MarketPrices(new MarketAllocation(M, greedyAlloc, new SingleStepFunction()),lpResult.getPriceVector());
-					PricesStatistics psGreedy = new PricesStatistics(greedyResult);
-					//Printer.printMatrix(greedyAlloc);
-					//numberOfEnvy = ps2.numberOfEnvyCampaigns();
-					//Printer.printVector(z.getPriceVector());
-					//System.out.println("Number of Envy Campaigns " + numberOfEnvy);
-					//Printer.printVector(ps2.computeWalrasianViolations());
-					//System.out.println("Seller revenue " + w.sellerRevenuePriceVector());
-					//System.out.println("greedy welfare = " + greedyResult.getMarketAllocation().value());
-					/*greedyWelfare.addValue(NumberMethods.getRatio(greedyResult.getMarketAllocation().value() , optimalWelfare));
-					greedyRevenue.addValue(NumberMethods.getRatio(greedyResult.sellerRevenuePriceVector() , optimalWelfare));
-					greedyEF.addValue((double) psGreedy.numberOfEnvyCampaigns() / j);
-					greedyWE.addValue((double) psGreedy.computeWalrasianViolations()[0] / i);*/
-					greedyTime.addValue(endTime - startTime);
-				}
-				/*System.out.println(String.format("%s %20s %20s %20s %20s %20s %20s %20s %20s %20s", 
-													"(" + i  + "," + j + ") = (" , 
-													approxWelfare.getMean() + "," , 
-													approxRevenue.getMean() + "," , 
-													approxEF.getMean() + "," ,
-													approxWE.getMean() + "," ,
-													approxTime.getMean() / 1000000 + ") - (" ,  
-													greedyWelfare.getMean() + "," , 
-													greedyRevenue.getMean() + "," , 
-													greedyEF.getMean() + "," , 
-													greedyWE.getMean() + "," + 
-													greedyTime.getMean() / 1000000 + ")"));*/
-			//}
-		//}
-	}
-	
-	public static void main2(String args[]) throws IloException, AllocationException, BidderCreationException{
-		//Market M = Examples.market2();
-		Market M = Examples.typicalTACMarket();
-		System.out.println(M);
-		/* Single-Step Efficient */
-		System.out.println("Single-Step Efficient Allocation");
-		Printer.printMatrix(new SingleStepEfficientAllocationILP().Solve(M).getAllocation());
-		/* Single-Step Greedy */
-		System.out.println("Single-Step Greedy Allocation");
-		Printer.printMatrix(new GreedyAllocation().Solve(M).getAllocation());
-		int stepSize = 1;
-		/* Multi-Step Efficient 
-		System.out.println("Multi-Step Efficient Allocation");
-		Printer.printMatrix(new MultiStepEfficientAllocationILP(M,stepSize,new IdentityObjectiveFunction()).Solve().get(0));
-		/* Multi-Step Greedy */
-		System.out.println("Multi-Step Greedy Allocation");
-		MarketAllocation x = new GreedyMultiStepAllocation(stepSize,new EffectiveReachRatio()).Solve(M);
-		Printer.printMatrix(x.getAllocation());
-		System.out.println("*** new market ");
-		System.out.println(x.getMarket());
-	}	
+    // Talk to LUKE about this!
+    // marketList.add(SingleMindedMarketFactory.discountSingleMindedMarket(SingleMindedMarkets.singleMinded1(), 20.0));
+    
+    ArrayList<AllocationAlgoInterface<Market<Goods,Bidder<Goods>>,Goods,Bidder<Goods>>> algosList = new ArrayList<AllocationAlgoInterface<Market<Goods,Bidder<Goods>>,Goods,Bidder<Goods>>>();
+    algosList.add(new GreedyAllocation());
+    //algosList.add(new SingleStepWelfareMaxAllocationILP());
+    // GreedyMulti Step fails for finding prices.
+    //algosList.add(new GreedyMultiStepAllocation(1, new EffectiveReachRatio()));
+    //algosList.add(new GreedyMultiStepAllocation(1, new IdentityObjectiveFunction()));
+    //algosList.add(new GreedyMultiStepAllocation(20, new EffectiveReachRatio()));
+
+    for (Market<Goods, Bidder<Goods>> M : marketList) {
+      System.out.println("********/*************/************");
+      Printer.PrintMarketInfo(M);      
+      for(AllocationAlgoInterface<Market<Goods,Bidder<Goods>>,Goods,Bidder<Goods>> algo : algosList){
+        /* Allocate Market.  */
+        MarketAllocation<Goods, Bidder<Goods>> alloc = algo.Solve(M);
+        System.out.println(algo + " Alloc");
+        /* Price Market.  */
+        RestrictedEnvyFreePricesLP REFPLP = new RestrictedEnvyFreePricesLP(alloc);
+        REFPLP.setMarketClearanceConditions(true);
+        REFPLP.createLP();
+        RestrictedEnvyFreePricesLPSolution marketPrices = REFPLP.Solve();
+        Printer.PrintOutcomeInfo(marketPrices);
+        /* Revenue Max Heuristic*/
+        RevMaxHeuristic rmh = new RevMaxHeuristic(M, algo);
+        System.out.println("Rev. Max Heuristic = " + rmh.Solve());
+      }
+    }
+  }
+
+  /**
+   * Testing singleMindedMarkets.
+   * @throws MarketOutcomeException 
+   * @throws MarketCreationException 
+   */
+  public static void main1(String[] args) throws MarketAllocationException, GoodsCreationException, BidderCreationException, MarketOutcomeException, MarketCreationException{
+    ArrayList<Market<Goods,Bidder<Goods>>> singleMindedMarketList = new ArrayList<Market<Goods,Bidder<Goods>>>();
+    singleMindedMarketList.add(SingleMindedMarkets.singleMinded0());
+    singleMindedMarketList.add(SingleMindedMarkets.singleMinded1());
+    singleMindedMarketList.add(SingleMindedMarketFactory.createRandomSingleMindedMarket(5, 3));
+    for (Market<Goods, Bidder<Goods>> singleMindedMarket : singleMindedMarketList) {
+      Printer.PrintMarketInfo(singleMindedMarket);
+      ApproxWE approxWE = new ApproxWE(singleMindedMarket);
+      MarketOutcome<Goods, Bidder<Goods>> x = approxWE.Solve();
+      Printer.PrintOutcomeInfo(x);
+    }
+  }
+  
+  public static void main2(String[] args) throws BidderCreationException, IloException, AllocationAlgoException, AllocationException, MarketAllocationException, GoodsException, MarketOutcomeException, MarketCreationException{
+    
+    //MarketWithReservePrice mwrp = new MarketWithReservePrice(SingleMindedMarkets.singleMinded0(), 4.0);
+    /*MarketWithReservePrice mwrp = new MarketWithReservePrice(SizeInterchangeableMarkets.market7(), 2.0);
+    Printer.PrintMarketInfo(mwrp.getMarket());
+    Printer.PrintMarketInfo(mwrp.getMarketWithReservePrice());
+    for(Bidder<Goods> bidder : mwrp.getMarket().getBidders()){
+      System.out.println(bidder + " -> " + mwrp.getBidderToBidderMap().get(bidder));
+    }*/
+    
+    //Market<Goods, Bidder<Goods>> market = SizeInterchangeableMarkets.market7();
+    //Market<Goods, Bidder<Goods>> market = SingleMindedMarkets.singleMinded0();
+    //Market<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(30, 40);
+    Market<Goods, Bidder<Goods>> market = RandomMarketFactory.randomMarket(5, 5, 1.0);
+    System.out.println(market);
+    
+    RevMaxHeuristic rmh = new RevMaxHeuristic(market, new GreedyAllocation());
+    //RevMaxHeuristic rmh = new RevMaxHeuristic(market, new SingleStepWelfareMaxAllocationILP());
+    //RevMaxHeuristic rmh = new RevMaxHeuristic(market, new GreedyMultiStepAllocation(1, new EffectiveReachRatio()));
+    MarketOutcome<Goods, Bidder<Goods>> outcome = rmh.Solve();
+    outcome.getMarketAllocation().printAllocation();
+    outcome.printPrices();
+    PricesStatistics<Goods, Bidder<Goods>> ps = new PricesStatistics<Goods, Bidder<Goods>>(outcome);
+    System.out.println("#Envy = " + ps.numberOfEnvyBidders());
+  }
+  
+  public static void main3(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException{
+    //double[][] x = UnitMarketFactory.getValuationMatrix(2,2,0.5);
+    //Printer.printMatrix(x);
+    Market<Goods, Bidder<Goods>> market = RandomMarketFactory.randomMarket(5, 5, 0.5);
+    System.out.println(market);
+    Printer.printMatrix(UnitMarketAllocationFactory.getValuationMatrixFromMarket(market));
+  }
+
 }

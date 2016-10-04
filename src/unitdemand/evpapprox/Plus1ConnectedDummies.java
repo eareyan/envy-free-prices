@@ -3,7 +3,7 @@ package unitdemand.evpapprox;
 import util.Printer;
 
 /**
- * Adds dummy only to connected users plus one more level.
+ * Adds dummy only to connected goods plus one more level.
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -49,7 +49,7 @@ public class Plus1ConnectedDummies extends AbstractMaxWEQReservePrices {
     for (int i = 0; i < this.valuationMatrix.length; i++) {
       /* Create dummy reserve demand */
       double[] dummyReserveRow = new double[(this.valuationMatrix.length) * 2];
-      if (includeUser(i, j)) {
+      if (includeGood(i, j)) {
         dummyReserveRow[i * 2] = this.reservePrices[i];
         dummyReserveRow[(i * 2) + 1] = this.reservePrices[i];
       }
@@ -71,20 +71,20 @@ public class Plus1ConnectedDummies extends AbstractMaxWEQReservePrices {
   }
 
   /**
-   * Computes whether or not to include user i.
+   * Computes whether or not to include good i.
    * 
-   * @param userIndex - user index.
-   * @param campaignIndex - campaign index.
-   * @return true if userIndex should be included
+   * @param goodIndex - good index.
+   * @param bidderIndex - bidder index.
+   * @return true if goodIndex should be included
    */
-  public boolean includeUser(int userIndex, int campaignIndex) {
+  public boolean includeGood(int goodIndex, int bidderIndex) {
 
     for (int j = 0; j < this.valuationMatrix[0].length; j++) {
-      if (this.valuationMatrix[userIndex][j] > Double.NEGATIVE_INFINITY) {
+      if (this.valuationMatrix[goodIndex][j] > Double.NEGATIVE_INFINITY) {
         for (int i = 0; i < this.valuationMatrix.length; i++) {
-          if (campaignIndex > -1) {
+          if (bidderIndex > -1) {
             if (this.valuationMatrix[i][j] > Double.NEGATIVE_INFINITY
-                && this.valuationMatrix[i][campaignIndex] > Double.NEGATIVE_INFINITY) {
+                && this.valuationMatrix[i][bidderIndex] > Double.NEGATIVE_INFINITY) {
               return true;
             }
           }

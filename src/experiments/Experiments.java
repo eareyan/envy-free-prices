@@ -4,10 +4,14 @@ import ilog.concert.IloException;
 
 import java.sql.SQLException;
 
+import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
+import structures.exceptions.GoodsCreationException;
+import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
-import structures.exceptions.MarketPricesException;
-import allocations.error.AllocationException;
+import structures.exceptions.MarketCreationException;
+import structures.exceptions.MarketOutcomeException;
+import allocations.error.AllocationAlgoException;
 import log.SqlDB;
 
 /**
@@ -25,15 +29,19 @@ public abstract class Experiments {
    * @throws IllegalAccessException
    * @throws ClassNotFoundException
    * @throws IloException
-   * @throws AllocationException
+   * @throws AllocationAlgoException
    * @throws BidderCreationException
    * @throws MarketAllocationException
-   * @throws MarketPricesException
+   * @throws MarketOutcomeException
+   * @throws AllocationException 
+   * @throws GoodsException 
+   * @throws GoodsCreationException 
+   * @throws MarketCreationException 
    */
   public void bulkTest(SqlDB dbLogger) throws SQLException,
       InstantiationException, IllegalAccessException, ClassNotFoundException,
-      IloException, AllocationException, BidderCreationException,
-      MarketAllocationException, MarketPricesException {
+      IloException, AllocationAlgoException, BidderCreationException,
+      MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException {
 
     int numUsers = 21;
     int numCampaigns = 21;
@@ -86,13 +94,17 @@ public abstract class Experiments {
    * @param dbLogger
    * @throws SQLException
    * @throws IloException
-   * @throws AllocationException
+   * @throws AllocationAlgoException
    * @throws BidderCreationException
    * @throws MarketAllocationException
-   * @throws MarketPricesException
+   * @throws MarketOutcomeException
+   * @throws GoodsCreationException 
+   * @throws AllocationException 
+   * @throws GoodsException 
+   * @throws MarketCreationException 
    */
   abstract public void runOneExperiment(int numUsers, int numCampaigns,
       double prob, int b, SqlDB dbLogger) throws SQLException, IloException,
-      AllocationException, BidderCreationException,
-      MarketAllocationException, MarketPricesException;
+      AllocationAlgoException, BidderCreationException,
+      MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException;
 }

@@ -102,12 +102,6 @@ public class RunParameters {
   public Experiments getExperimentObject(String type) throws Exception {
     if (type.equals("unit_demand")) {
       return new unit_demand();
-    } else if (type.equals("unit_uniform_demand")) {
-      return new unit_uniform_demand();
-    } else if (type.equals("fancy_underdemand")) {
-      return new fancy_underdemand();
-    } else if (type.equals("fancy_overdemand")) {
-      return new fancy_overdemand();
     } else if (type.equals("allocation")) {
       return new allocation();
     } else if (type.equals("singleminded")) {

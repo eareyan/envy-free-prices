@@ -1,7 +1,7 @@
 package unitdemand.evpapprox;
 
 /**
- * Adds dummy only to connected users.
+ * Adds dummy only to connected goods.
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -36,7 +36,7 @@ public class OnlyConnectedDummies extends AbstractMaxWEQReservePrices {
    * only in case (i,j)\in E and all other items at 0. The method adds columns
    * to account for these dummy consumers.
    * 
-   * @param j - Campaign index
+   * @param j - Bidder index
    * @return a valuation matrix.
    */
   public double[][] augmentValuationMatrix(int j) {

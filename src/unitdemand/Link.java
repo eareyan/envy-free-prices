@@ -11,7 +11,7 @@ import java.util.Collections;
 public class Link {
   
   /**
-   *  Campaign Index
+   *  Bidder Index
    */
   protected int j;
   
@@ -22,7 +22,7 @@ public class Link {
   
   /**
    * Constructor.
-   * @param j - campaign index.
+   * @param j - bidder index.
    * @param value - link value.
    */
   public Link(int j, double value) {
@@ -32,7 +32,7 @@ public class Link {
   
   /**
    * Getter.
-   * @return campaign index.
+   * @return bidder index.
    */
   public int getJ() {
     return this.j;

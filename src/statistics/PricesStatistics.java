@@ -4,30 +4,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import structures.MarketAllocation;
-import structures.MarketPrices;
+import structures.Bidder;
+import structures.Goods;
+import structures.MarketOutcome;
+import structures.exceptions.MarketAllocationException;
+import structures.exceptions.MarketOutcomeException;
 
 /**
  * This class implements functionality to compute
  * statistics from a market allocation object. 
  * @author Enrique Areyan Viqueira
  */
-public class PricesStatistics {
+public class PricesStatistics <G extends Goods, B extends Bidder<G>>{
 
   /**
    * MarketPrices object.
    */
-  protected MarketPrices marketPrices;
-
-  /**
-   * MarketAllocation object.
-   */
-  protected MarketAllocation marketAllocation;
-
-  /**
-   * PricesVector.
-   */
-  protected double[] pricesVector;
+  protected MarketOutcome<G, B> marketPrices;
 
   /**
    * epsilon parameter.
@@ -36,41 +29,43 @@ public class PricesStatistics {
 
   /**
    * Constructor.
+   * 
    * @param marketPrices - a MarketPrices object.
    */
-  public PricesStatistics(MarketPrices marketPrices) {
+  public PricesStatistics(MarketOutcome<G, B> marketPrices) {
     this.marketPrices = marketPrices;
-    this.marketAllocation = this.marketPrices.getMarketAllocation();
-    this.pricesVector = this.marketPrices.getPriceVector();
   }
 
   /**
-   * This function takes a list of UserPrice object -these are tuples (i,p_i)-
-   * and a campaign index and returns whether or not there exists a bundle that
+   * This function takes a list of GoodPrices object - these are tuples (i,p_i)-
+   * and a bidder and returns whether or not there exists a bundle that
    * is cheaper to the currently assigned bundle.
-   * @param userList - a list of UserPrices object.
-   * @param campaignIndex - a campaign index.
-   * @return true if the campaign is envy at current prices.
+   * 
+   * @param goodOrderedList - a list of UserPrices object.
+   * @param bidder - a bidder object.
+   * @return true if the bidder is envy at current prices.
+   * @throws MarketAllocationException 
+   * @throws MarketOutcomeException 
    */
-  public boolean isCampaignEnvyFree(ArrayList<UserPrices> userList, int campaignIndex) {
-    // System.out.println("Heuristic for campaign:" + campaignIndex +
+  public boolean isBidderEnvyFree(ArrayList<GoodPrices> goodOrderedList, B bidder) throws MarketAllocationException, MarketOutcomeException {
+    // System.out.println("Heuristic for bidder :" + bidder +
     // ", check this many users:" + userList.size());
     double costCheapestBundle = 0.0;
-    int impressionsNeeded = this.marketAllocation.getMarket().getBidder(campaignIndex).getDemand();
-    while (impressionsNeeded > 0 && userList.size() != 0) {
+    int impressionsNeeded = bidder.getDemand();
+    while (impressionsNeeded > 0 && goodOrderedList.size() != 0) {
       // Get first user from the list and remove it.
-      UserPrices userPriceObject = userList.get(0);
-      userList.remove(0);
-      int userIndex = userPriceObject.getUserIndex(), userSupply = this.marketAllocation.getMarket().getGood(userIndex).getSupply();
-      // If the campaign wants this user
-      if (this.marketAllocation.getMarket().isConnected(userIndex,campaignIndex)) {
+      G good = goodOrderedList.get(0).getGood();
+      goodOrderedList.remove(0);
+      int userSupply = good.getSupply();
+      // If the bidder wants this good
+      if (bidder.demandsGood(good)) {
         if (userSupply >= impressionsNeeded) { 
           // Take only as many users as you need.
-          costCheapestBundle += impressionsNeeded * this.pricesVector[userIndex];
+          costCheapestBundle += impressionsNeeded * this.marketPrices.getPrice(good);
           impressionsNeeded = 0;
         } else { 
           // Greedily take all of the users.
-          costCheapestBundle += userSupply * this.pricesVector[userIndex];
+          costCheapestBundle += userSupply * this.marketPrices.getPrice(good);
           impressionsNeeded -= userSupply;
         }
       }
@@ -80,52 +75,41 @@ public class PricesStatistics {
       return true;
     } else {
       /*
-       * System.out.println("\tcost of cheapest bundle = "+costCheapestBundle);
-       * System
-       * .out.println("\tcost of current  bundle = "+this.marketPrices.getBundleCost
-       * (campaignIndex));
-       * System.out.println("\tnbr  of current  bundle = "+this
-       * .marketAllocation.getBundleNumber(campaignIndex));
-       * System.out.println("\treward of this campaign = "
-       * +this.marketAllocation.
-       * getMarket().getCampaign(campaignIndex).getReward());
-       * System.out.println("\timpressionsNeeded = " + impressionsNeeded);
+       * There are two cases in which a bidder can be envy: (1) This bidder was
+       * satisfied but there exists a bundle in its demand set. (2) The campaign
+       * was not satisfied and there exists a bundle in its demand set.
        */
-      /*
-       * There are two cases in which a campaign can be envy: (1) This campaign
-       * was satisfied but there exists a cheaper bundle. (2) The campaign was
-       * not satisfied and there exists a bundle in its demand set.
-       */
-      if (this.marketAllocation.getBundleNumber(campaignIndex) >= this.marketAllocation.getMarket().getBidder(campaignIndex).getDemand()) {
+      if (this.marketPrices.getMarketAllocation().allocationToBidder(bidder) >= bidder.getDemand()) {
         // Case (1)
-        return (this.marketPrices.getBundleCost(campaignIndex) - costCheapestBundle >= PricesStatistics.epsilon);
+        return (this.marketPrices.getBundleCost(bidder) - costCheapestBundle >= PricesStatistics.epsilon);
       } else {
         // Case (2)
-        return (this.marketAllocation.getMarket().getBidder(campaignIndex).getReward() - costCheapestBundle < PricesStatistics.epsilon);
+        return (bidder.getReward() - costCheapestBundle < PricesStatistics.epsilon);
       }
     }
   }
   
   /**
-   * Computes the number of campaigns that have envy in this market.
-   * @return the number of campaigns that have envy in this market. 
+   * Computes the number of bidders that have envy in this market.
+   * 
+   * @return the number of bidders that have envy in this market. 
+   * @throws MarketOutcomeException 
+   * @throws MarketAllocationException 
    */
-  public int numberOfEnvyCampaigns() {
-    // System.out.println("Check Heuristic For Envy-free-ness");
+  public int numberOfEnvyBidders() throws MarketOutcomeException, MarketAllocationException {
     // Construct a priority queue with users where the priority is price in ascending order.
-    int numUsers = this.marketAllocation.getMarket().getNumberGoods();
-    ArrayList<UserPrices> listOfUsers = new ArrayList<UserPrices>();
-    for (int i = 0; i < numUsers; i++) {
-      listOfUsers.add(new UserPrices(i, this.pricesVector[i]));
+    ArrayList<GoodPrices> listOfGoods = new ArrayList<GoodPrices>();
+    for (G good : this.marketPrices.getMarketAllocation().getMarket().getGoods()) {
+      listOfGoods.add(new GoodPrices(good, this.marketPrices.getPrice(good)));
     }
-    Collections.sort(listOfUsers, new UserPriceComparator());
-    // Check that each campaign is envy-free w.r.t the previously constructed queue.
+    Collections.sort(listOfGoods, new UserPriceComparator());
+    // Check that each bidder is envy-free w.r.t the previously constructed queue.
     int counter = 0;
-    for (int j = 0; j < this.marketAllocation.getMarket().getNumberBidders(); j++) {
+    for (B bidder : this.marketPrices.getMarketAllocation().getMarket().getBidders()) {
       // System.out.println("**** check if " + j + " is envy");
-      if (!this.isCampaignEnvyFree(new ArrayList<UserPrices>(listOfUsers), j)) {
+      if (!this.isBidderEnvyFree(new ArrayList<GoodPrices>(listOfGoods), bidder)) {
         // Pass a copy of the queue each time.
-        // System.out.println("\t --- > Campaign " + j + " is envy");
+         System.out.println("\t --- > Bidder " + bidder + " is envy");
         counter++;
       }
     }
@@ -135,18 +119,21 @@ public class PricesStatistics {
   /**
    * This method computes violations of the Market Clearance (MC) conditions
    * A violation is one where an unallocated user has a price greater than zero.
+   * 
    * @return a tuple of two numbers. The first is the number of MC violations, the s
    * second is the ratio of the prices MC violations to the total price of users.
+   * @throws MarketOutcomeException 
+   * @throws MarketAllocationException 
    */
-  public double[] computeMarketClearanceViolations() {
+  public double[] computeMarketClearanceViolations() throws MarketAllocationException, MarketOutcomeException {
     int violations = 0;
     double totalPricesOfUsers = 0.0;
     double totalPricesOfViolatingUsers = 0.0;
-    for (int i = 0; i < this.marketAllocation.getMarket().getNumberGoods(); i++) {
-      totalPricesOfUsers += this.pricesVector[i];
-      if (this.marketAllocation.allocationFromGood(i) == 0 && this.pricesVector[i] > 0) {
+    for (G good : this.marketPrices.getMarketAllocation().getMarket().getGoods()) {
+      totalPricesOfUsers += this.marketPrices.getPrice(good);
+      if (this.marketPrices.getMarketAllocation().allocationFromGood(good) == 0 && this.marketPrices.getPrice(good) > 0) {
         violations++;
-        totalPricesOfViolatingUsers += this.pricesVector[i];
+        totalPricesOfViolatingUsers += this.marketPrices.getPrice(good);
       }
     }
     if (totalPricesOfUsers == 0) { // If the price of all users is zero, then
@@ -158,36 +145,38 @@ public class PricesStatistics {
   }
   
   /**
-   * Auxiliary class that links users to prices so we can order users by prices.
+   * Auxiliary class that links goods to prices so we can order goods by prices.
+   * 
    * @author Enrique Areyan Viqueira
    */
-  class UserPrices {
+  class GoodPrices {
     /**
      * User index.
      */
-    protected int userIndex;
+    protected final G good;
     
     /**
      * User Price.
      */
-    protected double userPrice;
+    protected final double price;
 
     /**
      * Constructor.
-     * @param userIndex - user index.
-     * @param userPrice - user price.
+     * 
+     * @param good - user index.
+     * @param price - user price.
      */
-    public UserPrices(int userIndex, double userPrice) {
-      this.userIndex = userIndex;
-      this.userPrice = userPrice;
+    public GoodPrices(G good, double price) {
+      this.good = good;
+      this.price = price;
     }
 
     /**
      * Getter.
      * @return user index.
      */
-    public int getUserIndex() {
-      return this.userIndex;
+    public G getGood() {
+      return this.good;
     }
 
     /**
@@ -195,12 +184,12 @@ public class PricesStatistics {
      * @return user price.
      */
     public double getPrice() {
-      return this.userPrice;
+      return this.price;
     }
 
     @Override
     public String toString() {
-      return "(" + this.userIndex + "," + this.userPrice + ")";
+      return "(" + this.good + "," + this.price + ")";
     };
   }
   
@@ -208,9 +197,9 @@ public class PricesStatistics {
    * Comparator to order users by prices.
    * @author Enrique Areyan Viqueira
    */
-  public class UserPriceComparator implements Comparator<UserPrices> {
+  public class UserPriceComparator implements Comparator<GoodPrices> {
     @Override
-    public int compare(UserPrices o1, UserPrices o2) {
+    public int compare(GoodPrices o1, GoodPrices o2) {
       //Order objects by ascending price
       return Double.compare(o1.getPrice(), o2.getPrice());
     }

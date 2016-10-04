@@ -8,16 +8,22 @@ import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import structures.Bidder;
+import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
+import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
+import structures.exceptions.GoodsCreationException;
+import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
+import structures.exceptions.MarketCreationException;
 import structures.factory.RandomMarketFactory;
 import util.NumberMethods;
-import allocations.error.AllocationException;
+import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyMultiStepAllocation;
 import allocations.objectivefunction.EffectiveReachRatio;
-import allocations.optimal.MultiStepEfficientAllocationILP;
+import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 @SuppressWarnings("unused")
 /**
@@ -27,19 +33,17 @@ import allocations.optimal.MultiStepEfficientAllocationILP;
  */
 public class allocation extends Experiments {
 
-  public void runOneExperiment(int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationException, BidderCreationException, MarketAllocationException {
+  public void runOneExperiment(int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, GoodsException, AllocationException, MarketCreationException {
     if (!dbLogger.checkIfUnitDemandRowExists("allocation", numUsers, numCampaigns, prob)) {
       System.out.println("\t Add data ");
       DescriptiveStatistics greedyToEfficient = new DescriptiveStatistics();
 
       for (int t = 0; t < RunParameters.numTrials; t++) {
         // Create a random Market.
-        Market randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
+        Market<Goods, Bidder<Goods>> randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
         // Compute different allocations.
-        MarketAllocation efficient = new MarketAllocation(randomMarket,
-            new MultiStepEfficientAllocationILP(1, new EffectiveReachRatio()).Solve(randomMarket).getAllocation());
-        MarketAllocation greedy = new GreedyMultiStepAllocation(1,
-            new EffectiveReachRatio()).Solve(randomMarket);
+        MarketAllocation<Goods, Bidder<Goods>> efficient = new SingleStepWelfareMaxAllocationILP().Solve(randomMarket);
+        MarketAllocation<Goods, Bidder<Goods>> greedy = new GreedyMultiStepAllocation(1, new EffectiveReachRatio()).Solve(randomMarket);
         /* Compute statistics */
         double greedyValue = greedy.value();
         double efficientValue = efficient.value();

@@ -61,7 +61,7 @@ public class unit_demand extends Experiments{
 				ckEfficiency.addValue(NumberMethods.getRatio(ckSol.getValueOfMatching() , valueOptAllocaction));
 				ckRevenue.addValue(NumberMethods.getRatio(ckSol.getSellerRevenue(), valueOptAllocaction));
 				ckTime.addValue(endTime - startTime);
-				ckWE1.addValue((double) ckSol.numberOfEnvyCampaigns() / numCampaigns);
+				ckWE1.addValue((double) ckSol.numberOfEnvyBidders() / numCampaigns);
 				ckWE2.addValue((double) ckSol.computeWalrasianViolations() / numUsers);
 				/*
 				 * Measure evpApp
@@ -74,7 +74,7 @@ public class unit_demand extends Experiments{
 				evpEfficiency.addValue(NumberMethods.getRatio(evpSol.getValueOfMatching() , valueOptAllocaction));
 				evpRevenue.addValue(NumberMethods.getRatio(evpSol.getSellerRevenue() , valueOptAllocaction));
 				evpTime.addValue(endTime - startTime);
-				evpWE1.addValue((double) evpSol.numberOfEnvyCampaigns() / numCampaigns);
+				evpWE1.addValue((double) evpSol.numberOfEnvyBidders() / numCampaigns);
 				evpWE2.addValue((double) evpSol.computeWalrasianViolations() / numUsers);
 				/*
 				 * Measure maxEQ
@@ -87,7 +87,7 @@ public class unit_demand extends Experiments{
 				mweqEfficiency.addValue(NumberMethods.getRatio(mweqSol.getValueOfMatching() , valueOptAllocaction));
 				mweqRevenue.addValue(NumberMethods.getRatio(mweqSol.getSellerRevenue() , valueOptAllocaction));
 				mweqTime.addValue(endTime - startTime);
-				mweqWE1.addValue((double) mweqSol.numberOfEnvyCampaigns() / numCampaigns);
+				mweqWE1.addValue((double) mweqSol.numberOfEnvyBidders() / numCampaigns);
 				mweqWE2.addValue((double) mweqSol.computeWalrasianViolations() / numUsers);				
 			}
 			/* log results in database */

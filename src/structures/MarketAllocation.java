@@ -1,9 +1,9 @@
 package structures;
 
-import java.util.ArrayList;
-
 import structures.exceptions.MarketAllocationException;
 import allocations.objectivefunction.ObjectiveFunction;
+
+import com.google.common.collect.Table;
 
 /**
  * This class associates a Market with an Allocation.
@@ -16,21 +16,22 @@ import allocations.objectivefunction.ObjectiveFunction;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketAllocation {
+public class MarketAllocation<G extends Goods, B extends Bidder<G>> {
   
   /**
    * Market that was allocated.
    */
-  protected Market market;
+  protected final Market<G, B> market;
   
   /**
-   * Allocation for the market.
+   * Allocation for the market. An allocation is a Table of goods, bidders and
+   * an integer denoting the allocation from a good to a bidder.
    */
-  protected int[][] allocation;
-  
+  Table<G, B, Integer> allocation;
+
   /**
    * Objective function. This is the function that the allocation
-   * algorithm reported as having used to perfom its allocation.
+   * algorithm reported as having used to perform its allocation.
    */
   protected ObjectiveFunction f;
   
@@ -38,9 +39,17 @@ public class MarketAllocation {
    * Basic constructor. Takes a Market and an allocation.
    * @param m
    * @param allocation
+   * @throws MarketAllocationException 
    */
-  public MarketAllocation(Market m, int[][] allocation) {
+  public MarketAllocation(Market<G, B> m, Table<G, B, Integer> allocation) throws MarketAllocationException {
     this.market = m;
+    if (this.market.bidders.size() * this.market.goods.size() != allocation.size()) {
+      throw new MarketAllocationException(
+          "Trying to construct a MarketAllocation object for a market with "
+              + this.market.bidders.size() + " bidders and "
+              + this.market.goods.size()
+              + " goods, but with an allocation of size " + allocation.size());
+    }
     this.allocation = allocation;
   }
   
@@ -49,8 +58,9 @@ public class MarketAllocation {
    * @param m
    * @param allocation
    * @param f
+   * @throws MarketAllocationException 
    */
-  public MarketAllocation(Market m, int[][] allocation, ObjectiveFunction f) {
+  public MarketAllocation(Market<G, B> m, Table<G, B, Integer> allocation,  ObjectiveFunction f) throws MarketAllocationException {
     this(m, allocation);
     this.f = f;
   }
@@ -59,26 +69,23 @@ public class MarketAllocation {
    * Getter.
    * @return the Market object.
    */
-  public Market getMarket() {
+  public Market<G, B> getMarket() {
     return this.market;
   }
 
   /**
    * Getter.
-   * @return the allocation matrix.
+   * 
+   * @param good - a good object.
+   * @param bidder -  a bidder object.
+   * @return the allocation from good to bidder.
+   * @throws MarketAllocationException 
    */
-  public int[][] getAllocation() {
-    return this.allocation;
-  }
-
-  /**
-   * Getter.
-   * @param i - good index.
-   * @param j - bidder index.
-   * @return the allocation from good i to bidder j.
-   */
-  public int getAllocation(int i, int j) {
-    return this.allocation[i][j];
+  public int getAllocation(G good, B bidder) throws MarketAllocationException {
+    if (!this.allocation.contains(good, bidder)) {
+      throw new MarketAllocationException("(Good,Bidder) pair not in allocation.");
+    }
+    return this.allocation.get(good, bidder);
   }
   
   /**
@@ -92,55 +99,43 @@ public class MarketAllocation {
   public double value() throws MarketAllocationException {
     double totalReward = 0.0;
     // Loop through each bidder to check if it is satisfied.
-    for (int j = 0; j < this.market.getNumberBidders(); j++) {
-      // Compute the extra reward attained by bidder j under the current allocation.
-      totalReward += this.marginalValue(j);
+    for (B bidder : this.market.bidders) {
+      // Compute the extra reward attained by the bidder under the current allocation.
+      totalReward += this.marginalValue(bidder);
     }
     return totalReward;
   }
   
   /**
-   * Computes the marginal value of the allocation for bidder j.
+   * Computes the marginal value of the allocation for a bidder.
    * 
-   * @param j - bidder index.
-   * @return the marginal value of bidder j.
-   * @throws MarketAllocationException
+   * @param bidder - the bidder object.
+   * @return the marginal value of the bidder.
+   * @throws MarketAllocationException in case an objective function was not defined for this MarketAllocation object.
    */
-  public double marginalValue(int j) throws MarketAllocationException {
+  public double marginalValue(B bidder) throws MarketAllocationException {
     // Make sure we have an objective function to be able to compute the value of the allocation.
     if (this.f == null){
       throw new MarketAllocationException("An objective function must be defined to compute the value of an allocation");
     } else {
-      return this.f.getObjective(this.market.bidders[j].getReward(), this.market.bidders[j].getDemand(), this.getBundleNumber(j) + this.market.bidders[j].getAllocationSoFar())
-          - this.f.getObjective(this.market.bidders[j].getReward(), this.market.bidders[j].getDemand(), this.market.bidders[j].getAllocationSoFar());
+      return this.f.getObjective(bidder.getReward(), bidder.getDemand(), this.allocationToBidder(bidder))
+           - this.f.getObjective(bidder.getReward(), bidder.getDemand(), 0);
     }
-  }
-  
-  /**
-   * Computes the sum of marginal values of the allocation 
-   * for all bidder in the given input list.
-   * 
-   * @param biddersIndices - an ArrayList of bidder indices.
-   * @return the sum of marginal values of bidders in biddersIndices
-   * @throws MarketAllocationException in case an objective function is not defined.
-   */
-  public double marginalValue(ArrayList<Integer> biddersIndices) throws MarketAllocationException {
-    double totalReward = 0.0;
-    for (Integer j : biddersIndices) {
-      totalReward += this.marginalValue(j);
-    }
-    return totalReward;
   }
   
   /**
    * Checks if a bidder is assigned something at all.
    * 
-   * @param j - bidder index.
-   * @return true if j was allocated at least one good.
+   * @param bidder - the bidder object.
+   * @return true if bidder was allocated at least one good.
+   * @throws MarketAllocationException in case the bidder is not found.
    */
-  public boolean isBidderBundleZero(int j) {
-    for (int i = 0; i < this.market.getNumberGoods(); i++) {
-      if (this.allocation[i][j] > 0) {
+  public boolean isBidderBundleZero(B bidder) throws MarketAllocationException {
+    if (!this.allocation.containsColumn(bidder)) {
+      throw new MarketAllocationException("Bidder not found.");
+    }
+    for (Integer alloc : this.allocation.column(bidder).values()) {
+      if (alloc > 0) {
         return false;
       }
     }
@@ -151,38 +146,48 @@ public class MarketAllocation {
    * Computes the number of items from good i that were allocated.
    * @param i - a good index.
    * @return the number of items from good i that were allocated.
+   * @throws MarketAllocationException  in case the good is not found.
    */
-  public int allocationFromGood(int i) {
+  public int allocationFromGood(G good) throws MarketAllocationException {
+    if (!this.allocation.containsRow(good)) {
+      throw new MarketAllocationException("Good not found.");
+    }
     int totalAllocation = 0;
-    for (int j = 0; j < this.market.getNumberBidders(); j++) {
-      totalAllocation += this.allocation[i][j];
+    for (Integer alloc : this.allocation.row(good).values()) {
+      totalAllocation += alloc;
     }
     return totalAllocation;
   }
   
   /**
-   * Get current bundle number for bidder j.
-   * @param j - a bidder index.
-   * @return the number of goods allocated to j.
+   * Get current bundle number for a bidder.
+   * @param bidder - a bidder object.
+   * @return the number of goods allocated to the bidder.
+   * @throws MarketAllocationException in case a bidder is not found
    */
-  public int getBundleNumber(int j) {
+  public int allocationToBidder(B bidder) throws MarketAllocationException {
+    if (!this.allocation.containsColumn(bidder)) {
+      throw new MarketAllocationException("Bidder not found.");
+    }
     int totalAllocation = 0;
-    for (int i = 0; i < this.market.getNumberGoods(); i++) {
-      if (this.allocation[i][j] > 0) {
-        totalAllocation += this.allocation[i][j];
+    for (Integer alloc : this.allocation.column(bidder).values()) {
+      totalAllocation += alloc;
+    }
+    return totalAllocation;
+  }
+  
+  /**
+   * Helper method to print a matrix representation of the allocation.
+   * 
+   * @throws MarketAllocationException
+   */
+  public void printAllocation() throws MarketAllocationException {
+    for (G good : this.market.goods) {
+      for (B bidder : this.market.bidders) {
+        System.out.print("\t " + this.getAllocation(good, bidder));
       }
+      System.out.print("\n");
     }
-    return totalAllocation;
-  }
-  
-  /**
-   * Updates an allocation.
-   * @param i - a good index.
-   * @param j - a bidder index.
-   * @param alloc - the new allocation from i to j.
-   */
-  public void updateAllocationEntry(int i, int j, int alloc) {
-    this.allocation[i][j] = alloc;
   }
   
 }

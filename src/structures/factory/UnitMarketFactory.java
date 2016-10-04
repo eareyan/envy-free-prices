@@ -1,9 +1,7 @@
 package structures.factory;
 
-import structures.Bidder;
-import structures.Market;
-import structures.Goods;
 import structures.exceptions.BidderCreationException;
+import structures.exceptions.GoodsCreationException;
 
 /**
  * This class implements methods to create unit-demand markets.
@@ -14,25 +12,28 @@ public class UnitMarketFactory {
 
   /**
    * Create a singleton market from a valuation matrix.
+   * 
    * @param valuationMatrix - a matrix of valuations.
    * @return a Market object.
-   * @throws BidderCreationException in case a campaign could not be created.
-   */
-  public static Market createMarketFromValuationMatrix(double[][] valuationMatrix) throws BidderCreationException {
-    Goods[] users = new Goods[valuationMatrix.length];
+   * @throws BidderCreationException in case a bidder could not be created.
+   * @throws GoodsCreationException in case a good could not be created.
+   
+  public static Market<Goods, Bidder<Goods>> createMarketFromValuationMatrix(double[][] valuationMatrix) throws BidderCreationException, GoodsCreationException {
+    ArrayList<Goods> goods = new ArrayList<Goods>();
     for (int i = 0; i < valuationMatrix.length; i++) {
-      users[i] = new Goods(1);
+      goods.add(new Goods(1));
     }
-    Bidder[] campaigns = new Bidder[valuationMatrix[0].length];
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
     for (int j = 0; j < valuationMatrix[0].length; j++) {
       double reward = Double.NEGATIVE_INFINITY;
+      HashSet<Goods> bDemandSet = new HashSet<Goods>();
       for (int i = 0; i < valuationMatrix.length; i++) {
         if (valuationMatrix[i][j] > Double.NEGATIVE_INFINITY) {
           reward = valuationMatrix[i][j];
           break;
         }
       }
-      campaigns[j] = new Bidder(1, reward);
+      bidders.add(new Bidder(1, reward));
     }
     boolean[][] connections = new boolean[valuationMatrix.length][valuationMatrix[0].length];
     for (int i = 0; i < valuationMatrix.length; i++) {
@@ -40,21 +41,22 @@ public class UnitMarketFactory {
         connections[i][j] = valuationMatrix[i][j] > Double.NEGATIVE_INFINITY;
       }
     }
-    return new Market(users, campaigns, connections);
+    return new Market<Goods, Bidder>(goods, bidders, connections);
   }
   
   /**
    * Shortcut method to create a unit demand random market by just providing the
-   * number of users, campaigns, and probability of connection.
+   * number of goods, bidders, and probability of connection.
    * 
-   * @param numberUsers - number of users.
-   * @param numberCampaigns - number of campaigns.
+   * @param numberGoods - number of goods.
+   * @param numberBidders - number of bidders.
    * @param probabilityConnections - probability of a connection being present.
    * @return a Market object.
-   * @throws BidderCreationException in case a campaign could not be created.
-   */
-  public static Market randomUnitDemandMarket(int numberUsers, int numberCampaigns, double probabilityConnections) throws BidderCreationException {
-    return RandomMarketFactory.randomMarket(numberUsers, 1, 1, numberCampaigns,
+   * @throws BidderCreationException in case a bidder could not be created.
+   * @throws GoodsCreationException in case a good could not be created.
+   
+  public static Market<Goods, Bidder> randomUnitDemandMarket(int numberGoods, int numberBidders, double probabilityConnections) throws BidderCreationException, GoodsCreationException {
+    return RandomMarketFactory.randomMarket(numberGoods, 1, 1, numberBidders,
         1, 1, RandomMarketFactory.defaultMinReward,
         RandomMarketFactory.defaultMaxReward, probabilityConnections);
   }
@@ -62,35 +64,36 @@ public class UnitMarketFactory {
   /**
    * Create a singleton market given all other parameters (connections matrix and rewards)
    * 
-   * @param numberUsers - number of users.
-   * @param numberCampaigns - number of campaigns.
+   * @param numberGoods - number of goods.
+   * @param numberBidders - number of bidders.
    * @param connections - matrix of connections.
-   * @param rewards - vector of campaigns rewards.
+   * @param rewards - vector of bidders rewards.
    * @return a Market object.
-   * @throws BidderCreationException
-   */
-  public static Market singletonMarket(int numberUsers, int numberCampaigns, boolean[][] connections, double[] rewards) throws BidderCreationException {
-    // Create Users
-    Goods[] users = new Goods[numberUsers];
-    for (int i = 0; i < numberUsers; i++) {
-      users[i] = new Goods(1);
+   * @throws BidderCreationException in case a bidder could not be created.
+   * @throws GoodsCreationException in case a good could not be created.
+   
+  public static Market<Goods, Bidder<Goods>> singletonMarket(int numberGoods, int numberBidders, boolean[][] connections, double[] rewards) throws BidderCreationException, GoodsCreationException {
+    // Create Goods
+    Goods[] goods = new Goods[numberGoods];
+    for (int i = 0; i < numberGoods; i++) {
+      goods[i] = new Goods(i, 1);
     }
-    // Create Campaigns
-    Bidder[] campaigns = new Bidder[numberCampaigns];
-    for (int j = 0; j < numberCampaigns; j++) {
-      campaigns[j] = new Bidder(1, rewards[j]);
+    // Create Bidder
+    Bidder[] bidders = new Bidder[numberBidders];
+    for (int j = 0; j < numberBidders; j++) {
+      bidders[j] = new Bidder(1, rewards[j]);
     }
-    return new Market(users, campaigns, connections);
+    return new Market<Goods, Bidder>(goods, bidders, connections);
   }
   
   /**
    * Produces a random valuation matrix V_ij, where valuations are within the default range.
    * 
-   * @param n - number of users.
-   * @param m - number of campaigns.
+   * @param n - number of goods.
+   * @param m - number of bidders.
    * @param prob - probability of a connection.
-   * @param minReward - lower bound on campaign reward.
-   * @param maxReward - upper bound on campaign reward.
+   * @param minReward - lower bound on bidders reward.
+   * @param maxReward - upper bound on bidders reward.
    * @return a matrix of valuations.
    */
   public static double[][] getValuationMatrix(int n, int m, double prob, double minReward, double maxReward) {
@@ -107,14 +110,13 @@ public class UnitMarketFactory {
   /**
    * Generates a random valuation matrix.
    * 
-   * @param n - number of users.
-   * @param m - number of campaigns.
+   * @param n - number of goods.
+   * @param m - number of bidders.
    * @param prob - probability of a connection.
    * @return a valuation matrix.
    */
   public static double[][] getValuationMatrix(int n, int m, double prob) {
-    return getValuationMatrix(n, m, prob, RandomMarketFactory.defaultMinReward,
-        RandomMarketFactory.defaultMaxReward);
+    return getValuationMatrix(n, m, prob, RandomMarketFactory.defaultMinReward, RandomMarketFactory.defaultMaxReward);
   }
 
   /**

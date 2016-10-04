@@ -1,8 +1,13 @@
 package algorithms.pricing;
 
+import com.google.common.collect.ImmutableMap;
+
+import structures.Bidder;
+import structures.Goods;
 import structures.MarketAllocation;
-import structures.MarketPrices;
-import structures.exceptions.MarketPricesException;
+import structures.MarketOutcome;
+import structures.exceptions.MarketAllocationException;
+import structures.exceptions.MarketOutcomeException;
 
 /**
  * This class stores the resulting envy-free prices from LP.
@@ -10,48 +15,23 @@ import structures.exceptions.MarketPricesException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RestrictedEnvyFreePricesLPSolution extends MarketPrices {
+public class RestrictedEnvyFreePricesLPSolution extends MarketOutcome<Goods, Bidder<Goods>> {
   
   /**
    * Status of the LP.
    */
-  String Status;
+  protected final String Status;
   
   /**
    * The optimalValue of the LP (seller revenue).
    */
-  double optimalValue;
+  protected final double optimalValue;
 
   /**
    * Constructor. Receives no parameters.
    */
-  public RestrictedEnvyFreePricesLPSolution() {
-    super();
-    this.Status = "Empty";
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param marketAllocation - a marketAllocation object.
-   * @param Status - a string representing the status of the LP.
-   */
-  public RestrictedEnvyFreePricesLPSolution(MarketAllocation marketAllocation, String Status) {
-    super();
-    this.marketAllocation = marketAllocation;
-    this.Status = Status;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param marketAllocation - a marketAllocation object.
-   * @param pricesVector - a vector of double containing the prices of users classes.
-   * @param Status - a string representing the status of the LP.
-   * @param optimalValue - the value (seller revenue) from LP.
-   */
-  public RestrictedEnvyFreePricesLPSolution(MarketAllocation marketAllocation, double[] pricesVector, String Status, double optimalValue) {
-    super(marketAllocation, pricesVector);
+  public RestrictedEnvyFreePricesLPSolution(MarketAllocation<Goods, Bidder<Goods>> marketAllocation, ImmutableMap<Goods, Double> prices, String Status, double optimalValue) {
+    super(marketAllocation, prices);
     this.Status = Status;
     this.optimalValue = optimalValue;
   }
@@ -68,9 +48,11 @@ public class RestrictedEnvyFreePricesLPSolution extends MarketPrices {
   @Override
   public String toString() {
     try {
-      return "Revenue:\t" + this.sellerRevenuePriceVector() + "-" + this.Status + "\n";
-    } catch (MarketPricesException e) {
+      return "Revenue:\t" + this.sellerRevenue() + "-" + this.Status + "\n";
+    } catch (MarketOutcomeException e) {
       System.out.println("MarketPricesException = " + e.getMessage());
+    } catch (MarketAllocationException e) {
+      System.out.println("MarketAllocationException = " + e.getMessage());
     }
     return null;
   }

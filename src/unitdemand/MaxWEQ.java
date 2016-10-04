@@ -8,7 +8,7 @@ package unitdemand;
 public class MaxWEQ {
 
   /**
-   * valuation matrix. Provides a valuation v_ij of user i by campaign j.
+   * valuation matrix. Provides a valuation v_ij of good i by bidder j.
    */
   double[][] valuationMatrix;
 
@@ -45,21 +45,10 @@ public class MaxWEQ {
     double[] prices = new double[this.valuationMatrix.length];
     Matching matchingCompleteV = Matching.computeMaximumWeightMatchingValue(this.valuationMatrix);
     double maxWeightCompleteV = matchingCompleteV.getValueOfMatching();
-    // System.out.println("w(V) = " + maxWeightCompleteV);
     for (int i = 0; i < this.valuationMatrix.length; i++) {
-      // prices[i] =Math.round((maxWeightCompleteV -
-      // Matching.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching())
-      // * 100000.0) / 100000.0;
       prices[i] = maxWeightCompleteV - Matching.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getValueOfMatching();
-      /*
-       * System.out.println("\t Matrix without row "+i);
-       * Printer.printMatrix(this.valuationMatrixWithNoi(i));
-       * System.out.println("w(V_i) = " +
-       * this.computeMaximumWeightMatchingValue(
-       * this.valuationMatrixWithNoi(i)).getValueOfMatching());
-       * System.out.println("price["+i+"] = " + prices[i]);
-       */
     }
     return new Matching(this.valuationMatrix, matchingCompleteV.getMatching(), prices);
   }
+  
 }

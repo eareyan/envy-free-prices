@@ -49,15 +49,15 @@ public class AscendingAuction {
    * @return a Matching object.
    */
   public Matching Solve() {
-    ArrayList<Integer> unallocatedCampaigns = new ArrayList<Integer>();
+    ArrayList<Integer> unallocatedBidders = new ArrayList<Integer>();
     for (int j = 0; j < this.valuationMatrix[0].length; j++) { 
       // Initially all campaigns are unallocated
-      unallocatedCampaigns.add(j);
+      unallocatedBidders.add(j);
     }
     while (true) {
       // System.out.println("unallocatedCampaigns = " + unallocatedCampaigns);
       ArrayList<Bid> setOfBids = new ArrayList<Bid>();
-      for (Integer j : unallocatedCampaigns) {
+      for (Integer j : unallocatedBidders) {
         ArrayList<Bid> setOfBidsOfCampaign = new ArrayList<Bid>();
         for (int i = 0; i < this.valuationMatrix.length; i++) {
           double bid = this.valuationMatrix[i][j] - (this.prices[i] + AscendingAuction.epsilon);
@@ -75,13 +75,13 @@ public class AscendingAuction {
         // System.out.println("Set of Bids = " + setOfBids);
         Bid b = setOfBids.get(0);
         // System.out.println("Set x["+b.getUser()+"]["+b.getCampaign()+"] = 1, and p["+b.getUser()+"] = p + e, and try to reallocate");
-        this.allocation[b.getUser()][b.getCampaign()] = 1;
-        unallocatedCampaigns.remove(new Integer(b.getCampaign()));
+        this.allocation[b.getGoodIndex()][b.getBidderIndex()] = 1;
+        unallocatedBidders.remove(new Integer(b.getBidderIndex()));
         for (int j = 0; j < this.valuationMatrix[0].length; j++) {
-          if (j != b.getCampaign() && this.allocation[b.getUser()][j] == 1) {
-            this.allocation[b.getUser()][j] = 0;
-            this.prices[b.getUser()] += AscendingAuction.epsilon;
-            unallocatedCampaigns.add(new Integer(j));
+          if (j != b.getBidderIndex() && this.allocation[b.getGoodIndex()][j] == 1) {
+            this.allocation[b.getGoodIndex()][j] = 0;
+            this.prices[b.getGoodIndex()] += AscendingAuction.epsilon;
+            unallocatedBidders.add(new Integer(j));
             // System.out.println("We have to unallocate");
           }
         }

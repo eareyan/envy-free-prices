@@ -1,15 +1,22 @@
 package singleminded;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
-import allocations.objectivefunction.SingleStepFunction;
+import structures.Bidder;
+import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketPrices;
+import structures.MarketOutcome;
+import structures.comparators.BiddersComparatorByReward;
+import structures.exceptions.MarketAllocationException;
+import allocations.objectivefunction.SingleStepFunction;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * This class implements the approximation WE algorithm for single-minded
@@ -24,7 +31,7 @@ public class ApproxWE {
   /**
    * Market is the input market. This needs to be a singleton market.
    */
-  protected Market M;
+  protected Market<Goods, Bidder<Goods>> M;
 
   /**
    * A is the boolean matrix encoding the single-minded preferences over items.
@@ -40,11 +47,15 @@ public class ApproxWE {
    * Integer number of items.
    */
   protected int numberOfItems;
+  
+  protected HashMap<Goods, Integer> goodsToIndex;
+  
+  protected HashMap<Bidder<Goods>, Integer> biddersToIndex;
 
   /**
    * The list of Rewards keeps tracks of all bidders rewards.
    */
-  protected List<BidderReward> Rewards;
+  protected List<Bidder<Goods>> listOfBidders;
   
   /**
    * The allocation matrix.
@@ -65,33 +76,42 @@ public class ApproxWE {
    * Constructor.
    * @param M - a market object.
    */
-  public ApproxWE(Market M) {
+  public ApproxWE(Market<Goods, Bidder<Goods>> M) {
     this.M = M;
     this.numberOfBidders = this.M.getNumberBidders();
     this.numberOfItems = this.M.getNumberGoods();
-    // Make an ArrayList of BidderReward so that we can ordered.
-    this.Rewards = new ArrayList<BidderReward>();
-    for (int j = 0; j < this.M.getNumberBidders(); j++) {
-      this.Rewards.add(new BidderReward(j, this.M.getBidder(j).getReward()));
+    // Create maps that point from bidders to indices, and from goods to indices.
+    this.goodsToIndex = new HashMap<Goods, Integer>();
+    for(int i = 0; i < M.getNumberGoods(); i++){
+      this.goodsToIndex.put(M.getGoods().get(i), i);
     }
-    Collections.sort(Rewards, this.UserRewardComparator);
-    // Make a copy of the connections matrix so that we don't change the original matrix.
+    this.biddersToIndex = new HashMap<Bidder<Goods>, Integer>();
+    for(int j = 0; j < M.getNumberBidders(); j++){
+      this.biddersToIndex.put(M.getBidders().get(j), j);
+    }
+    
+    // Produce a matrix to encode the single-minded preferences.
     this.A = new boolean[this.numberOfItems][this.numberOfBidders];
-    for (int i = 0; i < numberOfItems; i++) {
-      this.A[i] = Arrays.copyOf(this.M.getConnections()[i],
-          this.M.getConnections()[i].length);
+    for (Goods good : M.getGoods()) {
+      for(Bidder<Goods> bidder : M.getBidders()){
+        this.A[this.goodsToIndex.get(good)][this.biddersToIndex.get(bidder)] = bidder.demandsGood(good);
+      }
     }
     this.X = new int[numberOfItems][numberOfBidders];
     this.p = new double[numberOfItems];
     this.allocVector = new boolean[numberOfBidders];
+    // Make an ArrayList of BidderReward so that we can ordered.
+    this.listOfBidders = new ArrayList<Bidder<Goods>>(this.M.getBidders());
+    Collections.sort(this.listOfBidders, new BiddersComparatorByReward());
   }
 
   /**
    * Solves for the approximation allocation and prices.
    * @return a MarketPrices object.
+   * @throws MarketAllocationException 
    */
-  public MarketPrices Solve() {
-    //Keep iterating while there still are bidders that can be allocated.
+  public MarketOutcome<Goods, Bidder<Goods>> Solve() throws MarketAllocationException {
+    // Keep iterating while there still are bidders that can be allocated.
     while (!matrixAllFalse(this.A)) {
       // Find the commodity which attracts most bidders.
       int mostPopularItem = -1, popularityOfItem = -1;
@@ -107,15 +127,15 @@ public class ApproxWE {
       }
       // Find the bidder with highest budget that wants the most popular item.
       int winner = -1;
-      for (BidderReward bidder : this.Rewards) {
-        if (this.A[mostPopularItem][bidder.getIndex()]) {
+      for (Bidder<Goods> bidder : this.listOfBidders) {
+        if (this.A[mostPopularItem][this.biddersToIndex.get(bidder)]) {
           /*
            * Assign prices and bundle
            */
-          winner = bidder.getIndex();
+          winner = this.biddersToIndex.get(bidder);
           this.allocVector[winner] = true;
           this.p[mostPopularItem] = bidder.getReward();
-          this.Rewards.remove(bidder); // This bidder is satisfy, remove it
+          this.listOfBidders.remove(bidder); // This bidder is satisfy, remove it
           break;
         }
       }
@@ -147,11 +167,28 @@ public class ApproxWE {
        * Printer.printMatrix(X); System.out.println("-----");
        */
     }
-    return new MarketPrices(new MarketAllocation(this.M, this.X, new SingleStepFunction()), this.p);
+    
+    /*
+     * Create appropriate structures to return the outcome of the market. 
+     */
+    // Allocation
+    HashBasedTable<Goods,Bidder<Goods>,Integer> allocation = HashBasedTable.create();
+    for(Goods good : this.M.getGoods()){
+      for(Bidder<Goods> bidder : this.M.getBidders()){
+        allocation.put(good, bidder, this.X[this.goodsToIndex.get(good)][this.biddersToIndex.get(bidder)]);
+      }
+    }    
+    // Prices
+    Builder<Goods, Double> result = ImmutableMap.<Goods, Double>builder();
+    for(Goods good : this.M.getGoods()){
+      result.put(good, this.p[this.goodsToIndex.get(good)]);
+    }
+    MarketAllocation<Goods, Bidder<Goods>> x = new MarketAllocation<Goods, Bidder<Goods>>(this.M, allocation, new SingleStepFunction());
+    return new MarketOutcome<Goods, Bidder<Goods>>(x , result.build());
   }
   
   /**
-   * This function returns true if all the entries of a 2x2 matrix are false.
+   * This function returns true if all the entries of a matrix are false.
    * Otherwise, returns false.
    * @param X - a boolean matrix
    * @return true if all the entries of X are false. Otherwise, false.
@@ -167,64 +204,5 @@ public class ApproxWE {
     }
     return result;
   }
-
-  /**
-   * This class is an auxiliary class to be able to
-   * order bidders by their reward.
-   * @author Enrique Areyan Viqueira
-   */
-  private class BidderReward {
-    
-    /**
-     * Bidder index.
-     */
-    protected int j;
-    
-    /**
-     * Bidder reward.
-     */
-    protected double reward;
-    
-    /**
-     * Constructor.
-     * @param j - bidder index.
-     * @param reward - bidder reward.
-     */
-    public BidderReward(int j, double reward) {
-      this.j = j;
-      this.reward = reward;
-    }
-
-    /**
-     * Getter.
-     * @return the bidder index.
-     */
-    public int getIndex() {
-      return this.j;
-    }
-
-    /**
-     * Getter.
-     * @return the bidder reward.
-     */
-    public double getReward() {
-      return this.reward;
-    }
-
-    @Override
-    public String toString() {
-      return "(" + this.j + "," + this.reward + ")";
-    }
-    
-  }
-
-  /**
-   * User Reward comparator.
-   */
-  public final Comparator<BidderReward> UserRewardComparator = new Comparator<BidderReward>() {
-    public int compare(BidderReward u1, BidderReward u2) {
-      return Double.compare(u2.getReward(), u1.getReward());
-    }
-  };
   
 }

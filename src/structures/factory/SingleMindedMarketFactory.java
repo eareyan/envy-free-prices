@@ -1,14 +1,16 @@
 package structures.factory;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
 import structures.Bidder;
-import structures.Market;
 import structures.Goods;
+import structures.Market;
 import structures.exceptions.BidderCreationException;
+import structures.exceptions.GoodsCreationException;
 import structures.exceptions.MarketCreationException;
 
 /**
@@ -20,34 +22,45 @@ public class SingleMindedMarketFactory {
 
   /**
    * Creates a random single-minded market.
+   * 
    * @param n - number of items.
    * @param m - number of bidders.
    * @return a single minded market.
-   * @throws BidderCreationException in case a campaign could not be created.
+   * @throws BidderCreationException in case a bidder could not be created.
+   * @throws GoodsCreationException in case a good could not be created.
+   * @throws MarketCreationException 
    */
-  public static Market createRandomSingleMindedMarket(int n, int m) throws BidderCreationException {
-    Goods[] users = new Goods[n];
+  public static Market<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m) throws BidderCreationException, GoodsCreationException, MarketCreationException {
+    if (n <= 0) {
+      throw new GoodsCreationException("There must be at least one good to create a market.");
+    }
+    if (m <= 0) {
+      throw new BidderCreationException("There must be at least one bidder to create a market");
+    }
+    ArrayList<Goods> goods = new ArrayList<Goods>();
     for (int i = 0; i < n; i++) {
-      users[i] = new Goods(1);
+      goods.add(new Goods(1));
     }
     Random generator = new Random();
-    Bidder[] campaigns = new Bidder[m];
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
+    //boolean[][] connections = new boolean[n][m];
     for (int j = 0; j < m; j++) {
-      campaigns[j] = new Bidder(
-          generator.nextInt(n) + 1,
-          generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward);
-    }
-    boolean[][] connections = new boolean[n][m];
-    for (int j = 0; j < m; j++) {
-      int demand = campaigns[j].getDemand();
-      // Each bidder connects exactly with I_j users.
+      int demand = generator.nextInt(n) + 1;
+      // Each bidder connects exactly with I_j goods.
       Set<Integer> connectTo = SingleMindedMarketFactory.randomNumbers(demand, n);
       // System.out.println("Bidder " + j + " connect to " + connectTo);
+      HashSet<Goods> bDemandSet = new HashSet<Goods>();
       for (Integer i : connectTo) {
-        connections[i][j] = true;
+        //connections[i][j] = true;
+        bDemandSet.add(goods.get(i));
       }
+      bidders.add(new Bidder<Goods>( 
+          demand,
+          generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward,
+          bDemandSet));
+
     }
-    return new Market(users, campaigns, connections);
+    return new Market<Goods, Bidder<Goods>>(goods, bidders);
   }
   
   /**
@@ -55,33 +68,36 @@ public class SingleMindedMarketFactory {
    * another single-minded market where bidders that can't afford 
    * the reserve are dropped out.
    * 
-   * @param M - a market object.
+   * @param market - a single minded market object.
    * @param reserve - a reserve price.
    * @return a single-minded market.
-   * @throws MarketCreationException in case the reserve is too high and no campaign survived.
+   * @throws GoodsCreationException 
+   * @throws BidderCreationException 
+   * @throws MarketCreationException in case the reserve is too high and no bidder survived.
    */
-  public static Market discountSingleMindedMarket(Market M, double reserve) {
-    // Construct a map of the campaigns that "survive" the reserve price
-    HashMap<Integer, Bidder> remainingCampaigns = new HashMap<Integer, Bidder>();
-    for (int j = 0; j < M.getNumberBidders(); j++) {
-      if (M.getBidder(j).getReward() - reserve * M.getBidder(j).getDemand() >= 0) {
-        //System.out.println("Difference for " + j + " is " + (M.getCampaign(j).getReward() - reserve * M.getCampaign(j).getDemand()));
-        remainingCampaigns.put(j, M.getBidder(j));
-      }
+  public static Market<Goods, Bidder<Goods>> discountSingleMindedMarket(Market<Goods, Bidder<Goods>> market, double reserve) throws GoodsCreationException, BidderCreationException, MarketCreationException {
+    
+    // Copy the ArrayList of Goods.
+    ArrayList<Goods> goods = new ArrayList<Goods>();
+    for (Goods good : market.getGoods()) {
+      goods.add(new Goods(good.getSupply()));
     }
-    // Construct a new market only with "surviving" campaigns
-    Bidder[] campaigns = new Bidder[M.getNumberBidders()];
-    boolean[][] connections = new boolean[M.getNumberGoods()][M.getNumberBidders()];
-    for (int j = 0; j < M.getNumberBidders(); j++) {
-      campaigns[j] = M.getBidder(j);
-      Bidder campaign = remainingCampaigns.get(j);
-      if (campaign != null) {
-        for (int i = 0; i < M.getNumberGoods(); i++) {
-          connections[i][j] = M.getConnections()[i][j];
+
+    // Copy the ArrayList of Bidders
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
+    for (Bidder<Goods> bidder : market.getBidders()) {
+      if (bidder.getReward() - reserve * bidder.getDemand() >= 0) {
+        HashSet<Goods> bDemandSet = new HashSet<Goods>();
+        for (int i = 0; i < market.getNumberGoods(); i++) {
+          if (bidder.demandsGood(market.getGoods().get(i))) {
+            bDemandSet.add(goods.get(i));
+          }
         }
+        bidders.add(new Bidder<Goods>(bidder.getDemand(), bidder.getReward(), bDemandSet));
       }
     }
-    return new Market(M.getGoods(), campaigns, connections);
+
+    return new Market<Goods, Bidder<Goods>>(goods, bidders);
   }
   
   /**

@@ -5,122 +5,131 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import structures.Bidder;
+import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.exceptions.BidderCreationException;
+import structures.comparators.BiddersComparatorByRToSqrtIRatio;
+import structures.comparators.GoodsComparatorByRemainingSupply;
+import structures.exceptions.AllocationException;
+import structures.exceptions.GoodsException;
+import structures.exceptions.MarketAllocationException;
 import allocations.interfaces.AllocationAlgoInterface;
 import allocations.objectivefunction.ObjectiveFunction;
 import allocations.objectivefunction.SingleStepFunction;
-import structures.aux.BiddersComparatorByRewardToImpressionsRatio;
-import structures.aux.GoodSupply;
-import structures.aux.GoodsSupplyComparatorBySupply;
+
+import com.google.common.collect.HashBasedTable;
 
 /**
  * This class implements greedy allocation.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyAllocation implements AllocationAlgoInterface {
+public class GreedyAllocation implements AllocationAlgoInterface<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
 
   /**
-   * Campaign comparator.
+   * Bidder comparator.
    */
-  protected Comparator<Bidder> CampaignComparator;
+  protected Comparator<Bidder<Goods>> BidderComparator;
 
   /**
-   * User comparator
+   * Goods comparator
    */
-  protected Comparator<GoodSupply> UserSupplyComparator;
+  protected Comparator<Goods> GoodsComparator;
 
   /**
    * Constructor.
+   * 
+   * @param BidderComparator - a comparator to order bidders.
+   * @param GoodsSupplyComparator - a comparator to order goods.
    */
-  public GreedyAllocation() {
-    this.CampaignComparator = new BiddersComparatorByRewardToImpressionsRatio();
-    this.UserSupplyComparator = new GoodsSupplyComparatorBySupply();
+  public GreedyAllocation(Comparator<Bidder<Goods>> BidderComparator, Comparator<Goods> GoodsSupplyComparator) {
+    this.BidderComparator = BidderComparator;
+    this.GoodsComparator = GoodsSupplyComparator;
   }
 
   /**
    * Constructor.
-   * @param CampaignComparator - a comparator to order campaigns
-   * @param UserSupplyComparator - a comparator to order users
+   * 
+   * @param goodsOrder - order of remaining good supply. is 1 means ASC and -1 means
+   *          DESC, any other means no order
    */
-  public GreedyAllocation(Comparator<Bidder> CampaignComparator, Comparator<GoodSupply> UserSupplyComparator) {
-    this.CampaignComparator = CampaignComparator;
-    this.UserSupplyComparator = UserSupplyComparator;
+  public GreedyAllocation(int goodsOrder) {
+    this.BidderComparator = new BiddersComparatorByRToSqrtIRatio();
+    this.GoodsComparator = new GoodsComparatorByRemainingSupply(goodsOrder);
   }
   
   /**
    * Constructor.
-   * 
-   * @param userOrder - order of remaining user supply. is 1 means ASC and -1 means
-   *          DESC, any other means no order
+   * Default ordering of bidders is by reward to square root of demand ratio.
+   * Default ordering of goods is by ascending order of remaining supply.
    */
-  public GreedyAllocation(int userOrder) {
-    this.CampaignComparator = new BiddersComparatorByRewardToImpressionsRatio();
-    this.UserSupplyComparator = new GoodsSupplyComparatorBySupply(userOrder);
+  public GreedyAllocation() {
+    this(1);
   }
   
   /**
    * Solve for the greedy allocation.
+   * 
    * @param market - the market object to allocate.
+   * @throws AllocationException 
+   * @throws GoodsException 
+   * @throws MarketAllocationException 
    */
-  public MarketAllocation Solve(Market market) throws BidderCreationException {
-    // Make a copy of the campaigns array, filtering the campaigns already allocated. 
-    // Sort the copied list by reward.
-    ArrayList<Bidder> campaigns = new ArrayList<Bidder>();
-    for (int j = 0; j < market.getNumberBidders(); j++) {
-      if (market.getBidder(j).getDemand() - market.getBidder(j).getAllocationSoFar() > 0
-          & market.getBidder(j).getReward() - market.getBidder(j).getReserve() * (market.getBidder(j).getDemand() - market.getBidder(j).getAllocationSoFar()) > 0) {
-        campaigns.add(new Bidder(market.getBidder(j).getDemand(), 
-            market.getBidder(j).getReward() - market.getBidder(j).getReserve() * (market.getBidder(j).getDemand() - market.getBidder(j).getAllocationSoFar()), j));
+  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationException, GoodsException, MarketAllocationException {
+    // MAKE SHALLOW COPY OF BIDDERS - that is OK, you get the pointers anyway,
+    // which you can't change up because they provide no mutable fields.
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>(market.getBidders());
+    // Sort the copy of the list of market's bidders.
+    Collections.sort(bidders, this.BidderComparator);
+    // MAKE SHALLOW COPY OF GOODS.
+    ArrayList<Goods> goods = new ArrayList<Goods>(market.getGoods());
+    // Set the remaining supply of each good to be their initial supply.
+    // This will be used to sort the users.
+    for(Goods good : goods){
+      good.setRemainingSupply(good.getSupply());
+    }
+    // Make the ArrayList that will store the result of the algorithm.
+    // The allocation is zero at the beginning. 
+    HashBasedTable<Goods,Bidder<Goods>,Integer> greedyAllocation = HashBasedTable.create();
+    for(Goods good : market.getGoods()){
+      for(Bidder<Goods> bidder : market.getBidders()){
+        greedyAllocation.put(good, bidder, 0);
       }
     }
-    //Sort campaigns by the given comparator.
-    Collections.sort(campaigns, this.CampaignComparator);
-    int[][] greedyAllocation = new int[market.getNumberGoods()][market.getNumberBidders()];
-    int[] totalAllocationFromUserSoFar = new int[market.getNumberGoods()];
-    // Allocate each campaign, if possible, one at a time.
-    for (Bidder currentCampaign : campaigns) {
-      ArrayList<GoodSupply> accessibleUsers = new ArrayList<GoodSupply>();
+    
+    // Allocate each bidder, if possible, one at a time.
+    for (Bidder<Goods> bidder : bidders) {
       int totalAvailableSupply = 0;
-      int totalAllocationToCampaignSoFar = 0;
-      for (int i = 0; i < market.getNumberGoods(); i++) { 
-        // Compute the accessible users to this campaign.
-        // z_ij computes the number of impressions available from user i to campaign j.
-        int z_ij = (int) Math.min(
-            market.getGood(i).getSupply() - totalAllocationFromUserSoFar[i],
-            Math.floor(market.getBidder(currentCampaign.getBackpointer()).getLevel() * market.getGood(i).getSupply()));
-        if (market.isConnected(i, currentCampaign.getBackpointer()) && z_ij > 0) {
-          totalAvailableSupply += z_ij;
-          accessibleUsers.add(new GoodSupply(i, market.getGood(i).getSupply() - totalAllocationFromUserSoFar[i]));
+      // First, compute if there is enough supply of goods to satisfy this bidder.
+      for (Goods good : goods) {
+        if (bidder.demandsGood(good) && good.getRemainingSupply() > 0) {
+          totalAvailableSupply += good.getRemainingSupply();
         }
       }
-      Collections.sort(accessibleUsers, this.UserSupplyComparator);
-      if (totalAvailableSupply >= market.getBidder(currentCampaign.getBackpointer()).getDemand() - market.getBidder(currentCampaign.getBackpointer()).getAllocationSoFar()) {
-        // Try to allocate, one user at the time.
-        for (GoodSupply user : accessibleUsers) {
-          int i = user.getId(); // User Index
-          int jIndex = currentCampaign.getBackpointer(); // Campaign Index
-          int z_ij = (int) Math.min(
-              market.getGood(i).getSupply() - totalAllocationFromUserSoFar[i],
-              Math.floor(market.getBidder(jIndex).getLevel() * market.getGood(i).getSupply()));
-          greedyAllocation[i][jIndex] = Math.min(market.getBidder(jIndex).getDemand() - market.getBidder(jIndex).getAllocationSoFar() - totalAllocationToCampaignSoFar, z_ij);
-          totalAllocationFromUserSoFar[i] += greedyAllocation[i][jIndex];
-          totalAllocationToCampaignSoFar += greedyAllocation[i][jIndex];
-          if (totalAllocationToCampaignSoFar == market.getBidder(jIndex).getDemand()) {
-            // Break if the current campaign has been completely satisfied.
-            break; 
+      // Check if there is enough supply to satisfy the bidder.
+      if (totalAvailableSupply >= bidder.getDemand()) {
+        // Order goods
+        Collections.sort(goods, this.GoodsComparator);
+        // Try to allocate goods to this bidder, one good at the time.
+        int totalAllocationToBidderSoFar = 0;
+        for (Goods good : goods) {
+          // If the good is in the bidder demand set, AND there is supply 
+          // remaining from this good, AND the bidder is not completely allocated. 
+          if (bidder.demandsGood(good) && good.getRemainingSupply() > 0 && totalAllocationToBidderSoFar < bidder.getDemand()) {
+            int amount = Math.min(bidder.getDemand() - totalAllocationToBidderSoFar, good.getRemainingSupply());
+            greedyAllocation.put(good, bidder, amount);
+            good.setRemainingSupply(good.getRemainingSupply() - amount);
+            totalAllocationToBidderSoFar += amount;
           }
         }
       }
     }
-    return new MarketAllocation(market, greedyAllocation, this.getObjectiveFunction());
+    return new MarketAllocation<Goods, Bidder<Goods>>(market, greedyAllocation, this.getObjectiveFunction());
   }
 
   @Override
   public ObjectiveFunction getObjectiveFunction() {
     return new SingleStepFunction();
   }
-  
+
 }

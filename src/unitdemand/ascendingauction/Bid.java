@@ -1,19 +1,19 @@
 package unitdemand.ascendingauction;
 
 /**
- * This class represents a triplet (user,campaign,bid).
+ * This class represents a triplet (good,bidder,bid).
  * 
  * @author Enrique Areyan Viqueira
  */
 public class Bid {
   
   /**
-   * User index.
+   * Good index.
    */
 	protected int i;
 	
 	/**
-	 * Campaign index.
+	 * Bidder index.
 	 */
 	protected int j;
 	
@@ -25,8 +25,8 @@ public class Bid {
 	/**
 	 * Constructor. 
 	 * 
-	 * @param i - user index.
-	 * @param j - campaign index.
+	 * @param i - good index.
+	 * @param j - bidder index.
 	 * @param bid - bid.
 	 */
 	public Bid(int i,int j,double bid){
@@ -37,18 +37,18 @@ public class Bid {
 	
 	/**
 	 * Getter.
-	 * @return user index.
+	 * @return good index.
 	 */
-	public int getUser(){
+	public int getGoodIndex(){
 		return this.i;
 	}
 	
 	/**
 	 * Getter.
 	 * 
-	 * @return campaign index.
+	 * @return bidder index.
 	 */
-	public int getCampaign(){
+	public int getBidderIndex(){
 		return this.j;
 	}
 	

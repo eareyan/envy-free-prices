@@ -2,7 +2,7 @@ package unitdemand;
 
 /**
  * This class stores a matching, defined here as a matrix of integers
- * with a 1 at position (i,j) if user i is allocated to campaign j,
+ * with a 1 at position (i,j) if good i is allocated to bidder j,
  * and 0 otherwise. It also stores the prices of a matching and implements
  * method to get the value of a matching. 
  * 
@@ -36,7 +36,7 @@ public class Matching {
   protected double sellerRevenue = -1;
   
   /**
-   * Epsilon parameter. Used when computing number of envy campaigns.
+   * Epsilon parameter. Used when computing number of envy bidders.
    */
   protected static double epsilon = 0.1;
   
@@ -129,11 +129,11 @@ public class Matching {
   }
 
   /**
-   * Computes the utility of campaign j under this matching.
-   * @param j - campaign index.
-   * @return utility of campaign j under this matching.
+   * Computes the utility of bidder j under this matching.
+   * @param j - bidder index.
+   * @return utility of bidder j under this matching.
    */
-  public double getCampaignUtility(int j) {
+  public double getBidderUtility(int j) {
     for (int i = 0; i < this.valuationMatrix.length; i++) {
       if (this.matching[i][j] == 1) {
         return this.valuationMatrix[i][j] - this.prices[i];
@@ -143,15 +143,15 @@ public class Matching {
   }
   
   /**
-   * Compute number of envy-campaigns.
-   * @return number of envy-campaigns.
+   * Compute number of envy-bidders.
+   * @return number of envy-bidders.
    */
-  public int numberOfEnvyCampaigns() {
+  public int numberOfEnvyBidders() {
     int totalNumberEnvy = 0;
     for (int j = 0; j < this.valuationMatrix[0].length; j++) {
-      double campaignUtility = this.getCampaignUtility(j);
+      double bidderUtility = this.getBidderUtility(j);
       for (int i = 0; i < this.valuationMatrix.length; i++) {
-        if ((this.valuationMatrix[i][j] - this.prices[i]) - campaignUtility > Matching.epsilon) {
+        if ((this.valuationMatrix[i][j] - this.prices[i]) - bidderUtility > Matching.epsilon) {
           totalNumberEnvy++;
         }
       }
@@ -160,13 +160,13 @@ public class Matching {
   }
   
   /**
-   * Compute the number of users that are not allocated and not priced at zero.
-   * @return the number of users that are not allocated and not priced at zero.
+   * Compute the number of goods that are not allocated and not priced at zero.
+   * @return the number of goods that are not allocated and not priced at zero.
    */
   public int computeWalrasianViolations() {
     int violations = 0;
     for (int i = 0; i < this.valuationMatrix.length; i++) {
-      if (this.allocationFromUser(i) == 0 && this.prices[i] > 0) {
+      if (this.allocationFromGood(i) == 0 && this.prices[i] > 0) {
         violations++;
       }
     }
@@ -174,11 +174,11 @@ public class Matching {
   }
 
   /**
-   * Computes the allocation from user i.
-   * @param i - user index.
-   * @return the allocation from user i.
+   * Computes the allocation from good i.
+   * @param i - good index.
+   * @return the allocation from good i.
    */
-  public int allocationFromUser(int i) {
+  public int allocationFromGood(int i) {
     int totalAllocation = 0;
     for (int j = 0; j < this.valuationMatrix[0].length; j++) {
       totalAllocation += this.matching[i][j];
@@ -196,8 +196,8 @@ public class Matching {
     int[][] matching = new int[matrix.length][matrix[0].length];
     for (int i = 0; i < result.length; i++) {
       // System.out.println("--" + result[i]);
-      // If the assignment is possible and the user is actually connected to the
-      // campaigns
+      // If the assignment is possible and the good is actually connected to the
+      // bidder
       if (result[i] > -1 && matrix[i][result[i]] > Double.NEGATIVE_INFINITY) {
         matching[i][result[i]] = 1;
       }

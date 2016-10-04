@@ -2,183 +2,209 @@ package allocations.greedy;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 
+import structures.Bidder;
+import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.aux.GoodSupply;
-import structures.aux.GoodsSupplyComparatorBySupply;
-import allocations.error.AllocationErrorCodes;
-import allocations.error.AllocationException;
+import structures.comparators.GoodsComparatorByRemainingSupply;
+import structures.exceptions.AllocationException;
+import structures.exceptions.GoodsException;
+import structures.exceptions.MarketAllocationException;
+import allocations.error.AllocationAlgoErrorCodes;
+import allocations.error.AllocationAlgoException;
 import allocations.interfaces.AllocationAlgoInterface;
 import allocations.objectivefunction.ObjectiveFunction;
+import allocations.objectivefunction.SingleStepFunction;
+
+import com.google.common.collect.HashBasedTable;
 
 /**
  * This class implements greedy allocation with multi-steps.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
-  
+public class GreedyMultiStepAllocation implements
+    AllocationAlgoInterface<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
+
   /**
    * stepSize. Impressions get allocated in multiples of this step only.
    */
   protected int stepSize;
-  
+
   /**
-   * objective function that indicates how good is to allocate one chunk of a campaign.
+   * objective function that indicates how good is to allocate one chunk of a
+   * bidder.
    */
   protected ObjectiveFunction f;
-  
-  /**
-   * Initial allocation: indicates, for each campaign, how many impressions were already allocated
-   */
-  protected int[] currentAllocation;
-  
+
   /**
    * Constructor.
-   * Does not receive current allocation, so all campaigns start at zero allocation.
+   * 
    * @param stepSize
+   *          - the number of copies to allocate at each iteration of the
+   *          algorithm.
    * @param f
-   * @throws AllocationException
+   *          - the objective function of bidders.
+   * @throws AllocationAlgoException
    */
-  public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f) throws AllocationException {
+  public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f)
+      throws AllocationAlgoException {
     if (stepSize <= 0) {
-      throw new AllocationException(AllocationErrorCodes.STEP_NEGATIVE);
+      throw new AllocationAlgoException(AllocationAlgoErrorCodes.STEP_NEGATIVE);
     }
     this.stepSize = stepSize;
     this.f = f;
   }
-  
+
   /**
-   * Solve method. Returns an allocation.
+   * Constructor. Only takes step size and uses a SingleStepFunction as the
+   * default objective function.
    * 
-   * @param market - a Market object.
-   * @return an allocation
+   * @param stepSize
+   * @throws AllocationAlgoException
    */
-  public MarketAllocation Solve(Market market) {
-    // Initial structures.
-    int[][] allocation = new int[market.getNumberGoods()][market
-        .getNumberBidders()];
-    this.currentAllocation = new int[market.getNumberBidders()];
-    for (int j = 0; j < market.getNumberBidders(); j++) {
-      this.currentAllocation[j] = market.getBidder(j).getAllocationSoFar();
-    }
-    /*
-     * First, compute user queue supply. A user is added to the queue if it can
-     * supply at least the step size.
-     */
-    PriorityQueue<GoodSupply> usersQueue = new PriorityQueue<GoodSupply>(new GoodsSupplyComparatorBySupply(-1));
-    for (int i = 0; i < market.getNumberGoods(); i++) {
-      if (market.getGood(i).getSupply() >= this.stepSize) {
-        usersQueue.add(new GoodSupply(i, market.getGood(i).getSupply()));
-      }
-    }
-    /*
-     * Second, compute campaign queue. A campaign is added to the queue if it
-     * has a positive value and has not been fully allocated.
-     */
-    PriorityQueue<campaignValue> campaignQueue = new PriorityQueue<campaignValue>(new CampaignValueComparator());
-    for (int j = 0; j < market.getNumberBidders(); j++) {
-      double value = this.f.getObjective(market.getBidder(j).getReward(),
-          market.getBidder(j).getDemand(), this.currentAllocation[j]
-              + this.stepSize)
-          - this.f.getObjective(market.getBidder(j).getReward(), market
-              .getBidder(j).getDemand(), this.currentAllocation[j])
-          - (market.getBidder(j).getReserve() * this.stepSize);
-      if (this.currentAllocation[j] + this.stepSize <= market.getBidder(j).getDemand() && value > 0) {
-        campaignQueue.add(new campaignValue(j, value));
-      }
-    }
-    boolean userNotFound = true;
-    int j;
-    int i;
-    campaignValue campaign;
-    while ((campaign = campaignQueue.poll()) != null) {
-      ArrayList<GoodSupply> auxUserSupplyList = new ArrayList<GoodSupply>();
-      j = campaign.getIndex();
-      GoodSupply user;
-      // Looking for a user connected to this campaign.
-      while (userNotFound && (user = usersQueue.poll()) != null) { 
-        i = user.getId();
-        if (market.isConnected(i, j) && (Math.floor(market.getBidder(j).getLevel() * market.getGood(i).getSupply()) - allocation[i][j] >= this.stepSize)) {
-          // This user is connected to this campaign, allocate it.
-          allocation[i][j] += this.stepSize;
-          this.currentAllocation[j] += this.stepSize;
-          user.decrementSupply(this.stepSize);
-          userNotFound = false;
-        }
-        if (user.getSupply() >= this.stepSize) {
-          //This user still has some to give.
-          auxUserSupplyList.add(user);
-        }
-      }
-      // Add users back to the queue.
-      for (GoodSupply u : auxUserSupplyList) {
-        usersQueue.add(u);
-      }
-      /*
-       * If we did found a user connected to this campaign and the campaign
-       * still requires some, then compute its value.
-       */
-      if (!userNotFound && this.currentAllocation[j] + this.stepSize <= market.getBidder(j).getDemand()) {
-        double value = this.f.getObjective(market.getBidder(j).getReward(),market.getBidder(j).getDemand(), this.currentAllocation[j] + this.stepSize)
-            - this.f.getObjective(market.getBidder(j).getReward(), market.getBidder(j).getDemand(), this.currentAllocation[j]) - market.getBidder(j).getReserve() * this.stepSize;
-        if (value > 0) { // If value of the campaign is positive, then allocate.
-          campaign.updateValue(value);
-          campaignQueue.add(campaign);
-        }
-      }
-      userNotFound = true;
-    }
-    return new MarketAllocation(market, allocation, this.f);
+  public GreedyMultiStepAllocation(int stepSize) throws AllocationAlgoException {
+    this(stepSize, new SingleStepFunction());
   }
 
   /**
-   * This auxiliary class represents a campaign and its value.
+   * Solve method. Returns an allocation.
+   * 
+   * @param market
+   *          - a Market object.
+   * @return an allocation
+   * @throws GoodsException 
+   * @throws AllocationException 
+   * @throws MarketAllocationException 
+   */
+  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws GoodsException, AllocationException, MarketAllocationException {
+    HashBasedTable<Goods,Bidder<Goods>,Integer> allocation = HashBasedTable.create();
+    for(Goods good : market.getGoods()){
+      for(Bidder<Goods> bidder : market.getBidders()){
+        allocation.put(good, bidder, 0);
+      }
+    }
+    
+    HashMap<Bidder<Goods>, Integer> currentAllocationToBidder = new HashMap<Bidder<Goods>, Integer>();
+    /*
+     * First, compute a queue of goods. A good's remaining supply is set to its
+     * initial supply.
+     */
+    PriorityQueue<Goods> goodsQueue = new PriorityQueue<Goods>(new GoodsComparatorByRemainingSupply(1));
+    for (Goods good : market.getGoods()) {
+      good.setRemainingSupply(good.getSupply());
+      goodsQueue.add(good);
+    }
+    /*
+     * Second, compute a queue of bidders. A bidder is added to the queue if it
+     * has a positive value and has not been fully allocated.
+     */
+    PriorityQueue<bidderValue> biddersQueue = new PriorityQueue<bidderValue>(new BidderValueComparator());
+    for (Bidder<Goods> bidder : market.getBidders()) {
+      currentAllocationToBidder.put(bidder, 0); // Allocation to any bidder to start is zero.
+      double value = this.f.getObjective(bidder.getReward(), bidder.getDemand(), currentAllocationToBidder.get(bidder) + this.stepSize)
+                     - this.f.getObjective(bidder.getReward(), bidder.getDemand(), currentAllocationToBidder.get(bidder));
+      if (currentAllocationToBidder.get(bidder) + this.stepSize <= bidder.getDemand() && value > 0) {
+        biddersQueue.add(new bidderValue(bidder, value));
+      }
+    }
+    boolean goodNotFound = true;
+    bidderValue bidderValue;
+    while ((bidderValue = biddersQueue.poll()) != null) {
+      Goods good;
+      Bidder<Goods> bidder = bidderValue.getBidder();
+      ArrayList<Goods> auxGoodsSupplyList = new ArrayList<Goods>();
+      // Looking for a good connected to this bidder with enough supply.
+      while (goodNotFound && (good = goodsQueue.poll()) != null) {
+        if (bidder.demandsGood(good) && good.getSupply() >= this.stepSize) {
+          // This good is connected to this bidder and has at least s copies available.
+          allocation.put(good, bidder, allocation.get(good, bidder) + this.stepSize);
+          currentAllocationToBidder.put(bidder, currentAllocationToBidder.get(bidder) + this.stepSize);
+          good.setRemainingSupply(good.getRemainingSupply() - this.stepSize);
+          goodNotFound = false;
+        }
+        if (good.getRemainingSupply() >= this.stepSize) {
+          // This good still has some to give. Put it in this auxiliary queue to
+          // be put back in the goodsQueue later.
+          auxGoodsSupplyList.add(good);
+        }
+      }
+      // Add goods that were pulled out of the goodsQueue back to the queue.
+      for (Goods g : auxGoodsSupplyList) {
+        goodsQueue.add(g);
+      }
+      /*
+       * If we did found a good connected to this bidder and the bidder still
+       * requires some, then compute its value.
+       */
+      if (!goodNotFound && currentAllocationToBidder.get(bidder) + this.stepSize <= bidder.getDemand()) {
+        double value = this.f.getObjective(bidder.getReward(), bidder.getDemand(), currentAllocationToBidder.get(bidder) + this.stepSize)
+                       - this.f.getObjective(bidder.getReward(), bidder.getDemand(), currentAllocationToBidder.get(bidder));
+        if (value > 0) {
+          // If value of the bidder is still positive, then update value and add
+          // to the queue.
+          bidderValue.updateValue(value);
+          biddersQueue.add(bidderValue);
+        }
+      }
+      goodNotFound = true;
+    }
+    return new MarketAllocation<Goods, Bidder<Goods>>(market, allocation, this.f);
+  }
+
+  /**
+   * This auxiliary class represents a bidder and its value.
+   * 
    * @author Enrique Areyan Viqueira
    */
-  public class campaignValue {
-    
+  public class bidderValue {
+
     /**
-     * Campaign index.
+     * Bidder index.
      */
-    protected int j;
-    
+    final protected Bidder<Goods> bidder;
+
     /**
-     * Campaign value.
+     * Bidder value.
      */
     protected double value;
 
     /**
      * Constructor.
-     * @param j - campaign index.
-     * @param value - campaign value.
+     * 
+     * @param bidder - a bidder object.
+     * @param value - the bidder value.
      */
-    public campaignValue(int j, double value) {
-      this.j = j;
+    public bidderValue(Bidder<Goods> bidder, double value) {
+      this.bidder = bidder;
       this.value = value;
     }
 
     /**
      * Getter.
-     * @return campaign index.
+     * 
+     * @return bidder index.
      */
-    public int getIndex() {
-      return this.j;
+    public Bidder<Goods> getBidder() {
+      return this.bidder;
     }
 
     /**
      * Getter.
-     * @return campaign value.
+     * 
+     * @return bidder value.
      */
     public double getValue() {
       return this.value;
     }
 
     /**
-     * Updates the value of a campaign.
-     * @param value - the new value of the campaign.
+     * Updates the value of a bidder.
+     * 
+     * @param value - the new value of the bidder.
      */
     public void updateValue(double value) {
       this.value = value;
@@ -186,17 +212,18 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
 
     @Override
     public String toString() {
-      return "(" + this.j + "," + this.value + ")";
+      return "(" + this.bidder + "," + this.value + ")";
     }
   }
 
   /**
-   * Comparator to compare campaigns by value.
+   * Comparator to compare bidders by value.
+   * 
    * @author Enrique Areyan Viqueira
    */
-  public class CampaignValueComparator implements Comparator<campaignValue> {
+  public class BidderValueComparator implements Comparator<bidderValue> {
     @Override
-    public int compare(campaignValue c1, campaignValue c2) {
+    public int compare(bidderValue c1, bidderValue c2) {
       if (c1.getValue() < c2.getValue()) {
         return 1;
       } else if (c1.getValue() > c2.getValue()) {
@@ -214,5 +241,5 @@ public class GreedyMultiStepAllocation implements AllocationAlgoInterface {
   public ObjectiveFunction getObjectiveFunction() {
     return this.f;
   }
-  
+
 }

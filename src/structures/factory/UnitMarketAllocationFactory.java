@@ -1,7 +1,8 @@
 package structures.factory;
 
+import structures.Bidder;
+import structures.Goods;
 import structures.Market;
-import structures.MarketAllocation;
 import unitdemand.MWBMatchingAlgorithm;
 import unitdemand.Matching;
 
@@ -14,19 +15,19 @@ public class UnitMarketAllocationFactory {
 
   /**
    * Given a market, return a cost matrix to be input to the Hungarian
-   * algorithm. This matrix encodes the fact that a campaign is not connected to
-   * a user by assigning an infinite cost. For a connected campaign, we add a
+   * algorithm. This matrix encodes the fact that a bidder is not connected to
+   * a good by assigning an infinite cost. For a connected bidder, we add a
    * random valuation between 1 and 100 for each edge.
    * 
    * @param market - a market object. 
    * @return a matrix of valuations.
    */
-  public static double[][] getValuationMatrixFromMarket(Market market) {
+  public static double[][] getValuationMatrixFromMarket(Market<Goods, Bidder<Goods>> market) {
     double[][] costMatrix = new double[market.getNumberGoods()][market.getNumberBidders()];
     for (int i = 0; i < market.getNumberGoods(); i++) {
       for (int j = 0; j < market.getNumberBidders(); j++) {
-        if (market.isConnected(i, j)) {
-          costMatrix[i][j] = market.getBidder(j).getReward();
+        if (market.getBidders().get(j).demandsGood(market.getGoods().get(i))) {
+          costMatrix[i][j] = market.getBidders().get(j).getReward();
         } else {
           costMatrix[i][j] = Double.NEGATIVE_INFINITY;
         }
@@ -45,7 +46,7 @@ public class UnitMarketAllocationFactory {
     // Initialize allocation as all disconnected.
     int[][] allocationMatrix = new int[valuationMatrix.length][valuationMatrix[0].length];
     for (int i = 0; i < result.length; i++) {
-      // If the assignment is possible and the user is actually connected to the campaigns
+      // If the assignment is possible and the good is actually connected to the bidder
       if (result[i] > -1 && valuationMatrix[i][result[i]] > Double.NEGATIVE_INFINITY) {
         allocationMatrix[i][result[i]] = 1;
       }
@@ -59,9 +60,9 @@ public class UnitMarketAllocationFactory {
    * 
    * @param market - a market object. 
    * @return a MarketAllocation object.
-   */
-  public static MarketAllocation getMaxWeightMatchingAllocation(Market market) {
-    return new MarketAllocation(market, UnitMarketAllocationFactory.getMaximumMatchingFromValuationMatrix(UnitMarketAllocationFactory.getValuationMatrixFromMarket(market)));
+   
+  public static MarketAllocation<Goods, Bidder<Goods>> getMaxWeightMatchingAllocation(Market<Goods, Bidder<Goods>> market) {
+    return new MarketAllocation<Goods, Bidder<Goods>>(market, UnitMarketAllocationFactory.getMaximumMatchingFromValuationMatrix(UnitMarketAllocationFactory.getValuationMatrixFromMarket(market)));
   }
   
   /**

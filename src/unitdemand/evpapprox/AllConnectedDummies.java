@@ -36,7 +36,7 @@ public class AllConnectedDummies extends AbstractMaxWEQReservePrices {
    * This method adds two dummy consumers to all items at the given reserve
    * price. The method adds columns to account for these dummy consumers.
    * 
-   * @param j - campaign index.
+   * @param j - bidder index.
    * @return a matrix of valuations.
    */
   public double[][] augmentValuationMatrix(int j) {
