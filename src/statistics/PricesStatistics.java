@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
 import structures.Bidder;
 import structures.Goods;
 import structures.MarketOutcome;
@@ -13,14 +14,18 @@ import structures.exceptions.MarketOutcomeException;
 /**
  * This class implements functionality to compute
  * statistics from a market allocation object. 
+ * Note that, at the moment, the functions implemented in this
+ * class assume that the market outcome either completely allocated
+ * a bidder or it did not.
+ * 
  * @author Enrique Areyan Viqueira
  */
-public class PricesStatistics <G extends Goods, B extends Bidder<G>>{
+public class PricesStatistics <G extends Goods, B extends Bidder<G>, O extends ObjectiveFunction>{
 
   /**
    * MarketPrices object.
    */
-  protected MarketOutcome<G, B> marketPrices;
+  protected MarketOutcome<G, B, O> marketPrices;
 
   /**
    * epsilon parameter.
@@ -32,7 +37,7 @@ public class PricesStatistics <G extends Goods, B extends Bidder<G>>{
    * 
    * @param marketPrices - a MarketPrices object.
    */
-  public PricesStatistics(MarketOutcome<G, B> marketPrices) {
+  public PricesStatistics(MarketOutcome<G, B, O> marketPrices) {
     this.marketPrices = marketPrices;
   }
 

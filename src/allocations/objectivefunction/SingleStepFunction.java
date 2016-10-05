@@ -1,11 +1,13 @@
 package allocations.objectivefunction;
 
+import allocations.objectivefunction.interfaces.SafeReserveFunction;
+
 /**
  * This class implements the all-or-nothing objective function.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class SingleStepFunction implements ObjectiveFunction {
+public class SingleStepFunction implements SafeReserveFunction {
 
   /**
    * All-or-nothing objective.

@@ -1,5 +1,7 @@
 package allocations.objectivefunction;
 
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
+
 /**
  * Effective Reach Ratio as defined in the TAC Game.
  * 

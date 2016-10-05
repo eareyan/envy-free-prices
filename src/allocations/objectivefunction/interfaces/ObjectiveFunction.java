@@ -1,4 +1,4 @@
-package allocations.objectivefunction;
+package allocations.objectivefunction.interfaces;
 
 /**
  * This interface defines a single method that all

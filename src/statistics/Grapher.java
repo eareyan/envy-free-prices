@@ -4,22 +4,17 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
-import structures.MarketAllocation;
 import structures.factory.RandomMarketFactory;
 import structures.factory.UnitMarketFactory;
 import unitdemand.Matching;
 import unitdemand.MaxWEQ;
 import util.Printer;
-import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
-import algorithms.pricing.RestrictedEnvyFreePricesLP;
-import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 public class Grapher {
 	
@@ -337,8 +332,7 @@ public class Grapher {
 	    @SuppressWarnings("resource")
 		PrintWriter out = new PrintWriter(bw);
 		for(int i=0;i<numberOfPoints;i++){
-			double sellerRevenue = 0.0;
-			double[] reservePrices = new double[numUsers];
+			//double sellerRevenue = 0.0;
 			DescriptiveStatistics revenue = new DescriptiveStatistics();
 			for(int j=0;j<numberOfSamples;j++){
 				/* Sample a Market */
@@ -349,26 +343,26 @@ public class Grapher {
 				}else{
 					M = RandomMarketFactory.generateOverDemandedMarket(numUsers, numCampa, p, b);
 				}
+				System.out.println(M);
 				/* Compute the efficient allocation */
-				MarketAllocation<Goods, Bidder<Goods>> efficient = new SingleStepWelfareMaxAllocationILP().Solve(M);
-				double valueOptAllocaction = efficient.value();		
+				//MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> efficient = new SingleStepWelfareMaxAllocationILP().Solve(M);
+				//double valueOptAllocaction = efficient.value();		
 
 				/* Compute allocation that respects reserve price */
-				MarketAllocation<Goods, Bidder<Goods>> allocRespectReserve = new SingleStepWelfareMaxAllocationILP().Solve(M);
+				//MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> allocRespectReserve = new SingleStepWelfareMaxAllocationILP().Solve(M);
 
-				/* Compute envy-free prices */
-				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(allocRespectReserve);
+				/* Compute envy-free prices 
+				RestrictedEnvyFreePricesLPWithReserve<SingleStepFunction> efp = new RestrictedEnvyFreePricesLPWithReserve(allocRespectReserve);
 				efp.setMarketClearanceConditions(false);
 				efp.createLP();
-				Arrays.fill(reservePrices, reserve);
-				efp.setReservePrices(reservePrices);
+				efp.setReservePrice(reserve);
 				RestrictedEnvyFreePricesLPSolution sol = efp.Solve();
 				if(sol.getStatus().equals("Infeasible")){
 					sellerRevenue = 0.0;
 				}else{
 					sellerRevenue = sol.sellerRevenue();
 				}
-				revenue.addValue((double) sellerRevenue / valueOptAllocaction);
+				revenue.addValue((double) sellerRevenue / valueOptAllocaction);*/
 			}
 			out.println(reserve +"," + revenue.getMean());
 			out.flush();

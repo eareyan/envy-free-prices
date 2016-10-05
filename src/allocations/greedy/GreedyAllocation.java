@@ -13,8 +13,7 @@ import structures.comparators.GoodsComparatorByRemainingSupply;
 import structures.exceptions.AllocationException;
 import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
-import allocations.interfaces.AllocationAlgoInterface;
-import allocations.objectivefunction.ObjectiveFunction;
+import allocations.interfaces.AllocationAlgo;
 import allocations.objectivefunction.SingleStepFunction;
 
 import com.google.common.collect.HashBasedTable;
@@ -24,7 +23,7 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyAllocation implements AllocationAlgoInterface<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
+public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, SingleStepFunction> {
 
   /**
    * Bidder comparator.
@@ -75,7 +74,7 @@ public class GreedyAllocation implements AllocationAlgoInterface<Market<Goods, B
    * @throws GoodsException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationException, GoodsException, MarketAllocationException {
+  public MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationException, GoodsException, MarketAllocationException {
     // MAKE SHALLOW COPY OF BIDDERS - that is OK, you get the pointers anyway,
     // which you can't change up because they provide no mutable fields.
     ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>(market.getBidders());
@@ -124,12 +123,17 @@ public class GreedyAllocation implements AllocationAlgoInterface<Market<Goods, B
         }
       }
     }
-    return new MarketAllocation<Goods, Bidder<Goods>>(market, greedyAllocation, this.getObjectiveFunction());
+    return new MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction>(market, greedyAllocation, this.getObjectiveFunction());
   }
 
   @Override
-  public ObjectiveFunction getObjectiveFunction() {
+  public SingleStepFunction getObjectiveFunction() {
     return new SingleStepFunction();
+  }
+  
+  @Override
+  public String toString(){
+    return "GreedyAllocation which always uses SingleStepFunction objective";
   }
 
 }

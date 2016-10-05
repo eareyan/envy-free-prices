@@ -27,6 +27,7 @@ import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
 import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
+import allocations.objectivefunction.SingleStepFunction;
 import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 public class single_minded extends Experiments{
@@ -58,7 +59,7 @@ public class single_minded extends Experiments{
 				
 				/* Efficient Allocation */
 				//System.out.println("===== Efficient Alloc ======");
-				MarketAllocation<Goods, Bidder<Goods>> efficientAlloc = new SingleStepWelfareMaxAllocationILP().Solve(M);
+				MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> efficientAlloc = new SingleStepWelfareMaxAllocationILP().Solve(M);
 				//Printer.printMatrix(efficientAlloc.getAllocation());
 				//System.out.println("efficientWelfare = " + efficientAlloc.value());
 				double optimalWelfare = efficientAlloc.value();
@@ -66,9 +67,9 @@ public class single_minded extends Experiments{
 				/* run approx WE algo */
 				//System.out.println("===== ApproxWE ======");
 				startTime = System.nanoTime();
-				MarketOutcome<Goods, Bidder<Goods>> approxWEResult = new ApproxWE(M).Solve();
+				MarketOutcome<Goods, Bidder<Goods>, SingleStepFunction> approxWEResult = new ApproxWE(M).Solve();
 				endTime = System.nanoTime();
-				PricesStatistics<Goods, Bidder<Goods>> psApprox = new PricesStatistics<Goods, Bidder<Goods>>(approxWEResult);
+				PricesStatistics<Goods, Bidder<Goods>, SingleStepFunction> psApprox = new PricesStatistics<Goods, Bidder<Goods>, SingleStepFunction>(approxWEResult);
 
 				approxWelfare.addValue(NumberMethods.getRatio(approxWEResult.getMarketAllocation().value() , optimalWelfare));
 				approxRevenue.addValue(NumberMethods.getRatio(approxWEResult.sellerRevenue() ,  optimalWelfare));
@@ -81,11 +82,11 @@ public class single_minded extends Experiments{
 				startTime = System.nanoTime();
 				endTime = System.nanoTime();
 				//--LP
-				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new GreedyAllocation().Solve(M));
+				RestrictedEnvyFreePricesLP<SingleStepFunction> efp = new RestrictedEnvyFreePricesLP<SingleStepFunction>(new GreedyAllocation().Solve(M));
 				efp.setMarketClearanceConditions(false);
 				efp.createLP();
-				RestrictedEnvyFreePricesLPSolution lpResult = efp.Solve();
-				PricesStatistics<Goods, Bidder<Goods>> psGreedy = new PricesStatistics<Goods, Bidder<Goods>>(lpResult); 
+				RestrictedEnvyFreePricesLPSolution<SingleStepFunction> lpResult = efp.Solve();
+				PricesStatistics<Goods, Bidder<Goods>, SingleStepFunction> psGreedy = new PricesStatistics<Goods, Bidder<Goods>, SingleStepFunction>(lpResult); 
 				greedyWelfare.addValue(NumberMethods.getRatio(lpResult.getMarketAllocation().value() , optimalWelfare));
 				greedyRevenue.addValue(NumberMethods.getRatio(lpResult.sellerRevenue() , optimalWelfare));
 				greedyEF.addValue((double) psGreedy.numberOfEnvyBidders() / numCampaigns);

@@ -23,6 +23,8 @@ import util.NumberMethods;
 import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyMultiStepAllocation;
 import allocations.objectivefunction.EffectiveReachRatio;
+import allocations.objectivefunction.SingleStepFunction;
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
 import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 @SuppressWarnings("unused")
@@ -42,8 +44,8 @@ public class allocation extends Experiments {
         // Create a random Market.
         Market<Goods, Bidder<Goods>> randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
         // Compute different allocations.
-        MarketAllocation<Goods, Bidder<Goods>> efficient = new SingleStepWelfareMaxAllocationILP().Solve(randomMarket);
-        MarketAllocation<Goods, Bidder<Goods>> greedy = new GreedyMultiStepAllocation(1, new EffectiveReachRatio()).Solve(randomMarket);
+        MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> efficient = new SingleStepWelfareMaxAllocationILP().Solve(randomMarket);
+        MarketAllocation<Goods, Bidder<Goods>, EffectiveReachRatio> greedy = new GreedyMultiStepAllocation<EffectiveReachRatio>(1, new EffectiveReachRatio()).Solve(randomMarket);
         /* Compute statistics */
         double greedyValue = greedy.value();
         double efficientValue = efficient.value();

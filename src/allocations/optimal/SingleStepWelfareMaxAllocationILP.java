@@ -17,8 +17,7 @@ import structures.exceptions.MarketAllocationException;
 import util.Printer;
 import allocations.error.AllocationAlgoErrorCodes;
 import allocations.error.AllocationAlgoException;
-import allocations.interfaces.AllocationAlgoInterface;
-import allocations.objectivefunction.ObjectiveFunction;
+import allocations.interfaces.AllocationAlgo;
 import allocations.objectivefunction.SingleStepFunction;
 
 import com.google.common.collect.HashBasedTable;
@@ -29,7 +28,7 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class SingleStepWelfareMaxAllocationILP implements AllocationAlgoInterface<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
+public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, SingleStepFunction> {
   
   /**
    * Boolean to control whether or not to output.
@@ -62,7 +61,7 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgoInterfac
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
+  public MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
     try {
       IloCplex cplex = new IloCplex();
       if (!this.verbose){
@@ -178,7 +177,7 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgoInterfac
             alloc.put(good, bidder , (int) Math.round(Solutions.get(0)[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]));    
           }
         }
-        return new MarketAllocation<Goods, Bidder<Goods>>(market, alloc, this.getObjectiveFunction());
+        return new MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction>(market, alloc, this.getObjectiveFunction());
       }
     } catch (IloException e) {
       // Report that CPLEX failed.
@@ -195,8 +194,13 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgoInterfac
    * @see allocations.interfaces.AllocationAlgoInterface#getObjectiveFunction()
    */
   @Override
-  public ObjectiveFunction getObjectiveFunction() {
+  public SingleStepFunction getObjectiveFunction() {
     return new SingleStepFunction();
+  }
+  
+  @Override
+  public String toString(){
+    return "SingleStepWelfareMaxAllocationILP which always uses SingleStepFunction objective";
   }
 
 }

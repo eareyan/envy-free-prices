@@ -1,7 +1,7 @@
 package structures;
 
 import structures.exceptions.MarketAllocationException;
-import allocations.objectivefunction.ObjectiveFunction;
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
 
 import com.google.common.collect.Table;
 
@@ -16,7 +16,7 @@ import com.google.common.collect.Table;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketAllocation<G extends Goods, B extends Bidder<G>> {
+public class MarketAllocation<G extends Goods, B extends Bidder<G>, O extends ObjectiveFunction> {
   
   /**
    * Market that was allocated.

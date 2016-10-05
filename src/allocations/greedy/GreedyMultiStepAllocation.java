@@ -15,9 +15,8 @@ import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
 import allocations.error.AllocationAlgoErrorCodes;
 import allocations.error.AllocationAlgoException;
-import allocations.interfaces.AllocationAlgoInterface;
-import allocations.objectivefunction.ObjectiveFunction;
-import allocations.objectivefunction.SingleStepFunction;
+import allocations.interfaces.AllocationAlgo;
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
 
 import com.google.common.collect.HashBasedTable;
 
@@ -26,8 +25,8 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyMultiStepAllocation implements
-    AllocationAlgoInterface<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
+public class GreedyMultiStepAllocation<O extends ObjectiveFunction> implements
+    AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, O> {
 
   /**
    * stepSize. Impressions get allocated in multiples of this step only.
@@ -38,7 +37,7 @@ public class GreedyMultiStepAllocation implements
    * objective function that indicates how good is to allocate one chunk of a
    * bidder.
    */
-  protected ObjectiveFunction f;
+  protected O f;
 
   /**
    * Constructor.
@@ -50,7 +49,7 @@ public class GreedyMultiStepAllocation implements
    *          - the objective function of bidders.
    * @throws AllocationAlgoException
    */
-  public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f)
+  public GreedyMultiStepAllocation(int stepSize, O f)
       throws AllocationAlgoException {
     if (stepSize <= 0) {
       throw new AllocationAlgoException(AllocationAlgoErrorCodes.STEP_NEGATIVE);
@@ -66,9 +65,9 @@ public class GreedyMultiStepAllocation implements
    * @param stepSize
    * @throws AllocationAlgoException
    */
-  public GreedyMultiStepAllocation(int stepSize) throws AllocationAlgoException {
+  /*public GreedyMultiStepAllocation(int stepSize) throws AllocationAlgoException {
     this(stepSize, new SingleStepFunction());
-  }
+  }*/
 
   /**
    * Solve method. Returns an allocation.
@@ -80,7 +79,7 @@ public class GreedyMultiStepAllocation implements
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws GoodsException, AllocationException, MarketAllocationException {
+  public MarketAllocation<Goods, Bidder<Goods>, O> Solve(Market<Goods, Bidder<Goods>> market) throws GoodsException, AllocationException, MarketAllocationException {
     HashBasedTable<Goods,Bidder<Goods>,Integer> allocation = HashBasedTable.create();
     for(Goods good : market.getGoods()){
       for(Bidder<Goods> bidder : market.getBidders()){
@@ -152,7 +151,7 @@ public class GreedyMultiStepAllocation implements
       }
       goodNotFound = true;
     }
-    return new MarketAllocation<Goods, Bidder<Goods>>(market, allocation, this.f);
+    return new MarketAllocation<Goods, Bidder<Goods>, O>(market, allocation, this.f);
   }
 
   /**
@@ -238,8 +237,13 @@ public class GreedyMultiStepAllocation implements
    * Implements AllocationAlgoInterface
    */
   @Override
-  public ObjectiveFunction getObjectiveFunction() {
+  public O getObjectiveFunction() {
     return this.f;
+  }
+  
+  @Override
+  public String toString(){
+    return "GreedyMultiStepAlgorithm using step " + this.stepSize + " and objective" + this.f;
   }
 
 }
