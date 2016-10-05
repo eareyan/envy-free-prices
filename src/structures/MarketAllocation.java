@@ -16,7 +16,7 @@ import com.google.common.collect.Table;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketAllocation<G extends Goods, B extends Bidder<G>, O extends ObjectiveFunction> {
+public class MarketAllocation<G extends Goods, B extends Bidder<G>> {
   
   /**
    * Market that was allocated.
@@ -27,21 +27,21 @@ public class MarketAllocation<G extends Goods, B extends Bidder<G>, O extends Ob
    * Allocation for the market. An allocation is a Table of goods, bidders and
    * an integer denoting the allocation from a good to a bidder.
    */
-  Table<G, B, Integer> allocation;
+  protected final Table<G, B, Integer> allocation;
 
   /**
    * Objective function. This is the function that the allocation
    * algorithm reported as having used to perform its allocation.
    */
-  protected ObjectiveFunction f;
+  protected final ObjectiveFunction f;
   
   /**
-   * Basic constructor. Takes a Market and an allocation.
+   * Constructor. Takes a Market and an allocation.
    * @param m
    * @param allocation
    * @throws MarketAllocationException 
    */
-  public MarketAllocation(Market<G, B> m, Table<G, B, Integer> allocation) throws MarketAllocationException {
+  public MarketAllocation(Market<G, B> m, Table<G, B, Integer> allocation,  ObjectiveFunction f) throws MarketAllocationException {
     this.market = m;
     if (this.market.bidders.size() * this.market.goods.size() != allocation.size()) {
       throw new MarketAllocationException(
@@ -51,17 +51,6 @@ public class MarketAllocation<G extends Goods, B extends Bidder<G>, O extends Ob
               + " goods, but with an allocation of size " + allocation.size());
     }
     this.allocation = allocation;
-  }
-  
-  /**
-   * Second constructor. Takes a Market, an allocation, and an objective function.
-   * @param m
-   * @param allocation
-   * @param f
-   * @throws MarketAllocationException 
-   */
-  public MarketAllocation(Market<G, B> m, Table<G, B, Integer> allocation,  ObjectiveFunction f) throws MarketAllocationException {
-    this(m, allocation);
     this.f = f;
   }
   
@@ -188,6 +177,15 @@ public class MarketAllocation<G extends Goods, B extends Bidder<G>, O extends Ob
       }
       System.out.print("\n");
     }
+  }
+  
+  /**
+   * Getter.
+   * 
+   * @return the objective function.
+   */
+  public ObjectiveFunction getObjectiveFunction(){
+    return this.f;
   }
   
 }

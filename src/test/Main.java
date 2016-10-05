@@ -23,6 +23,7 @@ import structures.factory.SingleMindedMarketFactory;
 import util.Printer;
 import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.error.PrincingAlgoException;
 import algorithms.pricing.reserveprices.RevMaxHeuristic;
 import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
@@ -30,9 +31,7 @@ import allocations.greedy.GreedyMultiStepAllocation;
 import allocations.interfaces.AllocationAlgo;
 import allocations.objectivefunction.EffectiveReachRatio;
 import allocations.objectivefunction.IdentityObjectiveFunction;
-import allocations.objectivefunction.SingleStepFunction;
 import allocations.objectivefunction.interfaces.ObjectiveFunction;
-import allocations.objectivefunction.interfaces.SafeReserveFunction;
 import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 /*
@@ -46,9 +45,10 @@ public class Main {
   /**
    * Testing all kinds of markets.
    * @throws MarketCreationException 
+   * @throws PrincingAlgoException 
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public static<O extends ObjectiveFunction> void main(String[] args) throws IloException, BidderCreationException, AllocationAlgoException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException {
+  public static<O extends ObjectiveFunction> void main(String[] args) throws IloException, BidderCreationException, AllocationAlgoException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException, PrincingAlgoException {
 
     ArrayList<Market<Goods,Bidder<Goods>>> marketList = new ArrayList<Market<Goods,Bidder<Goods>>>();
     marketList.add(SizeInterchangeableMarkets.market0());
@@ -77,26 +77,29 @@ public class Main {
     // algosList.add(new GreedyMultiStepAllocation<O>(1, new IdentityObjectiveFunction()));
     // NOTE!!: GreedyMulti Step, using EffectiveReachRatio as objective function
     // fails for finding rev. maximizing prices (using reserve prices).
-    algosList.add(new GreedyMultiStepAllocation<EffectiveReachRatio>(1, new EffectiveReachRatio()));
-    algosList.add(new GreedyMultiStepAllocation<IdentityObjectiveFunction>(1, new IdentityObjectiveFunction()));
+    algosList.add(new GreedyMultiStepAllocation(1, new EffectiveReachRatio()));
+    algosList.add(new GreedyMultiStepAllocation(1, new IdentityObjectiveFunction()));
 
     for (Market<Goods, Bidder<Goods>> M : marketList) {
       System.out.println("********/*************/************");
       Printer.PrintMarketInfo(M);      
       for(AllocationAlgo algo : algosList){
         /* Allocate Market.  */
-        MarketAllocation<Goods, Bidder<Goods>, ObjectiveFunction> alloc = algo.Solve(M);
+        MarketAllocation<Goods, Bidder<Goods>> alloc = algo.Solve(M);
         System.out.println(algo + " Alloc");
         /* Price Market.  */
-        RestrictedEnvyFreePricesLP<ObjectiveFunction> REFPLP = new RestrictedEnvyFreePricesLP<ObjectiveFunction>(alloc);
-        REFPLP.setMarketClearanceConditions(true);
+        RestrictedEnvyFreePricesLP REFPLP = new RestrictedEnvyFreePricesLP(alloc);
+        REFPLP.setMarketClearanceConditions(false);
         REFPLP.createLP();
-        RestrictedEnvyFreePricesLPSolution<ObjectiveFunction> marketPrices = REFPLP.Solve();
+        RestrictedEnvyFreePricesLPSolution marketPrices = REFPLP.Solve();
         Printer.PrintOutcomeInfo(marketPrices);
         /* Revenue Max Heuristic*/
-        if(algo.getObjectiveFunction() instanceof SafeReserveFunction){
-          RevMaxHeuristic<SafeReserveFunction> rmh = new RevMaxHeuristic<SafeReserveFunction>(M, algo);
-          System.out.println("Rev. Max Heuristic = " + rmh.Solve());
+        if (algo.getObjectiveFunction().isSafeForReserve()) {
+          RevMaxHeuristic rmh = new RevMaxHeuristic(M, algo);
+          MarketOutcome<Goods, Bidder<Goods>> rmhOutcome = rmh.Solve();
+          System.out.println("Rev. Max Heuristic = " + rmhOutcome);
+          rmhOutcome.getMarketAllocation().printAllocation();
+          rmhOutcome.printPrices();
         }
       }
     }
@@ -115,12 +118,12 @@ public class Main {
     for (Market<Goods, Bidder<Goods>> singleMindedMarket : singleMindedMarketList) {
       Printer.PrintMarketInfo(singleMindedMarket);
       ApproxWE approxWE = new ApproxWE(singleMindedMarket);
-      MarketOutcome<Goods, Bidder<Goods>, SingleStepFunction> x = approxWE.Solve();
+      MarketOutcome<Goods, Bidder<Goods>> x = approxWE.Solve();
       Printer.PrintOutcomeInfo(x);
     }
   }
   
-  public static void main2(String[] args) throws BidderCreationException, IloException, AllocationAlgoException, AllocationException, MarketAllocationException, GoodsException, MarketOutcomeException, MarketCreationException{
+  public static void main2(String[] args) throws BidderCreationException, IloException, AllocationAlgoException, AllocationException, MarketAllocationException, GoodsException, MarketOutcomeException, MarketCreationException, PrincingAlgoException{
     
     //MarketWithReservePrice mwrp = new MarketWithReservePrice(SingleMindedMarkets.singleMinded0(), 4.0);
     /*MarketWithReservePrice mwrp = new MarketWithReservePrice(SizeInterchangeableMarkets.market7(), 2.0);
@@ -136,33 +139,33 @@ public class Main {
     Market<Goods, Bidder<Goods>> market = RandomMarketFactory.randomMarket(5, 5, 1.0);
     System.out.println(market);
     
-    RevMaxHeuristic<SingleStepFunction> rmh = new RevMaxHeuristic<SingleStepFunction>(market, new GreedyAllocation());
+    RevMaxHeuristic rmh = new RevMaxHeuristic(market, new GreedyAllocation());
     //RevMaxHeuristic rmh = new RevMaxHeuristic(market, new SingleStepWelfareMaxAllocationILP());
     //RevMaxHeuristic rmh = new RevMaxHeuristic(market, new GreedyMultiStepAllocation(1, new EffectiveReachRatio()));
-    MarketOutcome<Goods, Bidder<Goods>, SingleStepFunction> outcome = rmh.Solve();
+    MarketOutcome<Goods, Bidder<Goods>> outcome = rmh.Solve();
     outcome.getMarketAllocation().printAllocation();
     outcome.printPrices();
-    PricesStatistics<Goods, Bidder<Goods>, SingleStepFunction> ps = new PricesStatistics<Goods, Bidder<Goods>, SingleStepFunction>(outcome);
+    PricesStatistics<Goods, Bidder<Goods>> ps = new PricesStatistics<Goods, Bidder<Goods>>(outcome);
     System.out.println("#Envy = " + ps.numberOfEnvyBidders());
   }
   
-  public static void main3(String[] args) throws BidderCreationException, MarketCreationException, AllocationAlgoException, GoodsException, AllocationException, MarketAllocationException, IloException, MarketOutcomeException{
+  public static void main3(String[] args) throws BidderCreationException, MarketCreationException, AllocationAlgoException, GoodsException, AllocationException, MarketAllocationException, IloException, MarketOutcomeException, PrincingAlgoException{
     Market<Goods, Bidder<Goods>> market = SizeInterchangeableMarkets.market7();
     Printer.PrintMarketInfo(market); 
     /* Allocate Market.  */
     //AllocationAlgoInterface<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, SingleStepFunction> alloc = new GreedyAllocation();
-    AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, EffectiveReachRatio> alloc = new GreedyMultiStepAllocation<EffectiveReachRatio>(1, new EffectiveReachRatio());
+    AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> alloc = new GreedyMultiStepAllocation(1, new EffectiveReachRatio());
     /* Price Market.  */
     //RestrictedEnvyFreePricesLP<SingleStepFunction> REFPLP = new RestrictedEnvyFreePricesLP<SingleStepFunction>(alloc.Solve(market));
-    RestrictedEnvyFreePricesLP<EffectiveReachRatio> REFPLP = new RestrictedEnvyFreePricesLP<EffectiveReachRatio>(alloc.Solve(market));
+    RestrictedEnvyFreePricesLP REFPLP = new RestrictedEnvyFreePricesLP(alloc.Solve(market));
     REFPLP.setMarketClearanceConditions(false);
     REFPLP.createLP();
-    RestrictedEnvyFreePricesLPSolution<EffectiveReachRatio> marketPrices = REFPLP.Solve();
+    RestrictedEnvyFreePricesLPSolution marketPrices = REFPLP.Solve();
     Printer.PrintOutcomeInfo(marketPrices);
     
     //RevMaxHeuristic<SingleStepFunction> rmh = new RevMaxHeuristic<SingleStepFunction>(market, new GreedyAllocation());
-    RevMaxHeuristic<IdentityObjectiveFunction> rmh = new RevMaxHeuristic<IdentityObjectiveFunction>(market, new GreedyMultiStepAllocation<IdentityObjectiveFunction>(100, new IdentityObjectiveFunction()));
-    MarketOutcome<Goods, Bidder<Goods>, IdentityObjectiveFunction> outcomeWR = rmh.Solve();
+    RevMaxHeuristic rmh = new RevMaxHeuristic(market, new GreedyMultiStepAllocation(100, new IdentityObjectiveFunction()));
+    MarketOutcome<Goods, Bidder<Goods>> outcomeWR = rmh.Solve();
     Printer.PrintOutcomeInfo(outcomeWR);
   }
 

@@ -8,8 +8,12 @@ import java.util.Map;
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
+import structures.MarketAllocation;
 import structures.exceptions.BidderCreationException;
+import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
+
+import com.google.common.collect.HashBasedTable;
 
 /**
  * This class relates a given input market and reserve price r with a new
@@ -29,6 +33,11 @@ public class MarketWithReservePrice {
    * Reserve Price.
    */
   protected final double reserve;
+  
+  /**
+   * Are there any bidders in the market with reserve?
+   */
+  protected final boolean biddersInMarketWithReserve;
   
   /**
    * Map from input market bidders to market with reserve bidders.
@@ -81,8 +90,10 @@ public class MarketWithReservePrice {
     // There could be no surviving bidder. In that case we create a null market.
     if (newBidders.size() > 0) {
       this.marketWithReserve = new Market<Goods, Bidder<Goods>>(newGoods, newBidders);
+      this.biddersInMarketWithReserve = true;
     } else {
       this.marketWithReserve = null;
+      this.biddersInMarketWithReserve = false;
     }
   }
   
@@ -120,5 +131,39 @@ public class MarketWithReservePrice {
    */
   public double getReservePrice(){
     return this.reserve;
+  }
+  
+  /**
+   * Getter.
+   * 
+   * @return false if all bidders were dropped by the reserve price.
+   */
+  public boolean thereBiddersInTheMarketWithReserve(){
+    return this.biddersInMarketWithReserve;
+  }
+  
+  
+  /**
+   * Given a MarketAllocation for the MarketWithReserve, deduce an allocation
+   * for the original market from which the market with reserve was produced.
+   * 
+   * @param marketWithReserveObject
+   * @param allocForMarketWithReserve
+   * @return
+   * @throws MarketAllocationException
+   */
+  public MarketAllocation<Goods, Bidder<Goods>> deduceAllocation(MarketAllocation<Goods, Bidder<Goods>> allocForMarketWithReserve) throws MarketAllocationException{
+    
+    HashBasedTable<Goods,Bidder<Goods>,Integer> deducedAllocation = HashBasedTable.create();
+    for(Goods good : this.market.getGoods()){
+      for(Bidder<Goods> bidder : this.market.getBidders()){
+        if(this.bidderToBidderMap.containsKey(bidder)){
+          deducedAllocation.put(good, bidder, allocForMarketWithReserve.getAllocation(good, this.bidderToBidderMap.get(bidder)));
+        }else{
+          deducedAllocation.put(good, bidder, 0);
+        }
+      }
+    }
+    return new MarketAllocation<Goods, Bidder<Goods>>(this.market, deducedAllocation, allocForMarketWithReserve.getObjectiveFunction());
   }
 }

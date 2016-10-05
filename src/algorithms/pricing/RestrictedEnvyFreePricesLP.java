@@ -13,7 +13,6 @@ import structures.Bidder;
 import structures.Goods;
 import structures.MarketAllocation;
 import structures.exceptions.MarketAllocationException;
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -25,7 +24,7 @@ import com.google.common.collect.ImmutableMap.Builder;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RestrictedEnvyFreePricesLP<O extends ObjectiveFunction> {
+public class RestrictedEnvyFreePricesLP {
   
   /**
    * Boolean to control whether or not to output information.
@@ -35,7 +34,7 @@ public class RestrictedEnvyFreePricesLP<O extends ObjectiveFunction> {
   /**
    * Market Allocation Object. Contains the market and the allocation.
    */
-  protected MarketAllocation<Goods, Bidder<Goods>, O> allocatedMarket;
+  protected MarketAllocation<Goods, Bidder<Goods>> allocatedMarket;
   
   /**
    * Contains all the linear constrains
@@ -64,7 +63,7 @@ public class RestrictedEnvyFreePricesLP<O extends ObjectiveFunction> {
    * @param allocatedMarket - a MarketAllocation object.
    * @throws IloException in case the LP failed.
    */
-  public RestrictedEnvyFreePricesLP(MarketAllocation<Goods, Bidder<Goods>, O> allocatedMarket) throws IloException {
+  public RestrictedEnvyFreePricesLP(MarketAllocation<Goods, Bidder<Goods>> allocatedMarket) throws IloException {
     this.allocatedMarket = allocatedMarket;
     this.cplex = new IloCplex();
     // Create a map from goods to a numbers. This gives ordering of the goods.
@@ -229,8 +228,8 @@ public class RestrictedEnvyFreePricesLP<O extends ObjectiveFunction> {
    * 
    * @return an EnvyFreePricesSolutionLP object with the solution of the LP.
    */
-  public RestrictedEnvyFreePricesLPSolution<O> Solve() {
-    RestrictedEnvyFreePricesLPSolution<O> Solution = new RestrictedEnvyFreePricesLPSolution<O>(this.allocatedMarket , null, "", -1);
+  public RestrictedEnvyFreePricesLPSolution Solve() {
+    RestrictedEnvyFreePricesLPSolution Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket , null, "", -1);
     try {
       // Solve the LP.
       if (this.cplex.solve()) {
@@ -239,9 +238,9 @@ public class RestrictedEnvyFreePricesLP<O extends ObjectiveFunction> {
         for(Goods good : this.allocatedMarket.getMarket().getGoods()){
           result.put(good, LP_Prices[this.goodToPriceIndex.get(good)]);
         }
-        Solution = new RestrictedEnvyFreePricesLPSolution<O>(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(), this.cplex.getObjValue());
+        Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(), this.cplex.getObjValue());
       } else {
-        Solution = new RestrictedEnvyFreePricesLPSolution<O>(this.allocatedMarket, null, this.cplex.getStatus().toString(), -1);
+        Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket, null, this.cplex.getStatus().toString(), -1);
       }
       if (this.verbose) {
         System.out.println("Solution status = " + this.cplex.getStatus());

@@ -25,8 +25,8 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyMultiStepAllocation<O extends ObjectiveFunction> implements
-    AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, O> {
+public class GreedyMultiStepAllocation implements
+    AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
 
   /**
    * stepSize. Impressions get allocated in multiples of this step only.
@@ -37,7 +37,7 @@ public class GreedyMultiStepAllocation<O extends ObjectiveFunction> implements
    * objective function that indicates how good is to allocate one chunk of a
    * bidder.
    */
-  protected O f;
+  protected ObjectiveFunction f;
 
   /**
    * Constructor.
@@ -49,7 +49,7 @@ public class GreedyMultiStepAllocation<O extends ObjectiveFunction> implements
    *          - the objective function of bidders.
    * @throws AllocationAlgoException
    */
-  public GreedyMultiStepAllocation(int stepSize, O f)
+  public GreedyMultiStepAllocation(int stepSize, ObjectiveFunction f)
       throws AllocationAlgoException {
     if (stepSize <= 0) {
       throw new AllocationAlgoException(AllocationAlgoErrorCodes.STEP_NEGATIVE);
@@ -79,7 +79,7 @@ public class GreedyMultiStepAllocation<O extends ObjectiveFunction> implements
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>, O> Solve(Market<Goods, Bidder<Goods>> market) throws GoodsException, AllocationException, MarketAllocationException {
+  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws GoodsException, AllocationException, MarketAllocationException {
     HashBasedTable<Goods,Bidder<Goods>,Integer> allocation = HashBasedTable.create();
     for(Goods good : market.getGoods()){
       for(Bidder<Goods> bidder : market.getBidders()){
@@ -151,7 +151,7 @@ public class GreedyMultiStepAllocation<O extends ObjectiveFunction> implements
       }
       goodNotFound = true;
     }
-    return new MarketAllocation<Goods, Bidder<Goods>, O>(market, allocation, this.f);
+    return new MarketAllocation<Goods, Bidder<Goods>>(market, allocation, this.f);
   }
 
   /**
@@ -237,7 +237,7 @@ public class GreedyMultiStepAllocation<O extends ObjectiveFunction> implements
    * Implements AllocationAlgoInterface
    */
   @Override
-  public O getObjectiveFunction() {
+  public ObjectiveFunction getObjectiveFunction() {
     return this.f;
   }
   

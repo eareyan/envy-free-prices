@@ -1,6 +1,5 @@
 package algorithms.pricing;
 
-import allocations.objectivefunction.interfaces.SafeReserveFunction;
 import ilog.concert.IloException;
 import structures.Bidder;
 import structures.Goods;
@@ -14,9 +13,9 @@ import structures.exceptions.MarketAllocationException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RestrictedEnvyFreePricesLPWithReserve<T extends SafeReserveFunction> extends RestrictedEnvyFreePricesLP<T>{
+public class RestrictedEnvyFreePricesLPWithReserve extends RestrictedEnvyFreePricesLP{
 
-  public RestrictedEnvyFreePricesLPWithReserve(MarketAllocation<Goods, Bidder<Goods>, T> allocatedMarket) throws IloException {
+  public RestrictedEnvyFreePricesLPWithReserve(MarketAllocation<Goods, Bidder<Goods>> allocatedMarket) throws IloException {
     super(allocatedMarket);
   }
   

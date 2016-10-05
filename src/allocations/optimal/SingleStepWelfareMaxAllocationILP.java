@@ -28,7 +28,7 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, SingleStepFunction> {
+public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
   
   /**
    * Boolean to control whether or not to output.
@@ -61,7 +61,7 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
+  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
     try {
       IloCplex cplex = new IloCplex();
       if (!this.verbose){
@@ -177,7 +177,7 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
             alloc.put(good, bidder , (int) Math.round(Solutions.get(0)[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]));    
           }
         }
-        return new MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction>(market, alloc, this.getObjectiveFunction());
+        return new MarketAllocation<Goods, Bidder<Goods>>(market, alloc, this.getObjectiveFunction());
       }
     } catch (IloException e) {
       // Report that CPLEX failed.

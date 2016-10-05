@@ -2,7 +2,6 @@ package structures.comparators;
 
 import java.util.Comparator;
 
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
 import structures.Bidder;
 import structures.Goods;
 import structures.MarketOutcome;
@@ -14,9 +13,9 @@ import structures.exceptions.MarketOutcomeException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketPricesComparatorBySellerRevenue<O extends ObjectiveFunction> implements Comparator<MarketOutcome<Goods, Bidder<Goods>, O>> {
+public class MarketPricesComparatorBySellerRevenue implements Comparator<MarketOutcome<Goods, Bidder<Goods>>> {
   @Override
-  public int compare(MarketOutcome<Goods, Bidder<Goods>, O> MP1, MarketOutcome<Goods, Bidder<Goods>, O> MP2) {
+  public int compare(MarketOutcome<Goods, Bidder<Goods>> MP1, MarketOutcome<Goods, Bidder<Goods>> MP2) {
     try {
       if (MP1.sellerRevenue() < MP2.sellerRevenue()) {
         return 1;

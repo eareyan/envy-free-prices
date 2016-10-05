@@ -2,7 +2,6 @@ package structures;
 
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketOutcomeException;
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -17,13 +16,13 @@ import com.google.common.collect.ImmutableMap;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketOutcome <G extends Goods, B extends Bidder<G>, O extends ObjectiveFunction>{
+public class MarketOutcome <G extends Goods, B extends Bidder<G>>{
   
   /**
    * Market Allocation Object. Contains a market object and an allocation
    * (matrix of integers).
    */
-  protected final MarketAllocation<G, B, O> marketAllocation;
+  protected final MarketAllocation<G, B> marketAllocation;
   
   /**
    * This map defines a price for each good.
@@ -36,7 +35,7 @@ public class MarketOutcome <G extends Goods, B extends Bidder<G>, O extends Obje
    * @param marketAllocation - a MarketAllocation object.
    * @param prices - a map from goods to doubles.
    */
-  public MarketOutcome(MarketAllocation<G, B, O> marketAllocation, ImmutableMap<G, Double> prices) {
+  public MarketOutcome(MarketAllocation<G, B> marketAllocation, ImmutableMap<G, Double> prices) {
     this.marketAllocation = marketAllocation;
     this.prices = prices;
   }
@@ -45,7 +44,7 @@ public class MarketOutcome <G extends Goods, B extends Bidder<G>, O extends Obje
    * Getter.
    * @return a MarketAllocation object.
    */
-  public MarketAllocation<G, B, O> getMarketAllocation() {
+  public MarketAllocation<G, B> getMarketAllocation() {
     return this.marketAllocation;
   }
 

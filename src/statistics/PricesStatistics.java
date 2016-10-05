@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
 import structures.Bidder;
 import structures.Goods;
 import structures.MarketOutcome;
@@ -20,12 +19,12 @@ import structures.exceptions.MarketOutcomeException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class PricesStatistics <G extends Goods, B extends Bidder<G>, O extends ObjectiveFunction>{
+public class PricesStatistics <G extends Goods, B extends Bidder<G>>{
 
   /**
    * MarketPrices object.
    */
-  protected MarketOutcome<G, B, O> marketPrices;
+  protected MarketOutcome<G, B> marketPrices;
 
   /**
    * epsilon parameter.
@@ -37,7 +36,7 @@ public class PricesStatistics <G extends Goods, B extends Bidder<G>, O extends O
    * 
    * @param marketPrices - a MarketPrices object.
    */
-  public PricesStatistics(MarketOutcome<G, B, O> marketPrices) {
+  public PricesStatistics(MarketOutcome<G, B> marketPrices) {
     this.marketPrices = marketPrices;
   }
 

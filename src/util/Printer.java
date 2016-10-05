@@ -2,7 +2,6 @@ package util;
 
 import java.text.DecimalFormat;
 
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
 import statistics.PricesStatistics;
 import structures.Bidder;
 import structures.Goods;
@@ -143,7 +142,7 @@ public class Printer {
    * @throws MarketOutcomeException
    * @throws MarketAllocationException
    */
-  public static<O extends ObjectiveFunction> void PrintOutcomeInfo(MarketOutcome<Goods,Bidder<Goods>, O> outcome) throws MarketOutcomeException, MarketAllocationException{
+  public static void PrintOutcomeInfo(MarketOutcome<Goods,Bidder<Goods>> outcome) throws MarketOutcomeException, MarketAllocationException{
     /* Statistics for the allocation.*/
     outcome.getMarketAllocation().printAllocation();
     outcome.printPrices();
@@ -156,7 +155,7 @@ public class Printer {
       System.out.println("B = " + outcome.getMarketAllocation().allocationToBidder(bidder) + " " + outcome.getMarketAllocation().isBidderBundleZero(bidder));
     }
     /* Statistics for the prices. */
-    PricesStatistics<Goods, Bidder<Goods>, O> pricesStatistics = new PricesStatistics<Goods, Bidder<Goods>, O>(outcome);
+    PricesStatistics<Goods, Bidder<Goods>> pricesStatistics = new PricesStatistics<Goods, Bidder<Goods>>(outcome);
     System.out.println("MC Violations : " + pricesStatistics.computeMarketClearanceViolations()[0] + "," + pricesStatistics.computeMarketClearanceViolations()[1]);
     System.out.println("EF violations : " + pricesStatistics.numberOfEnvyBidders());
   }

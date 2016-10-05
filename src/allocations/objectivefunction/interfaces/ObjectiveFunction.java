@@ -18,4 +18,10 @@ public interface ObjectiveFunction {
    */
   public double getObjective(double reward, double total, double x);
   
+  /**
+   * 
+   * @return true if this objective is safe to be used with reserve prices.
+   */
+  public boolean isSafeForReserve();
+  
 }

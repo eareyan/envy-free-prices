@@ -23,7 +23,7 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>, SingleStepFunction> {
+public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
 
   /**
    * Bidder comparator.
@@ -74,7 +74,7 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
    * @throws GoodsException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationException, GoodsException, MarketAllocationException {
+  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationException, GoodsException, MarketAllocationException {
     // MAKE SHALLOW COPY OF BIDDERS - that is OK, you get the pointers anyway,
     // which you can't change up because they provide no mutable fields.
     ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>(market.getBidders());
@@ -123,7 +123,7 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
         }
       }
     }
-    return new MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction>(market, greedyAllocation, this.getObjectiveFunction());
+    return new MarketAllocation<Goods, Bidder<Goods>>(market, greedyAllocation, this.getObjectiveFunction());
   }
 
   @Override

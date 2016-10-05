@@ -1,7 +1,5 @@
 package algorithms.pricing;
 
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
-
 import com.google.common.collect.ImmutableMap;
 
 import structures.Bidder;
@@ -17,7 +15,7 @@ import structures.exceptions.MarketOutcomeException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RestrictedEnvyFreePricesLPSolution <O extends ObjectiveFunction> extends MarketOutcome<Goods, Bidder<Goods>, O> {
+public class RestrictedEnvyFreePricesLPSolution extends MarketOutcome<Goods, Bidder<Goods>> {
   
   /**
    * Status of the LP.
@@ -32,7 +30,7 @@ public class RestrictedEnvyFreePricesLPSolution <O extends ObjectiveFunction> ex
   /**
    * Constructor. Receives no parameters.
    */
-  public RestrictedEnvyFreePricesLPSolution(MarketAllocation<Goods, Bidder<Goods>, O> marketAllocation, ImmutableMap<Goods, Double> prices, String Status, double optimalValue) {
+  public RestrictedEnvyFreePricesLPSolution(MarketAllocation<Goods, Bidder<Goods>> marketAllocation, ImmutableMap<Goods, Double> prices, String Status, double optimalValue) {
     super(marketAllocation, prices);
     this.Status = Status;
     this.optimalValue = optimalValue;

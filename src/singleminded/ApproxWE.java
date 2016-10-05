@@ -110,7 +110,7 @@ public class ApproxWE {
    * @return a MarketPrices object.
    * @throws MarketAllocationException 
    */
-  public MarketOutcome<Goods, Bidder<Goods>, SingleStepFunction> Solve() throws MarketAllocationException {
+  public MarketOutcome<Goods, Bidder<Goods>> Solve() throws MarketAllocationException {
     // Keep iterating while there still are bidders that can be allocated.
     while (!matrixAllFalse(this.A)) {
       // Find the commodity which attracts most bidders.
@@ -183,8 +183,8 @@ public class ApproxWE {
     for(Goods good : this.M.getGoods()){
       result.put(good, this.p[this.goodsToIndex.get(good)]);
     }
-    MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction> x = new MarketAllocation<Goods, Bidder<Goods>, SingleStepFunction>(this.M, allocation, new SingleStepFunction());
-    return new MarketOutcome<Goods, Bidder<Goods>, SingleStepFunction>(x , result.build());
+    MarketAllocation<Goods, Bidder<Goods>> x = new MarketAllocation<Goods, Bidder<Goods>>(this.M, allocation, new SingleStepFunction());
+    return new MarketOutcome<Goods, Bidder<Goods>>(x , result.build());
   }
   
   /**

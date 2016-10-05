@@ -28,7 +28,7 @@ import allocations.objectivefunction.interfaces.ObjectiveFunction;
  * @param <G>
  * @param <B>
  */
-public interface AllocationAlgo<M extends Market<G, B>, G extends Goods, B extends Bidder<G>, O extends ObjectiveFunction> {
+public interface AllocationAlgo<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
 
   /**
    * The most important method of an allocation algorithm. Given a Market,
@@ -44,11 +44,11 @@ public interface AllocationAlgo<M extends Market<G, B>, G extends Goods, B exten
    * @throws GoodsException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<G, B, O> Solve(M market) throws IloException, AllocationAlgoException, BidderCreationException, GoodsCreationException, AllocationException, GoodsException, MarketAllocationException;
+  public MarketAllocation<G, B> Solve(M market) throws IloException, AllocationAlgoException, BidderCreationException, GoodsCreationException, AllocationException, GoodsException, MarketAllocationException;
 
   /**
    * This method defines the objective function that was used to allocate the
    * market.
    */
-  public O getObjectiveFunction();
+  public ObjectiveFunction getObjectiveFunction();
 }
