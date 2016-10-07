@@ -52,12 +52,14 @@ public class Market<G extends Goods, B extends Bidder<G>> {
    * @throws MarketCreationException 
    */
   public Market(ArrayList<G> goods, ArrayList<B> bidders) throws MarketCreationException{
+    // Create immutable goods list.
     if(goods.size() == 0){
       throw new MarketCreationException("A market must contain at least one good.");
     }
     ImmutableList.Builder<G> goodsBuilder = ImmutableList.builder();
     goodsBuilder.addAll(goods);
     this.goods = goodsBuilder.build();
+    // Create immutable bidders list.
     if(bidders.size() == 0){
       throw new MarketCreationException("A market must contain at least one bidder");
     }
@@ -65,6 +67,7 @@ public class Market<G extends Goods, B extends Bidder<G>> {
     biddersBuilder.addAll(bidders);
     this.bidders = biddersBuilder.build();
   }
+  
   /**
    * Gets the array of bidders.
    * 

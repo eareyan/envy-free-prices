@@ -112,13 +112,19 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
         // Try to allocate goods to this bidder, one good at the time.
         int totalAllocationToBidderSoFar = 0;
         for (Goods good : goods) {
-          // If the good is in the bidder demand set, AND there is supply 
-          // remaining from this good, AND the bidder is not completely allocated. 
-          if (bidder.demandsGood(good) && good.getRemainingSupply() > 0 && totalAllocationToBidderSoFar < bidder.getDemand()) {
-            int amount = Math.min(bidder.getDemand() - totalAllocationToBidderSoFar, good.getRemainingSupply());
-            greedyAllocation.put(good, bidder, amount);
-            good.setRemainingSupply(good.getRemainingSupply() - amount);
-            totalAllocationToBidderSoFar += amount;
+          // If the bidder is not completely allocated. 
+          if (totalAllocationToBidderSoFar < bidder.getDemand()){
+            // If good is in the bidder demand set, AND there is supply 
+            // remaining from this good.
+            if (bidder.demandsGood(good) && good.getRemainingSupply() > 0) {
+              int amount = Math.min(bidder.getDemand() - totalAllocationToBidderSoFar, good.getRemainingSupply());
+              greedyAllocation.put(good, bidder, amount);
+              good.setRemainingSupply(good.getRemainingSupply() - amount);
+              totalAllocationToBidderSoFar += amount;
+            }
+          }else{
+            // Optimization: If the bidder is already allocated, move on to the next bidder.
+            break;
           }
         }
       }

@@ -47,7 +47,6 @@ public class Main {
    * @throws MarketCreationException 
    * @throws PrincingAlgoException 
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   public static<O extends ObjectiveFunction> void main(String[] args) throws IloException, BidderCreationException, AllocationAlgoException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException, PrincingAlgoException {
 
     ArrayList<Market<Goods,Bidder<Goods>>> marketList = new ArrayList<Market<Goods,Bidder<Goods>>>();
@@ -71,7 +70,7 @@ public class Main {
     // marketList.add(SingleMindedMarketFactory.discountSingleMindedMarket(SingleMindedMarkets.singleMinded1(), 20.0));
     
     //ArrayList<AllocationAlgoInterface<Market<Goods,Bidder<Goods>>,Goods,Bidder<Goods>,ObjectiveFunction>> algosList = new ArrayList<AllocationAlgoInterface<Market<Goods,Bidder<Goods>>,Goods,Bidder<Goods>,ObjectiveFunction>>();
-    ArrayList<AllocationAlgo> algosList = new ArrayList<AllocationAlgo>();
+    ArrayList<AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>> algosList = new ArrayList<AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>>();
     algosList.add(new GreedyAllocation());
     algosList.add(new SingleStepWelfareMaxAllocationILP());
     // algosList.add(new GreedyMultiStepAllocation<O>(1, new IdentityObjectiveFunction()));
@@ -83,7 +82,7 @@ public class Main {
     for (Market<Goods, Bidder<Goods>> M : marketList) {
       System.out.println("********/*************/************");
       Printer.PrintMarketInfo(M);      
-      for(AllocationAlgo algo : algosList){
+      for(AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> algo : algosList){
         /* Allocate Market.  */
         MarketAllocation<Goods, Bidder<Goods>> alloc = algo.Solve(M);
         System.out.println(algo + " Alloc");
