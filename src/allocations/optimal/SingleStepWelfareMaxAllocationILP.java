@@ -28,7 +28,7 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
+public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements AllocationAlgo<M, G, B> {
   
   /**
    * Boolean to control whether or not to output.
@@ -61,7 +61,7 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
+  public MarketAllocation<G, B> Solve(M market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
     try {
       IloCplex cplex = new IloCplex();
       if (!this.verbose){
@@ -79,8 +79,8 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
        * These next two maps point from a good (resp. a bidder) to a positive integer.
        * These maps are used to point from a bidder to its CPLEX variable.
        */
-      HashMap<Goods, Integer> goodToCPLEXIndex = new HashMap<Goods, Integer>();
-      HashMap<Bidder<Goods>, Integer> bidderToCPLEXIndex = new HashMap<Bidder<Goods>, Integer>();
+      HashMap<G, Integer> goodToCPLEXIndex = new HashMap<G, Integer>();
+      HashMap<B, Integer> bidderToCPLEXIndex = new HashMap<B, Integer>();
       for (int i = 0; i < market.getNumberGoods(); i++) {
         goodToCPLEXIndex.put(market.getGoods().get(i), i);
       }
@@ -90,12 +90,12 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
       // Variables
       IloNumVar[] indicatorVariable = cplex.boolVarArray(market.getNumberBidders());
       IloNumVar[][] allocationMatrixVariable = new IloNumVar[market.getNumberGoods()][];
-      for (Goods good : market.getGoods()) {
+      for (G good : market.getGoods()) {
         allocationMatrixVariable[goodToCPLEXIndex.get(good)] = cplex.intVarArray(market.getNumberBidders(), 0, Integer.MAX_VALUE);
       }
       // LP objective function. \sum_j R_j y_j
       IloLinearNumExpr obj = cplex.linearNumExpr();
-      for (Bidder<Goods> bidder : market.getBidders()) {
+      for (B bidder : market.getBidders()) {
         obj.addTerm(bidder.getReward(), indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
       }
       // System.out.println(obj);
@@ -103,10 +103,10 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
 
       // Constraint (1). Allocation from a good not connected to a bidder is zero.
       // Constraint (2). Allocation satisfies bidder.
-      for (Bidder<Goods> bidder : market.getBidders()) {
+      for (B bidder : market.getBidders()) {
         double coeff = 1.0 / ((double) bidder.getDemand());
         IloLinearNumExpr expr = cplex.linearNumExpr();
-        for (Goods good : market.getGoods()) {
+        for (G good : market.getGoods()) {
           if (bidder.demandsGood(good)) {
             expr.addTerm(coeff, allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
           } else {
@@ -118,9 +118,9 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
       }
  
       // Constrain (2). Allocation from goods can not be more than supply.
-      for (Goods good : market.getGoods()) {
+      for (G good : market.getGoods()) {
         IloLinearNumExpr expr = cplex.linearNumExpr();
-        for (Bidder<Goods> bidder : market.getBidders()) {
+        for (B bidder : market.getBidders()) {
           expr.addTerm(1.0, allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
         }
         cplex.addLe(expr, good.getSupply());
@@ -150,13 +150,13 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
            */
           int[][] sol = new int[market.getNumberGoods()][market.getNumberBidders()];
           double[][] solDouble = new double[market.getNumberGoods()][market.getNumberBidders()];
-          for (Goods good : market.getGoods()) {
+          for (G good : market.getGoods()) {
             solDouble[goodToCPLEXIndex.get(good)] = cplex.getValues(allocationMatrixVariable[goodToCPLEXIndex.get(good)], l);
             /*
              * Unfortunately in Java the only way to cast your array is to
              * iterate through each element and cast them one by one
              */
-            for (Bidder<Goods> bidder : market.getBidders()) {
+            for (B bidder : market.getBidders()) {
               sol[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = (int) Math.round(solDouble[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
             }
           }
@@ -164,20 +164,20 @@ public class SingleStepWelfareMaxAllocationILP implements AllocationAlgo<Market<
           if (verbose) {
             Printer.printMatrix(sol);
             System.out.println();
-            for (Bidder<Goods> bidder : market.getBidders()) {
+            for (B bidder : market.getBidders()) {
               System.out.println(cplex.getValue(indicatorVariable[bidderToCPLEXIndex.get(bidder)], l));
             }
           }
         }
         cplex.end();
         
-        HashBasedTable<Goods,Bidder<Goods>,Integer> alloc = HashBasedTable.create();
-        for(Goods good : market.getGoods()){
-          for(Bidder<Goods> bidder : market.getBidders()){
+        HashBasedTable<G, B, Integer> alloc = HashBasedTable.create();
+        for(G good : market.getGoods()){
+          for(B bidder : market.getBidders()){
             alloc.put(good, bidder , (int) Math.round(Solutions.get(0)[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]));    
           }
         }
-        return new MarketAllocation<Goods, Bidder<Goods>>(market, alloc, this.getObjectiveFunction());
+        return new MarketAllocation<G, B>(market, alloc, this.getObjectiveFunction());
       }
     } catch (IloException e) {
       // Report that CPLEX failed.

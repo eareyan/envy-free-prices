@@ -10,7 +10,7 @@ import structures.Goods;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GoodsComparatorByRemainingSupply implements Comparator<Goods> {
+public class GoodsComparatorByRemainingSupply<G extends Goods> implements Comparator<G> {
   
   /**
    * order 1 means ASC and -1 means DESC, any other means no order
@@ -34,7 +34,7 @@ public class GoodsComparatorByRemainingSupply implements Comparator<Goods> {
   }
 
   @Override
-  public int compare(Goods U1, Goods U2) {
+  public int compare(G U1, G U2) {
     if (this.Order == -1) {
       if (U1.getRemainingSupply() < U2.getRemainingSupply()){
         return 1;

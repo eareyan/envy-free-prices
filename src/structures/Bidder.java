@@ -45,6 +45,9 @@ public class Bidder<G extends Goods> {
       throw new BidderCreationException("The reward of a bidder must be a positive double.");
     }
     this.reward = reward;
+    if (demandSet == null) {
+      throw new BidderCreationException("The demand set of a bidder cannot be null");
+    }
     this.demandSet = demandSet;
   }
   

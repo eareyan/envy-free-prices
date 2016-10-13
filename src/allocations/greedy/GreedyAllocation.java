@@ -23,17 +23,17 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
+public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements AllocationAlgo<M, G, B> {
 
   /**
    * Bidder comparator.
    */
-  protected Comparator<Bidder<Goods>> BidderComparator;
+  protected Comparator<B> BidderComparator;
 
   /**
    * Goods comparator
    */
-  protected Comparator<Goods> GoodsComparator;
+  protected Comparator<G> GoodsComparator;
 
   /**
    * Constructor.
@@ -41,7 +41,7 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
    * @param BidderComparator - a comparator to order bidders.
    * @param GoodsSupplyComparator - a comparator to order goods.
    */
-  public GreedyAllocation(Comparator<Bidder<Goods>> BidderComparator, Comparator<Goods> GoodsSupplyComparator) {
+  public GreedyAllocation(Comparator<B> BidderComparator, Comparator<G> GoodsSupplyComparator) {
     this.BidderComparator = BidderComparator;
     this.GoodsComparator = GoodsSupplyComparator;
   }
@@ -53,8 +53,8 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
    *          DESC, any other means no order
    */
   public GreedyAllocation(int goodsOrder) {
-    this.BidderComparator = new BiddersComparatorByRToSqrtIRatio();
-    this.GoodsComparator = new GoodsComparatorByRemainingSupply(goodsOrder);
+    this.BidderComparator = new BiddersComparatorByRToSqrtIRatio<G, B>();
+    this.GoodsComparator = new GoodsComparatorByRemainingSupply<G>(goodsOrder);
   }
   
   /**
@@ -74,33 +74,33 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
    * @throws GoodsException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws AllocationException, GoodsException, MarketAllocationException {
+  public MarketAllocation<G, B> Solve(M market) throws AllocationException, GoodsException, MarketAllocationException {
     // MAKE SHALLOW COPY OF BIDDERS - that is OK, you get the pointers anyway,
     // which you can't change up because they provide no mutable fields.
-    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>(market.getBidders());
+    ArrayList<B> bidders = new ArrayList<B>(market.getBidders());
     // Sort the copy of the list of market's bidders.
     Collections.sort(bidders, this.BidderComparator);
     // MAKE SHALLOW COPY OF GOODS.
-    ArrayList<Goods> goods = new ArrayList<Goods>(market.getGoods());
+    ArrayList<G> goods = new ArrayList<G>(market.getGoods());
     // Set the remaining supply of each good to be their initial supply.
     // This will be used to sort the users.
-    for(Goods good : goods){
+    for(G good : goods){
       good.setRemainingSupply(good.getSupply());
     }
     // Make the ArrayList that will store the result of the algorithm.
     // The allocation is zero at the beginning. 
-    HashBasedTable<Goods,Bidder<Goods>,Integer> greedyAllocation = HashBasedTable.create();
-    for(Goods good : market.getGoods()){
-      for(Bidder<Goods> bidder : market.getBidders()){
+    HashBasedTable<G, B, Integer> greedyAllocation = HashBasedTable.create();
+    for(G good : market.getGoods()){
+      for(B bidder : market.getBidders()){
         greedyAllocation.put(good, bidder, 0);
       }
     }
     
     // Allocate each bidder, if possible, one at a time.
-    for (Bidder<Goods> bidder : bidders) {
+    for (B bidder : bidders) {
       int totalAvailableSupply = 0;
       // First, compute if there is enough supply of goods to satisfy this bidder.
-      for (Goods good : goods) {
+      for (G good : goods) {
         if (bidder.demandsGood(good) && good.getRemainingSupply() > 0) {
           totalAvailableSupply += good.getRemainingSupply();
         }
@@ -111,7 +111,7 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
         Collections.sort(goods, this.GoodsComparator);
         // Try to allocate goods to this bidder, one good at the time.
         int totalAllocationToBidderSoFar = 0;
-        for (Goods good : goods) {
+        for (G good : goods) {
           // If the bidder is not completely allocated. 
           if (totalAllocationToBidderSoFar < bidder.getDemand()){
             // If good is in the bidder demand set, AND there is supply 
@@ -129,7 +129,7 @@ public class GreedyAllocation implements AllocationAlgo<Market<Goods, Bidder<Goo
         }
       }
     }
-    return new MarketAllocation<Goods, Bidder<Goods>>(market, greedyAllocation, this.getObjectiveFunction());
+    return new MarketAllocation<G, B>(market, greedyAllocation, this.getObjectiveFunction());
   }
 
   @Override

@@ -25,8 +25,7 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class GreedyMultiStepAllocation implements
-    AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> {
+public class GreedyMultiStepAllocation<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements AllocationAlgo<M, G, B> {
 
   /**
    * stepSize. Impressions get allocated in multiples of this step only.
@@ -79,21 +78,21 @@ public class GreedyMultiStepAllocation implements
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<Goods, Bidder<Goods>> Solve(Market<Goods, Bidder<Goods>> market) throws GoodsException, AllocationException, MarketAllocationException {
-    HashBasedTable<Goods,Bidder<Goods>,Integer> allocation = HashBasedTable.create();
-    for(Goods good : market.getGoods()){
-      for(Bidder<Goods> bidder : market.getBidders()){
+  public MarketAllocation<G, B> Solve(M market) throws GoodsException, AllocationException, MarketAllocationException {
+    HashBasedTable<G, B,Integer> allocation = HashBasedTable.create();
+    for(G good : market.getGoods()){
+      for(B bidder : market.getBidders()){
         allocation.put(good, bidder, 0);
       }
     }
     
-    HashMap<Bidder<Goods>, Integer> currentAllocationToBidder = new HashMap<Bidder<Goods>, Integer>();
+    HashMap<B, Integer> currentAllocationToBidder = new HashMap<B, Integer>();
     /*
      * First, compute a queue of goods. A good's remaining supply is set to its
      * initial supply.
      */
-    PriorityQueue<Goods> goodsQueue = new PriorityQueue<Goods>(new GoodsComparatorByRemainingSupply(1));
-    for (Goods good : market.getGoods()) {
+    PriorityQueue<G> goodsQueue = new PriorityQueue<G>(new GoodsComparatorByRemainingSupply<G>(1));
+    for (G good : market.getGoods()) {
       good.setRemainingSupply(good.getSupply());
       goodsQueue.add(good);
     }
@@ -102,7 +101,7 @@ public class GreedyMultiStepAllocation implements
      * has a positive value and has not been fully allocated.
      */
     PriorityQueue<bidderValue> biddersQueue = new PriorityQueue<bidderValue>(new BidderValueComparator());
-    for (Bidder<Goods> bidder : market.getBidders()) {
+    for (B bidder : market.getBidders()) {
       currentAllocationToBidder.put(bidder, 0); // Allocation to any bidder to start is zero.
       double value = this.f.getObjective(bidder.getReward(), bidder.getDemand(), currentAllocationToBidder.get(bidder) + this.stepSize)
                      - this.f.getObjective(bidder.getReward(), bidder.getDemand(), currentAllocationToBidder.get(bidder));
@@ -113,9 +112,9 @@ public class GreedyMultiStepAllocation implements
     boolean goodNotFound = true;
     bidderValue bidderValue;
     while ((bidderValue = biddersQueue.poll()) != null) {
-      Goods good;
-      Bidder<Goods> bidder = bidderValue.getBidder();
-      ArrayList<Goods> auxGoodsSupplyList = new ArrayList<Goods>();
+      G good;
+      B bidder = bidderValue.getBidder();
+      ArrayList<G> auxGoodsSupplyList = new ArrayList<G>();
       // Looking for a good connected to this bidder with enough supply.
       while (goodNotFound && (good = goodsQueue.poll()) != null) {
         if (bidder.demandsGood(good) && good.getSupply() >= this.stepSize) {
@@ -132,7 +131,7 @@ public class GreedyMultiStepAllocation implements
         }
       }
       // Add goods that were pulled out of the goodsQueue back to the queue.
-      for (Goods g : auxGoodsSupplyList) {
+      for (G g : auxGoodsSupplyList) {
         goodsQueue.add(g);
       }
       /*
@@ -151,7 +150,7 @@ public class GreedyMultiStepAllocation implements
       }
       goodNotFound = true;
     }
-    return new MarketAllocation<Goods, Bidder<Goods>>(market, allocation, this.f);
+    return new MarketAllocation<G, B>(market, allocation, this.f);
   }
 
   /**
@@ -164,7 +163,7 @@ public class GreedyMultiStepAllocation implements
     /**
      * Bidder index.
      */
-    final protected Bidder<Goods> bidder;
+    final protected B bidder;
 
     /**
      * Bidder value.
@@ -177,7 +176,7 @@ public class GreedyMultiStepAllocation implements
      * @param bidder - a bidder object.
      * @param value - the bidder value.
      */
-    public bidderValue(Bidder<Goods> bidder, double value) {
+    public bidderValue(B bidder, double value) {
       this.bidder = bidder;
       this.value = value;
     }
@@ -187,7 +186,7 @@ public class GreedyMultiStepAllocation implements
      * 
      * @return bidder index.
      */
-    public Bidder<Goods> getBidder() {
+    public B getBidder() {
       return this.bidder;
     }
 

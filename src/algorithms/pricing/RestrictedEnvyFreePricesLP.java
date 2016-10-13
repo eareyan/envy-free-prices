@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import structures.Bidder;
 import structures.Goods;
+import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.MarketAllocationException;
 
@@ -24,7 +25,7 @@ import com.google.common.collect.ImmutableMap.Builder;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RestrictedEnvyFreePricesLP {
+public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
   
   /**
    * Boolean to control whether or not to output information.
@@ -34,7 +35,7 @@ public class RestrictedEnvyFreePricesLP {
   /**
    * Market Allocation Object. Contains the market and the allocation.
    */
-  protected MarketAllocation<Goods, Bidder<Goods>> allocatedMarket;
+  protected MarketAllocation<G, B> allocatedMarket;
   
   /**
    * Contains all the linear constrains
@@ -44,7 +45,7 @@ public class RestrictedEnvyFreePricesLP {
   /**
    * This map is used internally to map goods to indices for CPLEX variables.
    */
-  protected final HashMap<Goods, Integer> goodToPriceIndex;
+  protected final HashMap<G, Integer> goodToPriceIndex;
   
   /**
    * Objects needed to interface with CPlex Library.
@@ -63,11 +64,11 @@ public class RestrictedEnvyFreePricesLP {
    * @param allocatedMarket - a MarketAllocation object.
    * @throws IloException in case the LP failed.
    */
-  public RestrictedEnvyFreePricesLP(MarketAllocation<Goods, Bidder<Goods>> allocatedMarket) throws IloException {
+  public RestrictedEnvyFreePricesLP(MarketAllocation<G, B> allocatedMarket) throws IloException {
     this.allocatedMarket = allocatedMarket;
     this.cplex = new IloCplex();
     // Create a map from goods to a numbers. This gives ordering of the goods.
-    this.goodToPriceIndex = new HashMap<Goods, Integer>();
+    this.goodToPriceIndex = new HashMap<G, Integer>();
     for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
       goodToPriceIndex.put(this.allocatedMarket.getMarket().getGoods().get(i), i);
     }    
@@ -83,8 +84,8 @@ public class RestrictedEnvyFreePricesLP {
   protected void generateObjectiveFunction() throws IloException, MarketAllocationException{
     // Create the objective function, i.e., the sum of all the prices.
     IloLinearNumExpr objective = this.cplex.linearNumExpr();
-    for (Goods good : this.allocatedMarket.getMarket().getGoods()) {
-      for (Bidder<Goods> bidder : this.allocatedMarket.getMarket().getBidders()) {
+    for (G good : this.allocatedMarket.getMarket().getGoods()) {
+      for (B bidder : this.allocatedMarket.getMarket().getBidders()) {
         objective.addTerm(this.allocatedMarket.getAllocation(good, bidder), this.prices[this.goodToPriceIndex.get(good)]);
       }
     }
@@ -101,11 +102,11 @@ public class RestrictedEnvyFreePricesLP {
     if (this.verbose) {
       System.out.println("--- Start to generate Compact Conditions ---");
     }
-    for (Goods good_i : this.allocatedMarket.getMarket().getGoods()) {
-      for (Bidder<Goods> bidder : this.allocatedMarket.getMarket().getBidders()) {
+    for (G good_i : this.allocatedMarket.getMarket().getGoods()) {
+      for (B bidder : this.allocatedMarket.getMarket().getBidders()) {
         if (this.allocatedMarket.getAllocation(good_i, bidder) > 0) {
           //In this case we have to add a condition for the compact condition.
-          for (Goods good_k : this.allocatedMarket.getMarket().getGoods()) {
+          for (G good_k : this.allocatedMarket.getMarket().getGoods()) {
             // If good k is connected to bidder j, and good k does not supply all of its items to bidder j.
             if (good_i != good_k && bidder.demandsGood(good_k) && this.allocatedMarket.getAllocation(good_k,bidder) < good_k.getSupply()) {
               if (this.verbose) {
@@ -135,12 +136,12 @@ public class RestrictedEnvyFreePricesLP {
    * @throws MarketAllocationException 
    */
   protected void generateIndividualRationalityConditions() throws IloException, MarketAllocationException {
-    for (Bidder<Goods> bidder : this.allocatedMarket.getMarket().getBidders()) {
+    for (B bidder : this.allocatedMarket.getMarket().getBidders()) {
       // Check if this bidder received at least one copy of a good. 
       if (!this.allocatedMarket.isBidderBundleZero(bidder)) {
         IloLinearNumExpr lhs = cplex.linearNumExpr();
         //int counter = 0;
-        for (Goods good : this.allocatedMarket.getMarket().getGoods()) {
+        for (G good : this.allocatedMarket.getMarket().getGoods()) {
           if (this.allocatedMarket.getAllocation(good, bidder) > 0) {
             lhs.addTerm(this.allocatedMarket.getAllocation(good, bidder), this.prices[this.goodToPriceIndex.get(good)]);
             //counter += this.allocatedMarket.getAllocation(good, bidder);
@@ -163,7 +164,7 @@ public class RestrictedEnvyFreePricesLP {
    */
   protected void generateBoundConditions() throws IloException {
     double highestReward = this.allocatedMarket.getMarket().getHighestReward();
-    for (Goods good : this.allocatedMarket.getMarket().getGoods()) {
+    for (G good : this.allocatedMarket.getMarket().getGoods()) {
       this.linearConstrains.add(this.cplex.addLe(this.prices[this.goodToPriceIndex.get(good)], Math.ceil(highestReward)));
     }
   }  
@@ -185,7 +186,7 @@ public class RestrictedEnvyFreePricesLP {
    * @throws MarketAllocationException 
    */
   protected void generateMarketClearanceConditions() throws IloException, MarketAllocationException {
-    for (Goods good : this.allocatedMarket.getMarket().getGoods()) {
+    for (G good : this.allocatedMarket.getMarket().getGoods()) {
       if (this.allocatedMarket.allocationFromGood(good) == 0) {
         this.linearConstrains.add(this.cplex.addLe(this.prices[this.goodToPriceIndex.get(good)], 0.0));
         this.linearConstrains.add(this.cplex.addGe(this.prices[this.goodToPriceIndex.get(good)], 0.0));
@@ -228,19 +229,19 @@ public class RestrictedEnvyFreePricesLP {
    * 
    * @return an EnvyFreePricesSolutionLP object with the solution of the LP.
    */
-  public RestrictedEnvyFreePricesLPSolution Solve() {
-    RestrictedEnvyFreePricesLPSolution Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket , null, "", -1);
+  public RestrictedEnvyFreePricesLPSolution<G, B> Solve() {
+    RestrictedEnvyFreePricesLPSolution<G, B> Solution = new RestrictedEnvyFreePricesLPSolution<G, B>(this.allocatedMarket , null, "", -1);
     try {
       // Solve the LP.
       if (this.cplex.solve()) {
         double[] LP_Prices = this.cplex.getValues(this.prices);
-        Builder<Goods, Double> result = ImmutableMap.<Goods, Double>builder();
-        for(Goods good : this.allocatedMarket.getMarket().getGoods()){
+        Builder<G, Double> result = ImmutableMap.<G, Double>builder();
+        for(G good : this.allocatedMarket.getMarket().getGoods()){
           result.put(good, LP_Prices[this.goodToPriceIndex.get(good)]);
         }
-        Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(), this.cplex.getObjValue());
+        Solution = new RestrictedEnvyFreePricesLPSolution<G, B>(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(), this.cplex.getObjValue());
       } else {
-        Solution = new RestrictedEnvyFreePricesLPSolution(this.allocatedMarket, null, this.cplex.getStatus().toString(), -1);
+        Solution = new RestrictedEnvyFreePricesLPSolution<G, B>(this.allocatedMarket, null, this.cplex.getStatus().toString(), -1);
       }
       if (this.verbose) {
         System.out.println("Solution status = " + this.cplex.getStatus());

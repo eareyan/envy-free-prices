@@ -44,8 +44,8 @@ public class allocation extends Experiments {
         // Create a random Market.
         Market<Goods, Bidder<Goods>> randomMarket = RandomMarketFactory.randomMarket(numUsers, numCampaigns, prob);
         // Compute different allocations.
-        MarketAllocation<Goods, Bidder<Goods>> efficient = new SingleStepWelfareMaxAllocationILP().Solve(randomMarket);
-        MarketAllocation<Goods, Bidder<Goods>> greedy = new GreedyMultiStepAllocation(1, new EffectiveReachRatio()).Solve(randomMarket);
+        MarketAllocation<Goods, Bidder<Goods>> efficient = new SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(randomMarket);
+        MarketAllocation<Goods, Bidder<Goods>> greedy = new GreedyMultiStepAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(1, new EffectiveReachRatio()).Solve(randomMarket);
         /* Compute statistics */
         double greedyValue = greedy.value();
         double efficientValue = efficient.value();

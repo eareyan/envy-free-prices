@@ -58,7 +58,7 @@ public class single_minded extends Experiments{
 				
 				/* Efficient Allocation */
 				//System.out.println("===== Efficient Alloc ======");
-				MarketAllocation<Goods, Bidder<Goods>> efficientAlloc = new SingleStepWelfareMaxAllocationILP().Solve(M);
+				MarketAllocation<Goods, Bidder<Goods>> efficientAlloc = new SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
 				//Printer.printMatrix(efficientAlloc.getAllocation());
 				//System.out.println("efficientWelfare = " + efficientAlloc.value());
 				double optimalWelfare = efficientAlloc.value();
@@ -81,10 +81,10 @@ public class single_minded extends Experiments{
 				startTime = System.nanoTime();
 				endTime = System.nanoTime();
 				//--LP
-				RestrictedEnvyFreePricesLP efp = new RestrictedEnvyFreePricesLP(new GreedyAllocation().Solve(M));
+				RestrictedEnvyFreePricesLP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efp = new RestrictedEnvyFreePricesLP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M));
 				efp.setMarketClearanceConditions(false);
 				efp.createLP();
-				RestrictedEnvyFreePricesLPSolution lpResult = efp.Solve();
+				RestrictedEnvyFreePricesLPSolution<Goods, Bidder<Goods>> lpResult = efp.Solve();
 				PricesStatistics<Goods, Bidder<Goods>> psGreedy = new PricesStatistics<Goods, Bidder<Goods>>(lpResult); 
 				greedyWelfare.addValue(NumberMethods.getRatio(lpResult.getMarketAllocation().value() , optimalWelfare));
 				greedyRevenue.addValue(NumberMethods.getRatio(lpResult.sellerRevenue() , optimalWelfare));

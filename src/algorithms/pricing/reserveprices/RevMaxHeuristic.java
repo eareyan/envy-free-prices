@@ -76,10 +76,10 @@ public class RevMaxHeuristic {
     //this.initialMarketAllocation.printAllocation();
     this.setOfSolutions = new ArrayList<MarketOutcome<Goods, Bidder<Goods>>>();
     // Create the first LP with no reserves.
-    RestrictedEnvyFreePricesLPWithReserve initialLP = new RestrictedEnvyFreePricesLPWithReserve(this.initialMarketAllocation);
+    RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> initialLP = new RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(this.initialMarketAllocation);
     initialLP.setMarketClearanceConditions(false);
     initialLP.createLP();
-    RestrictedEnvyFreePricesLPSolution initialSolution = initialLP.Solve();
+    RestrictedEnvyFreePricesLPSolution<Goods, Bidder<Goods>> initialSolution = initialLP.Solve();
     //initialSolution.printPrices();
     this.setOfSolutions = new ArrayList<MarketOutcome<Goods, Bidder<Goods>>>();
     //Add initial solution to set of solutions, so that we have a baseline with reserve prices all zero.
@@ -120,11 +120,11 @@ public class RevMaxHeuristic {
               MarketAllocation<Goods, Bidder<Goods>> allocForOriginalMarket = mwrp.deduceAllocation(allocForMarketWithReserve);
               //allocForOriginalMarket.printAllocation();
               // Run LP with reserve prices.
-              RestrictedEnvyFreePricesLPWithReserve efp = new RestrictedEnvyFreePricesLPWithReserve(allocForOriginalMarket);
+              RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efp = new RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(allocForOriginalMarket);
               efp.setMarketClearanceConditions(false);
               efp.createLP();
               efp.setReservePrice(reserve);
-              RestrictedEnvyFreePricesLPSolution refpSol = efp.Solve();
+              RestrictedEnvyFreePricesLPSolution<Goods, Bidder<Goods>> refpSol = efp.Solve();
               //System.out.println("Status = " + refpSol.getStatus());
               //refpSol.printPrices();
               //System.out.println(refpSol.sellerRevenue());

@@ -3,6 +3,7 @@ package algorithms.pricing;
 import ilog.concert.IloException;
 import structures.Bidder;
 import structures.Goods;
+import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.MarketAllocationException;
 
@@ -13,9 +14,9 @@ import structures.exceptions.MarketAllocationException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RestrictedEnvyFreePricesLPWithReserve extends RestrictedEnvyFreePricesLP{
+public class RestrictedEnvyFreePricesLPWithReserve<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> extends RestrictedEnvyFreePricesLP<M, G, B>{
 
-  public RestrictedEnvyFreePricesLPWithReserve(MarketAllocation<Goods, Bidder<Goods>> allocatedMarket) throws IloException {
+  public RestrictedEnvyFreePricesLPWithReserve(MarketAllocation<G, B> allocatedMarket) throws IloException {
     super(allocatedMarket);
   }
   
@@ -48,7 +49,7 @@ public class RestrictedEnvyFreePricesLPWithReserve extends RestrictedEnvyFreePri
    * @throws MarketAllocationException 
    */
   public void generateMarketClearanceConditionsWithReserve(double reserve) throws IloException, MarketAllocationException {
-    for (Goods good : this.allocatedMarket.getMarket().getGoods()) {
+    for (G good : this.allocatedMarket.getMarket().getGoods()) {
       if (this.allocatedMarket.allocationFromGood(good) == 0) {
         this.linearConstrains.add(this.cplex.addLe(this.prices[this.goodToPriceIndex.get(good)], reserve));
         this.linearConstrains.add(this.cplex.addGe(this.prices[this.goodToPriceIndex.get(good)], reserve));

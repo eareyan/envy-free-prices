@@ -1,7 +1,5 @@
 package algorithms.pricing;
 
-import com.google.common.collect.ImmutableMap;
-
 import structures.Bidder;
 import structures.Goods;
 import structures.MarketAllocation;
@@ -9,13 +7,15 @@ import structures.MarketOutcome;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketOutcomeException;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * This class stores the resulting envy-free prices from LP.
  * It extends MarketPrices.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RestrictedEnvyFreePricesLPSolution extends MarketOutcome<Goods, Bidder<Goods>> {
+public class RestrictedEnvyFreePricesLPSolution<G extends Goods, B extends Bidder<G>> extends MarketOutcome<G, B> {
   
   /**
    * Status of the LP.
@@ -30,7 +30,7 @@ public class RestrictedEnvyFreePricesLPSolution extends MarketOutcome<Goods, Bid
   /**
    * Constructor. Receives no parameters.
    */
-  public RestrictedEnvyFreePricesLPSolution(MarketAllocation<Goods, Bidder<Goods>> marketAllocation, ImmutableMap<Goods, Double> prices, String Status, double optimalValue) {
+  public RestrictedEnvyFreePricesLPSolution(MarketAllocation<G, B> marketAllocation, ImmutableMap<G, Double> prices, String Status, double optimalValue) {
     super(marketAllocation, prices);
     this.Status = Status;
     this.optimalValue = optimalValue;
