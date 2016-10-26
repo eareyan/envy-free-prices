@@ -49,7 +49,7 @@ public class Market<G extends Goods, B extends Bidder<G>> {
    * 
    * @param goods - an ArrayList of goods.
    * @param bidders - an ArrayList of bidders.
-   * @throws MarketCreationException 
+   * @throws MarketCreationException in case either list is null or empty.
    */
   public Market(ArrayList<G> goods, ArrayList<B> bidders) throws MarketCreationException{
     // Create immutable goods list.
@@ -59,15 +59,42 @@ public class Market<G extends Goods, B extends Bidder<G>> {
     ImmutableList.Builder<G> goodsBuilder = ImmutableList.builder();
     goodsBuilder.addAll(goods);
     this.goods = goodsBuilder.build();
+    // Sets bidders
+    this.setBidders(bidders);
+  }
+  
+  /**
+   * Constructor. 
+   * 
+   * @param goods - an ImmutableList of goods.
+   * @param bidder - an ArrayList of bidders.
+   * @throws MarketCreationException in case either list is null or empty.
+   */
+  public Market(ImmutableList<G> goods, ArrayList<B> bidders) throws MarketCreationException {
+    if (goods == null || goods.size() == 0) {
+      throw new MarketCreationException("A market must contain at least one good.");
+    }
+    this.goods = goods;
+    //Sets bidders
+    this.setBidders(bidders);
+  }
+  
+  /**
+   * A private method that gets called only by constructors to set the bidders.
+   * 
+   * @param bidder - an ArrayList of bidders.
+   * @throws MarketCreationException in case the list is null or empty.
+   */
+  private void setBidders(ArrayList<B> bidders) throws MarketCreationException {
     // Create immutable bidders list.
-    if(bidders == null || bidders.size() == 0){
+    if (bidders == null || bidders.size() == 0) {
       throw new MarketCreationException("A market must contain at least one bidder");
     }
     ImmutableList.Builder<B> biddersBuilder = ImmutableList.builder();
     biddersBuilder.addAll(bidders);
     this.bidders = biddersBuilder.build();
   }
-  
+
   /**
    * Gets the array of bidders.
    * 
@@ -170,7 +197,7 @@ public class Market<G extends Goods, B extends Bidder<G>> {
    * @return a string representation of the information of goods in the market
    */
   protected String stringGoodsInfo() {
-    String ret = "";
+    String ret = "Goods Supply";
     for (G good : this.goods) {
       ret += "\nN = " + good.supply;
     }
@@ -199,7 +226,7 @@ public class Market<G extends Goods, B extends Bidder<G>> {
    * @return a string representation of the connection matrix.
    */
   protected String stringConnectionsMatrix() {
-    String ret = "";
+    String ret = "Connection Matrix";
     for (G good : this.goods) {
       ret += "\n";
       for (B bidder : this.bidders) {
@@ -221,9 +248,9 @@ public class Market<G extends Goods, B extends Bidder<G>> {
         + "NbrGoods:\t"
         + this.getNumberGoods()
         + "\n\n"
-        + this.stringBiddersInfo() + "\n"
-        + "\nGoods Supply" + this.stringGoodsInfo() + "\n"
-        + "\nConnections Matrix:\t" + this.stringConnectionsMatrix();
+        + this.stringBiddersInfo() + "\n\n"
+        + this.stringGoodsInfo() + "\n\n"
+        + this.stringConnectionsMatrix();
   }
   
 }
