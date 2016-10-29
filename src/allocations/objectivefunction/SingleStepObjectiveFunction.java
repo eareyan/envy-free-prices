@@ -3,20 +3,21 @@ package allocations.objectivefunction;
 import allocations.objectivefunction.interfaces.ObjectiveFunction;
 
 /**
- * Approximation of the Effective Reach Ratio as a quadratic function.
+ * This class implements the all-or-nothing objective function.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class QuadraticObjectiveFunction implements ObjectiveFunction {
+public class SingleStepObjectiveFunction implements ObjectiveFunction{
 
-  @Override
+  /**
+   * All-or-nothing objective.
+   */
   public double getObjective(double reward, double total, double x) {
-    return (-1 * (reward / (total * total)) * x * x) + 2 * (reward / total) * x;
+    return (x >= total) ? reward : 0.0;
   }
 
   @Override
   public boolean isSafeForReserve() {
     return true;
   }
-  
 }

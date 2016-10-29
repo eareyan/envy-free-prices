@@ -14,7 +14,7 @@ import structures.exceptions.AllocationException;
 import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
 import allocations.interfaces.AllocationAlgo;
-import allocations.objectivefunction.SingleStepFunction;
+import allocations.objectivefunction.SingleStepObjectiveFunction;
 
 import com.google.common.collect.HashBasedTable;
 
@@ -133,8 +133,8 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
   }
 
   @Override
-  public SingleStepFunction getObjectiveFunction() {
-    return new SingleStepFunction();
+  public SingleStepObjectiveFunction getObjectiveFunction() {
+    return new SingleStepObjectiveFunction();
   }
   
   @Override

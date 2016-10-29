@@ -23,7 +23,7 @@ import util.NumberMethods;
 import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyMultiStepAllocation;
 import allocations.objectivefunction.EffectiveReachRatio;
-import allocations.objectivefunction.SingleStepFunction;
+import allocations.objectivefunction.SingleStepObjectiveFunction;
 import allocations.objectivefunction.interfaces.ObjectiveFunction;
 import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 

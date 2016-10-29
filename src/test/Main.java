@@ -29,6 +29,8 @@ import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
 import allocations.greedy.GreedyMultiStepAllocation;
 import allocations.interfaces.AllocationAlgo;
+import allocations.objectivefunction.ConcaveObjectiveFunction;
+import allocations.objectivefunction.ConvexObjectiveFunction;
 import allocations.objectivefunction.EffectiveReachRatio;
 import allocations.objectivefunction.IdentityObjectiveFunction;
 import allocations.objectivefunction.interfaces.ObjectiveFunction;
@@ -80,6 +82,8 @@ public class Main {
     // fails for finding rev. maximizing prices (using reserve prices).
     algosList.add(new GreedyMultiStepAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(1, new EffectiveReachRatio()));
     algosList.add(new GreedyMultiStepAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(1, new IdentityObjectiveFunction()));
+    algosList.add(new GreedyMultiStepAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(1, new ConcaveObjectiveFunction()));
+    algosList.add(new GreedyMultiStepAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(1, new ConvexObjectiveFunction()));
 
     for (Market<Goods, Bidder<Goods>> M : marketList) {
       System.out.println("********/*************/************");

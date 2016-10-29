@@ -18,7 +18,7 @@ import util.Printer;
 import allocations.error.AllocationAlgoErrorCodes;
 import allocations.error.AllocationAlgoException;
 import allocations.interfaces.AllocationAlgo;
-import allocations.objectivefunction.SingleStepFunction;
+import allocations.objectivefunction.SingleStepObjectiveFunction;
 
 import com.google.common.collect.HashBasedTable;
 
@@ -194,8 +194,8 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
    * @see allocations.interfaces.AllocationAlgoInterface#getObjectiveFunction()
    */
   @Override
-  public SingleStepFunction getObjectiveFunction() {
-    return new SingleStepFunction();
+  public SingleStepObjectiveFunction getObjectiveFunction() {
+    return new SingleStepObjectiveFunction();
   }
   
   @Override

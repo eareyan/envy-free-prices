@@ -12,7 +12,7 @@ import structures.MarketAllocation;
 import structures.MarketOutcome;
 import structures.comparators.BiddersComparatorByReward;
 import structures.exceptions.MarketAllocationException;
-import allocations.objectivefunction.SingleStepFunction;
+import allocations.objectivefunction.SingleStepObjectiveFunction;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMap;
@@ -183,7 +183,7 @@ public class ApproxWE {
     for(Goods good : this.M.getGoods()){
       result.put(good, this.p[this.goodsToIndex.get(good)]);
     }
-    MarketAllocation<Goods, Bidder<Goods>> x = new MarketAllocation<Goods, Bidder<Goods>>(this.M, allocation, new SingleStepFunction());
+    MarketAllocation<Goods, Bidder<Goods>> x = new MarketAllocation<Goods, Bidder<Goods>>(this.M, allocation, new SingleStepObjectiveFunction());
     return new MarketOutcome<Goods, Bidder<Goods>>(x , result.build());
   }
   
