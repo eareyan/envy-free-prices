@@ -6,6 +6,7 @@ import java.util.Comparator;
 
 import structures.Bidder;
 import structures.Goods;
+import structures.Market;
 import structures.MarketOutcome;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketOutcomeException;
@@ -19,12 +20,12 @@ import structures.exceptions.MarketOutcomeException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class PricesStatistics <G extends Goods, B extends Bidder<G>>{
+public class PricesStatistics <M extends Market<G, B>, G extends Goods, B extends Bidder<G>>{
 
   /**
    * MarketPrices object.
    */
-  protected MarketOutcome<G, B> marketPrices;
+  protected MarketOutcome<M, G, B> marketPrices;
 
   /**
    * epsilon parameter.
@@ -36,7 +37,7 @@ public class PricesStatistics <G extends Goods, B extends Bidder<G>>{
    * 
    * @param marketPrices - a MarketPrices object.
    */
-  public PricesStatistics(MarketOutcome<G, B> marketPrices) {
+  public PricesStatistics(MarketOutcome<M, G, B> marketPrices) {
     this.marketPrices = marketPrices;
   }
 

@@ -78,7 +78,7 @@ public class GreedyMultiStepAllocation<M extends Market<G, B>, G extends Goods, 
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<G, B> Solve(M market) throws GoodsException, AllocationException, MarketAllocationException {
+  public MarketAllocation<M, G, B> Solve(M market) throws GoodsException, AllocationException, MarketAllocationException {
     HashBasedTable<G, B,Integer> allocation = HashBasedTable.create();
     for(G good : market.getGoods()){
       for(B bidder : market.getBidders()){
@@ -150,7 +150,7 @@ public class GreedyMultiStepAllocation<M extends Market<G, B>, G extends Goods, 
       }
       goodNotFound = true;
     }
-    return new MarketAllocation<G, B>(market, allocation, this.f);
+    return new MarketAllocation<M, G, B>(market, allocation, this.f);
   }
 
   /**

@@ -142,7 +142,7 @@ public class Printer {
    * @throws MarketOutcomeException
    * @throws MarketAllocationException
    */
-  public static void PrintOutcomeInfo(MarketOutcome<Goods,Bidder<Goods>> outcome) throws MarketOutcomeException, MarketAllocationException{
+  public static void PrintOutcomeInfo(MarketOutcome<Market<Goods, Bidder<Goods>>, Goods,Bidder<Goods>> outcome) throws MarketOutcomeException, MarketAllocationException{
     /* Statistics for the allocation.*/
     outcome.getMarketAllocation().printAllocation();
     outcome.printPrices();
@@ -155,7 +155,7 @@ public class Printer {
       System.out.println("B = " + outcome.getMarketAllocation().allocationToBidder(bidder) + " " + outcome.getMarketAllocation().isBidderBundleZero(bidder));
     }
     /* Statistics for the prices. */
-    PricesStatistics<Goods, Bidder<Goods>> pricesStatistics = new PricesStatistics<Goods, Bidder<Goods>>(outcome);
+    PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> pricesStatistics = new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(outcome);
     System.out.println("MC Violations : " + pricesStatistics.computeMarketClearanceViolations()[0] + "," + pricesStatistics.computeMarketClearanceViolations()[1]);
     System.out.println("EF violations : " + pricesStatistics.numberOfEnvyBidders());
   }

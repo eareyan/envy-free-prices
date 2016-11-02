@@ -152,7 +152,7 @@ public class MarketWithReservePrice {
    * @return
    * @throws MarketAllocationException
    */
-  public MarketAllocation<Goods, Bidder<Goods>> deduceAllocation(MarketAllocation<Goods, Bidder<Goods>> allocForMarketWithReserve) throws MarketAllocationException{
+  public MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> deduceAllocation(MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> allocForMarketWithReserve) throws MarketAllocationException{
     
     HashBasedTable<Goods,Bidder<Goods>,Integer> deducedAllocation = HashBasedTable.create();
     for(Goods good : this.market.getGoods()){
@@ -164,6 +164,6 @@ public class MarketWithReservePrice {
         }
       }
     }
-    return new MarketAllocation<Goods, Bidder<Goods>>(this.market, deducedAllocation, allocForMarketWithReserve.getObjectiveFunction());
+    return new MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(this.market, deducedAllocation, allocForMarketWithReserve.getObjectiveFunction());
   }
 }

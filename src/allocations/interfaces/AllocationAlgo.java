@@ -44,7 +44,7 @@ public interface AllocationAlgo<M extends Market<G, B>, G extends Goods, B exten
    * @throws GoodsException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<G, B> Solve(M market) throws IloException, AllocationAlgoException, BidderCreationException, GoodsCreationException, AllocationException, GoodsException, MarketAllocationException;
+  public MarketAllocation<M, G, B> Solve(M market) throws IloException, AllocationAlgoException, BidderCreationException, GoodsCreationException, AllocationException, GoodsException, MarketAllocationException;
 
   /**
    * This method defines the objective function that was used to allocate the

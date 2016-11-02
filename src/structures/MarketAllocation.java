@@ -16,12 +16,12 @@ import com.google.common.collect.Table;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketAllocation<G extends Goods, B extends Bidder<G>> {
+public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
   
   /**
    * Market that was allocated.
    */
-  protected final Market<G, B> market;
+  protected final M market;
   
   /**
    * Allocation for the market. An allocation is a Table of goods, bidders and
@@ -41,7 +41,7 @@ public class MarketAllocation<G extends Goods, B extends Bidder<G>> {
    * @param allocation
    * @throws MarketAllocationException 
    */
-  public MarketAllocation(Market<G, B> m, Table<G, B, Integer> allocation,  ObjectiveFunction f) throws MarketAllocationException {
+  public MarketAllocation(M m, Table<G, B, Integer> allocation,  ObjectiveFunction f) throws MarketAllocationException {
     this.market = m;
     if (this.market.bidders.size() * this.market.goods.size() != allocation.size()) {
       throw new MarketAllocationException(

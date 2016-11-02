@@ -61,7 +61,7 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
    * @throws AllocationException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<G, B> Solve(M market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
+  public MarketAllocation<M, G, B> Solve(M market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
     try {
       IloCplex cplex = new IloCplex();
       if (!this.verbose){
@@ -177,7 +177,7 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
             alloc.put(good, bidder , (int) Math.round(Solutions.get(0)[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]));    
           }
         }
-        return new MarketAllocation<G, B>(market, alloc, this.getObjectiveFunction());
+        return new MarketAllocation<M, G, B>(market, alloc, this.getObjectiveFunction());
       }
     } catch (IloException e) {
       // Report that CPLEX failed.

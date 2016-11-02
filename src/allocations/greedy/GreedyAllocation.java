@@ -74,7 +74,7 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
    * @throws GoodsException 
    * @throws MarketAllocationException 
    */
-  public MarketAllocation<G, B> Solve(M market) throws AllocationException, GoodsException, MarketAllocationException {
+  public MarketAllocation<M, G, B> Solve(M market) throws AllocationException, GoodsException, MarketAllocationException {
     // MAKE SHALLOW COPY OF BIDDERS - that is OK, you get the pointers anyway,
     // which you can't change up because they provide no mutable fields.
     ArrayList<B> bidders = new ArrayList<B>(market.getBidders());
@@ -129,7 +129,7 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
         }
       }
     }
-    return new MarketAllocation<G, B>(market, greedyAllocation, this.getObjectiveFunction());
+    return new MarketAllocation<M, G, B>(market, greedyAllocation, this.getObjectiveFunction());
   }
 
   @Override

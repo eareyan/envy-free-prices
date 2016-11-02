@@ -39,12 +39,12 @@ public class RevMaxHeuristic {
   /**
    * MarketAllocation object.
    */
-  protected MarketAllocation<Goods, Bidder<Goods>> initialMarketAllocation;
+  protected MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> initialMarketAllocation;
   
   /**
    * ArrayList of MarketPrices.
    */
-  protected ArrayList<MarketOutcome<Goods, Bidder<Goods>>> setOfSolutions;
+  protected ArrayList<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>> setOfSolutions;
   
   /**
    * AllocationAlgorithm object. 
@@ -74,14 +74,14 @@ public class RevMaxHeuristic {
     // The initial allocation has reserve price of 0. The solution is the plain LP.
     this.initialMarketAllocation = this.AllocAlgo.Solve(market);
     //this.initialMarketAllocation.printAllocation();
-    this.setOfSolutions = new ArrayList<MarketOutcome<Goods, Bidder<Goods>>>();
+    this.setOfSolutions = new ArrayList<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>>();
     // Create the first LP with no reserves.
     RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> initialLP = new RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(this.initialMarketAllocation);
     initialLP.setMarketClearanceConditions(false);
     initialLP.createLP();
-    RestrictedEnvyFreePricesLPSolution<Goods, Bidder<Goods>> initialSolution = initialLP.Solve();
+    RestrictedEnvyFreePricesLPSolution<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> initialSolution = initialLP.Solve();
     //initialSolution.printPrices();
-    this.setOfSolutions = new ArrayList<MarketOutcome<Goods, Bidder<Goods>>>();
+    this.setOfSolutions = new ArrayList<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>>();
     //Add initial solution to set of solutions, so that we have a baseline with reserve prices all zero.
     setOfSolutions.add(initialSolution);
   }
@@ -99,7 +99,7 @@ public class RevMaxHeuristic {
    * @throws MarketOutcomeException 
    * @throws MarketCreationException 
    */
-  public MarketOutcome<Goods, Bidder<Goods>> Solve() throws IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException, MarketCreationException {
+  public MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> Solve() throws IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException, MarketCreationException {
     HashSet<Double> seenReservePrices = new HashSet<Double>();
     for (Goods good : this.market.getGoods()) {
       for (Bidder<Goods> bidder : this.market.getBidders()) {
@@ -114,17 +114,17 @@ public class RevMaxHeuristic {
             // Test if there are bidders in the market with reserve.
             if (mwrp.thereBiddersInTheMarketWithReserve()) {
               // Solve for a MarketAllocation in the market with reserve.
-              MarketAllocation<Goods, Bidder<Goods>> allocForMarketWithReserve = this.AllocAlgo.Solve(mwrp.getMarketWithReservePrice());
+              MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> allocForMarketWithReserve = this.AllocAlgo.Solve(mwrp.getMarketWithReservePrice());
               //allocForMarketWithReserve.printAllocation();
               // Deduce a MarketAllocation for the original market.
-              MarketAllocation<Goods, Bidder<Goods>> allocForOriginalMarket = mwrp.deduceAllocation(allocForMarketWithReserve);
+              MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> allocForOriginalMarket = mwrp.deduceAllocation(allocForMarketWithReserve);
               //allocForOriginalMarket.printAllocation();
               // Run LP with reserve prices.
               RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efp = new RestrictedEnvyFreePricesLPWithReserve<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(allocForOriginalMarket);
               efp.setMarketClearanceConditions(false);
               efp.createLP();
               efp.setReservePrice(reserve);
-              RestrictedEnvyFreePricesLPSolution<Goods, Bidder<Goods>> refpSol = efp.Solve();
+              RestrictedEnvyFreePricesLPSolution<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> refpSol = efp.Solve();
               //System.out.println("Status = " + refpSol.getStatus());
               //refpSol.printPrices();
               //System.out.println(refpSol.sellerRevenue());

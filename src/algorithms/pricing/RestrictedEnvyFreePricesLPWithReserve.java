@@ -16,7 +16,7 @@ import structures.exceptions.MarketAllocationException;
  */
 public class RestrictedEnvyFreePricesLPWithReserve<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> extends RestrictedEnvyFreePricesLP<M, G, B>{
 
-  public RestrictedEnvyFreePricesLPWithReserve(MarketAllocation<G, B> allocatedMarket) throws IloException {
+  public RestrictedEnvyFreePricesLPWithReserve(MarketAllocation<M, G, B> allocatedMarket) throws IloException {
     super(allocatedMarket);
   }
   

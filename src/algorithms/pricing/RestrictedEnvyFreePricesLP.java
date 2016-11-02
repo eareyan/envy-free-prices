@@ -35,7 +35,7 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
   /**
    * Market Allocation Object. Contains the market and the allocation.
    */
-  protected MarketAllocation<G, B> allocatedMarket;
+  protected MarketAllocation<M, G, B> allocatedMarket;
   
   /**
    * Contains all the linear constrains
@@ -64,7 +64,7 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
    * @param allocatedMarket - a MarketAllocation object.
    * @throws IloException in case the LP failed.
    */
-  public RestrictedEnvyFreePricesLP(MarketAllocation<G, B> allocatedMarket) throws IloException {
+  public RestrictedEnvyFreePricesLP(MarketAllocation<M, G, B> allocatedMarket) throws IloException {
     this.allocatedMarket = allocatedMarket;
     this.cplex = new IloCplex();
     // Create a map from goods to a numbers. This gives ordering of the goods.
@@ -229,8 +229,8 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
    * 
    * @return an EnvyFreePricesSolutionLP object with the solution of the LP.
    */
-  public RestrictedEnvyFreePricesLPSolution<G, B> Solve() {
-    RestrictedEnvyFreePricesLPSolution<G, B> Solution = new RestrictedEnvyFreePricesLPSolution<G, B>(this.allocatedMarket , null, "", -1);
+  public RestrictedEnvyFreePricesLPSolution<M, G, B> Solve() {
+    RestrictedEnvyFreePricesLPSolution<M, G, B> Solution = new RestrictedEnvyFreePricesLPSolution<M, G, B>(this.allocatedMarket , null, "", -1);
     try {
       // Solve the LP.
       if (this.cplex.solve()) {
@@ -239,9 +239,9 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
         for(G good : this.allocatedMarket.getMarket().getGoods()){
           result.put(good, LP_Prices[this.goodToPriceIndex.get(good)]);
         }
-        Solution = new RestrictedEnvyFreePricesLPSolution<G, B>(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(), this.cplex.getObjValue());
+        Solution = new RestrictedEnvyFreePricesLPSolution<M, G, B>(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(), this.cplex.getObjValue());
       } else {
-        Solution = new RestrictedEnvyFreePricesLPSolution<G, B>(this.allocatedMarket, null, this.cplex.getStatus().toString(), -1);
+        Solution = new RestrictedEnvyFreePricesLPSolution<M, G, B>(this.allocatedMarket, null, this.cplex.getStatus().toString(), -1);
       }
       if (this.verbose) {
         System.out.println("Solution status = " + this.cplex.getStatus());
