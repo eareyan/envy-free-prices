@@ -1,9 +1,24 @@
 package test;
 
-import ilog.concert.IloException;
-
 import java.util.ArrayList;
 
+import algorithms.ascendingauction.AscendingAuction;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.error.PrincingAlgoException;
+import algorithms.pricing.reserveprices.RandomSearch;
+import algorithms.pricing.reserveprices.RevMaxHeuristic;
+import allocations.error.AllocationAlgoException;
+import allocations.greedy.GreedyAllocation;
+import allocations.greedy.GreedyMultiStepAllocation;
+import allocations.interfaces.AllocationAlgo;
+import allocations.objectivefunction.ConcaveObjectiveFunction;
+import allocations.objectivefunction.ConvexObjectiveFunction;
+import allocations.objectivefunction.EffectiveReachRatio;
+import allocations.objectivefunction.IdentityObjectiveFunction;
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
+import allocations.optimal.SingleStepWelfareMaxAllocationILP;
+import ilog.concert.IloException;
 import singleminded.ApproxWE;
 import statistics.PricesStatistics;
 import structures.Bidder;
@@ -21,21 +36,6 @@ import structures.exceptions.MarketOutcomeException;
 import structures.factory.RandomMarketFactory;
 import structures.factory.SingleMindedMarketFactory;
 import util.Printer;
-import algorithms.pricing.RestrictedEnvyFreePricesLP;
-import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
-import algorithms.pricing.error.PrincingAlgoException;
-import algorithms.pricing.reserveprices.RandomSearch;
-import algorithms.pricing.reserveprices.RevMaxHeuristic;
-import allocations.error.AllocationAlgoException;
-import allocations.greedy.GreedyAllocation;
-import allocations.greedy.GreedyMultiStepAllocation;
-import allocations.interfaces.AllocationAlgo;
-import allocations.objectivefunction.ConcaveObjectiveFunction;
-import allocations.objectivefunction.ConvexObjectiveFunction;
-import allocations.objectivefunction.EffectiveReachRatio;
-import allocations.objectivefunction.IdentityObjectiveFunction;
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
-import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 /**
  * Main class. Use for testing purposes.
@@ -43,8 +43,18 @@ import allocations.optimal.SingleStepWelfareMaxAllocationILP;
  * @author Enrique Areyan Viqueira
  */
 public class Main {
-  
-  public static void main(String[] args) throws BidderCreationException, MarketCreationException, IloException, AllocationAlgoException, AllocationException, MarketAllocationException, GoodsException, MarketOutcomeException, PrincingAlgoException {
+  public static void main(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, MarketAllocationException, MarketOutcomeException {
+    System.out.println("Testing ascending auction");
+    //Market<Goods, Bidder<Goods>> market =  SingleMindedMarkets.singleMinded1();
+    Market<Goods, Bidder<Goods>> market =  SizeInterchangeableMarkets.market4();
+    System.out.println(market);
+    AscendingAuction au = new AscendingAuction(market);
+    MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> x = au.Solve();
+    x.getMarketAllocation().printAllocation();
+    x.printPrices();
+  }
+	
+  public static void main222(String[] args) throws BidderCreationException, MarketCreationException, IloException, AllocationAlgoException, AllocationException, MarketAllocationException, GoodsException, MarketOutcomeException, PrincingAlgoException {
     Market<Goods, Bidder<Goods>> market = RandomMarketFactory.randomMarket(15, 15, 0.25);
     System.out.println(market);
     
