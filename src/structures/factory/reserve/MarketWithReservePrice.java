@@ -1,6 +1,5 @@
-package algorithms.pricing.reserveprices;
+package structures.factory.reserve;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -22,12 +21,12 @@ import com.google.common.collect.HashBasedTable;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketWithReservePrice {
+abstract public class MarketWithReservePrice<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
   
   /**
    * Input Market.
    */
-  protected final Market<Goods, Bidder<Goods>> market;  
+  protected final M market;  
   
   /**
    * Reserve Price.
@@ -35,33 +34,28 @@ public class MarketWithReservePrice {
   protected final double reserve;
   
   /**
-   * Are there any bidders in the market with reserve?
-   */
-  protected final boolean biddersInMarketWithReserve;
-  
-  /**
    * Map from input market bidders to market with reserve bidders.
    */
-  protected final Map<Bidder<Goods>,Bidder<Goods>> bidderToBidderMap;
+  protected final Map<B, Bidder<G>> bidderToBidderMap;
   
   /**
    * Market with reserve. This market is produced in the constructor.
    */
-  protected final Market<Goods, Bidder<Goods>> marketWithReserve;
+  protected M marketWithReserve;
   
   /**
    * Constructor.
    * 
    * @param market - the input market.
-   * @param reserve - the reseve price.
+   * @param reserve - the reserve price.
    * @throws BidderCreationException in case a bidder could not be created.
    * @throws MarketCreationException 
    */
-  public MarketWithReservePrice(Market<Goods, Bidder<Goods>> market, double reserve) throws BidderCreationException, MarketCreationException{
+  public MarketWithReservePrice(M market, double reserve) throws BidderCreationException, MarketCreationException{
     this.market = market;
     this.reserve = reserve;
-    this.bidderToBidderMap = new HashMap<Bidder<Goods>,Bidder<Goods>>();
-    /*
+    this.bidderToBidderMap = new HashMap<B, Bidder<G>>();
+    /**
      * Creates a clone market but subtract the rewards of all bidders by the
      * parameter r times number of demanded items. If the reward of a bidder
      * becomes 0 or negative under the reserve price, throw this bidder out of
@@ -69,40 +63,39 @@ public class MarketWithReservePrice {
      * bidders in the original market to bidders in the reserve market so that
      * we can later refer to one another.
      */
-    // Goods are just a copy of the same goods as the original market.
-    ArrayList<Goods> newGoods = new ArrayList<Goods>(this.market.getGoods());
-    // Bidders might change...
-    ArrayList<Bidder<Goods>> newBidders = new ArrayList<Bidder<Goods>>();
-    for (Bidder<Goods> bidder : this.market.getBidders()) {
+    for (B bidder : this.market.getBidders()) {
       double newReward = bidder.getReward() - this.reserve * bidder.getDemand();
       if (newReward > 0) {
-        HashSet<Goods> bDemandSet = new HashSet<Goods>();
-        for(Goods good : this.market.getGoods()){
+        // Recreate the demand set of this bidder.
+        HashSet<G> bDemandSet = new HashSet<G>();
+        for(G good : this.market.getGoods()){
           if(bidder.demandsGood(good)){
             bDemandSet.add(good);
           }
         }
-        Bidder<Goods> newBidder = new Bidder<Goods>(bidder.getDemand(), newReward , bDemandSet);
+        Bidder<G> newBidder = new Bidder<G>(bidder.getDemand(), newReward , bDemandSet);
         this.bidderToBidderMap.put(bidder, newBidder);
-        newBidders.add(newBidder);
       }
     }
-    // There could be no surviving bidder. In that case we create a null market.
-    if (newBidders.size() > 0) {
-      this.marketWithReserve = new Market<Goods, Bidder<Goods>>(newGoods, newBidders);
-      this.biddersInMarketWithReserve = true;
-    } else {
-      this.marketWithReserve = null;
-      this.biddersInMarketWithReserve = false;
-    }
+    // If there are surviving bidders, create the new market. o/w the new market is null.
+    this.marketWithReserve = (this.bidderToBidderMap.size() > 0) ? this.createMarketWithReserve() : null;
   }
   
+  /**
+   * Implementing classes should reconstruct the original market with surviving
+   * bidders.
+   * 
+   * @return a market only with surviving bidders.
+   * @throws MarketCreationException
+   */
+  abstract protected M createMarketWithReserve() throws MarketCreationException;
+
   /**
    * Getter.
    * 
    * @return the input market.
    */
-  public Market<Goods, Bidder<Goods>> getMarket(){
+  public M getMarket(){
     return this.market;
   }
   
@@ -111,7 +104,7 @@ public class MarketWithReservePrice {
    * 
    * @return the market with reserve price.
    */
-  public Market<Goods, Bidder<Goods>> getMarketWithReservePrice(){
+  public M getMarketWithReservePrice(){
     return this.marketWithReserve;
   }
   
@@ -120,7 +113,7 @@ public class MarketWithReservePrice {
    * 
    * @return the bidder to bidder map.
    */
-  public Map<Bidder<Goods>,Bidder<Goods>> getBidderToBidderMap(){
+  public Map<B, Bidder<G>> getBidderToBidderMap(){
     return this.bidderToBidderMap;
   }
   
@@ -134,12 +127,13 @@ public class MarketWithReservePrice {
   }
   
   /**
-   * Getter.
+   * Getter. If there are no elements in the bidderToBidderMap,
+   * then there are no surviving bidders.
    * 
    * @return false if all bidders were dropped by the reserve price.
    */
-  public boolean thereBiddersInTheMarketWithReserve(){
-    return this.biddersInMarketWithReserve;
+  public boolean areThereBiddersInTheMarketWithReserve(){
+    return this.bidderToBidderMap.size() > 0;
   }
   
   
@@ -152,18 +146,18 @@ public class MarketWithReservePrice {
    * @return
    * @throws MarketAllocationException
    */
-  public MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> deduceAllocation(MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> allocForMarketWithReserve) throws MarketAllocationException{
+  public MarketAllocation<M, G, B> deduceAllocation(MarketAllocation<M, G, B> allocForMarketWithReserve) throws MarketAllocationException{
     
-    HashBasedTable<Goods,Bidder<Goods>,Integer> deducedAllocation = HashBasedTable.create();
-    for(Goods good : this.market.getGoods()){
-      for(Bidder<Goods> bidder : this.market.getBidders()){
+    HashBasedTable<G, B, Integer> deducedAllocation = HashBasedTable.create();
+    for(G good : this.market.getGoods()){
+      for(B bidder : this.market.getBidders()){
         if(this.bidderToBidderMap.containsKey(bidder)){
-          deducedAllocation.put(good, bidder, allocForMarketWithReserve.getAllocation(good, this.bidderToBidderMap.get(bidder)));
+          deducedAllocation.put(good, bidder, allocForMarketWithReserve.getAllocation(good, bidder));
         }else{
           deducedAllocation.put(good, bidder, 0);
         }
       }
     }
-    return new MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(this.market, deducedAllocation, allocForMarketWithReserve.getObjectiveFunction());
+    return new MarketAllocation<M, G, B>(this.market, deducedAllocation, allocForMarketWithReserve.getObjectiveFunction());
   }
 }

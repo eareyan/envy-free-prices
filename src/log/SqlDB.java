@@ -67,14 +67,29 @@ public class SqlDB {
    * @return true if the row (n,m) exists in tablename
    * @throws SQLException
    */
-  public boolean checkIfSingleMindedRowExists(String tablename, int n, int m)
-      throws SQLException {
+  public boolean checkIfSingleMindedRowExists(String tablename, int n, int m) throws SQLException {
     String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ?";
-    PreparedStatement preparedStatement = (PreparedStatement) conn
-        .prepareStatement(sql);
+    PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
     preparedStatement.setInt(1, n);
     preparedStatement.setInt(2, m);
     return ((ResultSet) preparedStatement.executeQuery()).next();
+  }
+  
+  /**
+   * Check if a row of the database exists.
+   * 
+   * @param tablename
+   * @param m
+   * @param p
+   * @return
+   * @throws SQLException
+   */
+  public boolean checkIfTACRowExists(String tablename, int m, double p) throws SQLException {
+    String sql = "SELECT * FROM " + tablename + " WHERE m = ? AND p = ?";
+    PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
+    preparedStatement.setInt(1, m);
+    preparedStatement.setDouble(2, p);
+    return ((ResultSet) preparedStatement.executeQuery()).next();    
   }
 
   /**
@@ -254,6 +269,32 @@ public class SqlDB {
     preparedStatement.setDouble(11, greedyWE);
     preparedStatement.setDouble(12, greedyTime);
 
+    preparedStatement.execute();
+  }
+  
+  public void saveTACExperiment(String table_name, int m, double p,
+      double greedyWelfare, double greedyRevenue, double greedyEF,
+      double greedyWE, double greedyTime, double optimaWelfare,
+      double optimaRevenue, double optimaEF, double optimaWE, double optimaTime)
+      throws SQLException {
+    
+    String sql = "INSERT INTO "
+        + table_name
+        + " (m,p,greedyWelfare,greedyRevenue,greedyEF,greedyWE,greedyTime,optimaWelfare,optimaRevenue,optimaEF,optimaWE,optimaTime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+    PreparedStatement preparedStatement = (PreparedStatement) conn.prepareStatement(sql);
+    preparedStatement.setInt(1, m);
+    preparedStatement.setDouble(2, p);
+    preparedStatement.setDouble(3, greedyWelfare);
+    preparedStatement.setDouble(4, greedyRevenue);
+    preparedStatement.setDouble(5, greedyEF);
+    preparedStatement.setDouble(6, greedyWE);
+    preparedStatement.setDouble(7, greedyTime);
+    preparedStatement.setDouble(8, optimaWelfare);
+    preparedStatement.setDouble(9, optimaRevenue);
+    preparedStatement.setDouble(10, optimaEF);
+    preparedStatement.setDouble(11, optimaWE);
+    preparedStatement.setDouble(12, optimaTime);
+    
     preparedStatement.execute();
   }
 }

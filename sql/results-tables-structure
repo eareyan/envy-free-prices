@@ -188,11 +188,28 @@ CREATE TABLE singleminded (
 	greedyWE double precision NOT NULL,
 	greedyTime double precision NOT NULL
 	);
+	
+CREATE TABLE tacexperiments (
+	m integer NOT NULL,
+	p double precision NOT NULL,
+	greedyWelfare double precision NOT NULL,
+	greedyRevenue double precision NOT NULL,
+	greedyEF double precision NOT NULL,
+	greedyWE double precision NOT NULL,
+	greedyTime double precision NOT NULL,
+	optimaWelfare double precision NOT NULL,
+	optimaRevenue double precision NOT NULL,
+	optimaEF double precision NOT NULL,
+	optimaWE double precision NOT NULL,
+	optimaTime double precision NOT NULL
+	);
 
 \copy (SELECT * FROM unit_demand ORDER BY n,m,p) to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_demand.csv' csv header
 \copy (SELECT * FROM unit_uniform_demand ORDER BY n,m,p) to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_uniform_demand.csv' csv header
 
 \copy (SELECT lpReservePriceRevenue / evpAppRevenue FROM unit_uniform_demand WHERE lpReservePriceRevenue >= evpAppRevenue AND p=0.25) to '/home/eareyanv/workspace/envy-free-prices/results/unit-uniform-demand/lpBiggerEqualevpapp-p25.csv' csv header
+
+\copy tacexperiments to '/home/eareyanv/workspace/envy-free-prices/results/results-tac_demand.csv' csv header
 
 \copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_demand.csv' csv header
 \copy unit_uniform_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_uniform_demand.csv' csv header
@@ -252,4 +269,78 @@ SELECT 	AVG(approxWelfare) AS approxWelfare,
 	AVG(greedyTime) AS greedyTime
 	FROM singleminded
 	WHERE n<=m;
+
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m < 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m <10;
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m < 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m < 10;
+
+
+
+
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m >= 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m >= 10;
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m >= 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m >= 10;
+
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime,
+	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments;
 

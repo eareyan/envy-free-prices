@@ -14,9 +14,9 @@ import structures.exceptions.MarketOutcomeException;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketPricesComparatorBySellerRevenue implements Comparator<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>> {
+public class MarketPricesComparatorBySellerRevenue<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements Comparator<MarketOutcome<M, G, B>> {
   @Override
-  public int compare(MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> MP1, MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> MP2) {
+  public int compare(MarketOutcome<M, G, B> MP1, MarketOutcome<M, G, B> MP2) {
     try {
       if (MP1.sellerRevenue() < MP2.sellerRevenue()) {
         return 1;

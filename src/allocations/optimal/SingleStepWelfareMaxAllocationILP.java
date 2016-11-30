@@ -40,10 +40,29 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
   protected static final int numSolutions = 1;
   
   /**
+   * Cplex object.
+   */
+  private IloCplex cplex;
+  
+  private double timeLimit = -1.0;
+  
+  
+  /**
    * Constructor.
    */
   public SingleStepWelfareMaxAllocationILP() {
 
+  }
+  
+  /**
+   * Constructor.
+   * @throws AllocationException 
+   */
+  public SingleStepWelfareMaxAllocationILP(double timeLimit) throws AllocationException {
+    if(timeLimit < 0) {
+      throw new AllocationException("The time limit for the SingleStepWelfareMaxAllocationILP must be positive");
+    }
+    this.timeLimit = timeLimit;
   }
 
   /**
@@ -53,7 +72,7 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
   public SingleStepWelfareMaxAllocationILP(boolean verbose) {
     this.verbose = verbose;
   }
-
+  
   /**
    * Solve method. Runs the algorithm.
    * @param market - a Market object.
@@ -63,9 +82,14 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
    */
   public MarketAllocation<M, G, B> Solve(M market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
     try {
-      IloCplex cplex = new IloCplex();
+      // Create Cplex Object
+      this.cplex = new IloCplex();
       if (!this.verbose){
-        cplex.setOut(null);
+        this.cplex.setOut(null);
+      }
+      // Set a time limit.
+      if(this.timeLimit >= 0) {
+        this.cplex.setParam(IloCplex.DoubleParam.TiLim, this.timeLimit);
       }
       /*
        * These two next parameters controls how many solutions we want to get.
@@ -73,8 +97,9 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
        * solutions to be, the second parameter controls how many solutions we
        * will get in total.
        */
-      cplex.setParam(IloCplex.DoubleParam.SolnPoolGap, 0.0);
-      cplex.setParam(IloCplex.IntParam.PopulateLim, SingleStepWelfareMaxAllocationILP.numSolutions);
+      this.cplex.setParam(IloCplex.DoubleParam.SolnPoolGap, 0.0);
+      this.cplex.setParam(IloCplex.IntParam.PopulateLim, SingleStepWelfareMaxAllocationILP.numSolutions);
+
       /*
        * These next two maps point from a good (resp. a bidder) to a positive integer.
        * These maps are used to point from a bidder to its CPLEX variable.
@@ -88,57 +113,57 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
         bidderToCPLEXIndex.put(market.getBidders().get(j), j);
       }
       // Variables
-      IloNumVar[] indicatorVariable = cplex.boolVarArray(market.getNumberBidders());
+      IloNumVar[] indicatorVariable = this.cplex.boolVarArray(market.getNumberBidders());
       IloNumVar[][] allocationMatrixVariable = new IloNumVar[market.getNumberGoods()][];
       for (G good : market.getGoods()) {
-        allocationMatrixVariable[goodToCPLEXIndex.get(good)] = cplex.intVarArray(market.getNumberBidders(), 0, Integer.MAX_VALUE);
+        allocationMatrixVariable[goodToCPLEXIndex.get(good)] = this.cplex.intVarArray(market.getNumberBidders(), 0, Integer.MAX_VALUE);
       }
       // LP objective function. \sum_j R_j y_j
-      IloLinearNumExpr obj = cplex.linearNumExpr();
+      IloLinearNumExpr obj = this.cplex.linearNumExpr();
       for (B bidder : market.getBidders()) {
         obj.addTerm(bidder.getReward(), indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
       }
       // System.out.println(obj);
-      cplex.addMaximize(obj);
+      this.cplex.addMaximize(obj);
 
       // Constraint (1). Allocation from a good not connected to a bidder is zero.
       // Constraint (2). Allocation satisfies bidder.
       for (B bidder : market.getBidders()) {
         double coeff = 1.0 / ((double) bidder.getDemand());
-        IloLinearNumExpr expr = cplex.linearNumExpr();
+        IloLinearNumExpr expr = this.cplex.linearNumExpr();
         for (G good : market.getGoods()) {
           if (bidder.demandsGood(good)) {
             expr.addTerm(coeff, allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
           } else {
-            cplex.addEq(0, allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
+            this.cplex.addEq(0, allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
           }
         }
-        cplex.addGe(expr, indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
-        cplex.addLe(expr, indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
+        this.cplex.addGe(expr, indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
+        this.cplex.addLe(expr, indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
       }
  
       // Constrain (2). Allocation from goods can not be more than supply.
       for (G good : market.getGoods()) {
-        IloLinearNumExpr expr = cplex.linearNumExpr();
+        IloLinearNumExpr expr = this.cplex.linearNumExpr();
         for (B bidder : market.getBidders()) {
           expr.addTerm(1.0, allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
         }
-        cplex.addLe(expr, good.getSupply());
+        this.cplex.addLe(expr, good.getSupply());
       }
 
       // Solve the problem and get many solutions.
-      cplex.solve();
-      if (cplex.populate()) {
-        int numsol = cplex.getSolnPoolNsolns();
-        int numsolreplaced = cplex.getSolnPoolNreplaced();
+      this.cplex.solve();
+      if (this.cplex.populate()) {
+        int numsol = this.cplex.getSolnPoolNsolns();
+        int numsolreplaced = this.cplex.getSolnPoolNreplaced();
         // Print some information
         if (verbose) {
           System.out.println("***********************************Populate");
           System.out.println("The solution pool contains " + numsol + " solutions.");
           System.out.println(numsolreplaced + " solutions were removed due to the " + "solution pool relative gap parameter.");
           System.out.println("In total, " + (numsol + numsolreplaced) + " solutions were generated.");
-          System.out.println("Solution status = " + cplex.getStatus());
-          System.out.println("Solution value  = " + cplex.getObjValue());
+          System.out.println("Solution status = " + this.cplex.getStatus());
+          System.out.println("Solution value  = " + this.cplex.getObjValue());
         }
         // Store all the solutions in an ArrayList.
         ArrayList<int[][]> Solutions = new ArrayList<>();
@@ -151,7 +176,7 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
           int[][] sol = new int[market.getNumberGoods()][market.getNumberBidders()];
           double[][] solDouble = new double[market.getNumberGoods()][market.getNumberBidders()];
           for (G good : market.getGoods()) {
-            solDouble[goodToCPLEXIndex.get(good)] = cplex.getValues(allocationMatrixVariable[goodToCPLEXIndex.get(good)], l);
+            solDouble[goodToCPLEXIndex.get(good)] = this.cplex.getValues(allocationMatrixVariable[goodToCPLEXIndex.get(good)], l);
             /*
              * Unfortunately in Java the only way to cast your array is to
              * iterate through each element and cast them one by one
@@ -165,11 +190,11 @@ public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends
             Printer.printMatrix(sol);
             System.out.println();
             for (B bidder : market.getBidders()) {
-              System.out.println(cplex.getValue(indicatorVariable[bidderToCPLEXIndex.get(bidder)], l));
+              System.out.println(this.cplex.getValue(indicatorVariable[bidderToCPLEXIndex.get(bidder)], l));
             }
           }
         }
-        cplex.end();
+        this.cplex.end();
         
         HashBasedTable<G, B, Integer> alloc = HashBasedTable.create();
         for(G good : market.getGoods()){

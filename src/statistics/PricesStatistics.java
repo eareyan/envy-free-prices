@@ -30,7 +30,12 @@ public class PricesStatistics <M extends Market<G, B>, G extends Goods, B extend
   /**
    * epsilon parameter.
    */
-  protected static double epsilon = 0.0;
+  protected static final double epsilon = 0.01;
+  
+  /**
+   * Prints information if true.
+   */
+  protected static final boolean  debug = false;
 
   /**
    * Constructor.
@@ -53,8 +58,6 @@ public class PricesStatistics <M extends Market<G, B>, G extends Goods, B extend
    * @throws MarketOutcomeException 
    */
   public boolean isBidderEnvyFree(ArrayList<GoodPrices> goodOrderedList, B bidder) throws MarketAllocationException, MarketOutcomeException {
-    // System.out.println("Heuristic for bidder :" + bidder +
-    // ", check this many users:" + userList.size());
     double costCheapestBundle = 0.0;
     int impressionsNeeded = bidder.getDemand();
     while (impressionsNeeded > 0 && goodOrderedList.size() != 0) {
@@ -64,7 +67,7 @@ public class PricesStatistics <M extends Market<G, B>, G extends Goods, B extend
       int userSupply = good.getSupply();
       // If the bidder wants this good
       if (bidder.demandsGood(good)) {
-        if (userSupply >= impressionsNeeded) { 
+        if (userSupply >= impressionsNeeded) {
           // Take only as many users as you need.
           costCheapestBundle += impressionsNeeded * this.marketPrices.getPrice(good);
           impressionsNeeded = 0;
@@ -81,15 +84,24 @@ public class PricesStatistics <M extends Market<G, B>, G extends Goods, B extend
     } else {
       /*
        * There are two cases in which a bidder can be envy: (1) This bidder was
-       * satisfied but there exists a bundle in its demand set. (2) The campaign
-       * was not satisfied and there exists a bundle in its demand set.
+       * satisfied but there exists a cheaper bundle than the one it got, and
+       * (2) The campaign received nothing and there exists a bundle in its
+       * demand set.
        */
       if (this.marketPrices.getMarketAllocation().allocationToBidder(bidder) >= bidder.getDemand()) {
         // Case (1)
-        return (this.marketPrices.getBundleCost(bidder) - costCheapestBundle >= PricesStatistics.epsilon);
+        if(PricesStatistics.debug) {
+          System.out.println("Case 1:" + this.marketPrices.getBundleCost(bidder) + "," + costCheapestBundle);
+          System.out.println("\t"  + (this.marketPrices.getBundleCost(bidder) - costCheapestBundle));
+        }
+        return (this.marketPrices.getBundleCost(bidder) - costCheapestBundle  <= PricesStatistics.epsilon);
       } else {
         // Case (2)
-        return (bidder.getReward() - costCheapestBundle < PricesStatistics.epsilon);
+        if(PricesStatistics.debug) {
+          System.out.println("Case 2: "  + bidder.getReward() + "," + costCheapestBundle);
+          System.out.println("\t"  + (bidder.getReward() - costCheapestBundle));
+        }
+        return (bidder.getReward() - costCheapestBundle <= PricesStatistics.epsilon);
       }
     }
   }
@@ -102,19 +114,22 @@ public class PricesStatistics <M extends Market<G, B>, G extends Goods, B extend
    * @throws MarketAllocationException 
    */
   public int numberOfEnvyBidders() throws MarketOutcomeException, MarketAllocationException {
-    // Construct a priority queue with users where the priority is price in ascending order.
+    // Construct a list of goods.
     ArrayList<GoodPrices> listOfGoods = new ArrayList<GoodPrices>();
     for (G good : this.marketPrices.getMarketAllocation().getMarket().getGoods()) {
       listOfGoods.add(new GoodPrices(good, this.marketPrices.getPrice(good)));
     }
+    // Sort the list by ascending order of price.
     Collections.sort(listOfGoods, new UserPriceComparator());
-    // Check that each bidder is envy-free w.r.t the previously constructed queue.
+    // Check that each bidder is envy-free w.r.t the previously constructed lsit.
     int counter = 0;
     for (B bidder : this.marketPrices.getMarketAllocation().getMarket().getBidders()) {
       // System.out.println("**** check if " + j + " is envy");
       if (!this.isBidderEnvyFree(new ArrayList<GoodPrices>(listOfGoods), bidder)) {
         // Pass a copy of the queue each time.
-         System.out.println("\t --- > Bidder " + bidder + " is envy");
+        if(PricesStatistics.debug) {
+          System.out.println("\t --- > Bidder " + bidder + " is envy");
+        }
         counter++;
       }
     }
