@@ -1,24 +1,9 @@
 package test;
 
+import ilog.concert.IloException;
+
 import java.util.ArrayList;
 
-import algorithms.ascendingauction.AscendingAuction;
-import algorithms.pricing.RestrictedEnvyFreePricesLP;
-import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
-import algorithms.pricing.error.PrincingAlgoException;
-import algorithms.pricing.reserveprices.RandomSearch;
-import algorithms.pricing.reserveprices.RevMaxHeuristic;
-import allocations.error.AllocationAlgoException;
-import allocations.greedy.GreedyAllocation;
-import allocations.greedy.GreedyMultiStepAllocation;
-import allocations.interfaces.AllocationAlgo;
-import allocations.objectivefunction.ConcaveObjectiveFunction;
-import allocations.objectivefunction.ConvexObjectiveFunction;
-import allocations.objectivefunction.EffectiveReachRatio;
-import allocations.objectivefunction.IdentityObjectiveFunction;
-import allocations.objectivefunction.interfaces.ObjectiveFunction;
-import allocations.optimal.SingleStepWelfareMaxAllocationILP;
-import ilog.concert.IloException;
 import singleminded.ApproxWE;
 import statistics.PricesStatistics;
 import structures.Bidder;
@@ -36,6 +21,23 @@ import structures.exceptions.MarketOutcomeException;
 import structures.factory.RandomMarketFactory;
 import structures.factory.SingleMindedMarketFactory;
 import util.Printer;
+import algorithms.ascendingauction.AscendingAuction;
+import algorithms.pricing.RestrictedEnvyFreePricesLP;
+import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
+import algorithms.pricing.error.PrincingAlgoException;
+import algorithms.pricing.reserveprices.CriticalPoints;
+import algorithms.pricing.reserveprices.RandomSearch;
+import algorithms.pricing.reserveprices.RevMaxHeuristic;
+import allocations.error.AllocationAlgoException;
+import allocations.greedy.GreedyAllocation;
+import allocations.greedy.GreedyMultiStepAllocation;
+import allocations.interfaces.AllocationAlgo;
+import allocations.objectivefunction.ConcaveObjectiveFunction;
+import allocations.objectivefunction.ConvexObjectiveFunction;
+import allocations.objectivefunction.EffectiveReachRatio;
+import allocations.objectivefunction.IdentityObjectiveFunction;
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
+import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 /**
  * Main class. Use for testing purposes.
@@ -43,10 +45,43 @@ import util.Printer;
  * @author Enrique Areyan Viqueira
  */
 public class Main {
-  public static void main(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, MarketAllocationException, MarketOutcomeException {
+  
+  public static void main(String[] args) throws BidderCreationException, MarketCreationException, PrincingAlgoException, IloException, AllocationAlgoException, MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException {
+    Market<Goods, Bidder<Goods>> market =  SingleMindedMarkets.singleMinded2();
+    //Market<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(3,3);
+    System.out.println(market);
+    //SingleStepWelfareMaxAllocationILP sswm = new SingleStepWelfareMaxAllocationILP();
+    //MarketAllocation z = sswm.Solve(market);
+    //z.printAllocation();
+    
+    // Critical Points
+    System.out.println("Critical Points");
+    CriticalPoints cps = new CriticalPoints(market, new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
+    //CriticalPoints cps = new CriticalPoints(market, new SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
+    MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> criPointsOutcome = cps.Solve();
+    System.out.println(criPointsOutcome);
+    criPointsOutcome.printPrices();
+    criPointsOutcome.getMarketAllocation().printAllocation();
+    System.out.println(criPointsOutcome.sellerRevenue());
+    System.out.println(cps.getSetOfSolutions());
+    
+    System.out.println("Rev Max Heuristic");
+    RevMaxHeuristic rmh = new RevMaxHeuristic(market, new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
+    //RevMaxHeuristic rmh = new RevMaxHeuristic(market, new SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
+    MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> revMaxOutcome = rmh.Solve();
+    System.out.println(revMaxOutcome);
+    revMaxOutcome.printPrices();
+    revMaxOutcome.getMarketAllocation().printAllocation();
+    System.out.println(revMaxOutcome.sellerRevenue());
+    System.out.println(rmh.getSetOfSolutions());
+
+
+  }
+  
+  public static void main333(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, MarketAllocationException, MarketOutcomeException {
     System.out.println("Testing ascending auction");
     //Market<Goods, Bidder<Goods>> market =  SingleMindedMarkets.singleMinded1();
-    Market<Goods, Bidder<Goods>> market =  SizeInterchangeableMarkets.market4();
+    Market<Goods, Bidder<Goods>> market =  SizeInterchangeableMarkets.market0();
     System.out.println(market);
     AscendingAuction au = new AscendingAuction(market);
     MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> x = au.Solve();

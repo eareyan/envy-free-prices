@@ -89,7 +89,7 @@ public abstract class SearchMetaHeuristic {
     } else {
       // Add reserve 0.0 as a default value.
       listOfReservePrices.add(0.0);
-      //System.out.println("List of reserves: " + listOfReservePrices);
+      System.out.println("List of reserves: " + listOfReservePrices);
     }
     //HashMap<Double, Double> reserveToRevenueMap = new HashMap<Double, Double>();
     for (Double reserve : listOfReservePrices) {
@@ -127,6 +127,15 @@ public abstract class SearchMetaHeuristic {
     //System.out.println(reserveToRevenueMap);
     Collections.sort(this.setOfSolutions, new MarketPricesComparatorBySellerRevenue<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
     return setOfSolutions.get(0);
+  }
+  
+  /**
+   * Getter.
+   * 
+   * @return the set of solutions found by the algorithm.
+   */
+  public ArrayList<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>> getSetOfSolutions() {
+    return this.setOfSolutions;
   }
   
   /**

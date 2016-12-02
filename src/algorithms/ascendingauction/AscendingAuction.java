@@ -19,6 +19,7 @@ import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketOutcomeException;
 
 /**
+ * This class implements a generalization of the CK ascending auction.
  * 
  * @author Enrique Areyan Viqueira
  */

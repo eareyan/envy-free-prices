@@ -43,7 +43,6 @@ public class SingleMindedMarketFactory {
     }
     Random generator = new Random();
     ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
-    //boolean[][] connections = new boolean[n][m];
     for (int j = 0; j < m; j++) {
       int demand = generator.nextInt(n) + 1;
       // Each bidder connects exactly with I_j goods.
@@ -51,7 +50,6 @@ public class SingleMindedMarketFactory {
       // System.out.println("Bidder " + j + " connect to " + connectTo);
       HashSet<Goods> bDemandSet = new HashSet<Goods>();
       for (Integer i : connectTo) {
-        //connections[i][j] = true;
         bDemandSet.add(goods.get(i));
       }
       bidders.add(new Bidder<Goods>( 
@@ -74,7 +72,7 @@ public class SingleMindedMarketFactory {
    * @throws GoodsCreationException 
    * @throws BidderCreationException 
    * @throws MarketCreationException in case the reserve is too high and no bidder survived.
-   */
+   
   public static Market<Goods, Bidder<Goods>> discountSingleMindedMarket(Market<Goods, Bidder<Goods>> market, double reserve) throws GoodsCreationException, BidderCreationException, MarketCreationException {
     
     // Copy the ArrayList of Goods.

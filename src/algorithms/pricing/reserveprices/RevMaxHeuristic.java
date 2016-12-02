@@ -8,7 +8,6 @@ import structures.Bidder;
 import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.MarketOutcome;
 import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsException;
@@ -33,15 +32,6 @@ public class RevMaxHeuristic extends SearchMetaHeuristic{
    */
   public RevMaxHeuristic(Market<Goods, Bidder<Goods>> market, AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> AllocAlgo) throws PrincingAlgoException {
     super(market, AllocAlgo);
-  }
-  
-  /**
-   * Getter.
-   * 
-   * @return the set of solutions found by the algorithm.
-   */
-  public ArrayList<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>> getSetOfSolutions() {
-    return this.setOfSolutions;
   }
 
   @Override

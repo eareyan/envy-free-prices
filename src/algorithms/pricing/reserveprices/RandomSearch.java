@@ -8,7 +8,6 @@ import java.util.Random;
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
-import structures.MarketOutcome;
 import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsCreationException;
@@ -80,15 +79,6 @@ public class RandomSearch extends SearchMetaHeuristic{
   public RandomSearch(Market<Goods, Bidder<Goods>> market, AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> AllocAlgo, int numberOfSamples) throws GoodsCreationException, IloException, AllocationAlgoException, BidderCreationException, AllocationException, GoodsException, MarketAllocationException, PrincingAlgoException {
     this(market, AllocAlgo);
     this.numberOfSamples = numberOfSamples;
-  }
-  
-  /**
-   * Getter.
-   * 
-   * @return the set of solutions found by the algorithm.
-   */
-  public ArrayList<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>> getSetOfSolutions() {
-    return this.setOfSolutions;
   }
 
   @Override
