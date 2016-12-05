@@ -31,10 +31,11 @@ import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 public class single_minded extends Experiments{
 
+  /**
+   * Run single-minded experiments.
+   */
 	@Override
-	public void runOneExperiment(	int numUsers, int numCampaigns, double prob,
-									int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException {
-	
+	public void runOneExperiment(	int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException {
 	
 		if(!dbLogger.checkIfSingleMindedRowExists("singleminded", numUsers, numCampaigns)){
 			System.out.println("\t Add data (" + numUsers + "," + numCampaigns + ")");
@@ -73,7 +74,7 @@ public class single_minded extends Experiments{
 				approxWelfare.addValue(NumberMethods.getRatio(approxWEResult.getMarketAllocation().value() , optimalWelfare));
 				approxRevenue.addValue(NumberMethods.getRatio(approxWEResult.sellerRevenue() ,  optimalWelfare));
 				approxEF.addValue((double) psApprox.numberOfEnvyBidders() / numCampaigns);
-				approxWE.addValue((double) psApprox.computeMarketClearanceViolations()[0] / numUsers);
+				approxWE.addValue((double) psApprox.getMarketClearanceViolations().getKey() / numUsers);
 				approxTime.addValue(endTime - startTime);
 				
 				/* Single-Step Greedy + LP */
@@ -89,7 +90,7 @@ public class single_minded extends Experiments{
 				greedyWelfare.addValue(NumberMethods.getRatio(lpResult.getMarketAllocation().value() , optimalWelfare));
 				greedyRevenue.addValue(NumberMethods.getRatio(lpResult.sellerRevenue() , optimalWelfare));
 				greedyEF.addValue((double) psGreedy.numberOfEnvyBidders() / numCampaigns);
-				greedyWE.addValue((double) psGreedy.computeMarketClearanceViolations()[0] / numUsers);
+				greedyWE.addValue((double) psGreedy.getMarketClearanceViolations().getKey() / numUsers);
 				greedyTime.addValue(endTime - startTime);
 			}
 			dbLogger.saveSingleMinded("singleminded", numUsers, numCampaigns, 

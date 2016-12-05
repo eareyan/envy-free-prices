@@ -46,7 +46,34 @@ import allocations.optimal.SingleStepWelfareMaxAllocationILP;
  */
 public class Main {
   
-  public static void main(String[] args) throws BidderCreationException, MarketCreationException, PrincingAlgoException, IloException, AllocationAlgoException, MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException {
+  public static void main(String[] args) throws BidderCreationException, MarketCreationException, MarketAllocationException, MarketOutcomeException, PrincingAlgoException, IloException, AllocationAlgoException, AllocationException, GoodsException {
+    Market<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(5, 5);
+    System.out.println(market);
+    ApproxWE aw = new ApproxWE(market);
+    MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> approxWEResult = aw.Solve();
+    approxWEResult.getMarketAllocation().printAllocation();
+    approxWEResult.printPrices();
+    PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> psApprox = new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(approxWEResult);
+    System.out.println("# = " + psApprox.numberOfEnvyBidders());
+    System.out.println("Who? = " + psApprox.listOfEnvyBidders());
+    System.out.println("#MC = " + psApprox.getMarketClearanceViolations().getKey() + "," + psApprox.getMarketClearanceViolations().getValue());
+    
+    
+    //market = RandomMarketFactory.randomMarket(5, 5, 0.25);
+    //System.out.println(market);
+    RevMaxHeuristic rmh = new RevMaxHeuristic(market, new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
+    //RevMaxHeuristic rmh = new RevMaxHeuristic(market, new SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
+    MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> revMaxOutcome = rmh.Solve();
+    System.out.println(revMaxOutcome);
+    revMaxOutcome.getMarketAllocation().printAllocation();
+    revMaxOutcome.printPrices();
+    PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> psRevMax = new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(revMaxOutcome);
+    System.out.println("# = " + psRevMax.numberOfEnvyBidders());
+    System.out.println("Who? = " + psRevMax.listOfEnvyBidders());
+    System.out.println("#MC = " + psRevMax.getMarketClearanceViolations().getKey() + "," + psRevMax.getMarketClearanceViolations().getValue());    
+  }
+  
+  public static void main77(String[] args) throws BidderCreationException, MarketCreationException, PrincingAlgoException, IloException, AllocationAlgoException, MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException {
     Market<Goods, Bidder<Goods>> market =  SingleMindedMarkets.singleMinded2();
     //Market<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(3,3);
     System.out.println(market);

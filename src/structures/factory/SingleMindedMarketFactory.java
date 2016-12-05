@@ -115,9 +115,9 @@ public class SingleMindedMarketFactory {
       }
       return generated;
     } else {
-      Random rng = new Random(); // Ideally just create one instance globally.
-                                 // Note: use LinkedHashSet to maintain
-                                 // insertion order
+      // Ideally just create one instance globally.
+      // Note: use LinkedHashSet to maintain insertion order.
+      Random rng = new Random(); 
       while (generated.size() < n) {
         // System.out.println("11");
         Integer next = rng.nextInt(max);

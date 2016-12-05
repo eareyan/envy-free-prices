@@ -156,7 +156,7 @@ public class Printer {
     }
     /* Statistics for the prices. */
     PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> pricesStatistics = new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(outcome);
-    System.out.println("MC Violations : " + pricesStatistics.computeMarketClearanceViolations()[0] + "," + pricesStatistics.computeMarketClearanceViolations()[1]);
+    System.out.println("MC Violations : " + pricesStatistics.getMarketClearanceViolations().getKey() + "," + pricesStatistics.getMarketClearanceViolations().getValue());
     System.out.println("EF violations : " + pricesStatistics.numberOfEnvyBidders());
   }
   
