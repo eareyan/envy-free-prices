@@ -17,14 +17,15 @@ import allocations.error.AllocationAlgoException;
 import allocations.interfaces.AllocationAlgo;
 
 /**
- * This class implements a strategy for searching for a revenue-maximizing solution.
+ * This class implements a strategy for searching for a revenue-maximizing
+ * solution.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class RevMaxHeuristic extends SearchMetaHeuristic{
+public class RevMaxHeuristic extends SearchMetaHeuristic {
 
   /**
-   * Constructor. 
+   * Constructor.
    * 
    * @param market
    * @param AllocAlgo

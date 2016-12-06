@@ -14,6 +14,7 @@ import structures.Market;
 import structures.MarketOutcome;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketOutcomeException;
+import util.NumberMethods;
 
 /**
  * This class implements functionality to compute statistics from a market
@@ -28,7 +29,12 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
   /**
    * MarketPrices object.
    */
-  private final MarketOutcome<M, G, B> marketPrices;
+  private final MarketOutcome<M, G, B> marketOutcome;
+  
+  /**
+   * Time taken to compute the outcome.
+   */
+  private long time = -1;
 
   /**
    * epsilon parameter. This class computes envy-freeness violations up to
@@ -56,11 +62,21 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
   /**
    * Constructor.
    * 
-   * @param marketPrices
-   *          - a MarketPrices object.
+   * @param marketPrices - a MarketPrices object.
    */
-  public PricesStatistics(MarketOutcome<M, G, B> marketPrices) {
-    this.marketPrices = marketPrices;
+  public PricesStatistics(MarketOutcome<M, G, B> marketOutcome) {
+    this.marketOutcome = marketOutcome;
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param marketPrices - a MarketPrices object.
+   * @param time - taken to compute the result
+   */
+  public PricesStatistics(MarketOutcome<M, G, B> marketOutcome, long time) {
+    this.marketOutcome = marketOutcome;
+    this.time = time;
   }
 
   /**
@@ -97,11 +113,11 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
       if (bidder.demandsGood(good)) {
         if (userSupply >= impressionsNeeded) {
           // Take only as many users as you need.
-          costCheapestBundle += impressionsNeeded * this.marketPrices.getPrice(good);
+          costCheapestBundle += impressionsNeeded * this.marketOutcome.getPrice(good);
           impressionsNeeded = 0;
         } else {
           // Greedily take all of the users.
-          costCheapestBundle += userSupply * this.marketPrices.getPrice(good);
+          costCheapestBundle += userSupply * this.marketOutcome.getPrice(good);
           impressionsNeeded -= userSupply;
         }
       }
@@ -116,13 +132,13 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
        * (2) The campaign received nothing and there exists a bundle in its
        * demand set.
        */
-      if (this.marketPrices.getMarketAllocation().allocationToBidder(bidder) >= bidder.getDemand()) {
+      if (this.marketOutcome.getMarketAllocation().allocationToBidder(bidder) >= bidder.getDemand()) {
         // Case (1)
         if (PricesStatistics.debug) {
-          System.out.println("Case 1:" + this.marketPrices.getBundleCost(bidder) + "," + costCheapestBundle);
-          System.out.println("\t" + (this.marketPrices.getBundleCost(bidder) - costCheapestBundle));
+          System.out.println("Case 1:" + this.marketOutcome.getBundleCost(bidder) + "," + costCheapestBundle);
+          System.out.println("\t" + (this.marketOutcome.getBundleCost(bidder) - costCheapestBundle));
         }
-        return (this.marketPrices.getBundleCost(bidder) - costCheapestBundle <= PricesStatistics.epsilon);
+        return (this.marketOutcome.getBundleCost(bidder) - costCheapestBundle <= PricesStatistics.epsilon);
       } else {
         // Case (2)
         if (PricesStatistics.debug) {
@@ -149,13 +165,13 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
       ImmutableList.Builder<B> listOfEnvyBiddersBuilder = ImmutableList.builder();
       // Construct a list of goods.
       ArrayList<GoodPrices> listOfGoods = new ArrayList<GoodPrices>();
-      for (G good : this.marketPrices.getMarketAllocation().getMarket().getGoods()) {
-        listOfGoods.add(new GoodPrices(good, this.marketPrices.getPrice(good)));
+      for (G good : this.marketOutcome.getMarketAllocation().getMarket().getGoods()) {
+        listOfGoods.add(new GoodPrices(good, this.marketOutcome.getPrice(good)));
       }
       // Sort the list by ascending order of price.
       Collections.sort(listOfGoods, new UserPriceComparator());
       // Check that each bidder is envy-free w.r.t the previously constructed list.
-      for (B bidder : this.marketPrices.getMarketAllocation().getMarket().getBidders()) {
+      for (B bidder : this.marketOutcome.getMarketAllocation().getMarket().getBidders()) {
         // System.out.println("**** check if " + j + " is envy");
         if (!this.isBidderEnvyFree(new ArrayList<GoodPrices>(listOfGoods), bidder)) {
           // Pass a copy of the goods' list each time.
@@ -181,17 +197,16 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
    * @throws MarketOutcomeException
    * @throws MarketAllocationException
    */
-  public Pair<Integer, Double> getMarketClearanceViolations()
-      throws MarketAllocationException, MarketOutcomeException {
+  public Pair<Integer, Double> getMarketClearanceViolations() throws MarketAllocationException, MarketOutcomeException {
     if (this.marketClearanceViolations == null) {
       int violations = 0;
       double totalPricesOfUsers = 0.0;
       double totalPricesOfViolatingUsers = 0.0;
-      for (G good : this.marketPrices.getMarketAllocation().getMarket().getGoods()) {
-        totalPricesOfUsers += this.marketPrices.getPrice(good);
-        if (this.marketPrices.getMarketAllocation().allocationFromGood(good) == 0 && this.marketPrices.getPrice(good) > 0) {
+      for (G good : this.marketOutcome.getMarketAllocation().getMarket().getGoods()) {
+        totalPricesOfUsers += this.marketOutcome.getPrice(good);
+        if (this.marketOutcome.getMarketAllocation().allocationFromGood(good) == 0 && this.marketOutcome.getPrice(good) > 0) {
           violations++;
-          totalPricesOfViolatingUsers += this.marketPrices.getPrice(good);
+          totalPricesOfViolatingUsers += this.marketOutcome.getPrice(good);
         }
       }
       // If the price of all users is zero, then the ratio should be zero.
@@ -203,7 +218,89 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
     }
     return this.marketClearanceViolations;
   }
+  
+  /**
+   * Wrapper to get the seller revenue for the associated outcome.
+   * 
+   * @return the seller revenue for the outcome.
+   * @throws MarketOutcomeException
+   * @throws MarketAllocationException
+   */
+  public double getSellerRevenue() throws MarketOutcomeException, MarketAllocationException {
+    return this.marketOutcome.sellerRevenue();
+  }
+  
+  /**
+   * Wrapper to get the value of the allocation for the associated outcome.
+   * 
+   * @return the value of the allocation for the outcome.
+   * @throws MarketAllocationException
+   */
+  public double getWelfare() throws MarketAllocationException {
+    return this.marketOutcome.getMarketAllocation().value();
+  }
+  
+  /**
+   * Computes the ratio of the seller revenue w.r.t a given value.
+   * 
+   * @param value
+   * @return the ratio of the seller revenue w.r.t a given value.
+   * @throws MarketOutcomeException
+   * @throws MarketAllocationException
+   */
+  public double getSellerRevenueRatio(double value) throws MarketOutcomeException, MarketAllocationException {
+    return NumberMethods.getRatio(this.getSellerRevenue() , value);
+  }
+  
+  /**
+   * Computes the ratio of the welfare w.r.t a given value.
+   * @param value
+   * @return the ratio of the welfare w.r.t a given value.
+   * @throws MarketAllocationException
+   */
+  public double getWelfareRatio(double value) throws MarketAllocationException {
+    return NumberMethods.getRatio(this.getWelfare() , value);
+  }
+  
+  /**
+   * Computes the ratio of EF violations to the total number of bidders.
+   * 
+   * @return the ratio of EF violations to the total number of bidders.
+   * @throws MarketOutcomeException
+   * @throws MarketAllocationException
+   */
+  public double getEFViolationsRatio() throws MarketOutcomeException, MarketAllocationException {
+    return (double) this.numberOfEnvyBidders() / this.marketOutcome.getMarketAllocation().getMarket().getNumberBidders();
+  }
 
+  /**
+   * Computes the ratio of MC violations to the total number of goods.
+   * 
+   * @return the ratio of MC violations to the total number of goods.
+   * @throws MarketOutcomeException 
+   * @throws MarketAllocationException 
+   */
+  public double getMCViolationsRatio() throws MarketAllocationException, MarketOutcomeException {
+    return (double) this.getMarketClearanceViolations().getKey() / this.marketOutcome.getMarketAllocation().getMarket().getNumberGoods();
+  }
+  
+  /**
+   * Getter.
+   * 
+   * @return the time taken to compute the result.
+   */
+  public long getTime() {
+    return this.time / 1000000;
+  }
+  
+  /**
+   * Getter.
+   * 
+   * @return the market outcome associated to these statistics.
+   */
+  public MarketOutcome<M, G, B> getMarketOutcome() {
+    return this.marketOutcome;
+  }
   /**
    * Auxiliary class that links goods to prices so we can order goods by prices.
    * 

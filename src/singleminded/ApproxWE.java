@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import statistics.PricesStatistics;
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
@@ -110,7 +111,7 @@ public class ApproxWE {
    * @return a MarketPrices object.
    * @throws MarketAllocationException 
    */
-  public MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> Solve() throws MarketAllocationException {
+  public PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> Solve() throws MarketAllocationException {
     // Keep iterating while there still are bidders that can be allocated.
     while (!matrixAllFalse(this.A)) {
       // Find the commodity which attracts most bidders.
@@ -183,8 +184,11 @@ public class ApproxWE {
     for(Goods good : this.M.getGoods()){
       result.put(good, this.p[this.goodsToIndex.get(good)]);
     }
-    MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> x = new MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(this.M, allocation, new SingleStepObjectiveFunction());
-    return new MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(x , result.build());
+    return new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
+        new MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
+            new MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
+                this.M, allocation, new SingleStepObjectiveFunction()), result
+                .build()));
   }
   
   /**

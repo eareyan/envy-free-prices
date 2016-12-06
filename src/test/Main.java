@@ -4,6 +4,7 @@ import ilog.concert.IloException;
 
 import java.util.ArrayList;
 
+import experiments.LPWrapper;
 import singleminded.ApproxWE;
 import statistics.PricesStatistics;
 import structures.Bidder;
@@ -44,17 +45,20 @@ import allocations.optimal.SingleStepWelfareMaxAllocationILP;
  */
 public class Main {
   
-  public static void main(String[] args) throws BidderCreationException, MarketCreationException, AllocationException, GoodsException, MarketAllocationException, AllocationAlgoException {
+  public static void main(String[] args) throws BidderCreationException, MarketCreationException, AllocationException, GoodsException, MarketAllocationException, AllocationAlgoException, IloException, MarketOutcomeException {
+    
     Market<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(5, 5);
     System.out.println(market);
-    GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(new BiddersComparatorBy1ToSqrtIRatio<Goods, Bidder<Goods>>());
-    MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> greedyAlloc = ga.Solve(market);
-    greedyAlloc.printAllocation();
 
-    System.out.println("---");
+    System.out.println("Greedy Welfare");
     GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga2 = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
     MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> greedyAlloc2 = ga2.Solve(market);
     greedyAlloc2.printAllocation();
+
+    System.out.println("Greedy Egalitarian");
+    GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(new BiddersComparatorBy1ToSqrtIRatio<Goods, Bidder<Goods>>());
+    MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> greedyAlloc = ga.Solve(market);
+    greedyAlloc.printAllocation();
     
     System.out.println("--- Welfare Max. Alloc");
     SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> sswm = new SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
@@ -65,6 +69,30 @@ public class Main {
     EgalitarianMaxAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> em = new EgalitarianMaxAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
     MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> egaAlloc = em.Solve(market);
     egaAlloc.printAllocation();
+    
+    
+    @SuppressWarnings("serial")
+    ArrayList<LPWrapper.Allocations> allocs = new ArrayList<LPWrapper.Allocations>() {
+      {
+        add(LPWrapper.Allocations.GreedyWelfare);
+        add(LPWrapper.Allocations.GreedyEgalitarian);
+        add(LPWrapper.Allocations.OptimalWelfare);
+        add(LPWrapper.Allocations.OptimalEgalitarian);
+      }
+    };
+    for(LPWrapper.Allocations alloc : allocs) {
+      PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> smlp = LPWrapper.getMarketPrices(market, alloc);
+      System.out.println(alloc + " - Welfare = " + smlp.getWelfare());     
+    }
+    
+    ApproxWE aw = new ApproxWE(market);
+    PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> approxWEResult = aw.Solve();
+    approxWEResult.getMarketOutcome().getMarketAllocation().printAllocation();
+    approxWEResult.getMarketOutcome().printPrices();
+    System.out.println("# = " + approxWEResult.numberOfEnvyBidders());
+    System.out.println("Who? = " + approxWEResult.listOfEnvyBidders());
+    System.out.println("#MC = " + approxWEResult.getMarketClearanceViolations().getKey() + "," + approxWEResult.getMarketClearanceViolations().getValue());
+
 
   }
   
@@ -72,13 +100,12 @@ public class Main {
     Market<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(5, 5);
     System.out.println(market);
     ApproxWE aw = new ApproxWE(market);
-    MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> approxWEResult = aw.Solve();
-    approxWEResult.getMarketAllocation().printAllocation();
-    approxWEResult.printPrices();
-    PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> psApprox = new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(approxWEResult);
-    System.out.println("# = " + psApprox.numberOfEnvyBidders());
-    System.out.println("Who? = " + psApprox.listOfEnvyBidders());
-    System.out.println("#MC = " + psApprox.getMarketClearanceViolations().getKey() + "," + psApprox.getMarketClearanceViolations().getValue());
+    PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> approxWEResult = aw.Solve();
+    approxWEResult.getMarketOutcome().getMarketAllocation().printAllocation();
+    approxWEResult.getMarketOutcome().printPrices();
+    System.out.println("# = " + approxWEResult.numberOfEnvyBidders());
+    System.out.println("Who? = " + approxWEResult.listOfEnvyBidders());
+    System.out.println("#MC = " + approxWEResult.getMarketClearanceViolations().getKey() + "," + approxWEResult.getMarketClearanceViolations().getValue());
     
     
     //market = RandomMarketFactory.randomMarket(5, 5, 0.25);

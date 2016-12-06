@@ -8,14 +8,14 @@ package experiments;
  */
 public class RunParameters {
 
-  public static final int totalNumUsers = 19;
-  public static final int totalNumCamp = 19;
+  public static final int totalNumGoods = 19;
+  public static final int totalNumBidders = 19;
   public static final int totalProbabilities = 4;
   public static final int totalB = 3;
   public static final int numTrials = 100;
 
-  public int numUsers;
-  public int numCampaigns;
+  public int numGoods;
+  public int numBidders;
   public double prob;
   public int b;
   public int id;
@@ -52,8 +52,8 @@ public class RunParameters {
    */
   public void computeRangeOfWork() {
     int k = 0;
-    for (int i = 0; i < RunParameters.totalNumUsers; i++) {
-      for (int j = 0; j < RunParameters.totalNumCamp; j++) {
+    for (int i = 0; i < RunParameters.totalNumGoods; i++) {
+      for (int j = 0; j < RunParameters.totalNumBidders; j++) {
         for (int p = 0; p < RunParameters.totalProbabilities; p++) {
           for (int b = 0; b < RunParameters.totalB; b++) {
             k++;
@@ -84,8 +84,8 @@ public class RunParameters {
                 break;
               // case 3: this.b = 4; break;
               }
-              this.numUsers = i + 2;
-              this.numCampaigns = j + 2;
+              this.numGoods = i + 2;
+              this.numBidders = j + 2;
             }
           }
         }
@@ -100,12 +100,8 @@ public class RunParameters {
    * @throws Exception
    */
   public Experiments getExperimentObject(String type) throws Exception {
-    if (type.equals("unit_demand")) {
-      return new unit_demand();
-    } else if (type.equals("allocation")) {
-      return new allocation();
-    } else if (type.equals("singleminded")) {
-      return new single_minded();
+    if (type.equals("SingleMinded")) {
+      return new SingleMinded();
     } else {
       throw new Exception("Unknown demand type");
     }
@@ -113,8 +109,8 @@ public class RunParameters {
 
   @Override
   public String toString() {
-    return "Param: " + "\n" + "numUsers \t= " + this.numUsers + "\n"
-        + "numCampaigns \t= " + this.numCampaigns + "\n" + "prob \t\t= "
+    return "Param: " + "\n" + "numUsers \t= " + this.numGoods + "\n"
+        + "numCampaigns \t= " + this.numBidders + "\n" + "prob \t\t= "
         + this.prob + "\n" + "b \t\t= " + this.b + "\n" + "experiment \t= "
         + this.experimentName;
   }

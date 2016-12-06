@@ -71,8 +71,8 @@ public abstract class Experiments {
         Parameters.dbPort, Parameters.dbName, Parameters.dbUsername,
         Parameters.dbPassword);
     if (args[0].equals("grid")) {
-      Parameters.experimentObject.runOneExperiment(Parameters.numUsers,
-          Parameters.numCampaigns, Parameters.prob, Parameters.b, dbLogger);
+      Parameters.experimentObject.runOneExperiment(Parameters.numGoods,
+          Parameters.numBidders, Parameters.prob, Parameters.b, dbLogger);
     } else {
       // Running local bulk tests
       System.out.println("Running local...");
@@ -103,8 +103,5 @@ public abstract class Experiments {
    * @throws GoodsException 
    * @throws MarketCreationException 
    */
-  abstract public void runOneExperiment(int numUsers, int numCampaigns,
-      double prob, int b, SqlDB dbLogger) throws SQLException, IloException,
-      AllocationAlgoException, BidderCreationException,
-      MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException;
+  abstract public void runOneExperiment(int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException;
 }
