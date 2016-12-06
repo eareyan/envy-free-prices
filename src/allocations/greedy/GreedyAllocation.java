@@ -34,6 +34,21 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
    * Goods comparator
    */
   protected Comparator<G> GoodsComparator;
+  
+  /**
+   * Default goods ordering
+   */
+  private final static int ascendingGoodsOrder = 1;
+  
+  /**
+   * Constructor.
+   * Takes in a bidder comparator and uses the default goods comparator.
+   * @param BidderComparator
+   */
+  public GreedyAllocation(Comparator<B> BidderComparator) {
+    this.BidderComparator = BidderComparator;
+    this.GoodsComparator = new GoodsComparatorByRemainingSupply<G>(GreedyAllocation.ascendingGoodsOrder);
+  }
 
   /**
    * Constructor.
@@ -63,7 +78,7 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
    * Default ordering of goods is by ascending order of remaining supply.
    */
   public GreedyAllocation() {
-    this(1);
+    this(GreedyAllocation.ascendingGoodsOrder);
   }
   
   /**
@@ -76,7 +91,7 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
    */
   public MarketAllocation<M, G, B> Solve(M market) throws AllocationException, GoodsException, MarketAllocationException {
     // MAKE SHALLOW COPY OF BIDDERS - that is OK, you get the pointers anyway,
-    // which you can't change up because they provide no mutable fields.
+    // which you can't change because they provide no mutable fields.
     ArrayList<B> bidders = new ArrayList<B>(market.getBidders());
     // Sort the copy of the list of market's bidders.
     Collections.sort(bidders, this.BidderComparator);

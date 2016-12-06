@@ -196,10 +196,8 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
       }
       // If the price of all users is zero, then the ratio should be zero.
       if (totalPricesOfUsers == 0) {
-        System.out.println("Flag 1 : ");
         this.marketClearanceViolations = new Pair<Integer, Double>(violations, 0.0);
       } else {
-        System.out.println("Flag 2 : " + totalPricesOfViolatingUsers / totalPricesOfUsers);
         this.marketClearanceViolations = new Pair<Integer, Double>(violations, totalPricesOfViolatingUsers / totalPricesOfUsers);
       }
     }
