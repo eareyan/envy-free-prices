@@ -1,0 +1,117 @@
+\documentclass{article}
+\usepackage{pgfplots}
+\usepackage{booktabs} % To thicken table lines
+\pgfplotsset{compat=1.11}
+\pgfplotstableread[col sep=comma]{50items.csv}\resultsfiftyitems
+\pgfplotstableread[col sep=comma]{50bidders.csv}\resultsfiftybidders
+
+
+\newcommand*{\figuretitle}[1]{%
+    {\centering%   <--------  will only affect the title because of the grouping (by the
+    \textbf{#1}%              braces before \centering and behind \medskip). If you remove
+    \par\medskip}%            these braces the whole body of a {figure} env will be centered.
+}
+
+
+\begin{document}
+ 
+\noindent
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lllllll}
+&\textbf{Efficiency}&\textbf{EF}\\\midrule
+\multicolumn{4}{c}{Over-demanded single-minded markets, $n < m$} \\\toprule
+\textbf{Huang}			&0.94	&0.14	\\
+\textbf{Greedy Utilitarian}	&0.75	&0.17	\\
+\textbf{Greedy Egalitarian}	&0.75	&0.17	\\
+\textbf{Optimal Utilitarian}	&0.75	&0.17	\\
+\textbf{Optimal Egalitarian}	&0.75	&0.17	\\\bottomrule
+\multicolumn{4}{c}{Under-demanded single-minded markets, $n \ge m$} \\\toprule 
+\textbf{Huang}			&0.94	&0.14	\\
+\textbf{Greedy Utilitarian}	&0.75	&0.17	\\
+\textbf{Greedy Egalitarian}	&0.75	&0.17	\\
+\textbf{Optimal Utilitarian}	&0.75	&0.17	\\
+\textbf{Optimal Egalitarian}	&0.75	&0.17	\\\bottomrule
+\end{tabular}}
+\label{SingleMindedResults}
+
+\newpage
+
+\begin{figure}
+%\centering
+\figuretitle{Welfare, 50 items.}
+\begin{tikzpicture}[scale=1.5]
+    \begin{axis}[ xlabel=Number Of Bidders, ylabel=Average ratio, legend style={at={(1,0.58)},font=\tiny} ]
+      \addplot table[x = m, y = approxwelfare]{\resultsfiftyitems};
+      \addlegendentry{Huang's}
+      \addplot table[x = m, y = gwwelfare]{\resultsfiftyitems};
+      \addlegendentry{Greedy Utilitarian}
+      \addplot table[x = m, y = gewelfare]{\resultsfiftyitems};
+      \addlegendentry{Greedy Egalitarian}
+      \addplot table[x = m, y = owwelfare]{\resultsfiftyitems};
+      \addlegendentry{Optimal Utilitarian}
+      \addplot table[x = m, y = oewelfare]{\resultsfiftyitems};
+      \addlegendentry{Optimal Egalitarian}
+  \end{axis}
+\end{tikzpicture}
+\end{figure}
+
+\begin{figure}
+\centering
+\figuretitle{EF violations, 50 items.}
+\begin{tikzpicture}[scale=1.5]
+    \begin{axis}[ xlabel=Number Of Bidders, ylabel=Average ratio, legend style={at={(1,1)},font=\tiny} ]
+      \addplot table[x = m, y = approxef]{\resultsfiftyitems};
+      \addlegendentry{Huang's}
+      \addplot table[x = m, y = gwef]{\resultsfiftyitems};
+      \addlegendentry{Greedy Utilitarian}
+      \addplot table[x = m, y = geef]{\resultsfiftyitems};
+      \addlegendentry{Greedy Egalitarian}
+      \addplot table[x = m, y = owef]{\resultsfiftyitems};
+      \addlegendentry{Optimal Utilitarian}
+      \addplot table[x = m, y = oeef]{\resultsfiftyitems};
+      \addlegendentry{Optimal Egalitarian}
+  \end{axis}
+\end{tikzpicture}
+\end{figure}
+
+
+\begin{figure}
+%\centering
+\figuretitle{Welfare, 50 bidders.}
+\begin{tikzpicture}[scale=1.5]
+    \begin{axis}[ xlabel=Number Of Items, ylabel=Average ratio, legend style={at={(1,0.58)},font=\tiny} ]
+      \addplot table[x = n, y = approxwelfare]{\resultsfiftybidders};
+      \addlegendentry{Huang's}
+      \addplot table[x = n, y = gwwelfare]{\resultsfiftybidders};
+      \addlegendentry{Greedy Utilitarian}
+      \addplot table[x = n, y = gewelfare]{\resultsfiftybidders};
+      \addlegendentry{Greedy Egalitarian}
+      \addplot table[x = n, y = owwelfare]{\resultsfiftybidders};
+      \addlegendentry{Optimal Utilitarian}
+      \addplot table[x = n, y = oewelfare]{\resultsfiftybidders};
+      \addlegendentry{Optimal Egalitarian}
+  \end{axis}
+\end{tikzpicture}
+\end{figure}
+
+\begin{figure}
+%\centering
+\figuretitle{EF Violations, 50 bidders.}
+\begin{tikzpicture}[scale=1.5]
+    \begin{axis}[ xlabel=Number Of Items, ylabel=Average ratio, legend style={at={(1,0.3)},font=\tiny} ]
+      \addplot table[x = n, y = approxef]{\resultsfiftybidders};
+      \addlegendentry{Huang's}
+      \addplot table[x = n, y = gwef]{\resultsfiftybidders};
+      \addlegendentry{Greedy Utilitarian}
+      \addplot table[x = n, y = geef]{\resultsfiftybidders};
+      \addlegendentry{Greedy Egalitarian}
+      \addplot table[x = n, y = owef]{\resultsfiftybidders};
+      \addlegendentry{Optimal Utilitarian}
+      \addplot table[x = n, y = oeef]{\resultsfiftybidders};
+      \addlegendentry{Optimal Egalitarian}
+  \end{axis}
+\end{tikzpicture}
+\end{figure}
+
+
+\end{document}

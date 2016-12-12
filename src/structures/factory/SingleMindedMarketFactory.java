@@ -62,43 +62,6 @@ public class SingleMindedMarketFactory {
   }
   
   /**
-   * Creates, from the input single-minded market, 
-   * another single-minded market where bidders that can't afford 
-   * the reserve are dropped out.
-   * 
-   * @param market - a single minded market object.
-   * @param reserve - a reserve price.
-   * @return a single-minded market.
-   * @throws GoodsCreationException 
-   * @throws BidderCreationException 
-   * @throws MarketCreationException in case the reserve is too high and no bidder survived.
-   
-  public static Market<Goods, Bidder<Goods>> discountSingleMindedMarket(Market<Goods, Bidder<Goods>> market, double reserve) throws GoodsCreationException, BidderCreationException, MarketCreationException {
-    
-    // Copy the ArrayList of Goods.
-    ArrayList<Goods> goods = new ArrayList<Goods>();
-    for (Goods good : market.getGoods()) {
-      goods.add(new Goods(good.getSupply()));
-    }
-
-    // Copy the ArrayList of Bidders
-    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
-    for (Bidder<Goods> bidder : market.getBidders()) {
-      if (bidder.getReward() - reserve * bidder.getDemand() >= 0) {
-        HashSet<Goods> bDemandSet = new HashSet<Goods>();
-        for (int i = 0; i < market.getNumberGoods(); i++) {
-          if (bidder.demandsGood(market.getGoods().get(i))) {
-            bDemandSet.add(goods.get(i));
-          }
-        }
-        bidders.add(new Bidder<Goods>(bidder.getDemand(), bidder.getReward(), bDemandSet));
-      }
-    }
-
-    return new Market<Goods, Bidder<Goods>>(goods, bidders);
-  }
-  
-  /**
    * Computes a set of n distinct, random integers, between 0 and max. 
    * If n>=max, returns the set of integers 0...max
    *

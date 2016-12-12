@@ -43,10 +43,10 @@ public abstract class Experiments {
       IloException, AllocationAlgoException, BidderCreationException,
       MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException {
 
-    int numUsers = 21;
-    int numCampaigns = 21;
-    for (int i = 2; i < numUsers; i++) {
-      for (int j = 2; j < numCampaigns; j++) {
+    int numGoods = 51;
+    int numBidders = 51;
+    for (int i = 2; i < numGoods; i++) {
+      for (int j = 2; j < numBidders; j++) {
         for (int p = 0; p < 4; p++) {
           double prob = 0.25 + p * (0.25);
           for (int b = 0; b < 4; b++) {
@@ -82,13 +82,13 @@ public abstract class Experiments {
   
   /**
    * This method is implemented by a particular type of experiment class. This
-   * method receives the number of users, number of campaigns and probability
-   * and runs one experiments, saving the result in the database. This method
+   * method receives the number of goods, number of bidders and probability, and
+   * runs one experiments, saving the results in the database. This method
    * should also check if we have that result first before running the
    * experiment.
    * 
-   * @param numUsers
-   * @param numCampaigns
+   * @param numGoods
+   * @param numBidders
    * @param prob
    * @param b
    * @param dbLogger
@@ -98,10 +98,10 @@ public abstract class Experiments {
    * @throws BidderCreationException
    * @throws MarketAllocationException
    * @throws MarketOutcomeException
-   * @throws GoodsCreationException 
-   * @throws AllocationException 
-   * @throws GoodsException 
-   * @throws MarketCreationException 
+   * @throws GoodsCreationException
+   * @throws AllocationException
+   * @throws GoodsException
+   * @throws MarketCreationException
    */
-  abstract public void runOneExperiment(int numUsers, int numCampaigns, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException;
+  abstract public void runOneExperiment(int numGoods, int numBidders, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException;
 }

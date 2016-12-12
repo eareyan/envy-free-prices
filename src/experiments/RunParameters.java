@@ -109,8 +109,8 @@ public class RunParameters {
 
   @Override
   public String toString() {
-    return "Param: " + "\n" + "numUsers \t= " + this.numGoods + "\n"
-        + "numCampaigns \t= " + this.numBidders + "\n" + "prob \t\t= "
+    return "Param: " + "\n" + "numGoods \t= " + this.numGoods + "\n"
+        + "numBidders \t= " + this.numBidders + "\n" + "prob \t\t= "
         + this.prob + "\n" + "b \t\t= " + this.b + "\n" + "experiment \t= "
         + this.experimentName;
   }

@@ -180,13 +180,28 @@ CREATE TABLE singleminded (
 	approxWelfare double precision NOT NULL,
 	approxRevenue double precision NOT NULL,
 	approxEF double precision NOT NULL,
-	approxWE double precision NOT NULL,
+	approxMC double precision NOT NULL,
 	approxTime double precision NOT NULL,
-	greedyWelfare double precision NOT NULL,
-	greedyRevenue double precision NOT NULL,
-	greedyEF double precision NOT NULL,
-	greedyWE double precision NOT NULL,
-	greedyTime double precision NOT NULL
+	gwWelfare double precision NOT NULL,
+	gwRevenue double precision NOT NULL,
+	gwEF double precision NOT NULL,
+	gwMC double precision NOT NULL,
+	gwTime double precision NOT NULL,
+	geWelfare double precision NOT NULL,
+	geRevenue double precision NOT NULL,
+	geEF double precision NOT NULL,
+	geMC double precision NOT NULL,
+	geTime double precision NOT NULL,
+	owWelfare double precision NOT NULL,
+	owRevenue double precision NOT NULL,
+	owEF double precision NOT NULL,
+	owMC double precision NOT NULL,
+	owTime double precision NOT NULL,
+	oeWelfare double precision NOT NULL,
+	oeRevenue double precision NOT NULL,
+	oeEF double precision NOT NULL,
+	oeMC double precision NOT NULL,
+	oeTime double precision NOT NULL
 	);
 	
 CREATE TABLE tacexperiments (
@@ -242,35 +257,49 @@ SELECT 	round(AVG(approxWelfare)::numeric,2) AS approxWelfare,
 	round(AVG(greedyTime)::numeric,2) AS greedyTime
 	FROM singleminded;
 
-SELECT 	round(AVG(approxWelfare)::numeric,2) AS approxWelfare, 
-	round(AVG(approxEF)::numeric,2) AS approxEF,
-	round(AVG(approxTime)::numeric,2) AS approxTime,
-	round(AVG(greedyWelfare)::numeric,2) AS greedyWelfare, 
-	round(AVG(greedyEF)::numeric,2) AS greedyEF,
-	round(AVG(greedyTime)::numeric,2) AS greedyTime
+
+##### Single Minded #########
+
+
+SELECT 	round(AVG(approxWelfare)::numeric,4) AS approxWelfare, 
+	round(AVG(approxEF)::numeric,4) AS approxEF,
+	round(AVG(approxTime)::numeric,4) AS approxTime,
+	round(AVG(gwWelfare)::numeric,4) AS gwWelfare, 
+	round(AVG(gwEF)::numeric,4) AS gwEF,
+	round(AVG(gwTime)::numeric,4) AS gwTime,
+	round(AVG(geWelfare)::numeric,4) AS geWelfare, 
+	round(AVG(geEF)::numeric,4) AS geEF,
+	round(AVG(geTime)::numeric,4) AS geTime,
+	round(AVG(owWelfare)::numeric,4) AS owWelfare, 
+	round(AVG(owEF)::numeric,4) AS owEF,
+	round(AVG(owTime)::numeric,4) AS owTime,
+	round(AVG(oeWelfare)::numeric,4) AS oeWelfare,
+	round(AVG(oeEF)::numeric,4) AS oeEF,
+	round(AVG(oeTime)::numeric,4) AS oeTime
 	FROM singleminded
-	WHERE n<=m;
+	WHERE n<=m AND n <= 45 AND m <= 45;
 
-
-SELECT 	AVG(approxWelfare) AS approxWelfare, 
-	AVG(approxEF) AS approxEF,
-	AVG(approxTime) AS approxTime,
-	AVG(greedyWelfare) AS greedyWelfare, 
-	AVG(greedyEF) AS greedyEF,
-	AVG(greedyTime) AS greedyTime
+SELECT 	round(AVG(approxWelfare)::numeric,4) AS approxWelfare, 
+	round(AVG(approxEF)::numeric,4) AS approxEF,
+	round(AVG(approxTime)::numeric,4) AS approxTime,
+	round(AVG(gwWelfare)::numeric,4) AS gwWelfare, 
+	round(AVG(gwEF)::numeric,4) AS gwEF,
+	round(AVG(gwTime)::numeric,4) AS gwTime,
+	round(AVG(geWelfare)::numeric,4) AS geWelfare, 
+	round(AVG(geEF)::numeric,4) AS geEF,
+	round(AVG(geTime)::numeric,4) AS geTime,
+	round(AVG(owWelfare)::numeric,4) AS owWelfare, 
+	round(AVG(owEF)::numeric,4) AS owEF,
+	round(AVG(owTime)::numeric,4) AS owTime,
+	round(AVG(oeWelfare)::numeric,4) AS oeWelfare,
+	round(AVG(oeEF)::numeric,4) AS oeEF,
+	round(AVG(oeTime)::numeric,4) AS oeTime
 	FROM singleminded
-	WHERE n>m;
-
-SELECT 	AVG(approxWelfare) AS approxWelfare, 
-	AVG(approxEF) AS approxEF,
-	AVG(approxTime) AS approxTime,
-	AVG(greedyWelfare) AS greedyWelfare, 
-	AVG(greedyEF) AS greedyEF,
-	AVG(greedyTime) AS greedyTime
-	FROM singleminded
-	WHERE n<=m;
+	WHERE n>m AND n <= 45 AND m <= 45;
 
 
+
+##### TAC Experiments ####
 SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
 	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
 	round(AVG(greedyEF)::numeric,4) AS greedyEF,

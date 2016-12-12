@@ -290,7 +290,7 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
    * @return the time taken to compute the result.
    */
   public long getTime() {
-    return this.time / 1000000;
+    return this.time;
   }
   
   /**
