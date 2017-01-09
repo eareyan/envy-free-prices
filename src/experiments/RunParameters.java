@@ -7,17 +7,11 @@ package experiments;
  * @author Enrique Areyan Viqueira
  */
 public class RunParameters {
-
-  public static final int totalNumGoods = 19;
-  public static final int totalNumBidders = 19;
-  public static final int totalProbabilities = 4;
-  public static final int totalB = 3;
+  
   public static final int numTrials = 100;
+  public static final int numGoods = 40;
+  public static final int numBidder = 40;
 
-  public int numGoods;
-  public int numBidders;
-  public double prob;
-  public int b;
   public int id;
   public String dbProvider;
   public String dbHost;
@@ -43,54 +37,6 @@ public class RunParameters {
     this.dbName = args[5];
     this.dbUsername = args[6];
     this.dbPassword = args[7];
-    this.id = Integer.parseInt(args[8]);
-    this.computeRangeOfWork();
-  }
-  
-  /**
-   * Implements logic to divide the work among many processes
-   */
-  public void computeRangeOfWork() {
-    int k = 0;
-    for (int i = 0; i < RunParameters.totalNumGoods; i++) {
-      for (int j = 0; j < RunParameters.totalNumBidders; j++) {
-        for (int p = 0; p < RunParameters.totalProbabilities; p++) {
-          for (int b = 0; b < RunParameters.totalB; b++) {
-            k++;
-            if (this.id == k) {
-              switch (p) {
-              case 0:
-                this.prob = 0.25;
-                break;
-              case 1:
-                this.prob = 0.5;
-                break;
-              case 2:
-                this.prob = 0.75;
-                break;
-              case 3:
-                this.prob = 1.0;
-                break;
-              }
-              switch (b) {
-              case 0:
-                this.b = 1;
-                break;
-              case 1:
-                this.b = 2;
-                break;
-              case 2:
-                this.b = 3;
-                break;
-              // case 3: this.b = 4; break;
-              }
-              this.numGoods = i + 2;
-              this.numBidders = j + 2;
-            }
-          }
-        }
-      }
-    }
   }
   
   /**
@@ -99,7 +45,7 @@ public class RunParameters {
    * @return an experiment object. 
    * @throws Exception
    */
-  public Experiments getExperimentObject(String type) throws Exception {
+  private Experiments getExperimentObject(String type) throws Exception {
     if (type.equals("SingleMinded")) {
       return new SingleMinded();
     } else {
@@ -107,12 +53,4 @@ public class RunParameters {
     }
   }
 
-  @Override
-  public String toString() {
-    return "Param: " + "\n" + "numGoods \t= " + this.numGoods + "\n"
-        + "numBidders \t= " + this.numBidders + "\n" + "prob \t\t= "
-        + this.prob + "\n" + "b \t\t= " + this.b + "\n" + "experiment \t= "
-        + this.experimentName;
-  }
-  
 }

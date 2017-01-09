@@ -3,10 +3,9 @@ package statistics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import org.apache.commons.math3.util.Pair;
-
-import com.google.common.collect.ImmutableList;
 
 import structures.Bidder;
 import structures.Goods;
@@ -15,6 +14,8 @@ import structures.MarketOutcome;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketOutcomeException;
 import util.NumberMethods;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * This class implements functionality to compute statistics from a market
@@ -51,6 +52,14 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
    * An immutable list of envy bidders. Implements singleton.
    */
   private ImmutableList<B> listOfEnvyBidders;
+  
+  /**
+   * Map from a bidder B to a tuple <Integer,Double> where the integer denotes
+   * the number of impressions needed to satisfy the bidder (0 if the bidder is
+   * satisfied under the allocation), and double is the cost of the cheapest
+   * bundle available.
+   */
+  private HashMap<B, Pair<Integer, Double>> envynessMeasures;
 
   /**
    * A tuple containing 2 elements. The first element is the number of MC
@@ -89,39 +98,57 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
   }
 
   /**
+   * This function takes a list of ordered GoodPrices and computes two things:
+   * (1) the impressions needed to satisfy a bidder and (2) the cost of the
+   * cheapest available bundle.
+   * 
+   * @param goodOrderedList
+   * @param bidder
+   * @return a pair with envyness measures: (1) impressions needed and (2) cost of cheapest bundle
+   * @throws MarketOutcomeException
+   */
+  private Pair<Integer, Double> envynessMeasures(ArrayList<GoodPrices> goodOrderedList, B bidder) throws MarketOutcomeException {
+    if (!this.envynessMeasures.containsKey(bidder)) {
+      double costCheapestBundle = 0.0;
+      int impressionsNeeded = bidder.getDemand();
+      while (impressionsNeeded > 0 && goodOrderedList.size() != 0) {
+        // Get first user from the list and remove it.
+        G good = goodOrderedList.get(0).getGood();
+        goodOrderedList.remove(0);
+        int userSupply = good.getSupply();
+        // If the bidder wants this good
+        if (bidder.demandsGood(good)) {
+          if (userSupply >= impressionsNeeded) {
+            // Take only as many users as you need.
+            costCheapestBundle += impressionsNeeded * this.marketOutcome.getPrice(good);
+            impressionsNeeded = 0;
+          } else {
+            // Greedily take all of the users.
+            costCheapestBundle += userSupply * this.marketOutcome.getPrice(good);
+            impressionsNeeded -= userSupply;
+          }
+        }
+      }
+      this.envynessMeasures.put(bidder, new Pair<Integer, Double>(impressionsNeeded, costCheapestBundle));
+    }
+    return this.envynessMeasures.get(bidder);
+  }
+  
+  /**
    * This function takes a list of GoodPrices object - these are tuples (i,p_i)-
    * and a bidder and returns whether or not there exists a bundle that is
    * cheaper to the currently assigned bundle.
    * 
-   * @param goodOrderedList
-   *          - a list of UserPrices object.
-   * @param bidder
-   *          - a bidder object.
+   * @param goodOrderedList - a list of UserPrices object.
+   * @param bidder - a bidder object.
    * @return true if the bidder is envy at current prices.
    * @throws MarketAllocationException
    * @throws MarketOutcomeException
    */
   private boolean isBidderEnvyFree(ArrayList<GoodPrices> goodOrderedList, B bidder) throws MarketAllocationException, MarketOutcomeException {
-    double costCheapestBundle = 0.0;
-    int impressionsNeeded = bidder.getDemand();
-    while (impressionsNeeded > 0 && goodOrderedList.size() != 0) {
-      // Get first user from the list and remove it.
-      G good = goodOrderedList.get(0).getGood();
-      goodOrderedList.remove(0);
-      int userSupply = good.getSupply();
-      // If the bidder wants this good
-      if (bidder.demandsGood(good)) {
-        if (userSupply >= impressionsNeeded) {
-          // Take only as many users as you need.
-          costCheapestBundle += impressionsNeeded * this.marketOutcome.getPrice(good);
-          impressionsNeeded = 0;
-        } else {
-          // Greedily take all of the users.
-          costCheapestBundle += userSupply * this.marketOutcome.getPrice(good);
-          impressionsNeeded -= userSupply;
-        }
-      }
-    }
+    Pair<Integer, Double> envynessMeasures = this.envynessMeasures(goodOrderedList, bidder);
+    int impressionsNeeded = envynessMeasures.getKey();
+    double costCheapestBundle = envynessMeasures.getValue();
     if (impressionsNeeded > 0) {
       // If you cannot be satisfied, you are immediately envy-free
       return true;
@@ -158,9 +185,9 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
    * @throws MarketOutcomeException
    * @throws MarketAllocationException
    */
-  public int numberOfEnvyBidders() throws MarketOutcomeException,
-      MarketAllocationException {
+  public int numberOfEnvyBidders() throws MarketOutcomeException, MarketAllocationException {
     if (this.listOfEnvyBidders == null) {
+      this.envynessMeasures = new HashMap<B, Pair<Integer,Double>>();
       // Initialize the list of envy-bidders.
       ImmutableList.Builder<B> listOfEnvyBiddersBuilder = ImmutableList.builder();
       // Construct a list of goods.
@@ -184,6 +211,32 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
       this.listOfEnvyBidders = listOfEnvyBiddersBuilder.build();
     }
     return this.listOfEnvyBidders.size();
+  }
+  
+  /**
+   * Computes a measure of loss utility defined as
+   * (\sum_{j\notinW} (R_j - P_j)) / \sum_{j\notinW} R_j, in words,
+   * the ratio of lost utility to total utility among losers.
+   *  
+   * @return Ratio of lost utility.
+   * @throws MarketAllocationException
+   * @throws MarketOutcomeException 
+   */
+  public double getRatioLossUtility() throws MarketAllocationException, MarketOutcomeException {
+    this.numberOfEnvyBidders();
+    //System.out.println("*************** computing ratio "+this.listOfEnvyBidders().size()+" ****************");
+    double numerator = 0.0;
+    double denominator = 0.0;
+    if(this.listOfEnvyBidders.size() == 0) {
+      return 0.0;
+    }
+    for(B bidder : this.listOfEnvyBidders) {
+      //System.out.println("---> \t " + bidder + " , " + this.envynessMeasures.get(bidder).getKey() + "," + this.envynessMeasures.get(bidder).getValue());
+      //System.out.println("\t\t " + (bidder.getReward() - this.envynessMeasures.get(bidder).getValue()));
+      numerator += bidder.getReward() - this.envynessMeasures.get(bidder).getValue();
+      denominator += bidder.getReward();
+    }
+    return numerator / denominator;
   }
 
   /**

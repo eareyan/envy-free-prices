@@ -69,11 +69,12 @@ public class SqlDB {
    * @return true if the row (n,m) exists in tablename
    * @throws SQLException
    */
-  public boolean checkIfSingleMindedRowExists(String tablename, int n, int m) throws SQLException {
-    String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ?";
+  public boolean checkIfSingleMindedRowExists(String tablename, int n, int m, int k) throws SQLException {
+    String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ? AND k = ?";
     PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
     preparedStatement.setInt(1, n);
     preparedStatement.setInt(2, m);
+    preparedStatement.setInt(3, k);
     return ((ResultSet) preparedStatement.executeQuery()).next();
   }
 
@@ -87,7 +88,7 @@ public class SqlDB {
    * @param stats
    * @throws SQLException
    */
-  public void saveSingleMinded(String table_name, int n, int m, HashMap<String, DescriptiveStatistics> stats) throws SQLException {
+  public void saveSingleMinded(String table_name, int n, int m, int k, HashMap<String, DescriptiveStatistics> stats) throws SQLException {
     // Add the number of goods.
     DescriptiveStatistics numberOfGoods = new DescriptiveStatistics();
     numberOfGoods.addValue(n);
@@ -96,17 +97,23 @@ public class SqlDB {
     DescriptiveStatistics numberOfBidders = new DescriptiveStatistics();
     numberOfBidders.addValue(m);
     stats.put("m", numberOfBidders);
+    // Add the bound on the size of demand set
+    DescriptiveStatistics boundOnDemand = new DescriptiveStatistics();
+    boundOnDemand.addValue(k);
+    stats.put("k", boundOnDemand);
     // Create and execute SQL statement.
     this.createAndExecuteSQLStatement(table_name, stats);
   }
   
   /**
-   * Creates and executes an insert sql statement into the table_name table for
-   * the values given in the stats map. The name of the columns are the keys of
-   * the map and the values are the corresponding values in the map.
+   * Creates and executes an insert an SQL statement into the table_name table
+   * for the values given in the stats map. The name of the columns are the keys
+   * of the map and the values are the corresponding values in the map.
    * 
-   * @param table_name - where to insert the data
-   * @param stats - a Map <String, DescriptiveStatistics> with the data.
+   * @param table_name
+   *          - where to insert the data
+   * @param stats
+   *          - a Map <String, DescriptiveStatistics> with the data.
    * @throws SQLException
    */
   public void createAndExecuteSQLStatement(String table_name, HashMap<String, DescriptiveStatistics> stats) throws SQLException {

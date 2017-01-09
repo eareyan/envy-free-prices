@@ -237,6 +237,14 @@ SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,
 SELECT n,m,p,ckEfficiency,ckRevenue,ckTime,ckWE1,ckWE2,ck2Efficiency,ck2Revenue,ck2Time,ck2WE1,ck2WE2 FROM fancy_overdemand;
 SELECT n,m,p, lprevenue, evprevenue FROM unit_uniform_demand WHERE lprevenue > evprevenue;
 
+
+\copy (SELECT n,m,approxWelfare,approxEF FROM singleminded WHERE n = 50) to '/home/eareyanv/workspace/envy-free-prices/results/latex/approxAlgo.csv' csv header
+
+
+\copy (SELECT m,approxWelfare,approxEF,gwwelfare,gwef,gewelfare,geef,owwelfare,owef,oewelfare,oeef FROM singleminded WHERE n = 50) to '/home/eareyanv/workspace/envy-free-prices/results/latex/50items.csv' csv header
+
+\copy (SELECT n,approxWelfare,approxEF,gwwelfare,gwef,gewelfare,geef,owwelfare,owef,oewelfare,oeef FROM singleminded WHERE m = 50) to '/home/eareyanv/workspace/envy-free-prices/results/latex/50bidders.csv' csv header
+
 SELECT 	AVG(approxWelfare) AS approxWelfare, 
 	AVG(approxRevenue) AS approxRevenue,
 	AVG(approxEF) AS approxEF,
@@ -277,7 +285,7 @@ SELECT 	round(AVG(approxWelfare)::numeric,4) AS approxWelfare,
 	round(AVG(oeEF)::numeric,4) AS oeEF,
 	round(AVG(oeTime)::numeric,4) AS oeTime
 	FROM singleminded
-	WHERE n<=m AND n <= 45 AND m <= 45;
+	WHERE n < m;
 
 SELECT 	round(AVG(approxWelfare)::numeric,4) AS approxWelfare, 
 	round(AVG(approxEF)::numeric,4) AS approxEF,

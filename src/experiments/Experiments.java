@@ -11,6 +11,7 @@ import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketOutcomeException;
+import algorithms.pricing.error.PrincingAlgoException;
 import allocations.error.AllocationAlgoException;
 import log.SqlDB;
 
@@ -37,46 +38,22 @@ public abstract class Experiments {
    * @throws GoodsException 
    * @throws GoodsCreationException 
    * @throws MarketCreationException 
+   * @throws PrincingAlgoException 
    */
   public void bulkTest(SqlDB dbLogger) throws SQLException,
       InstantiationException, IllegalAccessException, ClassNotFoundException,
       IloException, AllocationAlgoException, BidderCreationException,
-      MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException {
+      MarketAllocationException, MarketOutcomeException,
+      GoodsCreationException, GoodsException, AllocationException,
+      MarketCreationException, PrincingAlgoException {
 
-    int numGoods = 51;
-    int numBidders = 51;
-    for (int i = 2; i < numGoods; i++) {
-      for (int j = 2; j < numBidders; j++) {
-        for (int p = 0; p < 4; p++) {
-          double prob = 0.25 + p * (0.25);
-          for (int b = 0; b < 4; b++) {
-            System.out.print(" n = " + i + ", m = " + j + ", prob = " + prob
-                + ", b = " + (b + 1));
-            this.runOneExperiment(i, j, prob, b + 1, dbLogger);
-          }
+    for (int i = 2; i < RunParameters.numGoods; i++) {
+      for (int j = 2; j < RunParameters.numBidder; j++) {
+        for (int k = 1; k <= i; k++) {
+          System.out.print("(n, m, k) = (" + i + ", " + j + ", " + k + ")");
+          this.runOneExperiment(i, j, k, dbLogger);
         }
       }
-    }
-  }
-
-  /**
-   * Main method to run experiments. 
-   * @param args - command line arguments. 
-   * @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-    // Check if we are running on the grid
-    RunParameters Parameters = new RunParameters(args);
-    SqlDB dbLogger = new SqlDB(Parameters.dbProvider, Parameters.dbHost,
-        Parameters.dbPort, Parameters.dbName, Parameters.dbUsername,
-        Parameters.dbPassword);
-    if (args[0].equals("grid")) {
-      Parameters.experimentObject.runOneExperiment(Parameters.numGoods,
-          Parameters.numBidders, Parameters.prob, Parameters.b, dbLogger);
-    } else {
-      // Running local bulk tests
-      System.out.println("Running local...");
-      Parameters.experimentObject.bulkTest(dbLogger);
     }
   }
   
@@ -102,6 +79,20 @@ public abstract class Experiments {
    * @throws AllocationException
    * @throws GoodsException
    * @throws MarketCreationException
+   * @throws PrincingAlgoException 
    */
-  abstract public void runOneExperiment(int numGoods, int numBidders, double prob, int b, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException;
+  abstract public void runOneExperiment(int numGoods, int numBidders, int k, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException, PrincingAlgoException;
+
+  /**
+   * Main method to run experiments. 
+   * 
+   * @param args - command line arguments. 
+   * @throws Exception
+   */
+  public static void main(String[] args) throws Exception {
+    RunParameters Parameters = new RunParameters(args);
+    SqlDB dbLogger = new SqlDB(Parameters.dbProvider, Parameters.dbHost, Parameters.dbPort, Parameters.dbName, Parameters.dbUsername, Parameters.dbPassword);
+    Parameters.experimentObject.bulkTest(dbLogger);
+  }
+  
 }
