@@ -25,33 +25,17 @@ public abstract class Experiments {
   /**
    * Constructor. 
    * @param dbLogger
-   * @throws SQLException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws ClassNotFoundException
-   * @throws IloException
-   * @throws AllocationAlgoException
-   * @throws BidderCreationException
-   * @throws MarketAllocationException
-   * @throws MarketOutcomeException
-   * @throws AllocationException 
-   * @throws GoodsException 
-   * @throws GoodsCreationException 
-   * @throws MarketCreationException 
-   * @throws PrincingAlgoException 
+   * @throws Exception 
    */
-  public void bulkTest(SqlDB dbLogger) throws SQLException,
-      InstantiationException, IllegalAccessException, ClassNotFoundException,
-      IloException, AllocationAlgoException, BidderCreationException,
-      MarketAllocationException, MarketOutcomeException,
-      GoodsCreationException, GoodsException, AllocationException,
-      MarketCreationException, PrincingAlgoException {
+  public void bulkTest(SqlDB dbLogger) throws Exception {
 
     for (int i = 2; i < RunParameters.numGoods; i++) {
       for (int j = 2; j < RunParameters.numBidder; j++) {
         for (int k = 1; k <= i; k++) {
-          System.out.print("(n, m, k) = (" + i + ", " + j + ", " + k + ")");
-          this.runOneExperiment(i, j, k, dbLogger);
+          for(int b = 0 ; b < 2; b++) {
+            System.out.print("(n, m, k, b) = (" + i + ", " + j + ", " + k + ","+ ((b % 2) == 0 )+")");
+            this.runOneExperiment(i, j, k, (b % 2) == 0, dbLogger);
+          }
         }
       }
     }
@@ -80,8 +64,9 @@ public abstract class Experiments {
    * @throws GoodsException
    * @throws MarketCreationException
    * @throws PrincingAlgoException 
+   * @throws Exception 
    */
-  abstract public void runOneExperiment(int numGoods, int numBidders, int k, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException, PrincingAlgoException;
+  abstract public void runOneExperiment(int numGoods, int numBidders, int k, boolean uniform, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, GoodsCreationException, GoodsException, AllocationException, MarketCreationException, PrincingAlgoException, Exception;
 
   /**
    * Main method to run experiments. 

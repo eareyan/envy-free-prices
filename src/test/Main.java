@@ -1,7 +1,5 @@
 package test;
 
-import ilog.concert.IloException;
-
 import java.util.ArrayList;
 
 import singleminded.SingleMindedApproxWE;
@@ -16,20 +14,12 @@ import structures.MarketAllocation;
 import structures.MarketOutcome;
 import structures.comparators.BiddersComparatorBy1ToSqrtIRatio;
 import structures.comparators.BiddersComparatorByRToSqrtIRatio;
-import structures.exceptions.AllocationException;
-import structures.exceptions.BidderCreationException;
-import structures.exceptions.GoodsException;
-import structures.exceptions.MarketAllocationException;
-import structures.exceptions.MarketCreationException;
-import structures.exceptions.MarketOutcomeException;
 import structures.factory.RandomMarketFactory;
 import structures.factory.SingleMindedMarketFactory;
 import util.Printer;
 import algorithms.pricing.RestrictedEnvyFreePricesLP;
 import algorithms.pricing.RestrictedEnvyFreePricesLPSolution;
-import algorithms.pricing.error.PrincingAlgoException;
 import algorithms.pricing.reserveprices.RevMaxHeuristic;
-import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
 import allocations.greedy.GreedyMultiStepAllocation;
 import allocations.interfaces.AllocationAlgo;
@@ -49,8 +39,9 @@ import experiments.LPWrapper;
  */
 public class Main {
   
-  public static void main(String[] args) throws BidderCreationException, MarketCreationException, IloException, AllocationException, GoodsException, MarketAllocationException, MarketOutcomeException, AllocationAlgoException, PrincingAlgoException {
-    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(5, 5, 3);
+  public static void main(String[] args) throws Exception {
+    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(5, 5 , 3);
+    //SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createElitistRewardRandomSingleMindedMarket(5, 5, 2);
     System.out.println(market);
     
     // Run the LP using the allocation algorithm from before.
@@ -80,8 +71,8 @@ public class Main {
 
   }
   
-  public static void main3(String[] args) throws BidderCreationException, MarketCreationException, MarketAllocationException, MarketOutcomeException, IloException, AllocationAlgoException, AllocationException, GoodsException {
-    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(7, 7, 2);
+  public static void main3(String[] args) throws Exception {
+    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(7, 7, 2);
     System.out.println(market);
     
     SingleMindedApproxWE aw = new SingleMindedApproxWE(market);
@@ -102,9 +93,9 @@ public class Main {
 }
   
   
-  public static void main2(String[] args) throws BidderCreationException, MarketCreationException, AllocationException, GoodsException, MarketAllocationException, AllocationAlgoException, IloException, MarketOutcomeException, PrincingAlgoException {
+  public static void main2(String[] args) throws Exception {
     
-    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(5, 5);
+    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(5, 5, 2);
     System.out.println(market);
 
     System.out.println("Greedy Welfare");
@@ -153,8 +144,8 @@ public class Main {
 
   }
   
-  public static void main1(String[] args) throws BidderCreationException, MarketCreationException, MarketAllocationException, MarketOutcomeException, PrincingAlgoException, IloException, AllocationAlgoException, AllocationException, GoodsException {
-    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomSingleMindedMarket(5, 5);
+  public static void main1(String[] args) throws Exception {
+    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(5, 5, 2);
     System.out.println(market);
     SingleMindedApproxWE aw = new SingleMindedApproxWE(market);
     PricesStatistics<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> approxWEResult = aw.Solve();
@@ -182,10 +173,9 @@ public class Main {
   
   /**
    * Testing all kinds of markets.
-   * @throws MarketCreationException 
-   * @throws PrincingAlgoException 
+   * @throws Exception 
    */
-  public static<O extends ObjectiveFunction> void main0(String[] args) throws IloException, BidderCreationException, AllocationAlgoException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException, PrincingAlgoException {
+  public static<O extends ObjectiveFunction> void main0(String[] args) throws Exception {
 
     ArrayList<Market<Goods,Bidder<Goods>>> marketList = new ArrayList<Market<Goods,Bidder<Goods>>>();
     marketList.add(SizeInterchangeableMarkets.market0());
@@ -197,8 +187,8 @@ public class Main {
     marketList.add(SizeInterchangeableMarkets.market7());
     marketList.add(RandomMarketFactory.randomMarket(3, 5, 0.5));
     marketList.add(RandomMarketFactory.RandomKMarket(4, 4, 1.0, 2));
-    marketList.add(SingleMindedMarketFactory.createRandomSingleMindedMarket(4, 3));
-    marketList.add(SingleMindedMarketFactory.createRandomSingleMindedMarket(3, 4));
+    marketList.add(SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(4, 3, 2));
+    marketList.add(SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(3, 4, 2));
     marketList.add(SizeInterchangeableMarkets.market8());
     marketList.add(SingleMindedMarkets.singleMinded0());
     marketList.add(SingleMindedMarkets.singleMinded1());

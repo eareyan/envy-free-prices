@@ -69,12 +69,13 @@ public class SqlDB {
    * @return true if the row (n,m) exists in tablename
    * @throws SQLException
    */
-  public boolean checkIfSingleMindedRowExists(String tablename, int n, int m, int k) throws SQLException {
-    String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ? AND k = ?";
+  public boolean checkIfSingleMindedRowExists(String tablename, int n, int m, int k, int b) throws SQLException {
+    String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ? AND k = ? AND b = ?";
     PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
     preparedStatement.setInt(1, n);
     preparedStatement.setInt(2, m);
     preparedStatement.setInt(3, k);
+    preparedStatement.setInt(4, b);
     return ((ResultSet) preparedStatement.executeQuery()).next();
   }
 
@@ -88,7 +89,7 @@ public class SqlDB {
    * @param stats
    * @throws SQLException
    */
-  public void saveSingleMinded(String table_name, int n, int m, int k, HashMap<String, DescriptiveStatistics> stats) throws SQLException {
+  public void saveSingleMinded(String table_name, int n, int m, int k, int b, HashMap<String, DescriptiveStatistics> stats) throws SQLException {
     // Add the number of goods.
     DescriptiveStatistics numberOfGoods = new DescriptiveStatistics();
     numberOfGoods.addValue(n);
@@ -101,6 +102,10 @@ public class SqlDB {
     DescriptiveStatistics boundOnDemand = new DescriptiveStatistics();
     boundOnDemand.addValue(k);
     stats.put("k", boundOnDemand);
+    // Add the type of reward
+    DescriptiveStatistics typeOfReward = new DescriptiveStatistics();
+    typeOfReward.addValue(b);
+    stats.put("b", typeOfReward);
     // Create and execute SQL statement.
     this.createAndExecuteSQLStatement(table_name, stats);
   }

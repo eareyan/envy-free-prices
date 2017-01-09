@@ -1,8 +1,5 @@
 package experiments;
 
-import ilog.concert.IloException;
-
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import log.SqlDB;
@@ -16,32 +13,31 @@ import structures.Bidder;
 import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.exceptions.AllocationException;
-import structures.exceptions.BidderCreationException;
-import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
-import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketOutcomeException;
 import structures.factory.SingleMindedMarketFactory;
-import algorithms.pricing.error.PrincingAlgoException;
-import allocations.error.AllocationAlgoException;
 import allocations.optimal.SingleStepWelfareMaxAllocationILP;
 
 public class SingleMinded extends Experiments{
 
   /**
    * Run single-minded experiments.
-   * @throws PrincingAlgoException 
+   * @throws Exception 
    */
 	@Override
-	public void runOneExperiment(int numUsers, int numCampaigns, int k, SqlDB dbLogger) throws SQLException, IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, MarketOutcomeException, AllocationException, GoodsException, MarketCreationException, PrincingAlgoException {
+	public void runOneExperiment(int numUsers, int numCampaigns, int k, boolean uniform,  SqlDB dbLogger) throws Exception {
 	
-		if(!dbLogger.checkIfSingleMindedRowExists("singleminded2", numUsers, numCampaigns, k)){
+		if(!dbLogger.checkIfSingleMindedRowExists("singleminded2", numUsers, numCampaigns, k, (uniform ? 1 : 0))){
       System.out.println("\t Adding data ");
       HashMap<String, DescriptiveStatistics> stats = new HashMap<String, DescriptiveStatistics>();
 			for(int i = 0; i < RunParameters.numTrials; i ++){
 				// Generate Single-minded random market.
-				SingleMindedMarket<Goods, Bidder<Goods>> M = SingleMindedMarketFactory.createRandomSingleMindedMarket(numUsers , numCampaigns, k);
+			  SingleMindedMarket<Goods, Bidder<Goods>> M;
+			  if(uniform) {
+			    M = SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(numUsers , numCampaigns, k);
+			  } else {
+			    M = SingleMindedMarketFactory.createElitistRewardRandomSingleMindedMarket(numUsers , numCampaigns, k);
+			  }
 				//System.out.println(M);
 				// Efficient Allocation.
 				MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efficientAlloc = new SingleStepWelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
@@ -53,7 +49,7 @@ public class SingleMinded extends Experiments{
         this.populateStats(stats, LPWrapper.getMarketPrices(M, LPWrapper.Allocations.OptimalWelfare), "ow", optimalWelfare);
         this.populateStats(stats, LPWrapper.getMarketPrices(M, LPWrapper.Allocations.OptimalEgalitarian), "oe", optimalWelfare);
 			}
-			dbLogger.saveSingleMinded("singleminded2", numUsers, numCampaigns, k, stats);
+			dbLogger.saveSingleMinded("singleminded2", numUsers, numCampaigns, k, (uniform ? 1 : 0), stats);
 		} else {
 			System.out.println("\t Already have data ");			
 		}

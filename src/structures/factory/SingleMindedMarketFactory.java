@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -22,18 +23,40 @@ import structures.exceptions.MarketCreationException;
 public class SingleMindedMarketFactory {
 
   /**
-   * Creates a Random-k-Single-Minded-Market where the size of the demand size i
+   * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn
+   * from uniform distribution.
    * 
    * @param n
    * @param m
-   * @return
-   * @throws BidderCreationException
-   * @throws GoodsCreationException
-   * @throws MarketCreationException
+   * @return a Random-k-Single-Minded-Market(n,m,k)
+   * @throws Exception
    */
-  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m) throws BidderCreationException, GoodsCreationException, MarketCreationException {
-    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, m);
-  }
+  public static SingleMindedMarket<Goods, Bidder<Goods>> createUniformRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k,
+        new Callable<Double>() {
+          public Double call() {
+            return SingleMindedMarketFactory.getRandomUniformReward();
+          }
+        });
+  }  
+
+  /**
+   * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn
+   * from elitist distribution.
+   * 
+   * @param n
+   * @param m
+   * @return a Random-k-Single-Minded-Market(n,m,k)
+   * @throws Exception
+   */
+  public static SingleMindedMarket<Goods, Bidder<Goods>> createElitistRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k,
+        new Callable<Double>() {
+          public Double call() {
+            return SingleMindedMarketFactory.getElitistReward();
+          }
+        });
+  }  
 
   /**
    * Creates a random single-minded market.
@@ -42,11 +65,9 @@ public class SingleMindedMarketFactory {
    * @param m - number of bidders.
    * @param k - bound on size of demand set.
    * @return a single minded market.
-   * @throws BidderCreationException in case a bidder could not be created.
-   * @throws GoodsCreationException in case a good could not be created.
-   * @throws MarketCreationException
+   * @throws Exception 
    */
-  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m, int k) throws BidderCreationException, GoodsCreationException, MarketCreationException {
+  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m, int k, Callable<Double> rewardFunction) throws Exception {
     if (n <= 0) {
       throw new GoodsCreationException("There must be at least one good to create a market.");
     }
@@ -71,8 +92,7 @@ public class SingleMindedMarketFactory {
       for (Integer i : connectTo) {
         bDemandSet.add(goods.get(i));
       }
-      //bidders.add(new Bidder<Goods>(k, SingleMindedMarketFactory.getRandomUniformReward(), bDemandSet));
-      bidders.add(new Bidder<Goods>(k, SingleMindedMarketFactory.getElitistReward(), bDemandSet));
+      bidders.add(new Bidder<Goods>(k, rewardFunction.call(), bDemandSet));
     }
     return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
   }
@@ -88,8 +108,11 @@ public class SingleMindedMarketFactory {
   }
   
   /**
+   * Produces an elitist reward defined as: with probability 0.1, the reward is
+   * Normal(100, 0.1) i.e., a big reward with high probability. O/w, with
+   * probability 0.9 the reward is drawn from uniform.
    * 
-   * @return
+   * @return a double.
    */
   private static double getElitistReward() {
     Random generator = new Random();

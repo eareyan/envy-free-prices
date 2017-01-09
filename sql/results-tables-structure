@@ -203,6 +203,38 @@ CREATE TABLE singleminded (
 	oeMC double precision NOT NULL,
 	oeTime double precision NOT NULL
 	);
+
+
+CREATE TABLE singleminded2 (
+	n integer NOT NULL,
+	m integer NOT NULL,
+	k integer NOT NULL,
+	approxWelfare double precision NOT NULL,
+	approxRevenue double precision NOT NULL,
+	approxEF double precision NOT NULL,
+	approxEFLoss double precision NOT NULL,
+	approxTime double precision NOT NULL,
+	gwWelfare double precision NOT NULL,
+	gwRevenue double precision NOT NULL,
+	gwEF double precision NOT NULL,
+	gwEFLoss double precision NOT NULL,
+	gwTime double precision NOT NULL,
+	geWelfare double precision NOT NULL,
+	geRevenue double precision NOT NULL,
+	geEF double precision NOT NULL,
+	geEFLoss double precision NOT NULL,
+	geTime double precision NOT NULL,
+	owWelfare double precision NOT NULL,
+	owRevenue double precision NOT NULL,
+	owEF double precision NOT NULL,
+	owEFLoss double precision NOT NULL,
+	owTime double precision NOT NULL,
+	oeWelfare double precision NOT NULL,
+	oeRevenue double precision NOT NULL,
+	oeEF double precision NOT NULL,
+	oeEFLoss double precision NOT NULL,
+	oeTime double precision NOT NULL
+	);
 	
 CREATE TABLE tacexperiments (
 	m integer NOT NULL,
