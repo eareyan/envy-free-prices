@@ -209,6 +209,7 @@ CREATE TABLE singleminded2 (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	k integer NOT NULL,
+	b integer NOT NULL,
 	approxWelfare double precision NOT NULL,
 	approxRevenue double precision NOT NULL,
 	approxEF double precision NOT NULL,
