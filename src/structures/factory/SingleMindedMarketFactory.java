@@ -6,8 +6,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
-
 import singleminded.SingleMindedMarket;
 import structures.Bidder;
 import structures.Goods;
@@ -23,8 +21,7 @@ import structures.exceptions.MarketCreationException;
 public class SingleMindedMarketFactory {
 
   /**
-   * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn
-   * from uniform distribution.
+   * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn from uniform distribution.
    * 
    * @param n
    * @param m
@@ -32,17 +29,11 @@ public class SingleMindedMarketFactory {
    * @throws Exception
    */
   public static SingleMindedMarket<Goods, Bidder<Goods>> createUniformRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
-    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k,
-        new Callable<Double>() {
-          public Double call() {
-            return SingleMindedMarketFactory.getRandomUniformReward();
-          }
-        });
-  }  
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, RewardsGenerator.getRandomUniformRewardFunction());
+  }
 
   /**
-   * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn
-   * from elitist distribution.
+   * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn from elitist distribution.
    * 
    * @param n
    * @param m
@@ -50,13 +41,8 @@ public class SingleMindedMarketFactory {
    * @throws Exception
    */
   public static SingleMindedMarket<Goods, Bidder<Goods>> createElitistRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
-    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k,
-        new Callable<Double>() {
-          public Double call() {
-            return SingleMindedMarketFactory.getElitistReward();
-          }
-        });
-  }  
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, RewardsGenerator.getElitistRewardFunction());
+  }
 
   /**
    * Creates a random single-minded market.
@@ -65,7 +51,7 @@ public class SingleMindedMarketFactory {
    * @param m - number of bidders.
    * @param k - bound on size of demand set.
    * @return a single minded market.
-   * @throws Exception 
+   * @throws Exception
    */
   public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m, int k, Callable<Double> rewardFunction) throws Exception {
     if (n <= 0) {
@@ -87,7 +73,7 @@ public class SingleMindedMarketFactory {
     for (int j = 0; j < m; j++) {
       // Each bidder connects exactly with k distinct random goods.
       Set<Integer> connectTo = SingleMindedMarketFactory.randomNumbers(k, n);
-      //System.out.println("Bidder " + j + " connect to " + connectTo);
+      // System.out.println("Bidder " + j + " connect to " + connectTo);
       HashSet<Goods> bDemandSet = new HashSet<Goods>();
       for (Integer i : connectTo) {
         bDemandSet.add(goods.get(i));
@@ -98,35 +84,7 @@ public class SingleMindedMarketFactory {
   }
 
   /**
-   * Generates a random reward between the bounds.
-   * 
-   * @return a random reward between allowable bounds.
-   */
-  private static double getRandomUniformReward() {
-    Random generator = new Random();
-    return generator.nextDouble() * (RandomMarketFactory.defaultMaxReward - RandomMarketFactory.defaultMinReward) + RandomMarketFactory.defaultMinReward;
-  }
-  
-  /**
-   * Produces an elitist reward defined as: with probability 0.1, the reward is
-   * Normal(100, 0.1) i.e., a big reward with high probability. O/w, with
-   * probability 0.9 the reward is drawn from uniform.
-   * 
-   * @return a double.
-   */
-  private static double getElitistReward() {
-    Random generator = new Random();
-    if(generator.nextDouble() <= 0.1) {
-      NormalDistribution n = new NormalDistribution(100, 0.1);
-      return n.sample();
-    } else {
-      return SingleMindedMarketFactory.getRandomUniformReward();
-    }
-  }
-
-  /**
-   * Computes a set of n distinct, random integers, between 0 and max. If
-   * n>=max, returns the set of integers 0...max
+   * Computes a set of n distinct, random integers, between 0 and max. If n>=max, returns the set of integers 0...max
    *
    * @param n - the number of integers to produce.
    * @param max - the maximum value of any integer to be produced.

@@ -14,6 +14,7 @@ import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.MarketAllocationException;
+import algorithms.pricing.error.PrincingAlgoException;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -56,7 +57,12 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
   /**
    * By default, set the market clearance conditions.
    */
-  protected boolean marketClearanceConditions = true;
+  protected boolean marketClearanceConditions = false;
+  
+  /**
+   * Flag that indicates if the LP has been created.
+   */
+  private boolean lpCreated = false;
 
   /**
    * Constructor receives an allocated market and creates the IloCplex object.
@@ -70,7 +76,7 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
     // Create a map from goods to a numbers. This gives ordering of the goods.
     this.goodToPriceIndex = new HashMap<G, Integer>();
     for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
-      goodToPriceIndex.put(this.allocatedMarket.getMarket().getGoods().get(i), i);
+      this.goodToPriceIndex.put(this.allocatedMarket.getMarket().getGoods().get(i), i);
     }    
   }
   
@@ -186,6 +192,7 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
    * @throws MarketAllocationException 
    */
   protected void generateMarketClearanceConditions() throws IloException, MarketAllocationException {
+    System.out.println("In RestrictedEnvyFreePricesLP, generateMarketClearanceConditions = 0");
     for (G good : this.allocatedMarket.getMarket().getGoods()) {
       if (this.allocatedMarket.allocationFromGood(good) == 0) {
         this.linearConstrains.add(this.cplex.addLe(this.prices[this.goodToPriceIndex.get(good)], 0.0));
@@ -218,6 +225,7 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
       if (this.marketClearanceConditions) {
         this.generateMarketClearanceConditions();
       }
+      this.lpCreated = true;
     } catch (IloException e) {
       System.out.println("Exception: ==>");
       e.printStackTrace();
@@ -228,8 +236,12 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
    * This method solves the LP.
    * 
    * @return an EnvyFreePricesSolutionLP object with the solution of the LP.
+   * @throws PrincingAlgoException 
    */
-  public RestrictedEnvyFreePricesLPSolution<M, G, B> Solve() {
+  public RestrictedEnvyFreePricesLPSolution<M, G, B> Solve() throws PrincingAlgoException {
+    if(!this.lpCreated) {
+      throw new PrincingAlgoException("To solve for restricted envy-free prices, you must first create the LP.");
+    }
     RestrictedEnvyFreePricesLPSolution<M, G, B> Solution = new RestrictedEnvyFreePricesLPSolution<M, G, B>(this.allocatedMarket , null, "", -1);
     try {
       // Solve the LP.
