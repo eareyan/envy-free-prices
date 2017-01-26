@@ -3,15 +3,15 @@ package structures.factory;
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
-import unitdemand.MWBMatchingAlgorithm;
-import unitdemand.Matching;
+import unitdemand.algorithms.MWBMatchingAlgorithm;
+import unitdemand.structures.Matching;
 
 /**
  * Factory to work with allocated markets.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class UnitMarketAllocationFactory {
+public class UnitDemandMarketAllocationFactory {
 
   /**
    * Given a market, return a cost matrix to be input to the Hungarian

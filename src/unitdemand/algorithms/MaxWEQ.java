@@ -1,31 +1,35 @@
-package unitdemand;
+package unitdemand.algorithms;
+
+import unitdemand.structures.Matching;
 
 /**
- * This class implements MaxEQ: Maximum Walrasian Prices, as stated in Guruswami et al.
+ * This class implements MaxWEQ: Maximum Walrasian Prices, as stated in Guruswami et al.
  * 
  * @author Enrique Areyan Viqueira
  */
 public class MaxWEQ {
 
   /**
-   * valuation matrix. Provides a valuation v_ij of good i by bidder j.
+   * Valuation matrix. Provides a valuation v_ij of good i by bidder j.
    */
-  double[][] valuationMatrix;
+  private final double[][] valuationMatrix;
 
   /**
    * Constructor.
+   * 
    * @param valuationMatrix - a matrix of valuations.
    */
   public MaxWEQ(double[][] valuationMatrix) {
     this.valuationMatrix = valuationMatrix;
   }
-  
+
   /**
    * Computes the valuation matrix without row indexItem.
+   * 
    * @param indexItem - index of item.
    * @return the valuation matrix without row indexItem.
    */
-  protected double[][] valuationMatrixWithNoi(int indexItem) {
+  public double[][] valuationMatrixWithNoi(int indexItem) {
     double[][] newValuationMatrix = new double[this.valuationMatrix.length - 1][];
     int k = 0;
     for (int i = 0; i < this.valuationMatrix.length; i++) {
@@ -36,9 +40,10 @@ public class MaxWEQ {
     }
     return newValuationMatrix;
   }
-  
+
   /**
    * Implements MaxWEQ as stated in Guruswami et al.
+   * 
    * @return a Matching object.
    */
   public Matching Solve() {
@@ -50,5 +55,5 @@ public class MaxWEQ {
     }
     return new Matching(this.valuationMatrix, matchingCompleteV.getMatching(), prices);
   }
-  
+
 }

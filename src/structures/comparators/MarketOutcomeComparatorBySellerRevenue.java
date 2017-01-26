@@ -10,11 +10,11 @@ import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketOutcomeException;
 
 /**
- * Comparator to compare MarketPrices objects by sellerrevenue.
+ * Comparator to compare MarketPrices objects by seller revenue.
  * 
  * @author Enrique Areyan Viqueira
  */
-public class MarketPricesComparatorBySellerRevenue<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements Comparator<MarketOutcome<M, G, B>> {
+public class MarketOutcomeComparatorBySellerRevenue<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements Comparator<MarketOutcome<M, G, B>> {
   @Override
   public int compare(MarketOutcome<M, G, B> MP1, MarketOutcome<M, G, B> MP2) {
     try {
@@ -34,5 +34,5 @@ public class MarketPricesComparatorBySellerRevenue<M extends Market<G, B>, G ext
     }
     return 0;
   }
-  
+
 }

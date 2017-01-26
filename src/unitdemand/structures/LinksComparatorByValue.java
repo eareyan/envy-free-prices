@@ -1,4 +1,4 @@
-package unitdemand;
+package unitdemand.structures;
 
 import java.util.Comparator;
 

@@ -1,9 +1,10 @@
-package singleminded;
+package singleminded.algorithms;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import singleminded.structures.SingleMindedMarket;
 import statistics.PricesStatistics;
 import structures.Bidder;
 import structures.Goods;
@@ -18,10 +19,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 /**
- * This class implements the approximation WE algorithm for single-minded
- * bidders as presented in Huang, L.S., Li, M., Zhang, B.: Approximation of
- * Walrasian equilibrium in single- minded auctions. Theoretical computer
- * science 337(1), 390–398 (2005)
+ * This class implements the approximation WE algorithm for single-minded bidders as presented in Huang, L.S., Li, M., Zhang, B.: Approximation of Walrasian
+ * equilibrium in single- minded auctions. Theoretical computer science 337(1), 390–398 (2005)
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -30,7 +29,7 @@ public class SingleMindedApproxWE {
   /**
    * Market is the input market. This needs to be a singleton market.
    */
-  private final SingleMindedMarket<Goods, Bidder<Goods>> M;
+  private final SingleMindedMarket<Goods, Bidder<Goods>> market;
 
   /**
    * A is the boolean matrix encoding the single-minded preferences over items.
@@ -51,7 +50,7 @@ public class SingleMindedApproxWE {
    * The price vector.
    */
   private final double[] p;
-  
+
   /**
    * Start time, for statistics purposes.
    */
@@ -60,18 +59,18 @@ public class SingleMindedApproxWE {
   /**
    * Constructor.
    * 
-   * @param M - a market object.
+   * @param M - a single-minded market object.
    */
   public SingleMindedApproxWE(SingleMindedMarket<Goods, Bidder<Goods>> M) {
     this.startTime = System.nanoTime();
-    this.M = M;
+    this.market = M;
     // Make a copy of the connection matrix since we will change in the solve method.
-    this.A = this.M.getCopyOfA();
+    this.A = this.market.getCopyOfA();
     // Initialize the allocation matrix and price vector.
-    this.X = new int[this.M.getNumberGoods()][this.M.getNumberBidders()];
-    this.p = new double[this.M.getNumberGoods()];
+    this.X = new int[this.market.getNumberGoods()][this.market.getNumberBidders()];
+    this.p = new double[this.market.getNumberGoods()];
     // Make an ArrayList of BidderReward so that we can order the rewards.
-    this.listOfBidders = new ArrayList<Bidder<Goods>>(this.M.getBidders());
+    this.listOfBidders = new ArrayList<Bidder<Goods>>(this.market.getBidders());
     Collections.sort(this.listOfBidders, new BiddersComparatorByReward());
   }
 
@@ -81,15 +80,14 @@ public class SingleMindedApproxWE {
    * @return a MarketPrices object.
    * @throws MarketAllocationException
    */
-  public PricesStatistics<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> Solve()
-      throws MarketAllocationException {
+  public PricesStatistics<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> Solve() throws MarketAllocationException {
     // Keep iterating while there still are bidders that can be allocated.
     while (!matrixAllFalse(this.A)) {
       // Find the commodity which attracts most bidders.
       int mostPopularItem = -1, popularityOfItem = -1;
-      for (int i = 0; i < this.M.getNumberGoods(); i++) {
+      for (int i = 0; i < this.market.getNumberGoods(); i++) {
         int acum = 0;
-        for (int j = 0; j < this.M.getNumberBidders(); j++) {
+        for (int j = 0; j < this.market.getNumberBidders(); j++) {
           acum += this.A[i][j] ? 1 : 0;
         }
         if (acum >= popularityOfItem) {
@@ -100,9 +98,9 @@ public class SingleMindedApproxWE {
       // Find the bidder with highest budget that wants the most popular item.
       int winner = -1;
       for (Bidder<Goods> bidder : this.listOfBidders) {
-        if (this.A[mostPopularItem][this.M.biddersToIndex.get(bidder)]) {
+        if (this.A[mostPopularItem][this.market.getBidderIndex(bidder)]) {
           // Assign prices and bundle
-          winner = this.M.biddersToIndex.get(bidder);
+          winner = this.market.getBidderIndex(bidder);
           this.p[mostPopularItem] = bidder.getReward();
           // This bidder has been allocated, remove it.
           this.listOfBidders.remove(bidder);
@@ -110,15 +108,15 @@ public class SingleMindedApproxWE {
         }
       }
       // Remove any conflicts
-      for (int i = 0; i < this.M.getNumberGoods(); i++) {
+      for (int i = 0; i < this.market.getNumberGoods(); i++) {
         // The winner claimed item i
         if (this.A[i][winner]) {
           // Loop through all bidders
-          for (int j = 0; j < this.M.getNumberBidders(); j++) { 
+          for (int j = 0; j < this.market.getNumberBidders(); j++) {
             if (j != winner && this.A[i][j]) {
               // This bidder is not a winner and wanted item i.
               // He can't have it, so remove this bidder.
-              for (int iPrime = 0; iPrime < this.M.getNumberGoods(); iPrime++) {
+              for (int iPrime = 0; iPrime < this.market.getNumberGoods(); iPrime++) {
                 this.A[iPrime][j] = false;
               }
             }
@@ -126,7 +124,7 @@ public class SingleMindedApproxWE {
         }
       }
       // Remove winner
-      for (int i = 0; i < this.M.getNumberGoods(); i++) {
+      for (int i = 0; i < this.market.getNumberGoods(); i++) {
         this.X[i][winner] = (this.A[i][winner]) ? 1 : 0;
         this.A[i][winner] = false;
       }
@@ -137,26 +135,24 @@ public class SingleMindedApproxWE {
      */
     // Allocation
     HashBasedTable<Goods, Bidder<Goods>, Integer> allocation = HashBasedTable.create();
-    for (Goods good : this.M.getGoods()) {
-      for (Bidder<Goods> bidder : this.M.getBidders()) {
-        allocation.put(good, bidder,
-            this.X[this.M.goodsToIndex.get(good)][this.M.biddersToIndex.get(bidder)]);
+    for (Goods good : this.market.getGoods()) {
+      for (Bidder<Goods> bidder : this.market.getBidders()) {
+        allocation.put(good, bidder, this.X[this.market.getGoodIndex(good)][this.market.getBidderIndex(bidder)]);
       }
     }
     // Prices
     Builder<Goods, Double> result = ImmutableMap.<Goods, Double> builder();
-    for (Goods good : this.M.getGoods()) {
-      result.put(good, this.p[this.M.goodsToIndex.get(good)]);
+    for (Goods good : this.market.getGoods()) {
+      result.put(good, this.p[this.market.getGoodIndex(good)]);
     }
     return new PricesStatistics<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
         new MarketOutcome<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
-            new MarketAllocation<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
-                this.M, allocation, new SingleStepObjectiveFunction()), result.build()), System.nanoTime() - this.startTime);
+            new MarketAllocation<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(this.market, allocation, new SingleStepObjectiveFunction()),
+            result.build()), System.nanoTime() - this.startTime);
   }
 
   /**
-   * This function returns true if all the entries of a matrix are false.
-   * Otherwise, returns false.
+   * This function returns true if all the entries of a matrix are false. Otherwise, returns false.
    * 
    * @param X - a boolean matrix
    * @return true if all the entries of X are false. Otherwise, false.

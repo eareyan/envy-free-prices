@@ -2,6 +2,8 @@ package structures;
 
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import structures.exceptions.BidderCreationException;
 
 /**
@@ -26,7 +28,7 @@ public class Bidder<G extends Goods> {
   /**
    * Demand set
    */
-  protected final Set<G> demandSet;
+  protected final ImmutableSet<G> demandSet;
 
   /**
    * Constructor.
@@ -48,13 +50,13 @@ public class Bidder<G extends Goods> {
     if (demandSet == null) {
       throw new BidderCreationException("The demand set of a bidder cannot be null");
     }
-    this.demandSet = demandSet;
+    this.demandSet = ImmutableSet.copyOf(demandSet);
   }
   
   /**
    * Getter.
    * 
-   * @return this bidder demand.
+   * @return this bidder's demand.
    */
   public int getDemand() {
     return this.demand;
@@ -63,10 +65,19 @@ public class Bidder<G extends Goods> {
   /**
    * Getter.
    * 
-   * @return this bidder reward.
+   * @return this bidder's reward.
    */
   public double getReward() {
     return this.reward;
+  }
+  
+  /**
+   * Getter.
+   * 
+   * @return this bidder's demand set.
+   */
+  public ImmutableSet<G> getDemandSet() {
+    return this.demandSet;
   }
   
   /**

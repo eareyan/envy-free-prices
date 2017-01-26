@@ -13,7 +13,7 @@ import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.MarketOutcome;
-import structures.comparators.MarketPricesComparatorBySellerRevenue;
+import structures.comparators.MarketOutcomeComparatorBySellerRevenue;
 import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsException;
@@ -123,7 +123,7 @@ public abstract class SearchMetaHeuristic {
         }
       }
     }
-    Collections.sort(this.setOfSolutions, new MarketPricesComparatorBySellerRevenue<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
+    Collections.sort(this.setOfSolutions, new MarketOutcomeComparatorBySellerRevenue<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
     //System.out.println("Max-Rev reserve = " + this.reserveToOutcomeMap.get(setOfSolutions.get(0)));
     return setOfSolutions.get(0);
   }

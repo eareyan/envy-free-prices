@@ -6,8 +6,7 @@ import structures.Bidder;
 import structures.Goods;
 
 /**
- * This class implements a comparator to compare bidders by the ratio 1 to
- * demand (1 / I_j).
+ * This class implements a comparator to compare bidders by the ratio 1 to demand (1 / I_j).
  * 
  * @author Enrique Areyan Viqueira
  */

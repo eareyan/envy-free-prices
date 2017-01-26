@@ -3,7 +3,7 @@ package unitdemand.ascendingauction;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import unitdemand.Matching;
+import unitdemand.structures.Matching;
 
 /**
  * Implements ascending auction for the unit-demand case. 

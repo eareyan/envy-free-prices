@@ -6,7 +6,7 @@ package structures.factory;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class UnitMarketFactory {
+public class UnitDemandMarketFactory {
   
   /**
    * Produces a random valuation matrix V_ij, where valuations are within the default range.

@@ -5,18 +5,17 @@ import java.util.Comparator;
 import structures.Goods;
 
 /**
- * This class implements a comparator to compare goods by their 
- * remaining supply.
+ * This class implements a comparator to compare goods by their remaining supply.
  * 
  * @author Enrique Areyan Viqueira
  */
 public class GoodsComparatorByRemainingSupply<G extends Goods> implements Comparator<G> {
-  
+
   /**
    * order 1 means ASC and -1 means DESC, any other means no order
    */
   protected int Order = 0;
-  
+
   /**
    * Constructor.
    * 
@@ -36,19 +35,19 @@ public class GoodsComparatorByRemainingSupply<G extends Goods> implements Compar
   @Override
   public int compare(G U1, G U2) {
     if (this.Order == -1) {
-      if (U1.getRemainingSupply() < U2.getRemainingSupply()){
+      if (U1.getRemainingSupply() < U2.getRemainingSupply()) {
         return 1;
-      }else if (U1.getRemainingSupply() > U2.getRemainingSupply()){
+      } else if (U1.getRemainingSupply() > U2.getRemainingSupply()) {
         return -1;
       }
     } else if (this.Order == 1) {
-      if (U1.getRemainingSupply() < U2.getRemainingSupply()){
+      if (U1.getRemainingSupply() < U2.getRemainingSupply()) {
         return -1;
-      }else if (U1.getRemainingSupply() > U2.getRemainingSupply()){
+      } else if (U1.getRemainingSupply() > U2.getRemainingSupply()) {
         return 1;
       }
     }
     return 0;
   }
-  
+
 }

@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import singleminded.SingleMindedMarket;
+import singleminded.structures.SingleMindedMarket;
 import structures.Bidder;
 import structures.Goods;
 import structures.exceptions.BidderCreationException;

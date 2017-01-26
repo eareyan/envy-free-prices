@@ -1,9 +1,9 @@
 package experiments;
 
 import ilog.concert.IloException;
-import singleminded.SingleMindedGreedyAllocation;
-import singleminded.SingleMindedMarket;
-import singleminded.SingleMindedPricingLP;
+import singleminded.algorithms.SingleMindedGreedyAllocation;
+import singleminded.algorithms.SingleMindedPricingLP;
+import singleminded.structures.SingleMindedMarket;
 import statistics.PricesStatistics;
 import structures.Bidder;
 import structures.Goods;

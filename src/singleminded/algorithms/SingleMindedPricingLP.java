@@ -1,4 +1,4 @@
-package singleminded;
+package singleminded.algorithms;
 
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
@@ -9,6 +9,7 @@ import ilog.cplex.IloCplex;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import singleminded.structures.SingleMindedMarket;
 import statistics.PricesStatistics;
 import structures.Bidder;
 import structures.Goods;

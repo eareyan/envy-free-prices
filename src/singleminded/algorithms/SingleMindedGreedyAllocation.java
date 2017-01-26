@@ -1,4 +1,4 @@
-package singleminded;
+package singleminded.algorithms;
 
 import ilog.concert.IloException;
 
@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 
+import singleminded.structures.SingleMindedMarket;
 import structures.Bidder;
 import structures.Goods;
 import structures.MarketAllocation;

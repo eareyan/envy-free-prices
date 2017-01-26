@@ -1,4 +1,4 @@
-package unitdemand;
+package unitdemand.algorithms;
 
 /*
  * Copyright (c) 2007, Massachusetts Institute of Technology

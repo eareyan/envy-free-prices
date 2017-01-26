@@ -11,9 +11,9 @@ import structures.Bidder;
 import structures.Goods;
 import structures.Market;
 import structures.factory.RandomMarketFactory;
-import structures.factory.UnitMarketFactory;
-import unitdemand.Matching;
-import unitdemand.MaxWEQ;
+import structures.factory.UnitDemandMarketFactory;
+import unitdemand.algorithms.MaxWEQ;
+import unitdemand.structures.Matching;
 import util.Printer;
 
 public class Grapher {
@@ -151,10 +151,10 @@ public class Grapher {
 		
 	}
 	public static void main2(String args[]){
-		double[][] X = UnitMarketFactory.getValuationMatrix(4, 4, 1.0);
+		double[][] X = UnitDemandMarketFactory.getValuationMatrix(4, 4, 1.0);
 		Printer.printMatrix(X);
 		double reserve = 0.5;
-		double[][] XReserve = UnitMarketFactory.getValuationReserve(X, reserve);
+		double[][] XReserve = UnitDemandMarketFactory.getValuationReserve(X, reserve);
 		System.out.println("---");
 		Printer.printMatrix(XReserve);
 		MaxWEQ maxWEQAlgo = new MaxWEQ(XReserve);
@@ -205,11 +205,11 @@ public class Grapher {
 		/* Obtained as many samples as we want */
 		for(int j=0;j<numberOfSamples;j++){
 			/* generate a random market */
-			double[][] X = UnitMarketFactory.getValuationMatrix(10, 10, 0.75);
+			double[][] X = UnitDemandMarketFactory.getValuationMatrix(10, 10, 0.75);
 			/* compute the value of the optimal allocation*/
 			double valueOptAllocaction = Matching.computeMaximumWeightMatchingValue(X).getValueOfMatching();
 			/* compute the allocation that respects reserve price*/
-			double[][] XReserve = UnitMarketFactory.getValuationReserve(X, reserve);
+			double[][] XReserve = UnitDemandMarketFactory.getValuationReserve(X, reserve);
 			/* Run MaxWEQ on the allocation that respect reserve*/
 			MaxWEQ maxWEQAlgo = new MaxWEQ(XReserve);
 			Matching matchingWithReserve = maxWEQAlgo.Solve();
@@ -269,11 +269,11 @@ public class Grapher {
 			/* Obtained as many samples as we want */
 			for(int j=0;j<numberOfSamples;j++){
 				/* generate a random market */
-				double[][] X = UnitMarketFactory.getValuationMatrix(numUsers, numCampa, p);
+				double[][] X = UnitDemandMarketFactory.getValuationMatrix(numUsers, numCampa, p);
 				/* compute the value of the optimal allocation*/
 				double valueOptAllocaction = Matching.computeMaximumWeightMatchingValue(X).getValueOfMatching();
 				/* compute the allocation that respects reserve price*/
-				double[][] XReserve = UnitMarketFactory.getValuationReserve(X, reserve);
+				double[][] XReserve = UnitDemandMarketFactory.getValuationReserve(X, reserve);
 				/* Run MaxWEQ on the allocation that respect reserve*/
 				MaxWEQ maxWEQAlgo = new MaxWEQ(XReserve);
 				Matching matchingWithReserve = maxWEQAlgo.Solve();

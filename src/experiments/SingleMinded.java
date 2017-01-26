@@ -6,8 +6,8 @@ import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import singleminded.SingleMindedApproxWE;
-import singleminded.SingleMindedMarket;
+import singleminded.algorithms.SingleMindedApproxWE;
+import singleminded.structures.SingleMindedMarket;
 import statistics.PricesStatistics;
 import structures.Bidder;
 import structures.Goods;

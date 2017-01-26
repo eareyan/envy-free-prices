@@ -1,45 +1,46 @@
-package unitdemand;
+package unitdemand.structures;
+
+import unitdemand.algorithms.MWBMatchingAlgorithm;
+import util.Printer;
 
 /**
- * This class stores a matching, defined here as a matrix of integers
- * with a 1 at position (i,j) if good i is allocated to bidder j,
- * and 0 otherwise. It also stores the prices of a matching and implements
- * method to get the value of a matching. 
+ * This class stores a matching, defined here as a matrix of integers with a 1 at position (i,j) if good i is allocated to bidder j, and 0 otherwise. It also
+ * stores the prices of a matching and implements method to get the value of a matching.
  * 
  * @author Enrique Areyan Viqueira
  */
 public class Matching {
-  
+
   /**
    * valuation matrix. This is a matrix of doubles.
    */
   protected double[][] valuationMatrix;
-  
+
   /**
    * vector of prices. This is an array of doubles.
    */
   protected double[] prices;
-  
+
   /**
    * Matching. This is a matrix of integers.
    */
   protected int[][] matching;
-  
+
   /**
    * Value of the matrix. This is a double.
    */
   protected double valueOfMatching = -1;
-  
+
   /**
    * Seller revenue, a double.
    */
   protected double sellerRevenue = -1;
-  
+
   /**
    * Epsilon parameter. Used when computing number of envy bidders.
    */
-  protected static double epsilon = 0.1;
-  
+  protected static double epsilon = 0.00001;
+
   /**
    * Constructor.
    * 
@@ -63,26 +64,29 @@ public class Matching {
     this.valuationMatrix = valuationMatrix;
     this.matching = matching;
   }
-  
+
   /**
    * Getter.
+   * 
    * @return array of prices.
    */
   public double[] getPrices() {
     return this.prices;
   }
-  
+
   /**
    * Getter.
+   * 
    * @return valuation matrix.
    */
   public double[][] getValuationMarix() {
     return this.valuationMatrix;
   }
-  
+
   /**
    * Gets value of matching. Implements singleton.
-   * @return value of matching. 
+   * 
+   * @return value of matching.
    */
   public double getValueOfMatching() {
     if (this.valueOfMatching == -1) {
@@ -100,7 +104,8 @@ public class Matching {
   }
 
   /**
-   * Getter. 
+   * Getter.
+   * 
    * @return matrix of integers.
    */
   public int[][] getMatching() {
@@ -109,27 +114,31 @@ public class Matching {
 
   /**
    * Getter. Implements singleton.
+   * 
    * @return seller revenue under this matching.
    */
   public double getSellerRevenue() {
     if (this.sellerRevenue == -1) {
-      double revenue = 0.0;
-      if (this.matching == null)
+      if (this.matching == null) {
         return 0.0;
-      for (int i = 0; i < this.matching.length; i++) {
-        for (int j = 0; j < this.matching[0].length; j++) {
-          if (this.matching[i][j] == 1) {
-            revenue += prices[i];
+      } else {
+        double revenue = 0.0;
+        for (int i = 0; i < this.matching.length; i++) {
+          for (int j = 0; j < this.matching[0].length; j++) {
+            if (this.matching[i][j] == 1) {
+              revenue += prices[i];
+            }
           }
         }
+        this.sellerRevenue = revenue;
       }
-      this.sellerRevenue = revenue;
     }
     return this.sellerRevenue;
   }
 
   /**
    * Computes the utility of bidder j under this matching.
+   * 
    * @param j - bidder index.
    * @return utility of bidder j under this matching.
    */
@@ -141,9 +150,10 @@ public class Matching {
     }
     return 0.0;
   }
-  
+
   /**
    * Compute number of envy-bidders.
+   * 
    * @return number of envy-bidders.
    */
   public int numberOfEnvyBidders() {
@@ -158,12 +168,13 @@ public class Matching {
     }
     return totalNumberEnvy;
   }
-  
+
   /**
    * Compute the number of goods that are not allocated and not priced at zero.
+   * 
    * @return the number of goods that are not allocated and not priced at zero.
    */
-  public int computeWalrasianViolations() {
+  public int computeMarketClearanceViolations() {
     int violations = 0;
     for (int i = 0; i < this.valuationMatrix.length; i++) {
       if (this.allocationFromGood(i) == 0 && this.prices[i] > 0) {
@@ -175,6 +186,7 @@ public class Matching {
 
   /**
    * Computes the allocation from good i.
+   * 
    * @param i - good index.
    * @return the allocation from good i.
    */
@@ -185,9 +197,10 @@ public class Matching {
     }
     return totalAllocation;
   }
-  
+
   /**
    * Computes the maximum weight matching and its value for the argument matrix.
+   * 
    * @param matrix - matrix of valuations.
    * @return the maximum weight matching and its value for the argument matrix.
    */
@@ -195,19 +208,20 @@ public class Matching {
     int[] result = new MWBMatchingAlgorithm(matrix).getMatching();
     int[][] matching = new int[matrix.length][matrix[0].length];
     for (int i = 0; i < result.length; i++) {
-      // System.out.println("--" + result[i]);
-      // If the assignment is possible and the good is actually connected to the
-      // bidder
+      // If the assignment is possible and the good is actually connected to the bidder
       if (result[i] > -1 && matrix[i][result[i]] > Double.NEGATIVE_INFINITY) {
         matching[i][result[i]] = 1;
       }
     }
     return new Matching(matrix, matching);
   }
-  
+
   @Override
   public String toString() {
-    return "Revenue:\t" + this.getSellerRevenue() + "\n";
+    Printer.printMatrix(this.matching);
+    System.out.println("");
+    Printer.printVector(this.prices);
+    return "";
   }
 
 }

@@ -92,8 +92,13 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
    * Returns a list with the bidders that are envy.
    * 
    * @return
+   * @throws MarketAllocationException 
+   * @throws MarketOutcomeException 
    */
-  public ImmutableList<B> listOfEnvyBidders() {
+  public ImmutableList<B> listOfEnvyBidders() throws MarketOutcomeException, MarketAllocationException {
+    if (this.listOfEnvyBidders == null) {
+      this.numberOfEnvyBidders();
+    }
     return this.listOfEnvyBidders;
   }
 
