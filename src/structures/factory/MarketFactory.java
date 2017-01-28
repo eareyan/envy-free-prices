@@ -2,6 +2,7 @@ package structures.factory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.Callable;
 
 import structures.Bidder;
 import structures.Goods;
@@ -57,7 +58,7 @@ public class MarketFactory {
    * @return a market object with bidders and goods interchanged.
    * @throws Exception
    */
-  public static Market<Goods, Bidder<Goods>> transposeMarket(Market<Goods, Bidder<Goods>> market) throws Exception {
+  public static Market<Goods, Bidder<Goods>> transposeMarket(Market<Goods, Bidder<Goods>> market, Callable<Double> rewardFunction) throws Exception {
     // For each bidder of the input market, create a good.
     ArrayList<Goods> goods = new ArrayList<Goods>();
     for (Bidder<Goods> bidder : market.getBidders()) {
@@ -73,7 +74,7 @@ public class MarketFactory {
           bDemandSet.add(goods.get(j));
         }
       }
-      bidders.add(new Bidder<Goods>(market.getGoods().get(i).getSupply(), RewardsGenerator.getRandomUniformRewardFunction().call(), bDemandSet));
+      bidders.add(new Bidder<Goods>(market.getGoods().get(i).getSupply(), rewardFunction.call(), bDemandSet));
     }
     return new Market<Goods, Bidder<Goods>>(goods, bidders);
   }

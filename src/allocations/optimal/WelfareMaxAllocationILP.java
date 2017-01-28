@@ -21,7 +21,7 @@ import allocations.objectivefunction.SingleStepObjectiveFunction;
  * @param <G>
  * @param <B>
  */
-public class SingleStepWelfareMaxAllocationILP<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> extends OptimalAllocILP<M, G, B> {
+public class WelfareMaxAllocationILP<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> extends OptimalAllocILP<M, G, B> {
 
   @Override
   protected IloNumExpr getILPObjective(M market, IloNumVar[] indicatorVariable, HashMap<B, Integer> bidderToCPLEXIndex) throws IloException {

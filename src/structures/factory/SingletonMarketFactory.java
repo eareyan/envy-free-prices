@@ -1,8 +1,8 @@
 package structures.factory;
 
+import singleton.structures.SingletonMarket;
 import structures.Bidder;
 import structures.Goods;
-import structures.Market;
 
 /**
  * Factory methods to create singleton markets.
@@ -12,18 +12,33 @@ import structures.Market;
 public class SingletonMarketFactory {
 
   /**
-   * Creates a fully parameterizable singleton market.
+   * Creates a uniform reward singleton random market.
    * 
    * @param numberGoods
    * @param numberBidders
-   * @param minReward
-   * @param maxReward
    * @param probabilityConnection
    * @return
    * @throws Exception
    */
-  public static Market<Goods, Bidder<Goods>> uniformRewardRandomMarket(int numberGoods, int numberBidders, double probabilityConnection) throws Exception {
-    return RandomMarketFactory.randomMarket(numberGoods, 1, 1, numberBidders, 1, 1, RewardsGenerator.getRandomUniformRewardFunction(), probabilityConnection);
+  public static SingletonMarket<Goods, Bidder<Goods>> uniformRewardSingletonRandomMarket(int numberGoods, int numberBidders, double probabilityConnection)
+      throws Exception {
+    return new SingletonMarket<Goods, Bidder<Goods>>(RandomMarketFactory.randomMarket(numberGoods, 1, 1, numberBidders, 1, 1,
+        RewardsGenerator.getRandomUniformRewardFunction(), probabilityConnection));
   }
-  
+
+  /**
+   * Creates an elitist reward singleton random market.
+   * 
+   * @param numberGoods
+   * @param numberBidders
+   * @param probabilityConnection
+   * @return
+   * @throws Exception
+   */
+  public static SingletonMarket<Goods, Bidder<Goods>> elitistRewardSingletonRandomMarket(int numberGoods, int numberBidders, double probabilityConnection)
+      throws Exception {
+    return new SingletonMarket<Goods, Bidder<Goods>>(RandomMarketFactory.randomMarket(numberGoods, 1, 1, numberBidders, 1, 1,
+        RewardsGenerator.getElitistRewardFunction(), probabilityConnection));
+  }
+
 }

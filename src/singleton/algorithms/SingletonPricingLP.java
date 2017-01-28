@@ -1,4 +1,4 @@
-package singleminded.algorithms;
+package singleton.algorithms;
 
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
@@ -6,7 +6,7 @@ import ilog.concert.IloNumVar;
 
 import java.util.HashMap;
 
-import singleminded.structures.SingleMindedMarket;
+import singleton.structures.SingletonMarket;
 import structures.Bidder;
 import structures.Goods;
 import structures.MarketAllocation;
@@ -14,17 +14,25 @@ import structures.exceptions.MarketAllocationException;
 import algorithms.pricing.RestrictedEnvyFreePricesLP;
 
 /**
- * Implements an LP specialized for the Single-Minded case. Given an allocation and a Single-Minded market, solves for a set of prices such that winners are
- * envy-free and losers are as envy-free as possible, while maximizing seller revenue.
+ * This class implements an LP pricing for the case of singleton markets.
  * 
  * @author Enrique Areyan Viqueira
+ *
+ * @param <M>
+ * @param <G>
+ * @param <B>
  */
-public class SingleMindedPricingLP<M extends SingleMindedMarket<G, B>, G extends Goods, B extends Bidder<G>> extends RestrictedEnvyFreePricesLP<M, G, B> {
+public class SingletonPricingLP<M extends SingletonMarket<G, B>, G extends Goods, B extends Bidder<G>> extends RestrictedEnvyFreePricesLP<M, G, B> {
 
   /**
    * LoserSlack variables to be used in the LP.
    */
-  private IloNumVar[] losersSlack;
+  private IloNumVar[][] slack;
+
+  /**
+   * Map from bidders to indices.
+   */
+  private final HashMap<G, Integer> goodToSlackIndex;
 
   /**
    * Map from bidders to indices.
@@ -37,9 +45,13 @@ public class SingleMindedPricingLP<M extends SingleMindedMarket<G, B>, G extends
    * @param allocatedMarket
    * @throws IloException
    */
-  public SingleMindedPricingLP(MarketAllocation<M, G, B> allocatedMarket) throws IloException {
+  public SingletonPricingLP(MarketAllocation<M, G, B> allocatedMarket) throws IloException {
     super(allocatedMarket);
 
+    this.goodToSlackIndex = new HashMap<G, Integer>();
+    for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {
+      this.goodToSlackIndex.put(this.allocatedMarket.getMarket().getGoods().get(i), i);
+    }
     this.bidderToSlackIndex = new HashMap<B, Integer>();
     for (int j = 0; j < this.allocatedMarket.getMarket().getNumberBidders(); j++) {
       this.bidderToSlackIndex.put(this.allocatedMarket.getMarket().getBidders().get(j), j);
@@ -47,19 +59,19 @@ public class SingleMindedPricingLP<M extends SingleMindedMarket<G, B>, G extends
   }
 
   /**
-   * This method generates the objective function to be maximized by the LP. The function is seller revenue.
+   * This method generates the objective function to be maximized by the LP. The function is seller revenue minus the slack.
    * 
    * @throws IloException
    * @throws MarketAllocationException
    */
   @Override
-  public void generateObjectiveFunction() throws IloException, MarketAllocationException {
+  protected void generateObjectiveFunction() throws IloException, MarketAllocationException {
     // Create the objective function, i.e., the sum of all the prices.
     IloLinearNumExpr objective = this.cplex.linearNumExpr();
-    for (B bidder : this.allocatedMarket.getMarket().getBidders()) {
-      objective.addTerm(-1.0, this.losersSlack[this.bidderToSlackIndex.get(bidder)]);
-      for (G good : this.allocatedMarket.getMarket().getGoods()) {
+    for (G good : this.allocatedMarket.getMarket().getGoods()) {
+      for (B bidder : this.allocatedMarket.getMarket().getBidders()) {
         objective.addTerm(this.allocatedMarket.getAllocation(good, bidder), this.prices[this.goodToPriceIndex.get(good)]);
+        objective.addTerm(-1.0, this.slack[this.goodToSlackIndex.get(good)][this.bidderToSlackIndex.get(bidder)]);
       }
     }
     this.cplex.addMaximize(objective);
@@ -74,14 +86,13 @@ public class SingleMindedPricingLP<M extends SingleMindedMarket<G, B>, G extends
   private void generateLosersConditions() throws MarketAllocationException, IloException {
     for (B bidder : this.allocatedMarket.getMarket().getBidders()) {
       if (this.allocatedMarket.isBidderBundleZero(bidder)) {
-        IloLinearNumExpr lhs = this.cplex.linearNumExpr();
+        int j = this.bidderToSlackIndex.get(bidder);
         for (G good : this.allocatedMarket.getMarket().getGoods()) {
           if (bidder.demandsGood(good)) {
-            lhs.addTerm(1.0, this.prices[this.goodToPriceIndex.get(good)]);
+            this.linearConstrains.add(this.cplex.addGe(
+                this.cplex.sum(this.prices[this.goodToPriceIndex.get(good)], this.slack[this.goodToSlackIndex.get(good)][j]), bidder.getReward()));
           }
         }
-        lhs.addTerm(1.0, this.losersSlack[this.bidderToSlackIndex.get(bidder)]);
-        this.linearConstrains.add(this.cplex.addGe(lhs, bidder.getReward()));
       }
     }
   }
@@ -94,7 +105,10 @@ public class SingleMindedPricingLP<M extends SingleMindedMarket<G, B>, G extends
   @Override
   protected void initVariables() throws IloException {
     super.initVariables();
-    this.losersSlack = this.cplex.numVarArray(this.allocatedMarket.getMarket().getNumberBidders(), 0.0, Double.MAX_VALUE);
+    this.slack = new IloNumVar[this.allocatedMarket.getMarket().getNumberGoods()][];
+    for (G good : this.allocatedMarket.getMarket().getGoods()) {
+      this.slack[this.goodToSlackIndex.get(good)] = this.cplex.numVarArray(this.allocatedMarket.getMarket().getNumberBidders(), 0.0, Double.MAX_VALUE);
+    }
   }
 
   /**
@@ -105,13 +119,7 @@ public class SingleMindedPricingLP<M extends SingleMindedMarket<G, B>, G extends
    */
   @Override
   protected void createConstraints() throws IloException, MarketAllocationException {
-    // Create constraints.
-    this.generateIndividualRationalityConditions();
-    this.generateBoundConditions();
-    if (this.marketClearanceConditions) {
-      this.generateMarketClearanceConditions();
-    }
+    super.createConstraints();
     this.generateLosersConditions();
   }
-
 }

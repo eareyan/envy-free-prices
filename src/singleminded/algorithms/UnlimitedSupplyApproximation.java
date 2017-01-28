@@ -39,6 +39,11 @@ public class UnlimitedSupplyApproximation {
    * A list of ordered bidders.
    */
   private final List<Bidder<Goods>> orderedBidders;
+  
+  /**
+   * Start time, for statistics purposes.
+   */
+  private final long startTime;
 
   /**
    * Constructor.
@@ -46,10 +51,10 @@ public class UnlimitedSupplyApproximation {
    * @param market
    */
   public UnlimitedSupplyApproximation(SingleMindedMarket<Goods, Bidder<Goods>> market) {
+    this.startTime = System.nanoTime();
     this.market = market;
     this.orderedBidders = new ArrayList<Bidder<Goods>>(this.market.getBidders());
     Collections.sort(this.orderedBidders, new BiddersComparatorByRewardToImpressionsRatio());
-
   }
 
   /**
@@ -70,7 +75,7 @@ public class UnlimitedSupplyApproximation {
       }
     }
     Collections.sort(outcomes, new MarketOutcomeComparatorBySellerRevenue<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
-    return new PricesStatistics<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(outcomes.get(0));
+    return new PricesStatistics<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(outcomes.get(0), System.nanoTime() - this.startTime);
   }
 
   /**

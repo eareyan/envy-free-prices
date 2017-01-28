@@ -55,18 +55,36 @@ public class RandomMarketFactoryTest {
   }
 
   @Test
-  public void testGenerateOverDemandedMarket() throws Exception {
+  public void testGenerateUniformOverDemandedMarket() throws Exception {
     for (int i = 0; i < 1000; i++) {
-      Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateOverDemandedMarket(10, 10, 1.0, 3);
+      Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(10, 10, 1.0, 3);
       //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
       assertTrue(market.getSupplyToDemandRatio() == 1.0 / 3.0);
     }
   }
   
   @Test
-  public void testGenerateUnderDemandedMarket() throws Exception {
+  public void testGenerateUniformUnderDemandedMarket() throws Exception {
     for (int i = 0; i < 1000; i++) {
-      Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateOverSuppliedMarket(10, 10, 1.0, 3);
+      Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverSuppliedMarket(10, 10, 1.0, 3);
+      //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
+      assertTrue(market.getSupplyToDemandRatio() == 3.0);
+    }
+  }
+  
+  @Test
+  public void testGenerateElitistOverDemandedMarket() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateElitistRewardOverDemandedMarket(10, 10, 1.0, 3);
+      //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
+      assertTrue(market.getSupplyToDemandRatio() == 1.0 / 3.0);
+    }
+  }
+  
+  @Test
+  public void testGenerateElitistUnderDemandedMarket() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateElitistRewardOverSuppliedMarket(10, 10, 1.0, 3);
       //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
       assertTrue(market.getSupplyToDemandRatio() == 3.0);
     }

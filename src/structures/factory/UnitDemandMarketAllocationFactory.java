@@ -1,8 +1,8 @@
 package structures.factory;
 
+import singleton.structures.SingletonMarket;
 import structures.Bidder;
 import structures.Goods;
-import structures.Market;
 import unitdemand.algorithms.MWBMatchingAlgorithm;
 import unitdemand.structures.Matching;
 
@@ -22,7 +22,7 @@ public class UnitDemandMarketAllocationFactory {
    * @param market - a market object. 
    * @return a matrix of valuations.
    */
-  public static double[][] getValuationMatrixFromMarket(Market<Goods, Bidder<Goods>> market) {
+  public static double[][] getValuationMatrixFromMarket(SingletonMarket<Goods, Bidder<Goods>> market) {
     double[][] costMatrix = new double[market.getNumberGoods()][market.getNumberBidders()];
     for (int i = 0; i < market.getNumberGoods(); i++) {
       for (int j = 0; j < market.getNumberBidders(); j++) {

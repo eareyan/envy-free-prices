@@ -39,7 +39,7 @@ public class UnlimitedSupplyApproximationTest {
     for (int n = 1; n < 10; n++) {
       for (int m = 1; m < 10; m++) {
         for (int k = 1; k <= n; k++) {
-          SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.createUniformRewardRandomSingleMindedMarket(n, m, k);
+          SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(n, m, k);
           // System.out.println(singleMindedMarket);
           UnlimitedSupplyApproximation usa = new UnlimitedSupplyApproximation(singleMindedMarket);
           PricesStatistics<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> stats = usa.Solve();

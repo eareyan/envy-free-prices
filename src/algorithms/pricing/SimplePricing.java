@@ -39,6 +39,11 @@ public class SimplePricing {
    * A list of ordered bidders.
    */
   private final List<Bidder<Goods>> orderedBidders;
+  
+  /**
+   * Start time, for statistics purposes.
+   */
+  private final long startTime;
 
   /**
    * Constructor.
@@ -46,6 +51,7 @@ public class SimplePricing {
    * @param market
    */
   public SimplePricing(Market<Goods, Bidder<Goods>> market) {
+    this.startTime = System.nanoTime();
     this.market = market;
     this.orderedBidders = new ArrayList<Bidder<Goods>>(this.market.getBidders());
     Collections.sort(this.orderedBidders, new BiddersComparatorByRewardToImpressionsRatio());
@@ -67,7 +73,7 @@ public class SimplePricing {
       }
     }
     Collections.sort(listOfOutcomes, new MarketOutcomeComparatorBySellerRevenue<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
-    return new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(listOfOutcomes.get(0));
+    return new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(listOfOutcomes.get(0), System.nanoTime() - this.startTime);
   }
 
   /**

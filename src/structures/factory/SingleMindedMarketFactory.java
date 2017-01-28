@@ -28,7 +28,7 @@ public class SingleMindedMarketFactory {
    * @return a Random-k-Single-Minded-Market(n,m,k)
    * @throws Exception
    */
-  public static SingleMindedMarket<Goods, Bidder<Goods>> createUniformRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
+  public static SingleMindedMarket<Goods, Bidder<Goods>> uniformRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
     return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, RewardsGenerator.getRandomUniformRewardFunction());
   }
 
@@ -40,7 +40,7 @@ public class SingleMindedMarketFactory {
    * @return a Random-k-Single-Minded-Market(n,m,k)
    * @throws Exception
    */
-  public static SingleMindedMarket<Goods, Bidder<Goods>> createElitistRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
+  public static SingleMindedMarket<Goods, Bidder<Goods>> elitistRewardRandomSingleMindedMarket(int n, int m, int k) throws Exception {
     return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, RewardsGenerator.getElitistRewardFunction());
   }
 

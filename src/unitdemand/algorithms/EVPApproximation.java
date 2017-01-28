@@ -16,6 +16,10 @@ import algorithms.pricing.error.PrincingAlgoException;
  * @author Enrique Areyan Viqueira
  */
 public class EVPApproximation {
+  /**
+   * Start time, for statistics purposes.
+   */
+  private final long startTime;
 
   /**
    * valuation matrix. Provides a valuation v_ij of good i by bidder j.
@@ -31,6 +35,7 @@ public class EVPApproximation {
    *          - an AbstractMaxWEQReservePrices object.
    */
   public EVPApproximation(double[][] valuationMatrix) {
+    this.startTime = System.nanoTime();
     this.valuationMatrix = valuationMatrix;
   }
 
@@ -59,7 +64,8 @@ public class EVPApproximation {
       // System.out.println(x.getSellerRevenue());
     }
     Collections.sort(setOfSolutionMatchings, new MatchingComparatorBySellerRevenue());
-    return setOfSolutionMatchings.get(0);
+    Matching matching = setOfSolutionMatchings.get(0);
+    return new Matching(matching.getValuationMarix(), matching.getMatching(), matching.getPrices(), System.nanoTime() - this.startTime);
   }
 
 }

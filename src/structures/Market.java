@@ -80,6 +80,24 @@ public class Market<G extends Goods, B extends Bidder<G>> {
   }
   
   /**
+   * Constructor
+   * 
+   * @param goods
+   * @param bidders
+   * @throws MarketCreationException 
+   */
+  public Market(ImmutableList<G> goods, ImmutableList<B> bidders) throws MarketCreationException {
+    if(goods == null || goods.size() == 0) {
+      throw new MarketCreationException("A market must contain at least one good.");
+    }
+    this.goods = goods;
+    if(bidders == null || bidders.size() == 0) {
+      throw new MarketCreationException("A market must contain at least one bidder.");
+    }
+    this.bidders = bidders;    
+  }
+
+  /**
    * A private method that gets called only by constructors to set the bidders.
    * 
    * @param bidder - an ArrayList of bidders.

@@ -131,7 +131,7 @@ public class Grapher {
 			/* Compute using MaxWEQ. */
 			MaxWEQ maxWEQAlgo = new MaxWEQ(X);
 			Matching matching = maxWEQAlgo.Solve();
-			welfare += matching.getValueOfMatching();
+			welfare += matching.getWelfare();
 			expectedSellerRevenue += matching.getSellerRevenue();
 			
 			/* Compute which permutation won: */
@@ -207,7 +207,7 @@ public class Grapher {
 			/* generate a random market */
 			double[][] X = UnitDemandMarketFactory.getValuationMatrix(10, 10, 0.75);
 			/* compute the value of the optimal allocation*/
-			double valueOptAllocaction = Matching.computeMaximumWeightMatchingValue(X).getValueOfMatching();
+			double valueOptAllocaction = Matching.computeMaximumWeightMatchingValue(X).getWelfare();
 			/* compute the allocation that respects reserve price*/
 			double[][] XReserve = UnitDemandMarketFactory.getValuationReserve(X, reserve);
 			/* Run MaxWEQ on the allocation that respect reserve*/
@@ -271,7 +271,7 @@ public class Grapher {
 				/* generate a random market */
 				double[][] X = UnitDemandMarketFactory.getValuationMatrix(numUsers, numCampa, p);
 				/* compute the value of the optimal allocation*/
-				double valueOptAllocaction = Matching.computeMaximumWeightMatchingValue(X).getValueOfMatching();
+				double valueOptAllocaction = Matching.computeMaximumWeightMatchingValue(X).getWelfare();
 				/* compute the allocation that respects reserve price*/
 				double[][] XReserve = UnitDemandMarketFactory.getValuationReserve(X, reserve);
 				/* Run MaxWEQ on the allocation that respect reserve*/
@@ -339,9 +339,9 @@ public class Grapher {
 				Market<Goods, Bidder<Goods>> M;
 				/* Determine if it is an underdemanded or overdemanded market and produce the market accordingly. */
 				if(overunderdemand == 0){
-					M = RandomMarketFactory.generateOverSuppliedMarket(numUsers, numCampa, p, b);
+					M = RandomMarketFactory.generateUniformRewardOverSuppliedMarket(numUsers, numCampa, p, b);
 				}else{
-					M = RandomMarketFactory.generateOverDemandedMarket(numUsers, numCampa, p, b);
+					M = RandomMarketFactory.generateUniformRewardOverDemandedMarket(numUsers, numCampa, p, b);
 				}
 				System.out.println(M);
 				/* Compute the efficient allocation */

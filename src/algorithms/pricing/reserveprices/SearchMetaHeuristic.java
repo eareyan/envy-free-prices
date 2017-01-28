@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import statistics.PricesStatistics;
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
@@ -58,13 +59,25 @@ public abstract class SearchMetaHeuristic {
   protected final Map<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>, Double> reserveToOutcomeMap = new HashMap<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>, Double>();
 
   /**
+   * Statistics
+   */
+  private PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> statistics;
+
+  /**
+   * Start time, for statistics purposes.
+   */
+  private final long startTime;
+
+  /**
    * Constructor.
    * 
    * @param market
    * @param AllocAlgo
    * @throws PrincingAlgoException
    */
-  public SearchMetaHeuristic(Market<Goods, Bidder<Goods>> market, AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> AllocAlgo) throws PrincingAlgoException {
+  public SearchMetaHeuristic(Market<Goods, Bidder<Goods>> market, AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> AllocAlgo)
+      throws PrincingAlgoException {
+    this.startTime = System.nanoTime();
     if (!AllocAlgo.getObjectiveFunction().isSafeForReserve()) {
       throw new PrincingAlgoException("Try to run RevMaxHeuristic with an allocation algorithm that optimizes a function that is not reserve safe.");
     }
@@ -85,7 +98,8 @@ public abstract class SearchMetaHeuristic {
    * @throws MarketCreationException
    * @throws PrincingAlgoException
    */
-  public MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> Solve() throws IloException, AllocationAlgoException, BidderCreationException, MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException, MarketCreationException, PrincingAlgoException {
+  public MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> Solve() throws IloException, AllocationAlgoException, BidderCreationException,
+      MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException, MarketCreationException, PrincingAlgoException {
     // Maintain a hashmap of seen reserve prices so that we don't repeat computation.
     HashSet<Double> seenReservePrices = new HashSet<Double>();
     ArrayList<Double> listOfReservePrices = this.getListOfReservePrices();
@@ -124,7 +138,7 @@ public abstract class SearchMetaHeuristic {
       }
     }
     Collections.sort(this.setOfSolutions, new MarketOutcomeComparatorBySellerRevenue<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>());
-    //System.out.println("Max-Rev reserve = " + this.reserveToOutcomeMap.get(setOfSolutions.get(0)));
+    // System.out.println("Max-Rev reserve = " + this.reserveToOutcomeMap.get(setOfSolutions.get(0)));
     return setOfSolutions.get(0);
   }
 
@@ -135,6 +149,29 @@ public abstract class SearchMetaHeuristic {
    */
   public ArrayList<MarketOutcome<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>> getSetOfSolutions() {
     return this.setOfSolutions;
+  }
+
+  /**
+   * Gets statistics on the result of this algorithm.
+   * 
+   * @return
+   * @throws IloException
+   * @throws AllocationAlgoException
+   * @throws BidderCreationException
+   * @throws MarketAllocationException
+   * @throws AllocationException
+   * @throws GoodsException
+   * @throws MarketOutcomeException
+   * @throws MarketCreationException
+   * @throws PrincingAlgoException
+   */
+  public PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> getStatistics() throws IloException, AllocationAlgoException,
+      BidderCreationException, MarketAllocationException, AllocationException, GoodsException, MarketOutcomeException, MarketCreationException,
+      PrincingAlgoException {
+    if (this.statistics == null) {
+      this.statistics = new PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(this.Solve(), System.nanoTime() - this.startTime);
+    }
+    return this.statistics;
   }
 
   /**

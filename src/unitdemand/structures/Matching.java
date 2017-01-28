@@ -1,6 +1,7 @@
 package unitdemand.structures;
 
 import unitdemand.algorithms.MWBMatchingAlgorithm;
+import util.NumberMethods;
 import util.Printer;
 
 /**
@@ -35,6 +36,11 @@ public class Matching {
    * Seller revenue, a double.
    */
   protected double sellerRevenue = -1;
+  
+  /**
+   * Time
+   */
+  private long time = -1;
 
   /**
    * Epsilon parameter. Used when computing number of envy bidders.
@@ -52,6 +58,20 @@ public class Matching {
     this.valuationMatrix = valuationMatrix;
     this.matching = matching;
     this.prices = prices;
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param valuationMatrix - a matrix of valuations.
+   * @param matching - an integer matrix.
+   * @param prices - a vector of prices.
+   */
+  public Matching(double[][] valuationMatrix, int[][] matching, double[] prices, long time) {
+    this.valuationMatrix = valuationMatrix;
+    this.matching = matching;
+    this.prices = prices;
+    this.time = time;
   }
 
   /**
@@ -88,7 +108,7 @@ public class Matching {
    * 
    * @return value of matching.
    */
-  public double getValueOfMatching() {
+  public double getWelfare() {
     if (this.valueOfMatching == -1) {
       double value = 0.0;
       for (int i = 0; i < this.valuationMatrix.length; i++) {
@@ -216,6 +236,53 @@ public class Matching {
     return new Matching(matrix, matching);
   }
 
+  /**
+   * Computes the ratio of the welfare w.r.t a given value.
+   * 
+   * @param value
+   * @return
+   */
+  public double getWelfareRatio(double value) {
+    return NumberMethods.getRatio(this.getWelfare(), value);
+  }
+
+  /**
+   * Computes the ratio of the seller revenue w.r.t a given value.
+   * 
+   * @param value
+   * @return
+   */
+  public double getSellerRevenueRatio(double value) {
+    return NumberMethods.getRatio(this.getSellerRevenue(), value);
+  }
+  
+  /**
+   * Computes the ratio of EF violations to the total number of bidders.
+   * 
+   * @return
+   */
+  public double getEFViolationsRatio() {
+    return (double) this.numberOfEnvyBidders() / this.valuationMatrix[0].length;
+  }
+  
+  /**
+   * Computes the ratio of MC violations to the total number of goods.
+   * 
+   * @return
+   */
+  public double getMCViolationsRatio() {
+    return (double) this.computeMarketClearanceViolations() / this.valuationMatrix.length;
+  }
+  
+  /**
+   * Returns the time.
+   * 
+   * @return
+   */
+  public double getTime() {
+    return this.time;
+  }
+
   @Override
   public String toString() {
     Printer.printMatrix(this.matching);
@@ -223,5 +290,4 @@ public class Matching {
     Printer.printVector(this.prices);
     return "";
   }
-
 }

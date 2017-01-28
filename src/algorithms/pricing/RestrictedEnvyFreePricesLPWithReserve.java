@@ -74,10 +74,11 @@ public class RestrictedEnvyFreePricesLPWithReserve<M extends Market<G, B>, G ext
    * This method creates the LP.
    * 
    * @throws MarketAllocationException
+   * @throws IloException 
    *
    */
   @Override
-  public void createLP() throws MarketAllocationException {
+  public void createLP() throws MarketAllocationException, IloException {
     super.createLP();
     this.setReservePrice();
   }

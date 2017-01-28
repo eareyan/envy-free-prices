@@ -28,12 +28,12 @@ public class RandomMarketFactory {
    * @param numberGoods - number of goods.
    * @param numberBidders - number of bidders.
    * @param probabilityConnection - probability of a connection.
-   * @param b - supply to demand ratio.
+   * @param k - supply to demand ratio.
    * @return a Market object.
    * @throws Exception 
    */
-  public static Market<Goods, Bidder<Goods>> generateOverDemandedMarket(int numberGoods, int numberBidders, double probabilityConnection, int b) throws Exception {
-    return RandomKMarket(numberGoods, numberBidders, probabilityConnection, b, RewardsGenerator.getRandomUniformRewardFunction());
+  public static Market<Goods, Bidder<Goods>> generateUniformRewardOverDemandedMarket(int numberGoods, int numberBidders, double probabilityConnection, int k) throws Exception {
+    return RandomKMarket(numberGoods, numberBidders, probabilityConnection, k, RewardsGenerator.getRandomUniformRewardFunction());
   }
 
   /**
@@ -42,12 +42,40 @@ public class RandomMarketFactory {
    * @param numberGoods - number of goods.
    * @param numberBidders - number of bidders.
    * @param probabilityConnection - probability of a connection.
-   * @param b - supply to demand ratio.
+   * @param k - supply to demand ratio.
    * @return a Market object.
    * @throws Exception 
    */
-  public static Market<Goods, Bidder<Goods>> generateOverSuppliedMarket(int numberGoods, int numberBidders, double probabilityConnection, int b) throws Exception {
-    return MarketFactory.transposeMarket(RandomKMarket(numberBidders, numberGoods, probabilityConnection, b, RewardsGenerator.getRandomUniformRewardFunction()));
+  public static Market<Goods, Bidder<Goods>> generateUniformRewardOverSuppliedMarket(int numberGoods, int numberBidders, double probabilityConnection, int k) throws Exception {
+    return MarketFactory.transposeMarket(RandomKMarket(numberBidders, numberGoods, probabilityConnection, k, RewardsGenerator.getRandomUniformRewardFunction()), RewardsGenerator.getRandomUniformRewardFunction());
+  }
+  
+  /**
+   * Generate over demanded markets.
+   * 
+   * @param numberGoods - number of goods.
+   * @param numberBidders - number of bidders.
+   * @param probabilityConnection - probability of a connection.
+   * @param k - supply to demand ratio.
+   * @return a Market object.
+   * @throws Exception 
+   */
+  public static Market<Goods, Bidder<Goods>> generateElitistRewardOverDemandedMarket(int numberGoods, int numberBidders, double probabilityConnection, int k) throws Exception {
+    return RandomKMarket(numberGoods, numberBidders, probabilityConnection, k, RewardsGenerator.getElitistRewardFunction());
+  }
+
+  /**
+   * Generate over supplied markets
+   * 
+   * @param numberGoods - number of goods.
+   * @param numberBidders - number of bidders.
+   * @param probabilityConnection - probability of a connection.
+   * @param k - supply to demand ratio.
+   * @return a Market object.
+   * @throws Exception 
+   */
+  public static Market<Goods, Bidder<Goods>> generateElitistRewardOverSuppliedMarket(int numberGoods, int numberBidders, double probabilityConnection, int k) throws Exception {
+    return MarketFactory.transposeMarket(RandomKMarket(numberBidders, numberGoods, probabilityConnection, k, RewardsGenerator.getElitistRewardFunction()), RewardsGenerator.getElitistRewardFunction());
   }
   
   /**
@@ -108,11 +136,11 @@ public class RandomMarketFactory {
    * @param numberGoods - number of goods.
    * @param numberBidders - number of bidders.
    * @param probabilityConnection - probability of a connection.
-   * @param b - supply to demand ratio.
+   * @param k - supply to demand ratio.
    * @return a Market object.
    * @throws Exception 
    */
-  public static Market<Goods, Bidder<Goods>> RandomKMarket(int numberGoods, int numberBidders, double probabilityConnection, int b, Callable<Double> rewardFunction) throws Exception {
+  public static Market<Goods, Bidder<Goods>> RandomKMarket(int numberGoods, int numberBidders, double probabilityConnection, int k, Callable<Double> rewardFunction) throws Exception {
 
     int[] bidderConnectedToGood = new int[numberGoods];
     boolean[][] connections = new boolean[numberGoods][numberBidders];
@@ -133,7 +161,7 @@ public class RandomMarketFactory {
       finalDemands[j] = 1;
     }
     int[] finalSupply = new int[numberGoods];
-    int x = 0, k = 0;
+    int x = 0, b = 0;
     int totalSupply = 0;
     for (int i = 0; i < numberGoods; i++) {
       finalSupply[i] = bidderConnectedToGood[i]
@@ -141,14 +169,14 @@ public class RandomMarketFactory {
           + Parameters.defaultMinSupplyPerGood;
       // System.out.println("finalSupply["+i+"] = " + finalSupply[i]);
       totalSupply += finalSupply[i];
-      x = totalSupply * b - totalDemand;
+      x = totalSupply * k - totalDemand;
       totalDemand += x;
       ArrayList<Integer> demands = generateRandomIntegerFixedSum(bidderConnectedToGood[i], x);
-      k = 0;
+      b = 0;
       for (int j = 0; j < numberBidders; j++) {
         if (connections[i][j]) {
-          finalDemands[j] += demands.get(k);
-          k++;
+          finalDemands[j] += demands.get(b);
+          b++;
         }
       }
     }
