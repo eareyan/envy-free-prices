@@ -306,4 +306,4 @@ SELECT 'singleton_elitist' AS singleton_elitist, COUNT(*) FROM singleton_elitist
 UNION
 SELECT 'sizeinter_uniform' AS sizeinter_uniform, COUNT(*) FROM sizeinter_uniform
 UNION
-SELECT 'sizeinter_elitist' AS sizeinter_elitist, COUNT(*) FROM sizeinter_elitist;
+SELECT 'sizeinter_elitist' AS sizeinter_elitist, COUNT(*) FROM sizeinter_elitist; 
