@@ -295,3 +295,15 @@ SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare,
 	round(AVG(optimaTime)::numeric,4) AS optimaTime
 	FROM tacexperiments;
 
+
+SELECT 'singleminded_uniform' AS singleminded_uniform, COUNT(*) FROM singleminded_uniform
+UNION
+SELECT 'singleminded_elitist' AS singleminded_elitist, COUNT(*) FROM singleminded_elitist
+UNION
+SELECT 'singleton_uniform' AS singleton_uniform, COUNT(*) FROM singleton_uniform
+UNION
+SELECT 'singleton_elitist' AS singleton_elitist, COUNT(*) FROM singleton_elitist
+UNION
+SELECT 'sizeinter_uniform' AS sizeinter_uniform, COUNT(*) FROM sizeinter_uniform
+UNION
+SELECT 'sizeinter_elitist' AS sizeinter_elitist, COUNT(*) FROM sizeinter_elitist;
