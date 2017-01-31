@@ -1,6 +1,8 @@
 package unitdemand.algorithms;
 
-import unitdemand.structures.Matching;
+import unitdemand.structures.UnitDemandException;
+import unitdemand.structures.UnitDemandMarketAllocation;
+import unitdemand.structures.UnitDemandMarketOutcome;
 import algorithms.pricing.error.PrincingAlgoException;
 
 /**
@@ -39,11 +41,11 @@ public class MaxWEQReservePrices {
    * The method solve runs MaxWEQ on the augmented valuation matrix and then deduces a matching.
    * 
    * @return a Matching object.
+   * @throws UnitDemandException 
    */
-  public Matching Solve() {
-    Matching M = new MaxWEQ(this.augmentValuationMatrix()).Solve();
-    Matching deducedMatching = this.deduceMatching(M);
-    return new Matching(this.valuationMatrix, deducedMatching.getMatching(), M.getPrices());
+  public UnitDemandMarketOutcome Solve() throws UnitDemandException {
+    UnitDemandMarketOutcome M = new MaxWEQ(this.augmentValuationMatrix()).Solve();
+    return this.deduceMatching(M);
   }
 
   /**
@@ -78,9 +80,10 @@ public class MaxWEQReservePrices {
    * 
    * @param inputMatching a Matching object.
    * @return a Matching object.
+   * @throws UnitDemandException 
    */
-  public Matching deduceMatching(Matching inputMatching) {
-    int[][] matchingWithDummy = inputMatching.getMatching();
+  public UnitDemandMarketOutcome deduceMatching(UnitDemandMarketOutcome inputMatching) throws UnitDemandException {
+    int[][] matchingWithDummy = inputMatching.getMarketAllocation().getAllocation();
     double[] prices = inputMatching.getPrices();
     int[][] matching = new int[this.valuationMatrix.length][this.valuationMatrix[0].length];
     for (int i = 0; i < this.valuationMatrix.length; i++) {
@@ -125,7 +128,7 @@ public class MaxWEQReservePrices {
         }
       }
     }
-    return new Matching(inputMatching.getValuationMarix(), matching, prices);
+    return new UnitDemandMarketOutcome(new UnitDemandMarketAllocation(this.valuationMatrix, matching), prices);
   }
 
 }

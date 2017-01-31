@@ -3,10 +3,12 @@ package unitdemand.ascendingauction;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import unitdemand.structures.Matching;
+import unitdemand.structures.UnitDemandException;
+import unitdemand.structures.UnitDemandMarketAllocation;
+import unitdemand.structures.UnitDemandMarketOutcome;
 
 /**
- * Implements ascending auction for the unit-demand case. 
+ * Implements ascending auction for the unit-demand case.
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -47,10 +49,11 @@ public class AscendingAuction {
    * Solve method. Runs the auction.
    * 
    * @return a Matching object.
+   * @throws UnitDemandException
    */
-  public Matching Solve() {
+  public UnitDemandMarketOutcome Solve() throws UnitDemandException {
     ArrayList<Integer> unallocatedBidders = new ArrayList<Integer>();
-    for (int j = 0; j < this.valuationMatrix[0].length; j++) { 
+    for (int j = 0; j < this.valuationMatrix[0].length; j++) {
       // Initially all campaigns are unallocated
       unallocatedBidders.add(j);
     }
@@ -89,7 +92,7 @@ public class AscendingAuction {
         break;
       }
     }
-    return new Matching(this.valuationMatrix, this.allocation, this.prices);
+    return new UnitDemandMarketOutcome(new UnitDemandMarketAllocation(this.valuationMatrix, this.allocation), this.prices);
   }
-  
+
 }

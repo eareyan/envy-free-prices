@@ -8,7 +8,8 @@ import org.junit.Test;
 import structures.factory.UnitDemandMarketFactory;
 import unitdemand.algorithms.MaxWEQ;
 import unitdemand.algorithms.MaxWEQReservePrices;
-import unitdemand.structures.Matching;
+import unitdemand.structures.UnitDemandException;
+import unitdemand.structures.UnitDemandMarketOutcome;
 import algorithms.pricing.error.PrincingAlgoException;
 
 public class MaxWEQReservePricesTest {
@@ -56,7 +57,7 @@ public class MaxWEQReservePricesTest {
   }
 
   @Test
-  public void testDeduceMatching() throws PrincingAlgoException {
+  public void testDeduceMatching() throws PrincingAlgoException, UnitDemandException {
 
     for (int n = 2; n < 15; n++) {
       for (int m = 2; m < 15; m++) {
@@ -67,8 +68,8 @@ public class MaxWEQReservePricesTest {
             reservePrices[i] = Math.random();
           }
           MaxWEQReservePrices maxWEQReservePrices = new MaxWEQReservePrices(V, reservePrices);
-          Matching M = new MaxWEQ(maxWEQReservePrices.augmentValuationMatrix()).Solve();
-          Matching deducedMatching = maxWEQReservePrices.deduceMatching(M);
+          UnitDemandMarketOutcome M = new MaxWEQ(maxWEQReservePrices.augmentValuationMatrix()).Solve();
+          UnitDemandMarketOutcome deducedMatching = maxWEQReservePrices.deduceMatching(M);
           double[] prices = deducedMatching.getPrices();
           for (int i = 0; i < prices.length; i++) {
             assertTrue(Math.abs(prices[i] - reservePrices[i]) <= 0.0001 || prices[i] > reservePrices[i]);

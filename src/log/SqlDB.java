@@ -45,8 +45,8 @@ public class SqlDB {
     } else if (provider.equals("mysql")) {
       Class.forName("com.mysql.jdbc.Driver");
     }
-    this.conn = DriverManager.getConnection("jdbc:" + provider + "://" + host + ":" + port + "/" + dbName + "?user=" + user + "&password=" + pass);
-    if (this.conn == null) {
+    this.setConn(DriverManager.getConnection("jdbc:" + provider + "://" + host + ":" + port + "/" + dbName + "?user=" + user + "&password=" + pass));
+    if (this.getConn() == null) {
       System.out.println("NOT Connected to database...");
     }
   }
@@ -57,8 +57,8 @@ public class SqlDB {
    * @param conn
    * @throws SQLException
    */
-  public void closeConnection(Connection conn) throws SQLException {
-    this.conn.close();
+  public void closeConnection() throws SQLException {
+    this.getConn().close();
   }
 
   /**
@@ -72,7 +72,7 @@ public class SqlDB {
    */
   public boolean checkIfRowExists(String tablename, int n, int m, int k) throws SQLException {
     String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ? AND k = ?";
-    PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
     preparedStatement.setInt(1, n);
     preparedStatement.setInt(2, m);
     preparedStatement.setInt(3, k);
@@ -90,7 +90,7 @@ public class SqlDB {
    */
   public boolean checkIfRowExists(String tablename, int n, int m, double p) throws SQLException {
     String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ? AND p = ?";
-    PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
     preparedStatement.setInt(1, n);
     preparedStatement.setInt(2, m);
     preparedStatement.setDouble(3, p);
@@ -108,7 +108,7 @@ public class SqlDB {
    */
   public boolean checkIfRowExists(String tablename, int n, int m, int k, double p) throws SQLException {
     String sql = "SELECT * FROM " + tablename + " WHERE n = ? AND m = ? AND k = ? AND p = ?";
-    PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
     preparedStatement.setInt(1, n);
     preparedStatement.setInt(2, m);
     preparedStatement.setInt(3, k);
@@ -217,13 +217,21 @@ public class SqlDB {
       orderedStats.add(entry.getValue());
     }
     String sql = sqlPre.substring(0, sqlPre.length() - 1) + ") VALUES " + sqlPost.substring(0, sqlPost.length() - 1) + ")";
-    PreparedStatement preparedStatement = (PreparedStatement) this.conn.prepareStatement(sql);
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
     int i = 1;
     // Set the values in the same order as created by the sql string.
     for (DescriptiveStatistics ds : orderedStats) {
       preparedStatement.setDouble(i++, ds.getMean());
     }
     preparedStatement.execute();
+  }
+
+  public Connection getConn() {
+    return conn;
+  }
+
+  public void setConn(Connection conn) {
+    this.conn = conn;
   }
 
 }

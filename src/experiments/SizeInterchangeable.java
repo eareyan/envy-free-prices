@@ -48,8 +48,6 @@ public class SizeInterchangeable extends Experiments {
     coefficients.add(-1);
     coefficients.add(2);
     coefficients.add(-2);
-    coefficients.add(3);
-    coefficients.add(-3);
     for (int n = 2; n < RunParameters.numGoods; n++) {
       for (int m = 2; m < RunParameters.numBidder; m++) {
         for (Integer k : coefficients) {

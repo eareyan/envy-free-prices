@@ -1,6 +1,8 @@
 package unitdemand.algorithms;
 
-import unitdemand.structures.Matching;
+import unitdemand.structures.UnitDemandMarketAllocation;
+import unitdemand.structures.UnitDemandException;
+import unitdemand.structures.UnitDemandMarketOutcome;
 
 /**
  * This class implements MaxWEQ: Maximum Walrasian Prices, as stated in Guruswami et al.
@@ -45,15 +47,16 @@ public class MaxWEQ {
    * Implements MaxWEQ as stated in Guruswami et al.
    * 
    * @return a Matching object.
+   * @throws UnitDemandException 
    */
-  public Matching Solve() {
+  public UnitDemandMarketOutcome Solve() throws UnitDemandException {
     double[] prices = new double[this.valuationMatrix.length];
-    Matching matchingCompleteV = Matching.computeMaximumWeightMatchingValue(this.valuationMatrix);
+    UnitDemandMarketAllocation matchingCompleteV = UnitDemandMarketAllocation.computeMaximumWeightMatchingValue(this.valuationMatrix);
     double maxWeightCompleteV = matchingCompleteV.getWelfare();
     for (int i = 0; i < this.valuationMatrix.length; i++) {
-      prices[i] = maxWeightCompleteV - Matching.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getWelfare();
+      prices[i] = maxWeightCompleteV - UnitDemandMarketAllocation.computeMaximumWeightMatchingValue(this.valuationMatrixWithNoi(i)).getWelfare();
     }
-    return new Matching(this.valuationMatrix, matchingCompleteV.getMatching(), prices);
+    return new UnitDemandMarketOutcome(new UnitDemandMarketAllocation(this.valuationMatrix, matchingCompleteV.getAllocation()), prices);
   }
 
 }

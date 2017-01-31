@@ -27,10 +27,16 @@ public class RunParameters {
   /**
    * Constructor.
    * 
-   * @param args - command line arguments.
+   * @param args
+   *          - command line arguments.
    * @throws Exception
    */
   public RunParameters(String[] args) throws Exception {
+    if (args == null) {
+      throw new Exception("Received null parameters.");
+    } else if (args.length < 7) {
+      throw new Exception("Invalid number of parameters.");
+    }
     this.experimentName = args[0];
     this.experimentObject = this.getExperimentObject(this.experimentName);
     this.dbProvider = args[1];
@@ -44,7 +50,8 @@ public class RunParameters {
   /**
    * Factory method to create the type of experiment object.
    * 
-   * @param type - string with the number of the experiment object.
+   * @param type
+   *          - string with the number of the experiment object.
    * @return an experiment object.
    * @throws Exception
    */
@@ -55,6 +62,8 @@ public class RunParameters {
       return new SizeInterchangeable();
     } else if (type.equals("Singleton")) {
       return new Singleton();
+    } else if (type.equals("latextables")) {
+      return null;
     } else {
       throw new Exception("Unknown demand type");
     }

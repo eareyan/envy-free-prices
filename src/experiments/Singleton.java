@@ -24,7 +24,7 @@ import structures.exceptions.MarketOutcomeException;
 import structures.factory.SingletonMarketFactory;
 import structures.factory.UnitDemandMarketAllocationFactory;
 import unitdemand.algorithms.EVPApproximation;
-import unitdemand.structures.Matching;
+import unitdemand.structures.UnitDemandMarketOutcome;
 import algorithms.pricing.error.PrincingAlgoException;
 import algorithms.pricing.reserveprices.RevMaxHeuristic;
 import allocations.error.AllocationAlgoException;
@@ -96,9 +96,9 @@ public class Singleton extends Experiments {
    * @throws MarketAllocationException
    * @throws MarketOutcomeException
    */
-  public void populateStats(HashMap<String, DescriptiveStatistics> stats, Matching ps,
+  public void populateStats(HashMap<String, DescriptiveStatistics> stats, UnitDemandMarketOutcome ps,
       String id, double optimalWelfare) throws MarketAllocationException, MarketOutcomeException {
-    this.getDS(stats, id + "Welfare").addValue(ps.getWelfareRatio(optimalWelfare));
+    this.getDS(stats, id + "Welfare").addValue(ps.getMarketAllocation().getWelfareRatio(optimalWelfare));
     this.getDS(stats, id + "Revenue").addValue(ps.getSellerRevenueRatio(optimalWelfare));
     this.getDS(stats, id + "EF").addValue(ps.getEFViolationsRatio());
     this.getDS(stats, id + "EFLoss").addValue(0.0);

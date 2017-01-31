@@ -7,7 +7,8 @@ import org.junit.Test;
 
 import structures.factory.UnitDemandMarketFactory;
 import unitdemand.algorithms.MaxWEQ;
-import unitdemand.structures.Matching;
+import unitdemand.structures.UnitDemandException;
+import unitdemand.structures.UnitDemandMarketOutcome;
 
 public class MaxWEQTest {
 
@@ -31,12 +32,12 @@ public class MaxWEQTest {
   }
 
   @Test
-  public void testMaxWEQ() {
+  public void testMaxWEQ() throws UnitDemandException {
     for (int n = 2; n < 20; n++) {
       for (int m = 2; m < 20; m++) {
         for (int p = 1; p < 5; p++) {
           double[][] V = UnitDemandMarketFactory.getValuationMatrix(n, m, 0.25 * p);
-          Matching matching = new MaxWEQ(V).Solve();
+          UnitDemandMarketOutcome matching = new MaxWEQ(V).Solve();
           assertTrue(matching.numberOfEnvyBidders() == 0);
           assertTrue(matching.computeMarketClearanceViolations() == 0);
         }

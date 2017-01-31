@@ -5,8 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import unitdemand.structures.Link;
-import unitdemand.structures.Matching;
-import unitdemand.structures.MatchingComparatorBySellerRevenue;
+import unitdemand.structures.UnitDemandException;
+import unitdemand.structures.UnitDemandMarketOutcome;
+import unitdemand.structures.UnitDemandMarketOutcomeComparatorBySellerRevenue;
 import algorithms.pricing.error.PrincingAlgoException;
 
 /**
@@ -29,10 +30,8 @@ public class EVPApproximation {
   /**
    * Constructor.
    * 
-   * @param valuationMatrix
-   *          - a matrix of valuations.
-   * @param MWRP
-   *          - an AbstractMaxWEQReservePrices object.
+   * @param valuationMatrix - a matrix of valuations.
+   * @param MWRP - an AbstractMaxWEQReservePrices object.
    */
   public EVPApproximation(double[][] valuationMatrix) {
     this.startTime = System.nanoTime();
@@ -44,28 +43,29 @@ public class EVPApproximation {
    * 
    * @return a Matching object.
    * @throws PrincingAlgoException
+   * @throws UnitDemandException
    */
-  public Matching Solve() throws PrincingAlgoException {
+  public UnitDemandMarketOutcome Solve() throws PrincingAlgoException, UnitDemandException {
     // System.out.println("============ SOLVE ============");
     ArrayList<Link> valuations = Link.getEdgeValuations(this.valuationMatrix);
     // We add reserve price of zero always. This makes EVPApp at least as good as MaxWEQ.
     valuations.add(new Link(-1, 0.0));
     double[] reservePrices = new double[this.valuationMatrix.length];
-    ArrayList<Matching> setOfSolutionMatchings = new ArrayList<Matching>();
+    ArrayList<UnitDemandMarketOutcome> setOfSolutionMatchings = new ArrayList<UnitDemandMarketOutcome>();
     // For each item, run MaxWEQ_r with reserve prices given by the valuation.
     for (Link valueLink : valuations) {
       Arrays.fill(reservePrices, valueLink.getValue());
       MaxWEQReservePrices m = new MaxWEQReservePrices(this.valuationMatrix, reservePrices);
-      Matching x = m.Solve();
+      UnitDemandMarketOutcome x = m.Solve();
       setOfSolutionMatchings.add(x);
       // System.out.println("================= reserve price from bidder (" + valueLink.getJ() + ") = " + valueLink.getValue() + "++++++++++");
       // Printer.printMatrix(x.getMatching());
       // Printer.printVector(x.getPrices());
       // System.out.println(x.getSellerRevenue());
     }
-    Collections.sort(setOfSolutionMatchings, new MatchingComparatorBySellerRevenue());
-    Matching matching = setOfSolutionMatchings.get(0);
-    return new Matching(matching.getValuationMarix(), matching.getMatching(), matching.getPrices(), System.nanoTime() - this.startTime);
+    Collections.sort(setOfSolutionMatchings, new UnitDemandMarketOutcomeComparatorBySellerRevenue());
+    UnitDemandMarketOutcome winnerOutcome = setOfSolutionMatchings.get(0);
+    return new UnitDemandMarketOutcome(winnerOutcome.getMarketAllocation(), winnerOutcome.getPrices(), System.nanoTime() - this.startTime);
   }
 
 }

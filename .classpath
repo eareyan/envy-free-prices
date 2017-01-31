@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="/gpfs/main/home/eareyanv/workspace/envy-free-prices/lib/matlabcontrol-4.1.0.jar"/>
 	<classpathentry kind="lib" path="/gpfs/main/home/eareyanv/workspace/envy-free-prices/lib/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry kind="lib" path="/gpfs/main/home/eareyanv/workspace/envy-free-prices/lib/postgresql-9.4.1207.jre6.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

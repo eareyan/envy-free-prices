@@ -4,7 +4,8 @@ import singleton.structures.SingletonMarket;
 import structures.Bidder;
 import structures.Goods;
 import unitdemand.algorithms.MWBMatchingAlgorithm;
-import unitdemand.structures.Matching;
+import unitdemand.structures.UnitDemandMarketAllocation;
+import unitdemand.structures.UnitDemandException;
 
 /**
  * Factory to work with allocated markets.
@@ -74,8 +75,9 @@ public class UnitDemandMarketAllocationFactory {
    * @param valuationMatrix - a matrix of valuations.
    * @param reserve - a reserve price.
    * @return an integer matrix corresponding to the allocation of a maximum weight matching.
+   * @throws UnitDemandException 
    */
-  public static int[][] getAllocationWithReservePrices(double[][] valuationMatrix, double reserve) {
+  public static int[][] getAllocationWithReservePrices(double[][] valuationMatrix, double reserve) throws UnitDemandException {
     double[][] valuationMatrixWithReserve = new double[valuationMatrix.length][valuationMatrix[0].length];
     for (int i = 0; i < valuationMatrix.length; i++) {
       for (int j = 0; j < valuationMatrix[0].length; j++) {
@@ -83,7 +85,7 @@ public class UnitDemandMarketAllocationFactory {
       }
     }
     // Printer.printMatrix(valuationMatrixWithReserve);
-    return Matching.computeMaximumWeightMatchingValue(valuationMatrixWithReserve).getMatching();
+    return UnitDemandMarketAllocation.computeMaximumWeightMatchingValue(valuationMatrixWithReserve).getAllocation();
   }
 
 }
