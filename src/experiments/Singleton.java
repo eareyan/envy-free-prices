@@ -1,13 +1,19 @@
 package experiments;
 
-import ilog.concert.IloException;
-
 import java.util.HashMap;
-
-import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import algorithms.pricing.error.PrincingAlgoException;
+import algorithms.pricing.reserveprices.RevMaxHeuristic;
+import allocations.error.AllocationAlgoException;
+import allocations.greedy.GreedyAllocation;
+import allocations.interfaces.AllocationAlgo;
+import allocations.optimal.EgalitarianMaxAllocation;
+import allocations.optimal.WelfareMaxAllocationILP;
+import ilog.concert.IloException;
+import log.SqlDB;
+import singleton.algorithms.SingletonEVP;
 import singleton.structures.SingletonMarket;
 import statistics.PricesStatistics;
 import structures.Bidder;
@@ -22,16 +28,6 @@ import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketOutcomeException;
 import structures.factory.SingletonMarketFactory;
-import structures.factory.UnitDemandMarketAllocationFactory;
-import unitdemand.algorithms.EVPApproximation;
-import unitdemand.structures.UnitDemandMarketOutcome;
-import algorithms.pricing.error.PrincingAlgoException;
-import algorithms.pricing.reserveprices.RevMaxHeuristic;
-import allocations.error.AllocationAlgoException;
-import allocations.greedy.GreedyAllocation;
-import allocations.interfaces.AllocationAlgo;
-import allocations.optimal.EgalitarianMaxAllocation;
-import allocations.optimal.WelfareMaxAllocationILP;
 
 public class Singleton extends Experiments {
 
@@ -73,7 +69,7 @@ public class Singleton extends Experiments {
         MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efficientAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
         double optimalWelfare = efficientAlloc.value();
         // Obtain statistics from all algorithms.
-        this.populateStats(stats, new EVPApproximation(UnitDemandMarketAllocationFactory.getValuationMatrixFromMarket(M)).Solve(), "ev", optimalWelfare);
+        this.populateStats(stats, new SingletonEVP(M).Solve(), "ev", optimalWelfare);
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyWelfare), "gw", optimalWelfare);
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare);
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare);
@@ -84,27 +80,6 @@ public class Singleton extends Experiments {
     } else {
       System.out.println("\t Already have data ");
     }
-  }
-  
-  /**
-   * Keeps tracks of the statistics.
-   * 
-   * @param stats
-   * @param ps
-   * @param id
-   * @param optimalWelfare
-   * @throws MarketAllocationException
-   * @throws MarketOutcomeException
-   */
-  public void populateStats(HashMap<String, DescriptiveStatistics> stats, UnitDemandMarketOutcome ps,
-      String id, double optimalWelfare) throws MarketAllocationException, MarketOutcomeException {
-    this.getDS(stats, id + "Welfare").addValue(ps.getMarketAllocation().getWelfareRatio(optimalWelfare));
-    this.getDS(stats, id + "Revenue").addValue(ps.getSellerRevenueRatio(optimalWelfare));
-    this.getDS(stats, id + "EF").addValue(ps.getEFViolationsRatio());
-    this.getDS(stats, id + "EFLoss").addValue(0.0);
-    this.getDS(stats, id + "MC").addValue(ps.getMCViolationsRatio());
-    this.getDS(stats, id + "MCLoss").addValue(0.0);
-    this.getDS(stats, id + "Time").addValue(ps.getTime() / 1000000000.0);
   }
 
   /**
