@@ -42,10 +42,10 @@ public class Singleton extends Experiments {
     System.out.println("Singleton Experiments:");
     for (int n = 2; n < RunParameters.numGoods; n++) {
       for (int m = 2; m < RunParameters.numBidder; m++) {
-        for (int p = 1; p <= 4; p++) {
+        for (Double p : RunParameters.probabilities) {
           for (String distribution : RunParameters.distributions) {
-            System.out.print(distribution + ": (n, m, p) = (" + n + ", " + m + ", " + (0.25 * p) + ")");
-            this.runOneExperiment(n, m, -1, 0.25 * p, distribution, dbLogger);
+            System.out.print(distribution + ": (n, m, p) = (" + n + ", " + m + ", " + p + ")");
+            this.runOneExperiment(n, m, -1, p, distribution, dbLogger);
           }
         }
       }

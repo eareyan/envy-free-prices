@@ -51,10 +51,10 @@ public class SizeInterchangeable extends Experiments {
     for (int n = 2; n < RunParameters.numGoods; n++) {
       for (int m = 2; m < RunParameters.numBidder; m++) {
         for (Integer k : coefficients) {
-          for (int p = 1; p <= 4; p++) {
+          for (Double p : RunParameters.probabilities) {
             for (String distribution : RunParameters.distributions) {
-              System.out.print(distribution + ": (n, m, k, p) = (" + n + ", " + m + ", " + k + ", " + (0.25 * p) + ")");
-              this.runOneExperiment(n, m, k, 0.25 * p, distribution, dbLogger);
+              System.out.print(distribution + ": (n, m, k, p) = (" + n + ", " + m + ", " + k + ", " + p + ")");
+              this.runOneExperiment(n, m, k, p, distribution, dbLogger);
             }
           }
         }

@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+\pgfplotsset{compat=1.11}
+\pgfplotstableread[col sep=comma]{10items.csv}\singlemindeditems
+
+\newcommand*{\figuretitle}[1]{%
+    {\centering%   <--------  will only affect the title because of the grouping (by the
+    \textbf{#1}%              braces before \centering and behind \medskip). If you remove
+    \par\medskip}%            these braces the whole body of a {figure} env will be centered.
+}
+\begin{document}
+
+\begin{figure}
+\figuretitle{title}
+\begin{tikzpicture}[scale=1.5]
+	\begin{axis}[ xlabel = xlabel, ylabel = Average ratio, legend style={at={(1,0.58)},font=\tiny} ]
+		\addplot table[x = m, y = gwwelfare]{\singlemindeditems};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singlemindeditems};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singlemindeditems};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singlemindeditems};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\end{figure}
+
+\end{document}

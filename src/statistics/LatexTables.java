@@ -4,16 +4,12 @@ import java.io.PrintWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
 import log.SqlDB;
 
 import com.google.common.collect.ImmutableList;
-
-import experiments.RunParameters;
 
 /**
  * Transforms results in a database to a LaTex table.
@@ -22,19 +18,9 @@ import experiments.RunParameters;
  */
 public class LatexTables {
 
-  private final static List<Entry<String, String>> baseAlgos = new ArrayList<Entry<String, String>>();
-
-  static {
-    baseAlgos.add(new AbstractMap.SimpleEntry<String, String>("LP greedy utilitarian", "gw"));
-    baseAlgos.add(new AbstractMap.SimpleEntry<String, String>("LP greedy egalitarian", "ge"));
-    baseAlgos.add(new AbstractMap.SimpleEntry<String, String>("LP optimal utilitarian", "ow"));
-    baseAlgos.add(new AbstractMap.SimpleEntry<String, String>("LP optimal egalitarian", "oe"));
-  }
 
   public static void main(String[] args) throws Exception {
-    RunParameters rp = new RunParameters(args);
-    SqlDB sqlDB = new SqlDB(rp.dbProvider, rp.dbHost, rp.dbPort, rp.dbName, rp.dbUsername, rp.dbPassword);
-
+    SqlDB sqlDB = Util.getDB(args);
     String results = "\\section{Results}\n";
     results += LatexTables.getSingleMindedResults(sqlDB);
     results += LatexTables.getSingletonResults(sqlDB);
@@ -48,49 +34,36 @@ public class LatexTables {
   }
 
   public static String getSingleMindedResults(SqlDB sqlDB) throws SQLException {
-    List<Entry<String, String>> singleMindedAlgos = new ArrayList<Entry<String, String>>();
-    singleMindedAlgos.add(new AbstractMap.SimpleEntry<String, String>("Huang et. al.", "ap"));
-    singleMindedAlgos.add(new AbstractMap.SimpleEntry<String, String>("Guruswamin et. al. Unl. Supply", "us"));
-    singleMindedAlgos.addAll(baseAlgos);
-
     String table = "\\subsection{Single-Minded}\n";
-    table += createTable(sqlDB, "Single-Minded, Uniform Reward, Over Demanded", "singleminded_uniform", singleMindedAlgos, "WHERE k*m > n");
-    table += createTable(sqlDB, "Single-Minded, Uniform Reward, Under Demanded", "singleminded_uniform", singleMindedAlgos, "WHERE k*m <= n");
-    table += createTable(sqlDB, "Single-Minded, Elitist Reward, Over Demanded", "singleminded_elitist", singleMindedAlgos, "WHERE k*m > n");
-    table += createTable(sqlDB, "Single-Minded, Elitist Reward, Under Demanded", "singleminded_elitist", singleMindedAlgos, "WHERE k*m <= n");
+    table += createTable(sqlDB, "Single-Minded, Uniform Reward, Over Demanded", "singleminded_uniform", Util.singleMindedAlgos, "WHERE k*m > n");
+    table += createTable(sqlDB, "Single-Minded, Uniform Reward, Under Demanded", "singleminded_uniform", Util.singleMindedAlgos, "WHERE k*m <= n");
+    table += createTable(sqlDB, "Single-Minded, Elitist Reward, Over Demanded", "singleminded_elitist", Util.singleMindedAlgos, "WHERE k*m > n");
+    table += createTable(sqlDB, "Single-Minded, Elitist Reward, Under Demanded", "singleminded_elitist", Util.singleMindedAlgos, "WHERE k*m <= n");
     table += "\\newpage\n";
     return table;
   }
 
   public static String getSingletonResults(SqlDB sqlDB) throws SQLException {
-    List<Entry<String, String>> singletonAlgos = new ArrayList<Entry<String, String>>();
-    singletonAlgos.add(new AbstractMap.SimpleEntry<String, String>("Guruswamin Envy-Free Approx", "ev"));
-    singletonAlgos.addAll(baseAlgos);
-
     String table = "\\subsection{Singleton}\n";
-    table += createTable(sqlDB, "Singleton, Uniform Reward, Over Demanded", "singleton_uniform", singletonAlgos, "WHERE m > n");
-    table += createTable(sqlDB, "Singleton, Uniform Reward, Under Demanded", "singleton_uniform", singletonAlgos, "WHERE m <= n");
-    table += createTable(sqlDB, "Singleton, Elitist Reward, Over Demanded", "singleton_elitist", singletonAlgos, "WHERE m > n");
-    table += createTable(sqlDB, "Singleton, Elitist Reward, Under Demanded", "singleton_elitist", singletonAlgos, "WHERE m <= n");
+    table += createTable(sqlDB, "Singleton, Uniform Reward, Over Demanded", "singleton_uniform", Util.singletonAlgos, "WHERE m > n");
+    table += createTable(sqlDB, "Singleton, Uniform Reward, Under Demanded", "singleton_uniform", Util.singletonAlgos, "WHERE m <= n");
+    table += createTable(sqlDB, "Singleton, Elitist Reward, Over Demanded", "singleton_elitist", Util.singletonAlgos, "WHERE m > n");
+    table += createTable(sqlDB, "Singleton, Elitist Reward, Under Demanded", "singleton_elitist", Util.singletonAlgos, "WHERE m <= n");
     table += "\\newpage\n";
     return table;
   }
 
   public static String getSizeInterResults(SqlDB sqlDB) throws SQLException {
-    List<Entry<String, String>> singletonAlgos = new ArrayList<Entry<String, String>>();
-    singletonAlgos.add(new AbstractMap.SimpleEntry<String, String>("Simple Pricing", "sp"));
-    singletonAlgos.addAll(baseAlgos);
-
     String table = "\\subsection{Size-Interchangeable}\n";
-    table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Over Demanded", "sizeinter_uniform", singletonAlgos, "WHERE m > n");
-    table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Under Demanded", "sizeinter_uniform", singletonAlgos, "WHERE m <= n");
-    table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Over Demanded", "sizeinter_elitist", singletonAlgos, "WHERE m > n");
-    table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Under Demanded", "sizeinter_elitist", singletonAlgos, "WHERE m <= n");
+    table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Over Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE m > n");
+    table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Under Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE m <= n");
+    table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Over Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE m > n");
+    table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Under Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE m <= n");
     /*
-     * table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Over Demanded", "sizeinter_uniform", singletonAlgos, "WHERE k > 1"); table +=
-     * createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Under Demanded", "sizeinter_uniform", singletonAlgos, "WHERE k <= 1"); table +=
-     * createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Over Demanded", "sizeinter_elitist", singletonAlgos, "WHERE k > 1"); table +=
-     * createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Under Demanded", "sizeinter_elitist", singletonAlgos, "WHERE k <= 1");
+     * table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Over Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE k > 1"); table +=
+     * createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Under Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE k <= 1"); table +=
+     * createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Over Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE k > 1"); table +=
+     * createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Under Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE k <= 1");
      */
     return table;
   }
@@ -109,19 +82,10 @@ public class LatexTables {
    */
   public static String createTable(SqlDB sqlDB, String title, String tableName, List<Entry<String, String>> algos, String where) throws SQLException {
 
-    List<Entry<String, String>> metrics = new ArrayList<Entry<String, String>>();
-    metrics.add(new AbstractMap.SimpleEntry<String, String>("Welfare", "Welfare"));
-    metrics.add(new AbstractMap.SimpleEntry<String, String>("Revenue", "Revenue"));
-    metrics.add(new AbstractMap.SimpleEntry<String, String>("EF", "EF"));
-    metrics.add(new AbstractMap.SimpleEntry<String, String>("EF Loss", "EFLoss"));
-    metrics.add(new AbstractMap.SimpleEntry<String, String>("MC", "MC"));
-    metrics.add(new AbstractMap.SimpleEntry<String, String>("MC Loss", "MCLoss"));
-    metrics.add(new AbstractMap.SimpleEntry<String, String>("Time", "Time"));
-
     // Construct the SQL statement.
     String sql = "SELECT ";
     for (Entry<String, String> algo : algos) {
-      for (Entry<String, String> metric : metrics) {
+      for (Entry<String, String> metric : Util.metrics) {
         String metricName = algo.getValue() + metric.getValue();
         sql += "round(AVG(" + metricName + ")::numeric, 4) AS " + metricName + ", ";
       }
@@ -136,17 +100,17 @@ public class LatexTables {
     ImmutableList<Integer> data = getNumberBiddersAndItems(sqlDB, tableName, where);
     String table = "\\subsubsection*{" + title + ", " + data.get(0) + " bidders, " + data.get(1) + " goods} \n";
     table += "\\begin{tabular}{|c";
-    for (int i = 0; i < metrics.size(); i++)
+    for (int i = 0; i < Util.metrics.size(); i++)
       table += "|c";
     table += "|}\\hline\n";
     table += String.format("%30s", "\t&");
-    for (Entry<String, String> metric : metrics)
+    for (Entry<String, String> metric : Util.metrics)
       table += metric.getValue() + "\t&";
     table = table.substring(0, table.length() - 1);
     table += "\\\\\\hline\n";
     for (Entry<String, String> algo : algos) {
       table += String.format("%30s", algo.getKey()) + "\t&";
-      for (Entry<String, String> metric : metrics) {
+      for (Entry<String, String> metric : Util.metrics) {
         String metricName = algo.getValue() + metric.getValue();
         table += rs.getString(metricName) + "\t&";
       }
