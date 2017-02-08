@@ -295,7 +295,28 @@ public class PricesStatistics<M extends Market<G, B>, G extends Goods, B extends
    * @throws MarketAllocationException
    */
   public double getWelfare() throws MarketAllocationException {
-    return this.marketOutcome.getMarketAllocation().value();
+    return this.marketOutcome.getMarketAllocation().getValue();
+  }
+  
+  /**
+   * Wrapper to the the number of winners of the allocation for the associated outcome.
+   * 
+   * @return the number of winners.
+   * @throws MarketAllocationException 
+   */
+  public int getNumberOfWinners() throws MarketAllocationException {
+    return this.marketOutcome.getMarketAllocation().getNumberOfWinners();
+  }
+  
+  /**
+   * Computes the ratio of the number of winners w.r.t a given value.
+   * 
+   * @param value
+   * @return the ratio of the number of winners w.r.t a given value.
+   * @throws MarketAllocationException
+   */
+  public double getNumberOfWinnersRatio(double value) throws MarketAllocationException {
+    return NumberMethods.getRatio(this.getNumberOfWinners() , value);
   }
   
   /**

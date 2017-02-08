@@ -39,6 +39,7 @@ public class Util {
     metrics.add(new AbstractMap.SimpleEntry<String, String>("MC", "MC"));
     metrics.add(new AbstractMap.SimpleEntry<String, String>("MC Loss", "MCLoss"));
     metrics.add(new AbstractMap.SimpleEntry<String, String>("Time", "Time"));
+    metrics.add(new AbstractMap.SimpleEntry<String, String>("Winners", "Winners"));
   }
 
   public static SqlDB getDB(String[] args) throws Exception {

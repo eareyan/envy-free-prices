@@ -27,7 +27,7 @@ public class LatexTables {
     results += LatexTables.getSizeInterResults(sqlDB);
     System.out.println(results);
 
-    PrintWriter writer = new PrintWriter("/home/eareyanv/workspace/envy-free-prices/results/latex/tables/tables.tex", "UTF-8");
+    PrintWriter writer = new PrintWriter("/home/eareyanv/workspace/envy-free-prices/results/current/latextable/tables.tex", "UTF-8");
     writer.print(results);
     writer.close();
     sqlDB.closeConnection();

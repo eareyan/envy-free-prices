@@ -147,7 +147,7 @@ public class Printer {
     outcome.getMarketAllocation().printAllocation();
     outcome.printPrices();
     System.out.println("Seller Revenue = " + outcome.sellerRevenue());
-    System.out.println("Value = " + outcome.getMarketAllocation().value());
+    System.out.println("Value = " + outcome.getMarketAllocation().getValue());
     for(Goods good : outcome.getMarketAllocation().getMarket().getGoods()){
       System.out.println("G = " + outcome.getMarketAllocation().allocationFromGood(good));
     }

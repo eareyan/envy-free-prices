@@ -1,0 +1,1476 @@
+\documentclass{article}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+\pgfplotsset{compat=1.11}
+\usepackage{geometry}\geometry{a4paper,total={170mm,257mm},left=0mm,top=20mm,}
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedWelfare.csv}\singlemindeduniformOverDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedRevenue.csv}\singlemindeduniformOverDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedEF.csv}\singlemindeduniformOverDemandedEF
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedEFLoss.csv}\singlemindeduniformOverDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedMC.csv}\singlemindeduniformOverDemandedMC
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedMCLoss.csv}\singlemindeduniformOverDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedTime.csv}\singlemindeduniformOverDemandedTime
+\pgfplotstableread[col sep=comma]{singleminded/uniform/OverDemandedWinners.csv}\singlemindeduniformOverDemandedWinners
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedWelfare.csv}\singlemindeduniformUnderDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedRevenue.csv}\singlemindeduniformUnderDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedEF.csv}\singlemindeduniformUnderDemandedEF
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedEFLoss.csv}\singlemindeduniformUnderDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedMC.csv}\singlemindeduniformUnderDemandedMC
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedMCLoss.csv}\singlemindeduniformUnderDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedTime.csv}\singlemindeduniformUnderDemandedTime
+\pgfplotstableread[col sep=comma]{singleminded/uniform/UnderDemandedWinners.csv}\singlemindeduniformUnderDemandedWinners
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedWelfare.csv}\singlemindedelitistOverDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedRevenue.csv}\singlemindedelitistOverDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedEF.csv}\singlemindedelitistOverDemandedEF
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedEFLoss.csv}\singlemindedelitistOverDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedMC.csv}\singlemindedelitistOverDemandedMC
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedMCLoss.csv}\singlemindedelitistOverDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedTime.csv}\singlemindedelitistOverDemandedTime
+\pgfplotstableread[col sep=comma]{singleminded/elitist/OverDemandedWinners.csv}\singlemindedelitistOverDemandedWinners
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedWelfare.csv}\singlemindedelitistUnderDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedRevenue.csv}\singlemindedelitistUnderDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedEF.csv}\singlemindedelitistUnderDemandedEF
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedEFLoss.csv}\singlemindedelitistUnderDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedMC.csv}\singlemindedelitistUnderDemandedMC
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedMCLoss.csv}\singlemindedelitistUnderDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedTime.csv}\singlemindedelitistUnderDemandedTime
+\pgfplotstableread[col sep=comma]{singleminded/elitist/UnderDemandedWinners.csv}\singlemindedelitistUnderDemandedWinners
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedWelfare.csv}\singletonuniformOverDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedRevenue.csv}\singletonuniformOverDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedEF.csv}\singletonuniformOverDemandedEF
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedEFLoss.csv}\singletonuniformOverDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedMC.csv}\singletonuniformOverDemandedMC
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedMCLoss.csv}\singletonuniformOverDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedTime.csv}\singletonuniformOverDemandedTime
+\pgfplotstableread[col sep=comma]{singleton/uniform/OverDemandedWinners.csv}\singletonuniformOverDemandedWinners
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedWelfare.csv}\singletonuniformUnderDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedRevenue.csv}\singletonuniformUnderDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedEF.csv}\singletonuniformUnderDemandedEF
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedEFLoss.csv}\singletonuniformUnderDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedMC.csv}\singletonuniformUnderDemandedMC
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedMCLoss.csv}\singletonuniformUnderDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedTime.csv}\singletonuniformUnderDemandedTime
+\pgfplotstableread[col sep=comma]{singleton/uniform/UnderDemandedWinners.csv}\singletonuniformUnderDemandedWinners
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedWelfare.csv}\singletonelitistOverDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedRevenue.csv}\singletonelitistOverDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedEF.csv}\singletonelitistOverDemandedEF
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedEFLoss.csv}\singletonelitistOverDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedMC.csv}\singletonelitistOverDemandedMC
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedMCLoss.csv}\singletonelitistOverDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedTime.csv}\singletonelitistOverDemandedTime
+\pgfplotstableread[col sep=comma]{singleton/elitist/OverDemandedWinners.csv}\singletonelitistOverDemandedWinners
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedWelfare.csv}\singletonelitistUnderDemandedWelfare
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedRevenue.csv}\singletonelitistUnderDemandedRevenue
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedEF.csv}\singletonelitistUnderDemandedEF
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedEFLoss.csv}\singletonelitistUnderDemandedEFLoss
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedMC.csv}\singletonelitistUnderDemandedMC
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedMCLoss.csv}\singletonelitistUnderDemandedMCLoss
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedTime.csv}\singletonelitistUnderDemandedTime
+\pgfplotstableread[col sep=comma]{singleton/elitist/UnderDemandedWinners.csv}\singletonelitistUnderDemandedWinners
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedWelfare.csv}\sizeinteruniformOverDemandedWelfare
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedRevenue.csv}\sizeinteruniformOverDemandedRevenue
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedEF.csv}\sizeinteruniformOverDemandedEF
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedEFLoss.csv}\sizeinteruniformOverDemandedEFLoss
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedMC.csv}\sizeinteruniformOverDemandedMC
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedMCLoss.csv}\sizeinteruniformOverDemandedMCLoss
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedTime.csv}\sizeinteruniformOverDemandedTime
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/OverDemandedWinners.csv}\sizeinteruniformOverDemandedWinners
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedWelfare.csv}\sizeinteruniformUnderDemandedWelfare
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedRevenue.csv}\sizeinteruniformUnderDemandedRevenue
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedEF.csv}\sizeinteruniformUnderDemandedEF
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedEFLoss.csv}\sizeinteruniformUnderDemandedEFLoss
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedMC.csv}\sizeinteruniformUnderDemandedMC
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedMCLoss.csv}\sizeinteruniformUnderDemandedMCLoss
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedTime.csv}\sizeinteruniformUnderDemandedTime
+\pgfplotstableread[col sep=comma]{sizeinter/uniform/UnderDemandedWinners.csv}\sizeinteruniformUnderDemandedWinners
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedWelfare.csv}\sizeinterelitistOverDemandedWelfare
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedRevenue.csv}\sizeinterelitistOverDemandedRevenue
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedEF.csv}\sizeinterelitistOverDemandedEF
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedEFLoss.csv}\sizeinterelitistOverDemandedEFLoss
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedMC.csv}\sizeinterelitistOverDemandedMC
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedMCLoss.csv}\sizeinterelitistOverDemandedMCLoss
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedTime.csv}\sizeinterelitistOverDemandedTime
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/OverDemandedWinners.csv}\sizeinterelitistOverDemandedWinners
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedWelfare.csv}\sizeinterelitistUnderDemandedWelfare
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedRevenue.csv}\sizeinterelitistUnderDemandedRevenue
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedEF.csv}\sizeinterelitistUnderDemandedEF
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedEFLoss.csv}\sizeinterelitistUnderDemandedEFLoss
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedMC.csv}\sizeinterelitistUnderDemandedMC
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedMCLoss.csv}\sizeinterelitistUnderDemandedMCLoss
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedTime.csv}\sizeinterelitistUnderDemandedTime
+\pgfplotstableread[col sep=comma]{sizeinter/elitist/UnderDemandedWinners.csv}\sizeinterelitistUnderDemandedWinners
+\newcommand*{\figuretitle}[1]{{\centering\textbf{#1}\par\medskip}}
+\begin{document}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwelfare]{\singlemindeduniformOverDemandedWelfare};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswelfare]{\singlemindeduniformOverDemandedWelfare};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwelfare]{\singlemindeduniformOverDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singlemindeduniformOverDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singlemindeduniformOverDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singlemindeduniformOverDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aprevenue]{\singlemindeduniformOverDemandedRevenue};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usrevenue]{\singlemindeduniformOverDemandedRevenue};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwrevenue]{\singlemindeduniformOverDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singlemindeduniformOverDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singlemindeduniformOverDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singlemindeduniformOverDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apef]{\singlemindeduniformOverDemandedEF};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usef]{\singlemindeduniformOverDemandedEF};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwef]{\singlemindeduniformOverDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singlemindeduniformOverDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singlemindeduniformOverDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singlemindeduniformOverDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apefloss]{\singlemindeduniformOverDemandedEFLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usefloss]{\singlemindeduniformOverDemandedEFLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwefloss]{\singlemindeduniformOverDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singlemindeduniformOverDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singlemindeduniformOverDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singlemindeduniformOverDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmc]{\singlemindeduniformOverDemandedMC};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmc]{\singlemindeduniformOverDemandedMC};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmc]{\singlemindeduniformOverDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singlemindeduniformOverDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singlemindeduniformOverDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singlemindeduniformOverDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmcloss]{\singlemindeduniformOverDemandedMCLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmcloss]{\singlemindeduniformOverDemandedMCLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmcloss]{\singlemindeduniformOverDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singlemindeduniformOverDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singlemindeduniformOverDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singlemindeduniformOverDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aptime]{\singlemindeduniformOverDemandedTime};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = ustime]{\singlemindeduniformOverDemandedTime};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwtime]{\singlemindeduniformOverDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singlemindeduniformOverDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singlemindeduniformOverDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singlemindeduniformOverDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleminded uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwinners]{\singlemindeduniformOverDemandedWinners};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswinners]{\singlemindeduniformOverDemandedWinners};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwinners]{\singlemindeduniformOverDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singlemindeduniformOverDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singlemindeduniformOverDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singlemindeduniformOverDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwelfare]{\singlemindeduniformUnderDemandedWelfare};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswelfare]{\singlemindeduniformUnderDemandedWelfare};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwelfare]{\singlemindeduniformUnderDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singlemindeduniformUnderDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singlemindeduniformUnderDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singlemindeduniformUnderDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aprevenue]{\singlemindeduniformUnderDemandedRevenue};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usrevenue]{\singlemindeduniformUnderDemandedRevenue};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwrevenue]{\singlemindeduniformUnderDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singlemindeduniformUnderDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singlemindeduniformUnderDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singlemindeduniformUnderDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apef]{\singlemindeduniformUnderDemandedEF};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usef]{\singlemindeduniformUnderDemandedEF};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwef]{\singlemindeduniformUnderDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singlemindeduniformUnderDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singlemindeduniformUnderDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singlemindeduniformUnderDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apefloss]{\singlemindeduniformUnderDemandedEFLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usefloss]{\singlemindeduniformUnderDemandedEFLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwefloss]{\singlemindeduniformUnderDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singlemindeduniformUnderDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singlemindeduniformUnderDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singlemindeduniformUnderDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmc]{\singlemindeduniformUnderDemandedMC};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmc]{\singlemindeduniformUnderDemandedMC};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmc]{\singlemindeduniformUnderDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singlemindeduniformUnderDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singlemindeduniformUnderDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singlemindeduniformUnderDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmcloss]{\singlemindeduniformUnderDemandedMCLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmcloss]{\singlemindeduniformUnderDemandedMCLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmcloss]{\singlemindeduniformUnderDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singlemindeduniformUnderDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singlemindeduniformUnderDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singlemindeduniformUnderDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aptime]{\singlemindeduniformUnderDemandedTime};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = ustime]{\singlemindeduniformUnderDemandedTime};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwtime]{\singlemindeduniformUnderDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singlemindeduniformUnderDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singlemindeduniformUnderDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singlemindeduniformUnderDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleminded uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwinners]{\singlemindeduniformUnderDemandedWinners};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswinners]{\singlemindeduniformUnderDemandedWinners};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwinners]{\singlemindeduniformUnderDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singlemindeduniformUnderDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singlemindeduniformUnderDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singlemindeduniformUnderDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwelfare]{\singlemindedelitistOverDemandedWelfare};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswelfare]{\singlemindedelitistOverDemandedWelfare};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwelfare]{\singlemindedelitistOverDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singlemindedelitistOverDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singlemindedelitistOverDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singlemindedelitistOverDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aprevenue]{\singlemindedelitistOverDemandedRevenue};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usrevenue]{\singlemindedelitistOverDemandedRevenue};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwrevenue]{\singlemindedelitistOverDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singlemindedelitistOverDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singlemindedelitistOverDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singlemindedelitistOverDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apef]{\singlemindedelitistOverDemandedEF};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usef]{\singlemindedelitistOverDemandedEF};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwef]{\singlemindedelitistOverDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singlemindedelitistOverDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singlemindedelitistOverDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singlemindedelitistOverDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apefloss]{\singlemindedelitistOverDemandedEFLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usefloss]{\singlemindedelitistOverDemandedEFLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwefloss]{\singlemindedelitistOverDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singlemindedelitistOverDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singlemindedelitistOverDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singlemindedelitistOverDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmc]{\singlemindedelitistOverDemandedMC};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmc]{\singlemindedelitistOverDemandedMC};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmc]{\singlemindedelitistOverDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singlemindedelitistOverDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singlemindedelitistOverDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singlemindedelitistOverDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmcloss]{\singlemindedelitistOverDemandedMCLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmcloss]{\singlemindedelitistOverDemandedMCLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmcloss]{\singlemindedelitistOverDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singlemindedelitistOverDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singlemindedelitistOverDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singlemindedelitistOverDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aptime]{\singlemindedelitistOverDemandedTime};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = ustime]{\singlemindedelitistOverDemandedTime};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwtime]{\singlemindedelitistOverDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singlemindedelitistOverDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singlemindedelitistOverDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singlemindedelitistOverDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleminded elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwinners]{\singlemindedelitistOverDemandedWinners};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswinners]{\singlemindedelitistOverDemandedWinners};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwinners]{\singlemindedelitistOverDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singlemindedelitistOverDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singlemindedelitistOverDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singlemindedelitistOverDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwelfare]{\singlemindedelitistUnderDemandedWelfare};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswelfare]{\singlemindedelitistUnderDemandedWelfare};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwelfare]{\singlemindedelitistUnderDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singlemindedelitistUnderDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singlemindedelitistUnderDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singlemindedelitistUnderDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aprevenue]{\singlemindedelitistUnderDemandedRevenue};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usrevenue]{\singlemindedelitistUnderDemandedRevenue};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwrevenue]{\singlemindedelitistUnderDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singlemindedelitistUnderDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singlemindedelitistUnderDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singlemindedelitistUnderDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apef]{\singlemindedelitistUnderDemandedEF};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usef]{\singlemindedelitistUnderDemandedEF};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwef]{\singlemindedelitistUnderDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singlemindedelitistUnderDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singlemindedelitistUnderDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singlemindedelitistUnderDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apefloss]{\singlemindedelitistUnderDemandedEFLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usefloss]{\singlemindedelitistUnderDemandedEFLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwefloss]{\singlemindedelitistUnderDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singlemindedelitistUnderDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singlemindedelitistUnderDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singlemindedelitistUnderDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmc]{\singlemindedelitistUnderDemandedMC};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmc]{\singlemindedelitistUnderDemandedMC};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmc]{\singlemindedelitistUnderDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singlemindedelitistUnderDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singlemindedelitistUnderDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singlemindedelitistUnderDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apmcloss]{\singlemindedelitistUnderDemandedMCLoss};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = usmcloss]{\singlemindedelitistUnderDemandedMCLoss};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwmcloss]{\singlemindedelitistUnderDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singlemindedelitistUnderDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singlemindedelitistUnderDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singlemindedelitistUnderDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = aptime]{\singlemindedelitistUnderDemandedTime};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = ustime]{\singlemindedelitistUnderDemandedTime};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwtime]{\singlemindedelitistUnderDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singlemindedelitistUnderDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singlemindedelitistUnderDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singlemindedelitistUnderDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleminded elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = apwinners]{\singlemindedelitistUnderDemandedWinners};
+		\addlegendentry{Huang et. al.}
+		\addplot table[x = m, y = uswinners]{\singlemindedelitistUnderDemandedWinners};
+		\addlegendentry{Guruswami et. al. Unl. Supply}
+		\addplot table[x = m, y = gwwinners]{\singlemindedelitistUnderDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singlemindedelitistUnderDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singlemindedelitistUnderDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singlemindedelitistUnderDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwelfare]{\singletonuniformOverDemandedWelfare};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwelfare]{\singletonuniformOverDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singletonuniformOverDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singletonuniformOverDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singletonuniformOverDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evrevenue]{\singletonuniformOverDemandedRevenue};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwrevenue]{\singletonuniformOverDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singletonuniformOverDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singletonuniformOverDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singletonuniformOverDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evef]{\singletonuniformOverDemandedEF};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwef]{\singletonuniformOverDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singletonuniformOverDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singletonuniformOverDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singletonuniformOverDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evefloss]{\singletonuniformOverDemandedEFLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwefloss]{\singletonuniformOverDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singletonuniformOverDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singletonuniformOverDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singletonuniformOverDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmc]{\singletonuniformOverDemandedMC};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmc]{\singletonuniformOverDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singletonuniformOverDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singletonuniformOverDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singletonuniformOverDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmcloss]{\singletonuniformOverDemandedMCLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmcloss]{\singletonuniformOverDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singletonuniformOverDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singletonuniformOverDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singletonuniformOverDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evtime]{\singletonuniformOverDemandedTime};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwtime]{\singletonuniformOverDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singletonuniformOverDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singletonuniformOverDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singletonuniformOverDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleton uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwinners]{\singletonuniformOverDemandedWinners};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwinners]{\singletonuniformOverDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singletonuniformOverDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singletonuniformOverDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singletonuniformOverDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwelfare]{\singletonuniformUnderDemandedWelfare};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwelfare]{\singletonuniformUnderDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singletonuniformUnderDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singletonuniformUnderDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singletonuniformUnderDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evrevenue]{\singletonuniformUnderDemandedRevenue};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwrevenue]{\singletonuniformUnderDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singletonuniformUnderDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singletonuniformUnderDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singletonuniformUnderDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evef]{\singletonuniformUnderDemandedEF};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwef]{\singletonuniformUnderDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singletonuniformUnderDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singletonuniformUnderDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singletonuniformUnderDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evefloss]{\singletonuniformUnderDemandedEFLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwefloss]{\singletonuniformUnderDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singletonuniformUnderDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singletonuniformUnderDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singletonuniformUnderDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmc]{\singletonuniformUnderDemandedMC};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmc]{\singletonuniformUnderDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singletonuniformUnderDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singletonuniformUnderDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singletonuniformUnderDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmcloss]{\singletonuniformUnderDemandedMCLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmcloss]{\singletonuniformUnderDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singletonuniformUnderDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singletonuniformUnderDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singletonuniformUnderDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evtime]{\singletonuniformUnderDemandedTime};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwtime]{\singletonuniformUnderDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singletonuniformUnderDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singletonuniformUnderDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singletonuniformUnderDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleton uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwinners]{\singletonuniformUnderDemandedWinners};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwinners]{\singletonuniformUnderDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singletonuniformUnderDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singletonuniformUnderDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singletonuniformUnderDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwelfare]{\singletonelitistOverDemandedWelfare};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwelfare]{\singletonelitistOverDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singletonelitistOverDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singletonelitistOverDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singletonelitistOverDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evrevenue]{\singletonelitistOverDemandedRevenue};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwrevenue]{\singletonelitistOverDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singletonelitistOverDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singletonelitistOverDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singletonelitistOverDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evef]{\singletonelitistOverDemandedEF};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwef]{\singletonelitistOverDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singletonelitistOverDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singletonelitistOverDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singletonelitistOverDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evefloss]{\singletonelitistOverDemandedEFLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwefloss]{\singletonelitistOverDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singletonelitistOverDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singletonelitistOverDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singletonelitistOverDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmc]{\singletonelitistOverDemandedMC};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmc]{\singletonelitistOverDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singletonelitistOverDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singletonelitistOverDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singletonelitistOverDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmcloss]{\singletonelitistOverDemandedMCLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmcloss]{\singletonelitistOverDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singletonelitistOverDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singletonelitistOverDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singletonelitistOverDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evtime]{\singletonelitistOverDemandedTime};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwtime]{\singletonelitistOverDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singletonelitistOverDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singletonelitistOverDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singletonelitistOverDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleton elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwinners]{\singletonelitistOverDemandedWinners};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwinners]{\singletonelitistOverDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singletonelitistOverDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singletonelitistOverDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singletonelitistOverDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwelfare]{\singletonelitistUnderDemandedWelfare};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwelfare]{\singletonelitistUnderDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\singletonelitistUnderDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\singletonelitistUnderDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\singletonelitistUnderDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evrevenue]{\singletonelitistUnderDemandedRevenue};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwrevenue]{\singletonelitistUnderDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\singletonelitistUnderDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\singletonelitistUnderDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\singletonelitistUnderDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evef]{\singletonelitistUnderDemandedEF};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwef]{\singletonelitistUnderDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\singletonelitistUnderDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\singletonelitistUnderDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\singletonelitistUnderDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evefloss]{\singletonelitistUnderDemandedEFLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwefloss]{\singletonelitistUnderDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\singletonelitistUnderDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\singletonelitistUnderDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\singletonelitistUnderDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmc]{\singletonelitistUnderDemandedMC};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmc]{\singletonelitistUnderDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\singletonelitistUnderDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\singletonelitistUnderDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\singletonelitistUnderDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evmcloss]{\singletonelitistUnderDemandedMCLoss};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwmcloss]{\singletonelitistUnderDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\singletonelitistUnderDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\singletonelitistUnderDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\singletonelitistUnderDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evtime]{\singletonelitistUnderDemandedTime};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwtime]{\singletonelitistUnderDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\singletonelitistUnderDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\singletonelitistUnderDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\singletonelitistUnderDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners singleton elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = evwinners]{\singletonelitistUnderDemandedWinners};
+		\addlegendentry{Guruswami Envy-Free Approx.}
+		\addplot table[x = m, y = gwwinners]{\singletonelitistUnderDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\singletonelitistUnderDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\singletonelitistUnderDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\singletonelitistUnderDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwelfare]{\sizeinteruniformOverDemandedWelfare};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwelfare]{\sizeinteruniformOverDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\sizeinteruniformOverDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\sizeinteruniformOverDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\sizeinteruniformOverDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sprevenue]{\sizeinteruniformOverDemandedRevenue};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwrevenue]{\sizeinteruniformOverDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\sizeinteruniformOverDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\sizeinteruniformOverDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\sizeinteruniformOverDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spef]{\sizeinteruniformOverDemandedEF};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwef]{\sizeinteruniformOverDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\sizeinteruniformOverDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\sizeinteruniformOverDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\sizeinteruniformOverDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spefloss]{\sizeinteruniformOverDemandedEFLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwefloss]{\sizeinteruniformOverDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\sizeinteruniformOverDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\sizeinteruniformOverDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\sizeinteruniformOverDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmc]{\sizeinteruniformOverDemandedMC};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmc]{\sizeinteruniformOverDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\sizeinteruniformOverDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\sizeinteruniformOverDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\sizeinteruniformOverDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmcloss]{\sizeinteruniformOverDemandedMCLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmcloss]{\sizeinteruniformOverDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\sizeinteruniformOverDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\sizeinteruniformOverDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\sizeinteruniformOverDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sptime]{\sizeinteruniformOverDemandedTime};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwtime]{\sizeinteruniformOverDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\sizeinteruniformOverDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\sizeinteruniformOverDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\sizeinteruniformOverDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners sizeinter uniformOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwinners]{\sizeinteruniformOverDemandedWinners};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwinners]{\sizeinteruniformOverDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\sizeinteruniformOverDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\sizeinteruniformOverDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\sizeinteruniformOverDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwelfare]{\sizeinteruniformUnderDemandedWelfare};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwelfare]{\sizeinteruniformUnderDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\sizeinteruniformUnderDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\sizeinteruniformUnderDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\sizeinteruniformUnderDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sprevenue]{\sizeinteruniformUnderDemandedRevenue};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwrevenue]{\sizeinteruniformUnderDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\sizeinteruniformUnderDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\sizeinteruniformUnderDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\sizeinteruniformUnderDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spef]{\sizeinteruniformUnderDemandedEF};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwef]{\sizeinteruniformUnderDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\sizeinteruniformUnderDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\sizeinteruniformUnderDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\sizeinteruniformUnderDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spefloss]{\sizeinteruniformUnderDemandedEFLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwefloss]{\sizeinteruniformUnderDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\sizeinteruniformUnderDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\sizeinteruniformUnderDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\sizeinteruniformUnderDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmc]{\sizeinteruniformUnderDemandedMC};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmc]{\sizeinteruniformUnderDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\sizeinteruniformUnderDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\sizeinteruniformUnderDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\sizeinteruniformUnderDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmcloss]{\sizeinteruniformUnderDemandedMCLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmcloss]{\sizeinteruniformUnderDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\sizeinteruniformUnderDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\sizeinteruniformUnderDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\sizeinteruniformUnderDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sptime]{\sizeinteruniformUnderDemandedTime};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwtime]{\sizeinteruniformUnderDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\sizeinteruniformUnderDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\sizeinteruniformUnderDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\sizeinteruniformUnderDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners sizeinter uniformUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwinners]{\sizeinteruniformUnderDemandedWinners};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwinners]{\sizeinteruniformUnderDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\sizeinteruniformUnderDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\sizeinteruniformUnderDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\sizeinteruniformUnderDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwelfare]{\sizeinterelitistOverDemandedWelfare};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwelfare]{\sizeinterelitistOverDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\sizeinterelitistOverDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\sizeinterelitistOverDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\sizeinterelitistOverDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sprevenue]{\sizeinterelitistOverDemandedRevenue};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwrevenue]{\sizeinterelitistOverDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\sizeinterelitistOverDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\sizeinterelitistOverDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\sizeinterelitistOverDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spef]{\sizeinterelitistOverDemandedEF};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwef]{\sizeinterelitistOverDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\sizeinterelitistOverDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\sizeinterelitistOverDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\sizeinterelitistOverDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spefloss]{\sizeinterelitistOverDemandedEFLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwefloss]{\sizeinterelitistOverDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\sizeinterelitistOverDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\sizeinterelitistOverDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\sizeinterelitistOverDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmc]{\sizeinterelitistOverDemandedMC};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmc]{\sizeinterelitistOverDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\sizeinterelitistOverDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\sizeinterelitistOverDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\sizeinterelitistOverDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmcloss]{\sizeinterelitistOverDemandedMCLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmcloss]{\sizeinterelitistOverDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\sizeinterelitistOverDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\sizeinterelitistOverDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\sizeinterelitistOverDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sptime]{\sizeinterelitistOverDemandedTime};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwtime]{\sizeinterelitistOverDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\sizeinterelitistOverDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\sizeinterelitistOverDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\sizeinterelitistOverDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners sizeinter elitistOverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwinners]{\sizeinterelitistOverDemandedWinners};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwinners]{\sizeinterelitistOverDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\sizeinterelitistOverDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\sizeinterelitistOverDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\sizeinterelitistOverDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Welfare sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwelfare]{\sizeinterelitistUnderDemandedWelfare};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwelfare]{\sizeinterelitistUnderDemandedWelfare};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewelfare]{\sizeinterelitistUnderDemandedWelfare};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwelfare]{\sizeinterelitistUnderDemandedWelfare};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewelfare]{\sizeinterelitistUnderDemandedWelfare};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Revenue sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sprevenue]{\sizeinterelitistUnderDemandedRevenue};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwrevenue]{\sizeinterelitistUnderDemandedRevenue};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gerevenue]{\sizeinterelitistUnderDemandedRevenue};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owrevenue]{\sizeinterelitistUnderDemandedRevenue};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oerevenue]{\sizeinterelitistUnderDemandedRevenue};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EF sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spef]{\sizeinterelitistUnderDemandedEF};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwef]{\sizeinterelitistUnderDemandedEF};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geef]{\sizeinterelitistUnderDemandedEF};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owef]{\sizeinterelitistUnderDemandedEF};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeef]{\sizeinterelitistUnderDemandedEF};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = EFLoss sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spefloss]{\sizeinterelitistUnderDemandedEFLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwefloss]{\sizeinterelitistUnderDemandedEFLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = geefloss]{\sizeinterelitistUnderDemandedEFLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owefloss]{\sizeinterelitistUnderDemandedEFLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oeefloss]{\sizeinterelitistUnderDemandedEFLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MC sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmc]{\sizeinterelitistUnderDemandedMC};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmc]{\sizeinterelitistUnderDemandedMC};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemc]{\sizeinterelitistUnderDemandedMC};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmc]{\sizeinterelitistUnderDemandedMC};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemc]{\sizeinterelitistUnderDemandedMC};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = MCLoss sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spmcloss]{\sizeinterelitistUnderDemandedMCLoss};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwmcloss]{\sizeinterelitistUnderDemandedMCLoss};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gemcloss]{\sizeinterelitistUnderDemandedMCLoss};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owmcloss]{\sizeinterelitistUnderDemandedMCLoss};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oemcloss]{\sizeinterelitistUnderDemandedMCLoss};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Time sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = sptime]{\sizeinterelitistUnderDemandedTime};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwtime]{\sizeinterelitistUnderDemandedTime};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = getime]{\sizeinterelitistUnderDemandedTime};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owtime]{\sizeinterelitistUnderDemandedTime};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oetime]{\sizeinterelitistUnderDemandedTime};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
+	\begin{axis}[xlabel = Winners sizeinter elitistUnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
+		\addplot table[x = m, y = spwinners]{\sizeinterelitistUnderDemandedWinners};
+		\addlegendentry{Simple Pricing}
+		\addplot table[x = m, y = gwwinners]{\sizeinterelitistUnderDemandedWinners};
+		\addlegendentry{LP greedy utilitarian}
+		\addplot table[x = m, y = gewinners]{\sizeinterelitistUnderDemandedWinners};
+		\addlegendentry{LP greedy egalitarian}
+		\addplot table[x = m, y = owwinners]{\sizeinterelitistUnderDemandedWinners};
+		\addlegendentry{LP optimal utilitarian}
+		\addplot table[x = m, y = oewinners]{\sizeinterelitistUnderDemandedWinners};
+		\addlegendentry{LP optimal egalitarian}
+	\end{axis}
+\end{tikzpicture}
+
+\end{document}

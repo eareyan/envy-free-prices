@@ -15,6 +15,7 @@ import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.MarketAllocationException;
+import util.Cplex;
 import algorithms.pricing.error.PrincingAlgoException;
 
 import com.google.common.collect.ImmutableMap;
@@ -79,7 +80,8 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
    */
   public RestrictedEnvyFreePricesLP(MarketAllocation<M, G, B> allocatedMarket) throws IloException {
     this.allocatedMarket = allocatedMarket;
-    this.cplex = new IloCplex();
+    //this.cplex = new IloCplex();
+    this.cplex = Cplex.getCplex();
     // Create a map from goods to a numbers. This gives ordering of the goods.
     this.goodToPriceIndex = new HashMap<G, Integer>();
     for (int i = 0; i < this.allocatedMarket.getMarket().getNumberGoods(); i++) {

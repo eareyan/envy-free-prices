@@ -15,6 +15,7 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.exceptions.AllocationException;
 import structures.exceptions.MarketAllocationException;
+import util.Cplex;
 import util.Printer;
 import allocations.error.AllocationAlgoErrorCodes;
 import allocations.error.AllocationAlgoException;
@@ -86,7 +87,8 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
   public MarketAllocation<M, G, B> Solve(M market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
     try {
       // Create Cplex Object
-      this.cplex = new IloCplex();
+      //this.cplex = new IloCplex();
+      this.cplex = Cplex.getCplex();
       if (!this.verbose){
         this.cplex.setOut(null);
       }
@@ -192,7 +194,7 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
             }
           }
         }
-        this.cplex.end();
+        //this.cplex.end();
         
         HashBasedTable<G, B, Integer> alloc = HashBasedTable.create();
         for(G good : market.getGoods()){

@@ -9,9 +9,9 @@ import com.google.common.collect.ImmutableList;
  */
 public class RunParameters {
 
-  public static final int numTrials = 30;
-  public static final int numGoods = 11;
-  public static final int numBidder = 11;
+  public static final int numTrials = 50;
+  public static final int numGoods = 21;
+  public static final int numBidder = 21;
   public static final ImmutableList<String> distributions = ImmutableList.of("Uniform", "Elitist");
   public static final ImmutableList<Double> probabilities = ImmutableList.of(1.0 / 3.0, 2.0 / 3.0, 1.0);
 
@@ -28,8 +28,7 @@ public class RunParameters {
   /**
    * Constructor.
    * 
-   * @param args
-   *          - command line arguments.
+   * @param args - command line arguments.
    * @throws Exception
    */
   public RunParameters(String[] args) throws Exception {
@@ -59,10 +58,12 @@ public class RunParameters {
   private Experiments getExperimentObject(String type) throws Exception {
     if (type.equals("SingleMinded")) {
       return new SingleMinded();
-    } else if (type.equals("SizeInterchangeable")) {
-      return new SizeInterchangeable();
     } else if (type.equals("Singleton")) {
       return new Singleton();
+    } else if (type.equals("SizeInterchangeable")) {
+      return new SizeInterchangeable();
+    } else if (type.equals("TAC")) {
+      return new TAC();
     } else if (type.equals("latextables")) {
       return null;
     } else {

@@ -9,7 +9,7 @@ import algorithms.pricing.reserveprices.RevMaxHeuristic;
 import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
 import allocations.interfaces.AllocationAlgo;
-import allocations.optimal.EgalitarianMaxAllocation;
+import allocations.optimal.EgalitarianMaxAllocationILP;
 import allocations.optimal.WelfareMaxAllocationILP;
 import ilog.concert.IloException;
 import log.SqlDB;
@@ -65,15 +65,18 @@ public class Singleton extends Experiments {
       for (int i = 0; i < RunParameters.numTrials; i++) {
         // Generate Single-minded random market.
         SingletonMarket<Goods, Bidder<Goods>> M = this.getSingletonMarket(numGoods, numBidders, p, distribution);
-        // Efficient Allocation.
-        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efficientAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
-        double optimalWelfare = efficientAlloc.value();
+        // Optimal Utilitarian Allocation.
+        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> utilitarianMaxAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
+        double optimalWelfare = utilitarianMaxAlloc.getValue();
+        // Optimal Egalitarian Allocation.
+        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> egalitarianMaxAlloc = new EgalitarianMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
+        double optimalEgalitarian = (double) egalitarianMaxAlloc.getNumberOfWinners();
         // Obtain statistics from all algorithms.
-        this.populateStats(stats, new SingletonEVP(M).Solve(), "ev", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyWelfare), "gw", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare);
+        this.populateStats(stats, new SingletonEVP(M).Solve(), "ev", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyWelfare), "gw", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
       dbLogger.saveSingleton("singleton_" + distribution, numGoods, numBidders, p, stats);
@@ -132,7 +135,7 @@ public class Singleton extends Experiments {
       allocAlgo = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     case OptimalEgalitarian:
-      allocAlgo = new EgalitarianMaxAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      allocAlgo = new EgalitarianMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     }
     return new RevMaxHeuristic(market, allocAlgo).getStatistics();

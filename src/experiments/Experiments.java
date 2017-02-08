@@ -89,9 +89,10 @@ public abstract class Experiments {
    * @throws MarketOutcomeException
    */
   public void populateStats(HashMap<String, DescriptiveStatistics> stats, @SuppressWarnings("rawtypes") PricesStatistics ps,
-      String id, double optimalWelfare) throws MarketAllocationException, MarketOutcomeException {
+      String id, double optimalWelfare, double optimalEgalitarian) throws MarketAllocationException, MarketOutcomeException {
     this.getDS(stats, id + "Welfare").addValue(ps.getWelfareRatio(optimalWelfare));
     this.getDS(stats, id + "Revenue").addValue(ps.getSellerRevenueRatio(optimalWelfare));
+    this.getDS(stats, id + "Winners").addValue(ps.getNumberOfWinnersRatio(optimalEgalitarian));
     this.getDS(stats, id + "EF").addValue(ps.getEFViolationsRatio());
     this.getDS(stats, id + "EFLoss").addValue(ps.getRatioLossUtility());
     this.getDS(stats, id + "MC").addValue(ps.getMCViolationsRatio());

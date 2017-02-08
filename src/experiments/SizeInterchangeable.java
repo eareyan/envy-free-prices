@@ -29,7 +29,7 @@ import algorithms.pricing.reserveprices.RevMaxHeuristic;
 import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
 import allocations.interfaces.AllocationAlgo;
-import allocations.optimal.EgalitarianMaxAllocation;
+import allocations.optimal.EgalitarianMaxAllocationILP;
 import allocations.optimal.WelfareMaxAllocationILP;
 
 public class SizeInterchangeable extends Experiments {
@@ -75,15 +75,18 @@ public class SizeInterchangeable extends Experiments {
       for (int i = 0; i < RunParameters.numTrials; i++) {
         // Generate Single-minded random market.
         Market<Goods, Bidder<Goods>> M = this.getSizeInterMarket(numGoods, numBidders, k, p, distribution);
-        // Efficient Allocation.
-        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efficientAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
-        double optimalWelfare = efficientAlloc.value();
+        // Optimal Utilitarian Allocation.
+        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> utilitarianMaxAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
+        double optimalWelfare = utilitarianMaxAlloc.getValue();
+        // Optimal Egalitarian Allocation.
+        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> egalitarianMaxAlloc = new EgalitarianMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
+        double optimalEgalitarian = (double) egalitarianMaxAlloc.getNumberOfWinners();
         // Obtain statistics from all algorithms.
-        this.populateStats(stats, new SimplePricing(M).Solve(), "sp", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyWelfare), "gw", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare);
+        this.populateStats(stats, new SimplePricing(M).Solve(), "sp", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.GreedyWelfare), "gw", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
       dbLogger.saveSizeInter("sizeinter_" + distribution, numGoods, numBidders, k, p, stats);
@@ -128,7 +131,7 @@ public class SizeInterchangeable extends Experiments {
    * @throws MarketCreationException
    * @throws MarketOutcomeException
    */
-  public PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> getRevMaxMarketPrices(Market<Goods, Bidder<Goods>> market, Allocations whichAllocAlgo) throws IloException, AllocationException, GoodsException, MarketAllocationException, AllocationAlgoException, BidderCreationException, PrincingAlgoException, MarketOutcomeException, MarketCreationException {
+  public static PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> getRevMaxMarketPrices(Market<Goods, Bidder<Goods>> market, Allocations whichAllocAlgo) throws IloException, AllocationException, GoodsException, MarketAllocationException, AllocationAlgoException, BidderCreationException, PrincingAlgoException, MarketOutcomeException, MarketCreationException {
     // Determine which allocation algorithm to use.
     AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> allocAlgo = null;
     switch (whichAllocAlgo) {
@@ -142,7 +145,7 @@ public class SizeInterchangeable extends Experiments {
       allocAlgo = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     case OptimalEgalitarian:
-      allocAlgo = new EgalitarianMaxAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      allocAlgo = new EgalitarianMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     }
     return new RevMaxHeuristic(market, allocAlgo).getStatistics();

@@ -6,56 +6,59 @@ import allocations.objectivefunction.interfaces.ObjectiveFunction;
 import com.google.common.collect.Table;
 
 /**
- * This class associates a Market with an Allocation.
- * The idea is that an Allocation is an object associated 
- * but separate from a Market.
+ * This class associates a Market with an Allocation. The idea is that an Allocation is an object associated but separate from a Market.
  * 
- * An allocation is the result of some allocation algorithm.
- * This class provides a common class for any allocation
- * algorithm to report its results.
+ * An allocation is the result of some allocation algorithm. This class provides a common class for any allocation algorithm to report its results.
  * 
  * @author Enrique Areyan Viqueira
  */
 public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
-  
+
   /**
    * Market that was allocated.
    */
   protected final M market;
-  
+
   /**
-   * Allocation for the market. An allocation is a Table of goods, bidders and
-   * an integer denoting the allocation from a good to a bidder.
+   * Allocation for the market. An allocation is a Table of goods, bidders and an integer denoting the allocation from a good to a bidder.
    */
   protected final Table<G, B, Integer> allocation;
 
   /**
-   * Objective function. This is the function that the allocation
-   * algorithm reported as having used to perform its allocation.
+   * Objective function. This is the function that the allocation algorithm reported as having used to perform its allocation.
    */
   protected final ObjectiveFunction f;
+
+  /**
+   * Value of the allocation.
+   */
+  protected double value = -1.0;
   
   /**
+   * Number of winners.
+   */
+  protected int numberOfWinners = -1;
+
+  /**
    * Constructor. Takes a Market and an allocation.
+   * 
    * @param m
    * @param allocation
-   * @throws MarketAllocationException 
+   * @throws MarketAllocationException
    */
-  public MarketAllocation(M m, Table<G, B, Integer> allocation,  ObjectiveFunction f) throws MarketAllocationException {
+  public MarketAllocation(M m, Table<G, B, Integer> allocation, ObjectiveFunction f) throws MarketAllocationException {
     this.market = m;
     if (this.market.bidders.size() * this.market.goods.size() != allocation.size()) {
-      throw new MarketAllocationException(
-          "Trying to construct a MarketAllocation object for a market with "
-              + this.market.bidders.size() + " bidders and "
-              + this.market.goods.size()
-              + " goods, but with an allocation of size " + allocation.size());
+      throw new MarketAllocationException("Trying to construct a MarketAllocation object for a market with " + this.market.bidders.size() + " bidders and "
+          + this.market.goods.size() + " goods, but with an allocation of size " + allocation.size());
     }
     this.allocation = allocation;
     this.f = f;
   }
-  
+
   /**
    * Getter.
+   * 
    * @return the Market object.
    */
   public Market<G, B> getMarket() {
@@ -66,9 +69,9 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
    * Getter.
    * 
    * @param good - a good object.
-   * @param bidder -  a bidder object.
+   * @param bidder - a bidder object.
    * @return the allocation from good to bidder.
-   * @throws MarketAllocationException 
+   * @throws MarketAllocationException
    */
   public int getAllocation(G good, B bidder) throws MarketAllocationException {
     if (!this.allocation.contains(good, bidder)) {
@@ -76,25 +79,28 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
     }
     return this.allocation.get(good, bidder);
   }
-  
+
   /**
-   * Get value of allocation. The value of an allocation is the sum of rewards
-   * obtained by the allocation across all bidders. This value depends on the
+   * Get value of allocation. The value of an allocation is the sum of rewards obtained by the allocation across all bidders. This value depends on the
    * objective function being used.
    * 
    * @return the value of an allocation, i.e., the sum of rewards of allocated bidders.
-   * @throws MarketAllocationException in case there is a null allocation 
+   * @throws MarketAllocationException
+   *           in case there is a null allocation
    */
-  public double value() throws MarketAllocationException {
-    double totalReward = 0.0;
-    // Loop through each bidder to check if it is satisfied.
-    for (B bidder : this.market.bidders) {
-      // Compute the extra reward attained by the bidder under the current allocation.
-      totalReward += this.marginalValue(bidder);
+  public double getValue() throws MarketAllocationException {
+    if (this.value == -1.0) {
+      double total = 0.0;
+      // Loop through each bidder to check if it is satisfied.
+      for (B bidder : this.market.bidders) {
+        // Compute the extra reward attained by the bidder under the current allocation.
+        total += this.marginalValue(bidder);
+      }
+      this.value = total;
     }
-    return totalReward;
+    return this.value;
   }
-  
+
   /**
    * Computes the marginal value of the allocation for a bidder.
    * 
@@ -104,14 +110,14 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
    */
   public double marginalValue(B bidder) throws MarketAllocationException {
     // Make sure we have an objective function to be able to compute the value of the allocation.
-    if (this.f == null){
+    if (this.f == null) {
       throw new MarketAllocationException("An objective function must be defined to compute the value of an allocation");
     } else {
       return this.f.getObjective(bidder.getReward(), bidder.getDemand(), this.allocationToBidder(bidder))
-           - this.f.getObjective(bidder.getReward(), bidder.getDemand(), 0);
+          - this.f.getObjective(bidder.getReward(), bidder.getDemand(), 0);
     }
   }
-  
+
   /**
    * Checks if a bidder is assigned something at all.
    * 
@@ -130,12 +136,13 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
     }
     return true;
   }
-  
+
   /**
    * Computes the number of items from good i that were allocated.
+   * 
    * @param i - a good index.
    * @return the number of items from good i that were allocated.
-   * @throws MarketAllocationException  in case the good is not found.
+   * @throws MarketAllocationException in case the good is not found.
    */
   public int allocationFromGood(G good) throws MarketAllocationException {
     if (!this.allocation.containsRow(good)) {
@@ -147,9 +154,10 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
     }
     return totalAllocation;
   }
-  
+
   /**
    * Get current bundle number for a bidder.
+   * 
    * @param bidder - a bidder object.
    * @return the number of goods allocated to the bidder.
    * @throws MarketAllocationException in case a bidder is not found
@@ -164,7 +172,26 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
     }
     return totalAllocation;
   }
-  
+
+  /**
+   * Computes the number of bidders that received at least one item.
+   * 
+   * @return the number of bidders that received at least one item;
+   * @throws MarketAllocationException
+   */
+  public int getNumberOfWinners() throws MarketAllocationException {
+    if (this.numberOfWinners == -1) {
+      int total = 0;
+      for (B bidder : this.market.getBidders()) {
+        if (!this.isBidderBundleZero(bidder)) {
+          total++;
+        }
+      }
+      this.numberOfWinners = total;
+    }
+    return this.numberOfWinners;
+  }
+
   /**
    * Helper method to print a matrix representation of the allocation.
    * 
@@ -178,14 +205,14 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
       System.out.print("\n");
     }
   }
-  
+
   /**
    * Getter.
    * 
    * @return the objective function.
    */
-  public ObjectiveFunction getObjectiveFunction(){
+  public ObjectiveFunction getObjectiveFunction() {
     return this.f;
   }
-  
+
 }

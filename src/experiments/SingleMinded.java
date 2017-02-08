@@ -27,7 +27,7 @@ import structures.factory.SingleMindedMarketFactory;
 import algorithms.pricing.error.PrincingAlgoException;
 import allocations.error.AllocationAlgoException;
 import allocations.interfaces.AllocationAlgo;
-import allocations.optimal.EgalitarianMaxAllocation;
+import allocations.optimal.EgalitarianMaxAllocationILP;
 import allocations.optimal.WelfareMaxAllocationILP;
 
 public class SingleMinded extends Experiments {
@@ -65,16 +65,19 @@ public class SingleMinded extends Experiments {
       for (int i = 0; i < RunParameters.numTrials; i++) {
         // Generate Single-minded random market.
         SingleMindedMarket<Goods, Bidder<Goods>> M = this.getSingleMindedMarket(numGoods, numBidders, k, distribution);
-        // Efficient Allocation.
-        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> efficientAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
-        double optimalWelfare = efficientAlloc.value();
+        // Optimal Utilitarian Allocation.
+        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> utilitarianMaxAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
+        double optimalWelfare = utilitarianMaxAlloc.getValue();
+        // Optimal Egalitarian Allocation.
+        MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> egalitarianMaxAlloc = new EgalitarianMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
+        double optimalEgalitarian = (double) egalitarianMaxAlloc.getNumberOfWinners();
         // Obtain statistics from all algorithms.
-        this.populateStats(stats, new SingleMindedApproxWE(M).Solve(), "ap", optimalWelfare);
-        this.populateStats(stats, new UnlimitedSupplyApproximation(M).Solve(), "us", optimalWelfare);
-        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.GreedyWelfare), "gw", optimalWelfare);
-        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare);
-        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare);
-        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare);
+        this.populateStats(stats, new SingleMindedApproxWE(M).Solve(), "ap", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, new UnlimitedSupplyApproximation(M).Solve(), "us", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.GreedyWelfare), "gw", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
       dbLogger.saveSingleMinded("singleminded_" + distribution, numGoods, numBidders, k, stats);
@@ -134,7 +137,7 @@ public class SingleMinded extends Experiments {
       allocAlgo = new WelfareMaxAllocationILP<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     case OptimalEgalitarian:
-      allocAlgo = new EgalitarianMaxAllocation<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      allocAlgo = new EgalitarianMaxAllocationILP<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     }
     long startTime = System.nanoTime();

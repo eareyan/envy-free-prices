@@ -98,6 +98,21 @@ public class SqlDB {
   }
   
   /**
+   * Check if a row exists in the database.
+   * 
+   * @param tablename
+   * @param m
+   * @return true if the row exists
+   * @throws SQLException
+   */
+  public boolean checkIfRowExists(String tablename, int m) throws SQLException {
+    String sql = "SELECT * FROM " + tablename + " WHERE m = ?";
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
+    preparedStatement.setInt(1, m);
+    return ((ResultSet) preparedStatement.executeQuery()).next();
+  }
+  
+  /**
    * Check if a row of the database exists.
    * 
    * @param tablename
@@ -143,7 +158,7 @@ public class SqlDB {
   }
   
   /**
-   * Save single minded experiment. This function is just a handy wrapper for createAndExecuteSQLStatement
+   * Save size interchangeable experiment. This function is just a handy wrapper for createAndExecuteSQLStatement
    * 
    * @param table_name
    * @param n
@@ -168,6 +183,23 @@ public class SqlDB {
     DescriptiveStatistics probabilityConnections = new DescriptiveStatistics();
     probabilityConnections.addValue(p);
     stats.put("p", probabilityConnections);
+    // Create and execute SQL statement.
+    this.createAndExecuteSQLStatement(table_name, stats);
+  }
+  
+  /**
+   * Save TAC experiment.
+   * 
+   * @param table_name
+   * @param m
+   * @param stats
+   * @throws SQLException
+   */
+  public void saveTAC(String table_name, int m, HashMap<String, DescriptiveStatistics> stats) throws SQLException {
+    // Add the number of bidders.
+    DescriptiveStatistics numberOfBidders = new DescriptiveStatistics();
+    numberOfBidders.addValue(m);
+    stats.put("m", numberOfBidders);
     // Create and execute SQL statement.
     this.createAndExecuteSQLStatement(table_name, stats);
   }

@@ -25,7 +25,7 @@ public class CollectResults {
   public static void main(String[] args) throws Exception {
     RunParameters rp = new RunParameters(args);
     SqlDB sqlDB = new SqlDB(rp.dbProvider, rp.dbHost, rp.dbPort, rp.dbName, rp.dbUsername, rp.dbPassword);
-    String dir = "/home/eareyanv/workspace/envy-free-prices/results/current/";
+    String dir = "/home/eareyanv/workspace/envy-free-prices/results/current/data/";
 
     ArrayList<Entry<String, String>> sqlStatements = new ArrayList<Entry<String, String>>();
     sqlStatements.add(new AbstractMap.SimpleEntry<String, String>("SELECT * FROM singleminded_uniform ORDER BY n,m,k", "singleminded_uniform.csv"));
