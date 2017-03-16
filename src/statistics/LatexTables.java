@@ -25,6 +25,7 @@ public class LatexTables {
     results += LatexTables.getSingleMindedResults(sqlDB);
     results += LatexTables.getSingletonResults(sqlDB);
     results += LatexTables.getSizeInterResults(sqlDB);
+    //results += LatexTables.getTACResults(sqlDB);
     System.out.println(results);
 
     PrintWriter writer = new PrintWriter("/home/eareyanv/workspace/envy-free-prices/results/current/latextable/tables.tex", "UTF-8");
@@ -37,8 +38,8 @@ public class LatexTables {
     String table = "\\subsection{Single-Minded}\n";
     table += createTable(sqlDB, "Single-Minded, Uniform Reward, Over Demanded", "singleminded_uniform", Util.singleMindedAlgos, "WHERE k*m > n");
     table += createTable(sqlDB, "Single-Minded, Uniform Reward, Under Demanded", "singleminded_uniform", Util.singleMindedAlgos, "WHERE k*m <= n");
-    table += createTable(sqlDB, "Single-Minded, Elitist Reward, Over Demanded", "singleminded_elitist", Util.singleMindedAlgos, "WHERE k*m > n");
-    table += createTable(sqlDB, "Single-Minded, Elitist Reward, Under Demanded", "singleminded_elitist", Util.singleMindedAlgos, "WHERE k*m <= n");
+    //table += createTable(sqlDB, "Single-Minded, Elitist Reward, Over Demanded", "singleminded_elitist", Util.singleMindedAlgos, "WHERE k*m > n");
+    //table += createTable(sqlDB, "Single-Minded, Elitist Reward, Under Demanded", "singleminded_elitist", Util.singleMindedAlgos, "WHERE k*m <= n");
     table += "\\newpage\n";
     return table;
   }
@@ -47,8 +48,8 @@ public class LatexTables {
     String table = "\\subsection{Singleton}\n";
     table += createTable(sqlDB, "Singleton, Uniform Reward, Over Demanded", "singleton_uniform", Util.singletonAlgos, "WHERE m > n");
     table += createTable(sqlDB, "Singleton, Uniform Reward, Under Demanded", "singleton_uniform", Util.singletonAlgos, "WHERE m <= n");
-    table += createTable(sqlDB, "Singleton, Elitist Reward, Over Demanded", "singleton_elitist", Util.singletonAlgos, "WHERE m > n");
-    table += createTable(sqlDB, "Singleton, Elitist Reward, Under Demanded", "singleton_elitist", Util.singletonAlgos, "WHERE m <= n");
+    //table += createTable(sqlDB, "Singleton, Elitist Reward, Over Demanded", "singleton_elitist", Util.singletonAlgos, "WHERE m > n");
+    //table += createTable(sqlDB, "Singleton, Elitist Reward, Under Demanded", "singleton_elitist", Util.singletonAlgos, "WHERE m <= n");
     table += "\\newpage\n";
     return table;
   }
@@ -57,14 +58,15 @@ public class LatexTables {
     String table = "\\subsection{Size-Interchangeable}\n";
     table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Over Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE m > n");
     table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Under Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE m <= n");
-    table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Over Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE m > n");
-    table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Under Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE m <= n");
-    /*
-     * table += createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Over Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE k > 1"); table +=
-     * createTable(sqlDB, "Size-Interchangeable, Uniform Reward, Under Demanded", "sizeinter_uniform", Util.sizeInterAlgos, "WHERE k <= 1"); table +=
-     * createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Over Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE k > 1"); table +=
-     * createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Under Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE k <= 1");
-     */
+    //table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Over Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE m > n");
+    //table += createTable(sqlDB, "Size-Interchangeable, Elitist Reward, Under Demanded", "sizeinter_elitist", Util.sizeInterAlgos, "WHERE m <= n");
+    return table;
+  }
+  
+  public static String getTACResults(SqlDB sqlDB) throws SQLException {
+    String table = "\\subsection{TAC}\n";
+    table += createTable(sqlDB, "TAC, Over Demanded",  "tac", Util.sizeInterAlgos, "WHERE m > 20 AND spWelfare!='Nan'");
+    table += createTable(sqlDB, "TAC, Under Demanded", "tac", Util.sizeInterAlgos, "WHERE m <= 20 AND spWelfare!='Nan'");
     return table;
   }
 
@@ -91,7 +93,7 @@ public class LatexTables {
       }
     }
     sql = sql.substring(0, sql.length() - 2) + " FROM " + tableName + " " + where;
-    // System.out.println(sql);
+    System.out.println(sql);
 
     // Execute SQL statement and prepare results.
     PreparedStatement preparedStatement = (PreparedStatement) sqlDB.getConn().prepareStatement(sql);
@@ -131,10 +133,12 @@ public class LatexTables {
    * @throws SQLException
    */
   public static ImmutableList<Integer> getNumberBiddersAndItems(SqlDB sqlDB, String tableName, String where) throws SQLException {
-    String sql1 = "SELECT n,m FROM " + tableName + " " + where + " ORDER BY n DESC, m DESC";
+    //String sql1 = "SELECT n,m FROM " + tableName + " " + where + " ORDER BY n DESC, m DESC";
+    String sql1 = "SELECT m FROM " + tableName + " " + where + " ORDER BY m DESC";
     PreparedStatement preparedStatement1 = (PreparedStatement) sqlDB.getConn().prepareStatement(sql1);
     ResultSet rs1 = preparedStatement1.executeQuery();
     rs1.next();
-    return ImmutableList.of(rs1.getInt(2), rs1.getInt(1));
+    //return ImmutableList.of(rs1.getInt(2), rs1.getInt(1));
+    return ImmutableList.of(rs1.getInt(1), 0);
   }
 }

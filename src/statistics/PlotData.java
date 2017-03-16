@@ -76,7 +76,7 @@ public class PlotData {
     String type = overDemanded ? "OverDemanded" : "UnderDemanded";
     String col = fixItems ? "m" : "n";
     for (Entry<String, String> metric : Util.metrics) {
-      tables.add(new PlotData("SELECT "+col+", " + getAvgSqlCols(metric.getValue(), algos) + " FROM " + bidders + "_" + reward + " " + where
+      tables.add(new PlotData("SELECT "+col+", " + getAvgSqlCols(metric.getValue(), algos) + " FROM " + bidders + "_"  + reward + " " + where
           + " GROUP BY "+col+" ORDER BY "+col, bidders + reward + type + metric.getValue(), bidders + "/" + reward + "/" + type + metric.getValue() + ".csv", metric
           .getValue() + " " + bidders + " " + reward + type, "Bidders", col, metric.getValue()));
     }

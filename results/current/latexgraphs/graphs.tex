@@ -61,19 +61,6 @@
 		\addplot table[x = m, y = oeef]{\TACOverDemandedEF};
 		\addlegendentry{LP optimal egalitarian}
 	\end{axis}
-\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = EFLoss TAC OverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = spefloss]{\TACOverDemandedEFLoss};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwefloss]{\TACOverDemandedEFLoss};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = geefloss]{\TACOverDemandedEFLoss};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owefloss]{\TACOverDemandedEFLoss};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oeefloss]{\TACOverDemandedEFLoss};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
 \end{tikzpicture}
 \begin{tikzpicture}[scale=0.9]
 	\begin{axis}[xlabel = MC TAC OverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
@@ -86,46 +73,6 @@
 		\addplot table[x = m, y = owmc]{\TACOverDemandedMC};
 		\addlegendentry{LP optimal utilitarian}
 		\addplot table[x = m, y = oemc]{\TACOverDemandedMC};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
-\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = MCLoss TAC OverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = spmcloss]{\TACOverDemandedMCLoss};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwmcloss]{\TACOverDemandedMCLoss};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = gemcloss]{\TACOverDemandedMCLoss};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owmcloss]{\TACOverDemandedMCLoss};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oemcloss]{\TACOverDemandedMCLoss};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
-\end{tikzpicture}
-\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = Time TAC OverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = sptime]{\TACOverDemandedTime};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwtime]{\TACOverDemandedTime};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = getime]{\TACOverDemandedTime};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owtime]{\TACOverDemandedTime};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oetime]{\TACOverDemandedTime};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
-\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = Winners TAC OverDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = spwinners]{\TACOverDemandedWinners};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwwinners]{\TACOverDemandedWinners};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = gewinners]{\TACOverDemandedWinners};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owwinners]{\TACOverDemandedWinners};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oewinners]{\TACOverDemandedWinners};
 		\addlegendentry{LP optimal egalitarian}
 	\end{axis}
 \end{tikzpicture}
@@ -170,19 +117,6 @@
 		\addplot table[x = m, y = oeef]{\TACUnderDemandedEF};
 		\addlegendentry{LP optimal egalitarian}
 	\end{axis}
-\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = EFLoss TAC UnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = spefloss]{\TACUnderDemandedEFLoss};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwefloss]{\TACUnderDemandedEFLoss};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = geefloss]{\TACUnderDemandedEFLoss};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owefloss]{\TACUnderDemandedEFLoss};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oeefloss]{\TACUnderDemandedEFLoss};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
 \end{tikzpicture}
 \begin{tikzpicture}[scale=0.9]
 	\begin{axis}[xlabel = MC TAC UnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
@@ -195,46 +129,6 @@
 		\addplot table[x = m, y = owmc]{\TACUnderDemandedMC};
 		\addlegendentry{LP optimal utilitarian}
 		\addplot table[x = m, y = oemc]{\TACUnderDemandedMC};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
-\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = MCLoss TAC UnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = spmcloss]{\TACUnderDemandedMCLoss};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwmcloss]{\TACUnderDemandedMCLoss};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = gemcloss]{\TACUnderDemandedMCLoss};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owmcloss]{\TACUnderDemandedMCLoss};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oemcloss]{\TACUnderDemandedMCLoss};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
-\end{tikzpicture}
-\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = Time TAC UnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = sptime]{\TACUnderDemandedTime};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwtime]{\TACUnderDemandedTime};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = getime]{\TACUnderDemandedTime};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owtime]{\TACUnderDemandedTime};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oetime]{\TACUnderDemandedTime};
-		\addlegendentry{LP optimal egalitarian}
-	\end{axis}
-\end{tikzpicture}\begin{tikzpicture}[scale=0.9]
-	\begin{axis}[xlabel = Winners TAC UnderDemanded, ylabel = Average ratio, legend style={at={(0,1)},font=\tiny} ]
-		\addplot table[x = m, y = spwinners]{\TACUnderDemandedWinners};
-		\addlegendentry{Simple Pricing}
-		\addplot table[x = m, y = gwwinners]{\TACUnderDemandedWinners};
-		\addlegendentry{LP greedy utilitarian}
-		\addplot table[x = m, y = gewinners]{\TACUnderDemandedWinners};
-		\addlegendentry{LP greedy egalitarian}
-		\addplot table[x = m, y = owwinners]{\TACUnderDemandedWinners};
-		\addlegendentry{LP optimal utilitarian}
-		\addplot table[x = m, y = oewinners]{\TACUnderDemandedWinners};
 		\addlegendentry{LP optimal egalitarian}
 	\end{axis}
 \end{tikzpicture}

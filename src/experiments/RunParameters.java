@@ -9,11 +9,11 @@ import com.google.common.collect.ImmutableList;
  */
 public class RunParameters {
 
-  public static final int numTrials = 50;
+  public static final int numTrials = 100;
   public static final int numGoods = 21;
   public static final int numBidder = 21;
   public static final ImmutableList<String> distributions = ImmutableList.of("Uniform", "Elitist");
-  public static final ImmutableList<Double> probabilities = ImmutableList.of(1.0 / 3.0, 2.0 / 3.0, 1.0);
+  public static final ImmutableList<Double> probabilities = ImmutableList.of(1.0 / 4.0, 2.0 / 4.0, 3.0/4.0, 1.0);
 
   public int id;
   public String dbProvider;

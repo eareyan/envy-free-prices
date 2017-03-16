@@ -43,10 +43,11 @@ public class SingleMinded extends Experiments {
     for (int n = 2; n < RunParameters.numGoods; n++) {
       for (int m = 2; m < RunParameters.numBidder; m++) {
         for (int k = 1; k <= n; k++) {
-          for (String distribution : RunParameters.distributions) {
+          //for (String distribution : RunParameters.distributions) {
+          String distribution = "Uniform";
             System.out.print(distribution + ": (n, m, k) = (" + n + ", " + m + ", " + k + ")");
             this.runOneExperiment(n, m, k, -1, distribution, dbLogger);
-          }
+          //}
         }
       }
     }

@@ -10,8 +10,8 @@ import com.google.common.collect.Iterables;
 public class TACLatexGraphs {
 
   public static Iterable<PlotData> getTACData(boolean fixItems) {
-    ArrayList<PlotData> tablesUniformOverDemanded = PlotData.getData(fixItems, Util.sizeInterAlgos, "TAC", "", true, "WHERE m > 15");
-    ArrayList<PlotData> tablesUniformUnderDemanded = PlotData.getData(fixItems, Util.sizeInterAlgos, "TAC", "", false, "WHERE m <= 15");
+    ArrayList<PlotData> tablesUniformOverDemanded = PlotData.getData(fixItems, Util.sizeInterAlgos, "TAC", "", true, "WHERE m > 20");
+    ArrayList<PlotData> tablesUniformUnderDemanded = PlotData.getData(fixItems, Util.sizeInterAlgos, "TAC", "", false, "WHERE m < 30");
     return Iterables.unmodifiableIterable(Iterables.concat(tablesUniformOverDemanded, tablesUniformUnderDemanded));
   }
 

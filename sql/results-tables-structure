@@ -103,6 +103,7 @@ CREATE TABLE singleton_elitist (
 
 CREATE TABLE sizeinter_uniform (
 CREATE TABLE sizeinter_elitist (
+CREATE TABLE sizeintersmall_uniform (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	k integer NOT NULL,
@@ -332,4 +333,6 @@ SELECT 'singleton_elitist' AS singleton_elitist, COUNT(*) FROM singleton_elitist
 UNION
 SELECT 'sizeinter_uniform' AS sizeinter_uniform, COUNT(*) FROM sizeinter_uniform
 UNION
-SELECT 'sizeinter_elitist' AS sizeinter_elitist, COUNT(*) FROM sizeinter_elitist; 
+SELECT 'sizeinter_elitist' AS sizeinter_elitist, COUNT(*) FROM sizeinter_elitist
+UNION
+SELECT 'tac' AS tac, COUNT(*) FROM tac; 

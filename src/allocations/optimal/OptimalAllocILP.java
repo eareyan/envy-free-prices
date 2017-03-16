@@ -49,7 +49,7 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
   /**
    * Maximum time allowable for the algorithm.
    */
-  protected double timeLimit = -1.0;
+  protected double timeLimit = 0.5;
   
   /**
    * Constructor.
