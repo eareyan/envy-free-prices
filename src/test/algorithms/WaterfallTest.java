@@ -10,6 +10,7 @@ import structures.exceptions.GoodsException;
 import structures.exceptions.MarketCreationException;
 import test.SizeInterchangeableMarkets;
 import waterfall.Waterfall;
+import waterfall.WaterfallSolution;
 
 public class WaterfallTest {
 
@@ -27,7 +28,9 @@ public class WaterfallTest {
     // Market<Goods, Bidder<Goods>> market = SizeInterchangeableMarkets.market9();
     System.out.println(market);
     Waterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> waterfall = new Waterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(market);
-    waterfall.run();
+    WaterfallSolution<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> waterfallSolution = waterfall.run();
+    waterfallSolution.printAllocationTable();
+    waterfallSolution.printPricesTable();
   }
 
 }

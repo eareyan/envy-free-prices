@@ -1,13 +1,11 @@
 package waterfall;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import structures.Bidder;
@@ -158,48 +156,10 @@ public class Waterfall<M extends Market<G, B>, G extends Goods, B extends Bidder
         goods.remove(good);
       }
     }
-    this.printAllocationTable(allocation);
-    this.printPricesTable(prices);
-    return new WaterfallSolution<M, G, B>(allocation, prices);
-  }
-
-  /**
-   * Helper method to print the allocation.
-   * 
-   * @param allocation
-   */
-  private void printAllocationTable(Table<G, B, Integer> allocation) {
-    for (Entry<B, Map<G, Integer>> z : allocation.columnMap().entrySet()) {
-      System.out.print(z.getKey() + "\t");
-    }
-    System.out.println();
-    for (Entry<G, Map<B, Integer>> x : allocation.rowMap().entrySet()) {
-      System.out.print(x.getKey() + "\t");
-      for (Entry<B, Integer> y : x.getValue().entrySet()) {
-        System.out.print(y.getValue() + "\t");
-      }
-      System.out.println("");
-    }
-  }
-
-  /**
-   * Helper method to print prices.
-   * 
-   * @param prices
-   */
-  private void printPricesTable(Table<G, B, Double> prices) {
-    DecimalFormat df = new DecimalFormat("#.00");
-    for (Entry<B, Map<G, Double>> z : prices.columnMap().entrySet()) {
-      System.out.print(z.getKey() + "\t");
-    }
-    System.out.println();
-    for (Entry<G, Map<B, Double>> x : prices.rowMap().entrySet()) {
-      System.out.print(x.getKey() + "\t");
-      for (Entry<B, Double> y : x.getValue().entrySet()) {
-        System.out.print(df.format(y.getValue()) + "\t");
-      }
-      System.out.println("");
-    }
+    WaterfallSolution<M, G, B> waterfallSolution = new WaterfallSolution<M, G, B>(allocation, prices);
+    //waterfallSolution.printAllocationTable();
+    //waterfallSolution.printPricesTable();
+    return waterfallSolution;
   }
 
 }
