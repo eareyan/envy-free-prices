@@ -36,14 +36,31 @@ public class Waterfall<M extends Market<G, B>, G extends Goods, B extends Bidder
    * Comparator of bids by 2nd price.
    */
   private final ComparatorBidsBy2ndPrice<G> bidsComparatorBy2ndPrice = new ComparatorBidsBy2ndPrice<G>();
+  
+  /**
+   * Reserve price.
+   */
+  private final double reserve;
 
   /**
-   * Constructor.
+   * Constructor. 
+   * 
+   * @param market
+   * @param reserve
+   */
+  public Waterfall(M market, double reserve) {
+    this.market = market;
+    this.reserve = reserve;
+  }
+  
+  /**
+   * Constructor for reserve price 0.0.
    * 
    * @param market
    */
   public Waterfall(M market) {
     this.market = market;
+    this.reserve = 0.0;
   }
 
   /**
@@ -78,6 +95,15 @@ public class Waterfall<M extends Market<G, B>, G extends Goods, B extends Bidder
 
     // Initial set of bidders.
     Set<B> bidders = new HashSet<B>(this.market.getBidders());
+    // Compute the bidders that cannot afford the reserve price
+    Set<B> biddersBelowReserve = new HashSet<B>();
+    for(B bidder: bidders) {
+      if(bidder.getReward() < this.reserve * bidder.getDemand()) {
+        biddersBelowReserve.add(bidder);
+      }
+    }
+    // Eliminate all bidders that cannot afford reserve
+    bidders.removeAll(biddersBelowReserve);
 
     while (true) {
       // System.out.println("*************");
@@ -119,6 +145,7 @@ public class Waterfall<M extends Market<G, B>, G extends Goods, B extends Bidder
           for (B bidder : feasibleBidders) {
             if (bidder.demandsGood(good)) {
               bids.add(bidder.getReward() / (double) bidder.getDemand());
+              bids.add(this.reserve);
             }
           }
           listOfBids.add(new Bids<G>(good, bids));
