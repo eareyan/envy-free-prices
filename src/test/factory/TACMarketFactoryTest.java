@@ -4,9 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import structures.Bidder;
-import structures.Goods;
-import structures.Market;
 import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsCreationException;
 import structures.exceptions.MarketCreationException;
@@ -16,23 +13,6 @@ import adx.structures.MarketSegment;
 
 public class TACMarketFactoryTest {
 
-  @Test
-  public void testRandomTACMarket() throws AdXException, GoodsCreationException, BidderCreationException, MarketCreationException {
-    for (int m = 1; m < 2; m++) {
-      double total = 0.0;
-      for (int t = 1; t < 10; t++) {
-        total += TACMarketFactory.RandomTACMarket_Old(m).getSupplyToDemandRatio();
-      }
-      System.out.println(m + " = " + (total / 10.0));
-    }
-  }
-  
-  @Test
-  public void testRandomTACMarket2() throws GoodsCreationException, AdXException, BidderCreationException, MarketCreationException {
-    Market<Goods, Bidder<Goods>> market = TACMarketFactory.RandomTACMarket_Old(10);
-    System.out.println(market);
-  }
-  
   @Test
   public void testSampler() throws GoodsCreationException, AdXException, BidderCreationException, MarketCreationException {
     for (int m = 1; m < 2; m++) {
