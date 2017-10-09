@@ -1,6 +1,7 @@
 package util;
 
 import ilog.concert.IloException;
+import ilog.cp.IloCP;
 import ilog.cplex.IloCplex;
 
 /**
@@ -16,6 +17,11 @@ public class Cplex {
   private static IloCplex cplexUniqueObject;
 
   /**
+   * CP (constraint programming) unique object.
+   */
+  private static IloCP cpUniqueObject;
+
+  /**
    * Returns a unique instance of cplex.
    * 
    * @return
@@ -27,6 +33,21 @@ public class Cplex {
     }
     Cplex.cplexUniqueObject.clearModel();
     return Cplex.cplexUniqueObject;
+  }
+
+  /**
+   * Returns a unique instance of CP model.
+   * 
+   * @return
+   * @throws IloException
+   */
+  public static IloCP getCP() throws IloException {
+    if (Cplex.cpUniqueObject == null) {
+      Cplex.cpUniqueObject = new IloCP();
+    } else {
+      Cplex.cpUniqueObject.clearModel();
+    }
+    return Cplex.cpUniqueObject;
   }
 
 }
