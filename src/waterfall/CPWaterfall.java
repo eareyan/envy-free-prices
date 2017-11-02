@@ -4,6 +4,7 @@ import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumExpr;
 import ilog.concert.IloNumVar;
+import ilog.concert.IloNumVarType;
 import ilog.cp.IloCP;
 
 import java.util.HashMap;
@@ -84,12 +85,12 @@ public class CPWaterfall<M extends Market<G, B>, G extends Goods, B extends Bidd
     IloNumVar[][] pricesMatrixVariable = new IloNumVar[market.getNumberGoods()][market.getNumberBidders()];
     for (G good : market.getGoods()) {
       for (B bidder : market.getBidders()) {
-        pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = this.cp.numVar(0, market.getHighestReward());
+        pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = this.cp.numVar(0, market.getHighestReward(), IloNumVarType.Int);
+        //pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = this.cp.numVar(0, market.getHighestReward(), IloNumVarType.Float);
         //pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = this.cp.intVar(0, Integer.MAX_VALUE);
         // Bound the variables, otherwise cplex complains that there are uninitialized variables
-        // this.cp.addGe(pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)], 0.0);
-        // this.cp.addLe(pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)], (int) market.getHighestReward());
-        // this.cp.addLe(pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)], market.getHighestReward());
+        this.cp.addGe(pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)], 0.0);
+        this.cp.addLe(pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)], market.getHighestReward());
       }
     }
     // Indicator variable
@@ -211,7 +212,7 @@ public class CPWaterfall<M extends Market<G, B>, G extends Goods, B extends Bidd
   public static void main(String[] args) throws Exception {
     System.out.println("Testing CP Waterfall algorithm");
     // Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(4, 4, 0.75, 2);
-    Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(3, 4, 1.0, -2);
+    Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(4, 4, 1.0, -2);
     // Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(4, 2, 1.0, -2);
     System.out.println(market);
     CPWaterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> cpWaterfall = new CPWaterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(market);
