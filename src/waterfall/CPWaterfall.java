@@ -212,7 +212,7 @@ public class CPWaterfall<M extends Market<G, B>, G extends Goods, B extends Bidd
   public static void main(String[] args) throws Exception {
     System.out.println("Testing CP Waterfall algorithm");
     // Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(4, 4, 0.75, 2);
-    Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(4, 4, 1.0, -2);
+    Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(2, 3, 1.0, 1);
     // Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(4, 2, 1.0, -2);
     System.out.println(market);
     CPWaterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> cpWaterfall = new CPWaterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(market);
