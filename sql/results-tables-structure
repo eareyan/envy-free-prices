@@ -104,6 +104,7 @@ CREATE TABLE singleton_elitist (
 CREATE TABLE sizeinter_uniform (
 CREATE TABLE sizeinter_elitist (
 CREATE TABLE sizeintersmall_uniform (
+CREATE TABLE waterfall_uniform (
 	n integer NOT NULL,
 	m integer NOT NULL,
 	k integer NOT NULL,
@@ -147,7 +148,15 @@ CREATE TABLE sizeintersmall_uniform (
 	oeEFLoss double precision NOT NULL,
 	oeMC double precision NOT NULL,
 	oeMCLoss double precision NOT NULL,
-	oeTime double precision NOT NULL
+	oeTime double precision NOT NULL,
+	wfWelfare double precision NOT NULL,
+	wfRevenue double precision NOT NULL,
+	wfWinners double precision NOT NULL,
+	wfEF double precision NOT NULL,
+	wfEFLoss double precision NOT NULL,
+	wfMC double precision NOT NULL,
+	wfMCLoss double precision NOT NULL,
+	wfTime double precision NOT NULL
 	);
 
 CREATE TABLE TAC (

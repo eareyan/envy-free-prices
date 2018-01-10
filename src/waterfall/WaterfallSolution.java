@@ -7,6 +7,9 @@ import java.util.Map.Entry;
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
+import structures.MarketAllocation;
+import structures.exceptions.MarketAllocationException;
+import allocations.objectivefunction.SingleStepObjectiveFunction;
 
 import com.google.common.collect.Table;
 
@@ -22,6 +25,11 @@ import com.google.common.collect.Table;
 public class WaterfallSolution<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
 
   /**
+   * Market.
+   */
+  private final M market;
+
+  /**
    * Allocation.
    */
   private final Table<G, B, Integer> allocation;
@@ -31,7 +39,13 @@ public class WaterfallSolution<M extends Market<G, B>, G extends Goods, B extend
    */
   private final Table<G, B, Double> prices;
 
-  public WaterfallSolution(Table<G, B, Integer> allocation, Table<G, B, Double> prices) {
+  /**
+   * Market Allocation object.
+   */
+  private MarketAllocation<M, G, B> marketAllocation;
+
+  public WaterfallSolution(M market, Table<G, B, Integer> allocation, Table<G, B, Double> prices) {
+    this.market = market;
     this.allocation = allocation;
     this.prices = prices;
   }
@@ -48,6 +62,22 @@ public class WaterfallSolution<M extends Market<G, B>, G extends Goods, B extend
   }
 
   /**
+   * Returns an object of MarketAllocation type with the allocation.
+   * 
+   * @return
+   * @throws MarketAllocationException
+   */
+  public MarketAllocation<M, G, B> getAllocation() throws MarketAllocationException {
+    if (this.marketAllocation == null) {
+      this.marketAllocation = new MarketAllocation<M, G, B>(this.market, this.allocation, new SingleStepObjectiveFunction());
+      // System.out.println("Getting WF allocation");
+      // this.marketAllocation.printAllocation();
+      // System.out.println("***");
+    }
+    return this.marketAllocation;
+  }
+
+  /**
    * Returns the price of per good quoted to the bidder.
    * 
    * @param good
@@ -57,7 +87,7 @@ public class WaterfallSolution<M extends Market<G, B>, G extends Goods, B extend
   public double getPrice(G good, B bidder) {
     return this.prices.get(good, bidder);
   }
-  
+
   /**
    * Helper method to print the allocation.
    * 

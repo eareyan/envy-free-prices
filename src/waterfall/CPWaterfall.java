@@ -165,7 +165,7 @@ public class CPWaterfall<M extends Market<G, B>, G extends Goods, B extends Bidd
     // Objective
     IloNumExpr obj = this.cp.linearNumExpr();
     for (B bidder : market.getBidders()) {
-      obj = this.cp.sum(obj, this.cp.prod(bidder.getReward(), indicatorVariable[bidderToCPLEXIndex.get(bidder)]));
+      //obj = this.cp.sum(obj, this.cp.prod(bidder.getReward(), indicatorVariable[bidderToCPLEXIndex.get(bidder)]));
       for (G good : market.getGoods()) {
         obj = this.cp.sum(obj, this.cp.prod(pricesMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)],
             allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]));

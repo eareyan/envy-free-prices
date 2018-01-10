@@ -1,5 +1,7 @@
 package waterfall;
 
+import ilog.concert.IloException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +13,16 @@ import java.util.Set;
 import structures.Bidder;
 import structures.Goods;
 import structures.Market;
+import structures.MarketAllocation;
+import structures.exceptions.AllocationException;
+import structures.exceptions.BidderCreationException;
+import structures.exceptions.GoodsCreationException;
 import structures.exceptions.GoodsException;
+import structures.exceptions.MarketAllocationException;
+import allocations.error.AllocationAlgoException;
+import allocations.interfaces.AllocationAlgo;
+import allocations.objectivefunction.SingleStepObjectiveFunction;
+import allocations.objectivefunction.interfaces.ObjectiveFunction;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -25,7 +36,7 @@ import com.google.common.collect.Table;
  * @param <G>
  * @param <B>
  */
-public class Waterfall<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
+public class Waterfall<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements AllocationAlgo<M, G, B> {
 
   /**
    * Market object in which to run the Waterfall algorithm.
@@ -183,10 +194,20 @@ public class Waterfall<M extends Market<G, B>, G extends Goods, B extends Bidder
         goods.remove(good);
       }
     }
-    WaterfallSolution<M, G, B> waterfallSolution = new WaterfallSolution<M, G, B>(allocation, prices);
+    WaterfallSolution<M, G, B> waterfallSolution = new WaterfallSolution<M, G, B>(this.market, allocation, prices);
     //waterfallSolution.printAllocationTable();
     //waterfallSolution.printPricesTable();
     return waterfallSolution;
+  }
+
+  @Override
+  public MarketAllocation<M, G, B> Solve(M market) throws IloException, AllocationAlgoException, BidderCreationException, GoodsCreationException, AllocationException, GoodsException, MarketAllocationException {
+    return this.run().getAllocation();
+  }
+
+  @Override
+  public ObjectiveFunction getObjectiveFunction() {
+    return new SingleStepObjectiveFunction();
   }
 
 }

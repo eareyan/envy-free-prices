@@ -23,6 +23,7 @@ import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketOutcomeException;
 import structures.factory.RandomMarketFactory;
+import waterfall.Waterfall;
 import algorithms.pricing.SimplePricing;
 import algorithms.pricing.error.PrincingAlgoException;
 import algorithms.pricing.reserveprices.RevMaxHeuristic;
@@ -71,7 +72,8 @@ public class SizeInterchangeable extends Experiments {
    */
   @Override
   public void runOneExperiment(int numGoods, int numBidders, int k, double p, String distribution, SqlDB dbLogger) throws Exception {
-    if (!dbLogger.checkIfRowExists("sizeinter_" + distribution, numGoods, numBidders, k, p)) {
+    String dbName = "waterfall_";
+    if (!dbLogger.checkIfRowExists(dbName + distribution, numGoods, numBidders, k, p)) {
       System.out.print("\t Adding data... ");
       HashMap<String, DescriptiveStatistics> stats = new HashMap<String, DescriptiveStatistics>();
       for (int i = 0; i < RunParameters.numTrials; i++) {
@@ -89,9 +91,10 @@ public class SizeInterchangeable extends Experiments {
         this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.WaterFall), "wf", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
-      dbLogger.saveSizeInter("sizeinter_" + distribution, numGoods, numBidders, k, p, stats);
+      dbLogger.saveSizeInter(dbName + distribution, numGoods, numBidders, k, p, stats);
     } else {
       System.out.println("\t Already have data ");
     }
@@ -148,6 +151,9 @@ public class SizeInterchangeable extends Experiments {
       break;
     case OptimalEgalitarian:
       allocAlgo = new EgalitarianMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      break;
+    case WaterFall:
+      allocAlgo = new Waterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(market);
       break;
     }
     return new RevMaxHeuristic(market, allocAlgo).getStatistics();
