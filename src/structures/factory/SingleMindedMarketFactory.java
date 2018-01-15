@@ -45,15 +45,16 @@ public class SingleMindedMarketFactory {
   }
 
   /**
-   * Creates a random single-minded market.
+   * Checks the validity of the parameters needed to create a single minded market.
    * 
-   * @param n - number of items.
-   * @param m - number of bidders.
-   * @param k - bound on size of demand set.
-   * @return a single minded market.
-   * @throws Exception
+   * @param n
+   * @param m
+   * @param k
+   * @throws GoodsCreationException
+   * @throws BidderCreationException
+   * @throws MarketCreationException
    */
-  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m, int k, Callable<Double> rewardFunction) throws Exception {
+  public static void checkSingleMindedParameters(int n, int m, int k) throws GoodsCreationException, BidderCreationException, MarketCreationException {
     if (n <= 0) {
       throw new GoodsCreationException("There must be at least one good to create a market.");
     }
@@ -63,6 +64,23 @@ public class SingleMindedMarketFactory {
     if (k > n) {
       throw new MarketCreationException("The size of the demand set of a Single-Minded Bidder cannot be bigger than the number of available goods.");
     }
+  }
+
+  /**
+   * Creates a random single-minded market.
+   * 
+   * @param n
+   *          - number of items.
+   * @param m
+   *          - number of bidders.
+   * @param k
+   *          - bound on size of demand set.
+   * @return a single minded market.
+   * @throws Exception
+   */
+  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m, int k, Callable<Double> rewardFunction) throws Exception {
+    // Check validity of parameters.
+    SingleMindedMarketFactory.checkSingleMindedParameters(n, m, k);
     // Create goods, each with unit supply.
     ArrayList<Goods> goods = new ArrayList<Goods>();
     for (int i = 0; i < n; i++) {
@@ -83,11 +101,38 @@ public class SingleMindedMarketFactory {
     return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
   }
 
+  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomParametrizedSingleMindedMarket(int n, int m, double p, Callable<Double> rewardFunction)
+      throws Exception {
+    // Check validity of parameters.
+    SingleMindedMarketFactory.checkSingleMindedParameters(n, m, 0);
+    // Create goods, each with unit supply.
+    ArrayList<Goods> goods = new ArrayList<Goods>();
+    for (int i = 0; i < n; i++) {
+      goods.add(new Goods(1));
+    }
+    // Create bidders
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
+    for (int j = 0; j < m; j++) {
+      HashSet<Goods> bDemandSet = new HashSet<Goods>();
+      while (bDemandSet.isEmpty()) {
+        for (int i = 0; i < n; i++) {
+          if (Math.random() <= p) {
+            bDemandSet.add(goods.get(i));
+          }
+        }
+      }
+      bidders.add(new Bidder<Goods>(bDemandSet.size(), rewardFunction.call(), bDemandSet));
+    }
+    return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
+  }
+
   /**
    * Computes a set of n distinct, random integers, between 0 and max. If n>=max, returns the set of integers 0...max
    *
-   * @param n - the number of integers to produce.
-   * @param max - the maximum value of any integer to be produced.
+   * @param n
+   *          - the number of integers to produce.
+   * @param max
+   *          - the maximum value of any integer to be produced.
    * @return a list of integers.
    */
   public static Set<Integer> randomNumbers(int n, int max) {

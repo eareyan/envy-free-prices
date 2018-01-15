@@ -331,6 +331,18 @@ SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare,
 	round(AVG(optimaTime)::numeric,4) AS optimaTime
 	FROM tacexperiments;
 
+### Waterfall Results
+
+SELECT 	round(AVG(wfWelfare)::numeric,4) AS wfWelfare, 
+	round(AVG(wfRevenue)::numeric,4) AS wfRevenue,
+	round(AVG(wfEF)::numeric,4) AS wfEF,
+	round(AVG(wfEFLoss)::numeric,4) AS wfEFLoss, 
+	round(AVG(wfMC)::numeric,4) AS wfMC,
+	round(AVG(wfMCLoss)::numeric,4) AS wfMCLoss,
+	round(AVG(wfTime)::numeric,4) AS wfTime 
+	FROM waterfall_uniform
+	WHERE n>m AND n <= 10 AND m <=10;
+
 
 SELECT 'singleminded_uniform' AS singleminded_uniform, COUNT(*) FROM singleminded_uniform
 UNION
