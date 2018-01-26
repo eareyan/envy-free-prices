@@ -1,0 +1,154 @@
+\copy (SELECT * FROM unit_demand ORDER BY n,m,p) to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_demand.csv' csv header
+\copy (SELECT * FROM unit_uniform_demand ORDER BY n,m,p) to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_uniform_demand.csv' csv header
+
+\copy tacexperiments to '/home/eareyanv/workspace/envy-free-prices/results/results-tac_demand.csv' csv header
+
+\copy unit_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_demand.csv' csv header
+\copy unit_uniform_demand to '/home/eareyanv/workspace/envy-free-prices/results/results-unit_uniform_demand.csv' csv header
+
+
+\copy fancy_underdemand to '/home/eareyanv/workspace/envy-free-prices/results/results-fancy_underdemand.csv' csv header
+\copy fancy_overdemand to '/home/eareyanv/workspace/envy-free-prices/results/results-fancy_overdemand.csv' csv header
+
+
+##### Single Minded #########
+
+
+SELECT 	round(AVG(approxWelfare)::numeric,4) AS approxWelfare, 
+	round(AVG(approxEF)::numeric,4) AS approxEF,
+	round(AVG(approxTime)::numeric,4) AS approxTime,
+	round(AVG(gwWelfare)::numeric,4) AS gwWelfare, 
+	round(AVG(gwEF)::numeric,4) AS gwEF,
+	round(AVG(gwTime)::numeric,4) AS gwTime,
+	round(AVG(geWelfare)::numeric,4) AS geWelfare, 
+	round(AVG(geEF)::numeric,4) AS geEF,
+	round(AVG(geTime)::numeric,4) AS geTime,
+	round(AVG(owWelfare)::numeric,4) AS owWelfare, 
+	round(AVG(owEF)::numeric,4) AS owEF,
+	round(AVG(owTime)::numeric,4) AS owTime,
+	round(AVG(oeWelfare)::numeric,4) AS oeWelfare,
+	round(AVG(oeEF)::numeric,4) AS oeEF,
+	round(AVG(oeTime)::numeric,4) AS oeTime
+	FROM singleminded
+	WHERE n < m;
+
+SELECT 	round(AVG(approxWelfare)::numeric,4) AS approxWelfare, 
+	round(AVG(approxEF)::numeric,4) AS approxEF,
+	round(AVG(approxTime)::numeric,4) AS approxTime,
+	round(AVG(gwWelfare)::numeric,4) AS gwWelfare, 
+	round(AVG(gwEF)::numeric,4) AS gwEF,
+	round(AVG(gwTime)::numeric,4) AS gwTime,
+	round(AVG(geWelfare)::numeric,4) AS geWelfare, 
+	round(AVG(geEF)::numeric,4) AS geEF,
+	round(AVG(geTime)::numeric,4) AS geTime,
+	round(AVG(owWelfare)::numeric,4) AS owWelfare, 
+	round(AVG(owEF)::numeric,4) AS owEF,
+	round(AVG(owTime)::numeric,4) AS owTime,
+	round(AVG(oeWelfare)::numeric,4) AS oeWelfare,
+	round(AVG(oeEF)::numeric,4) AS oeEF,
+	round(AVG(oeTime)::numeric,4) AS oeTime
+	FROM singleminded
+	WHERE n>m AND n <= 45 AND m <= 45;
+
+
+
+##### TAC Experiments ####
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m < 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m <10;
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m < 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m < 10;
+
+
+
+
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m >= 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.25 OR p = 0.5 AND m >= 10;
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m >= 10;
+
+SELECT 	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments WHERE p = 0.75 OR p = 1.0 AND m >= 10;
+
+
+SELECT 	round(AVG(greedyWelfare)::numeric,4) AS greedyWelfare, 
+	round(AVG(greedyRevenue)::numeric,4) AS greedyRevenue,
+	round(AVG(greedyEF)::numeric,4) AS greedyEF,
+	round(AVG(greedyWE)::numeric,4) AS greedyWE, 
+	round(AVG(greedyTime)::numeric,4) AS greedyTime,
+	round(AVG(optimaWelfare)::numeric,4) AS optimaWelfare, 
+	round(AVG(optimaRevenue)::numeric,4) AS optimaRevenue,
+	round(AVG(optimaEF)::numeric,4) AS optimaEF,
+	round(AVG(optimaWE)::numeric,4) AS optimaWE, 
+	round(AVG(optimaTime)::numeric,4) AS optimaTime
+	FROM tacexperiments;
+
+### Waterfall Results
+
+SELECT 	round(AVG(wfWelfare)::numeric,4) AS wfWelfare, 
+	round(AVG(wfRevenue)::numeric,4) AS wfRevenue,
+	round(AVG(wfEF)::numeric,4) AS wfEF,
+	round(AVG(wfEFLoss)::numeric,4) AS wfEFLoss, 
+	round(AVG(wfMC)::numeric,4) AS wfMC,
+	round(AVG(wfMCLoss)::numeric,4) AS wfMCLoss,
+	round(AVG(wfTime)::numeric,4) AS wfTime 
+	FROM waterfall_uniform
+	WHERE n>m AND n <= 10 AND m <=10;
+
+
+SELECT 'singleminded_uniform' AS singleminded_uniform, COUNT(*) FROM singleminded_uniform
+UNION
+SELECT 'singleminded_elitist' AS singleminded_elitist, COUNT(*) FROM singleminded_elitist
+UNION
+SELECT 'singleton_uniform' AS singleton_uniform, COUNT(*) FROM singleton_uniform
+UNION
+SELECT 'singleton_elitist' AS singleton_elitist, COUNT(*) FROM singleton_elitist
+UNION
+SELECT 'sizeinter_uniform' AS sizeinter_uniform, COUNT(*) FROM sizeinter_uniform
+UNION
+SELECT 'sizeinter_elitist' AS sizeinter_elitist, COUNT(*) FROM sizeinter_elitist
+UNION
+SELECT 'tac' AS tac, COUNT(*) FROM tac; 

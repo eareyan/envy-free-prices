@@ -39,7 +39,7 @@ public class TAC extends Experiments {
    */
   @Override
   public void runOneExperiment(int numGoods, int numBidders, int k, double p, String distribution, SqlDB dbLogger) throws Exception {
-    if (!dbLogger.checkIfRowExists("TAC_", numBidders)) {
+    if (!dbLogger.checkIfRowExists("TAC", numBidders)) {
       System.out.print("\t Adding data... ");
       HashMap<String, DescriptiveStatistics> stats = new HashMap<String, DescriptiveStatistics>();
       for (int i = 0; i < RunParameters.numTrials; i++) {
@@ -61,7 +61,7 @@ public class TAC extends Experiments {
         this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.MaxBidder), "mb", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
-      dbLogger.saveTAC("TAC_", numBidders, stats);
+      dbLogger.saveTAC("TAC", numBidders, stats);
     } else {
       System.out.println("\t Already have data ");
     }
