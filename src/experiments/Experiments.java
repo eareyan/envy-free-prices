@@ -93,8 +93,8 @@ public abstract class Experiments {
     this.getDS(stats, id + "Welfare").addValue(ps.getWelfareRatio(optimalWelfare));
     this.getDS(stats, id + "Revenue").addValue(ps.getSellerRevenueRatio(optimalWelfare));
     this.getDS(stats, id + "Winners").addValue(ps.getNumberOfWinnersRatio(optimalEgalitarian));
-    this.getDS(stats, id + "EF").addValue(ps.getEFViolationsRatio());
-    this.getDS(stats, id + "EFLoss").addValue(ps.getRatioLossUtility());
+    this.getDS(stats, id + "UM").addValue(ps.getEFViolationsRatio());
+    this.getDS(stats, id + "UMLoss").addValue(ps.getRatioLossUtility());
     this.getDS(stats, id + "MC").addValue(ps.getMCViolationsRatio());
     this.getDS(stats, id + "MCLoss").addValue((double) ps.getMarketClearanceViolations().getValue());
     this.getDS(stats, id + "Time").addValue(ps.getTime() / 1000000000.0);

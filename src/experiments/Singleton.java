@@ -42,10 +42,10 @@ public class Singleton extends Experiments {
   @Override
   public void runExperiments(SqlDB dbLogger) throws Exception {
     System.out.println("Singleton Experiments:");
-    for (int n = 2; n < RunParameters.numGoods; n++) {
-      for (int m = 2; m < RunParameters.numBidder; m++) {
-        for (Double p : RunParameters.probabilities) {
-          for (String distribution : RunParameters.distributions) {
+    for (String distribution : RunParameters.distributions) {
+      for (int n = 2; n < RunParameters.numGoods; n++) {
+        for (int m = 2; m < RunParameters.numBidder; m++) {
+          for (Double p : RunParameters.probabilities) {
             System.out.print(distribution + ": (n, m, p) = (" + n + ", " + m + ", " + p + ")");
             this.runOneExperiment(n, m, -1, p, distribution, dbLogger);
           }
