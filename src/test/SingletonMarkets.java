@@ -22,7 +22,7 @@ import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketOutcomeException;
 import algorithms.pricing.error.PrincingAlgoException;
-import allocations.greedy.GreedyAllocation;
+import allocations.greedy.GreedyAllocationFactory;
 import allocations.objectivefunction.SingleStepObjectiveFunction;
 
 import com.google.common.collect.HashBasedTable;
@@ -63,7 +63,7 @@ public class SingletonMarkets {
   public void testSingletonMarket0() throws BidderCreationException, MarketCreationException, AllocationException, GoodsException, MarketAllocationException, IloException, MarketOutcomeException, PrincingAlgoException {
     SingletonMarket<Goods, Bidder<Goods>> market = SingletonMarkets.singletonMarket0();
     System.out.println(market);
-    MarketAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = new GreedyAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(market);
+    MarketAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = GreedyAllocationFactory.<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>GreedyAllocation().Solve(market);
     ga.printAllocation();
     SingletonPricingLP<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> splp = new SingletonPricingLP<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(ga);
     splp.getStatistics().getMarketOutcome().printPrices();

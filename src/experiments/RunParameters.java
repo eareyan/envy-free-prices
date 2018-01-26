@@ -9,12 +9,18 @@ import com.google.common.collect.ImmutableList;
  */
 public class RunParameters {
 
+  /**
+   * Global parameters of the experiments.
+   */
   public static final int numTrials = 100;
-  public static final int numGoods = 21;
-  public static final int numBidder = 21;
+  public static final int numGoods = 10;
+  public static final int numBidder = 10;
   public static final ImmutableList<String> distributions = ImmutableList.of("Uniform", "Elitist");
-  public static final ImmutableList<Double> probabilities = ImmutableList.of(1.0 / 4.0, 2.0 / 4.0, 3.0/4.0, 1.0);
+  public static final ImmutableList<Double> probabilities = ImmutableList.of(1.0 / 4.0, 2.0 / 4.0, 3.0 / 4.0, 1.0);
 
+  /**
+   * Data to interface the DB.
+   */
   public int id;
   public String dbProvider;
   public String dbHost;
@@ -64,8 +70,6 @@ public class RunParameters {
       return new SizeInterchangeable();
     } else if (type.equals("TAC")) {
       return new TAC();
-    } else if (type.equals("latextables")) {
-      return null;
     } else {
       throw new Exception("Unknown demand type");
     }

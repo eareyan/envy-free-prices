@@ -37,8 +37,7 @@ public class TACMarketFactory {
    * @throws BidderCreationException
    * @throws MarketCreationException
    */
-  public static Market<Goods, Bidder<Goods>> RandomTACMarket(int m) throws GoodsCreationException, AdXException, BidderCreationException,
-      MarketCreationException {
+  public static Market<Goods, Bidder<Goods>> RandomTACMarket(int m) throws GoodsCreationException, AdXException, BidderCreationException, MarketCreationException {
     MarketSegmentSampler mss = new MarketSegmentSampler("/home/eareyanv/workspace/history/tac-adx/AdX/adx-server/config/tac13adx_sim.conf");
     mss.pContinue = 0.3;
     mss.samplePublishers();

@@ -26,6 +26,7 @@ import algorithms.pricing.error.PrincingAlgoException;
 import algorithms.pricing.reserveprices.RevMaxHeuristic;
 import allocations.error.AllocationAlgoException;
 import allocations.greedy.GreedyAllocation;
+import allocations.greedy.GreedyAllocationFactory;
 import allocations.optimal.WelfareMaxAllocationILP;
 
 public class RevMaxHeuristicTest<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> {
@@ -37,7 +38,7 @@ public class RevMaxHeuristicTest<M extends Market<G, B>, G extends Goods, B exte
         for (int p = 1; p <= 4; p++) {
           // SingletonMarket<Goods, Bidder<Goods>> market = SingletonMarketFactory.uniformRewardSingletonRandomMarket(n, m, p*0.25);
           SingletonMarket<Goods, Bidder<Goods>> market = SingletonMarketFactory.elitistRewardSingletonRandomMarket(n, m, p * 0.25);
-          GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+          GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = GreedyAllocationFactory.GreedyAllocation();
           PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> stat = new RestrictedEnvyFreePricesLP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
               ga.Solve(market)).getStatistics();
           PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> rmhStats = new RevMaxHeuristic(market, ga).getStatistics();
@@ -62,7 +63,7 @@ public class RevMaxHeuristicTest<M extends Market<G, B>, G extends Goods, B exte
   @Test
   public void test() throws BidderCreationException, MarketCreationException, AllocationException, GoodsException, MarketAllocationException,
       AllocationAlgoException, IloException, PrincingAlgoException, MarketOutcomeException {
-    GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> greedy = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+    GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> greedy = GreedyAllocationFactory.GreedyAllocation();
     WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> optimal = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
 
     //Market<Goods, Bidder<Goods>> market = SizeInterchangeableMarkets.market0();

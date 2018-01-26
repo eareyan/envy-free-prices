@@ -8,8 +8,6 @@ import structures.Bidder;
 import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.comparators.BiddersComparatorByRToSqrtIRatio;
-import structures.comparators.GoodsComparatorByRemainingSupply;
 import structures.exceptions.AllocationException;
 import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
@@ -19,7 +17,9 @@ import allocations.objectivefunction.SingleStepObjectiveFunction;
 import com.google.common.collect.HashBasedTable;
 
 /**
- * This class implements greedy allocation.
+ * This class implements greedy allocation algorithm. The class is parameterized so that a comparator of bidders and goods is received as a parameter. An extra
+ * parameter, maxNumberAllocatedBidders caps the number of allowable allocated bidders. This parameter is used to implement a variant where only the bidder with
+ * highest value is allocated. This algorithm has an approximation ratio of m (number of bidders) w.r.t the optimal welfare.
  * 
  * @author Enrique Areyan Viqueira
  */
@@ -28,66 +28,39 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
   /**
    * Bidder comparator.
    */
-  protected Comparator<B> BidderComparator;
+  private final Comparator<B> BidderComparator;
 
   /**
    * Goods comparator
    */
-  protected Comparator<G> GoodsComparator;
+  private final Comparator<G> GoodsComparator;
   
   /**
-   * Default goods ordering
+   * Default cap on the number of allocated bidders.
    */
-  private final static int ascendingGoodsOrder = 1;
+  private final int maxNumberAllocatedBidders;
   
-  /**
-   * Constructor.
-   * Takes in a bidder comparator and uses the default goods comparator.
-   * @param BidderComparator
-   */
-  public GreedyAllocation(Comparator<B> BidderComparator) {
-    this.BidderComparator = BidderComparator;
-    this.GoodsComparator = new GoodsComparatorByRemainingSupply<G>(GreedyAllocation.ascendingGoodsOrder);
-  }
-
   /**
    * Constructor.
    * 
-   * @param BidderComparator - a comparator to order bidders.
-   * @param GoodsSupplyComparator - a comparator to order goods.
+   * @param BidderComparator
+   * @param GoodsSupplyComparator
+   * @param maxNumberAllocatedBidders
    */
-  public GreedyAllocation(Comparator<B> BidderComparator, Comparator<G> GoodsSupplyComparator) {
+  public GreedyAllocation(Comparator<B> BidderComparator, Comparator<G> GoodsSupplyComparator, int maxNumberAllocatedBidders) {
     this.BidderComparator = BidderComparator;
     this.GoodsComparator = GoodsSupplyComparator;
+    this.maxNumberAllocatedBidders = maxNumberAllocatedBidders;
   }
 
-  /**
-   * Constructor.
-   * 
-   * @param goodsOrder - order of remaining good supply. is 1 means ASC and -1 means
-   *          DESC, any other means no order
-   */
-  public GreedyAllocation(int goodsOrder) {
-    this.BidderComparator = new BiddersComparatorByRToSqrtIRatio<G, B>();
-    this.GoodsComparator = new GoodsComparatorByRemainingSupply<G>(goodsOrder);
-  }
-  
-  /**
-   * Constructor.
-   * Default ordering of bidders is by reward to square root of demand ratio.
-   * Default ordering of goods is by ascending order of remaining supply.
-   */
-  public GreedyAllocation() {
-    this(GreedyAllocation.ascendingGoodsOrder);
-  }
-  
   /**
    * Solve for the greedy allocation.
    * 
-   * @param market - the market object to allocate.
-   * @throws AllocationException 
-   * @throws GoodsException 
-   * @throws MarketAllocationException 
+   * @param market
+   *          - the market object to allocate.
+   * @throws AllocationException
+   * @throws GoodsException
+   * @throws MarketAllocationException
    */
   public MarketAllocation<M, G, B> Solve(M market) throws AllocationException, GoodsException, MarketAllocationException {
     // MAKE SHALLOW COPY OF BIDDERS - that is OK, you get the pointers anyway,
@@ -99,18 +72,18 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
     ArrayList<G> goods = new ArrayList<G>(market.getGoods());
     // Set the remaining supply of each good to be their initial supply.
     // This will be used to sort the users.
-    for(G good : goods){
+    for (G good : goods) {
       good.setRemainingSupply(good.getSupply());
     }
     // Make the ArrayList that will store the result of the algorithm.
-    // The allocation is zero at the beginning. 
+    // The allocation is zero at the beginning.
     HashBasedTable<G, B, Integer> greedyAllocation = HashBasedTable.create();
-    for(G good : market.getGoods()){
-      for(B bidder : market.getBidders()){
+    for (G good : market.getGoods()) {
+      for (B bidder : market.getBidders()) {
         greedyAllocation.put(good, bidder, 0);
       }
     }
-    
+    int totalAllocatedBidders = 0;
     // Allocate each bidder, if possible, one at a time.
     for (B bidder : bidders) {
       int totalAvailableSupply = 0;
@@ -127,9 +100,9 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
         // Try to allocate goods to this bidder, one good at the time.
         int totalAllocationToBidderSoFar = 0;
         for (G good : goods) {
-          // If the bidder is not completely allocated. 
-          if (totalAllocationToBidderSoFar < bidder.getDemand()){
-            // If good is in the bidder demand set, AND there is supply 
+          // If the bidder is not completely allocated.
+          if (totalAllocationToBidderSoFar < bidder.getDemand()) {
+            // If good is in the bidder demand set, AND there is supply
             // remaining from this good.
             if (bidder.demandsGood(good) && good.getRemainingSupply() > 0) {
               int amount = Math.min(bidder.getDemand() - totalAllocationToBidderSoFar, good.getRemainingSupply());
@@ -137,11 +110,15 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
               good.setRemainingSupply(good.getRemainingSupply() - amount);
               totalAllocationToBidderSoFar += amount;
             }
-          }else{
+          } else {
             // Optimization: If the bidder is already allocated, move on to the next bidder.
             break;
           }
         }
+      }
+      totalAllocatedBidders++;
+      if(totalAllocatedBidders + 1 > this.maxNumberAllocatedBidders) {
+        break;
       }
     }
     return new MarketAllocation<M, G, B>(market, greedyAllocation, this.getObjectiveFunction());
@@ -151,9 +128,9 @@ public class GreedyAllocation<M extends Market<G, B>, G extends Goods, B extends
   public SingleStepObjectiveFunction getObjectiveFunction() {
     return new SingleStepObjectiveFunction();
   }
-  
+
   @Override
-  public String toString(){
+  public String toString() {
     return "GreedyAllocation which always uses SingleStepFunction objective";
   }
 

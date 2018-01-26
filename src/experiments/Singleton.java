@@ -1,18 +1,13 @@
 package experiments;
 
+import ilog.concert.IloException;
+
 import java.util.HashMap;
+
+import log.SqlDB;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import algorithms.pricing.error.PrincingAlgoException;
-import algorithms.pricing.reserveprices.RevMaxHeuristic;
-import allocations.error.AllocationAlgoException;
-import allocations.greedy.GreedyAllocation;
-import allocations.interfaces.AllocationAlgo;
-import allocations.optimal.EgalitarianMaxAllocationILP;
-import allocations.optimal.WelfareMaxAllocationILP;
-import ilog.concert.IloException;
-import log.SqlDB;
 import singleton.algorithms.SingletonEVP;
 import singleton.structures.SingletonMarket;
 import statistics.PricesStatistics;
@@ -20,7 +15,6 @@ import structures.Bidder;
 import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.comparators.BiddersComparatorBy1ToSqrtIRatio;
 import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsException;
@@ -28,6 +22,14 @@ import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
 import structures.exceptions.MarketOutcomeException;
 import structures.factory.SingletonMarketFactory;
+import waterfall.Waterfall;
+import algorithms.pricing.error.PrincingAlgoException;
+import algorithms.pricing.reserveprices.RevMaxHeuristic;
+import allocations.error.AllocationAlgoException;
+import allocations.greedy.GreedyAllocationFactory;
+import allocations.interfaces.AllocationAlgo;
+import allocations.optimal.EgalitarianMaxAllocationILP;
+import allocations.optimal.WelfareMaxAllocationILP;
 
 public class Singleton extends Experiments {
 
@@ -63,7 +65,7 @@ public class Singleton extends Experiments {
       System.out.print("\t Adding data... ");
       HashMap<String, DescriptiveStatistics> stats = new HashMap<String, DescriptiveStatistics>();
       for (int i = 0; i < RunParameters.numTrials; i++) {
-        // Generate Single-minded random market.
+        // Generate Singleton random market.
         SingletonMarket<Goods, Bidder<Goods>> M = this.getSingletonMarket(numGoods, numBidders, p, distribution);
         // Optimal Utilitarian Allocation.
         MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> utilitarianMaxAlloc = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(M);
@@ -77,6 +79,8 @@ public class Singleton extends Experiments {
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.WaterFall), "wf", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.MaxBidder), "gm", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
       dbLogger.saveSingleton("singleton_" + distribution, numGoods, numBidders, p, stats);
@@ -126,16 +130,22 @@ public class Singleton extends Experiments {
     AllocationAlgo<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> allocAlgo = null;
     switch (whichAllocAlgo) {
     case GreedyWelfare:
-      allocAlgo = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      allocAlgo = GreedyAllocationFactory.GreedyAllocation();
       break;
     case GreedyEgalitarian:
-      allocAlgo = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(new BiddersComparatorBy1ToSqrtIRatio<Goods, Bidder<Goods>>());
+      allocAlgo = GreedyAllocationFactory.GreedyEgalitarianAllocation();
       break;
     case OptimalWelfare:
       allocAlgo = new WelfareMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     case OptimalEgalitarian:
       allocAlgo = new EgalitarianMaxAllocationILP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      break;
+    case WaterFall:
+      allocAlgo = new Waterfall<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(market);
+      break;
+    case MaxBidder:
+      allocAlgo = GreedyAllocationFactory.GreedyMaxBidderAllocation();
       break;
     }
     return new RevMaxHeuristic(market, allocAlgo).getStatistics();

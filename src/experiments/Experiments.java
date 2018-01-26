@@ -28,7 +28,7 @@ import allocations.error.AllocationAlgoException;
 public abstract class Experiments {
   
   public enum Allocations {
-    GreedyWelfare, GreedyEgalitarian, OptimalWelfare, OptimalEgalitarian, WaterFall
+    GreedyWelfare, GreedyEgalitarian, OptimalWelfare, OptimalEgalitarian, WaterFall, MaxBidder
   }
 
   /**

@@ -21,6 +21,7 @@ public class TACMarketFactoryTest {
         total += TACMarketFactory.RandomTACMarket(m).getSupplyToDemandRatio();
       }
       System.out.println(m + " = " + (total / 10.0));
+      System.out.println(TACMarketFactory.RandomTACMarket(2));
     }
   }
   

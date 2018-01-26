@@ -91,7 +91,7 @@ public class GreedyMultiStepAllocation<M extends Market<G, B>, G extends Goods, 
      * First, compute a queue of goods. A good's remaining supply is set to its
      * initial supply.
      */
-    PriorityQueue<G> goodsQueue = new PriorityQueue<G>(new GoodsComparatorByRemainingSupply<G>(1));
+    PriorityQueue<G> goodsQueue = new PriorityQueue<G>(new GoodsComparatorByRemainingSupply<G>(GoodsComparatorByRemainingSupply.Order.ascending));
     for (G good : market.getGoods()) {
       good.setRemainingSupply(good.getSupply());
       goodsQueue.add(good);

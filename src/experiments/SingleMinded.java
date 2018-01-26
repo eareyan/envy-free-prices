@@ -9,7 +9,6 @@ import log.SqlDB;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import singleminded.algorithms.SingleMindedApproxWE;
-import singleminded.algorithms.SingleMindedGreedyAllocation;
 import singleminded.algorithms.SingleMindedPricingLP;
 import singleminded.algorithms.UnlimitedSupplyApproximation;
 import singleminded.structures.SingleMindedMarket;
@@ -18,14 +17,15 @@ import structures.Bidder;
 import structures.Goods;
 import structures.Market;
 import structures.MarketAllocation;
-import structures.comparators.BiddersComparatorBy1ToSqrtIRatio;
 import structures.exceptions.AllocationException;
 import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
 import structures.factory.SingleMindedMarketFactory;
+import waterfall.Waterfall;
 import algorithms.pricing.error.PrincingAlgoException;
 import allocations.error.AllocationAlgoException;
+import allocations.greedy.GreedyAllocationFactory;
 import allocations.interfaces.AllocationAlgo;
 import allocations.optimal.EgalitarianMaxAllocationILP;
 import allocations.optimal.WelfareMaxAllocationILP;
@@ -79,6 +79,8 @@ public class SingleMinded extends Experiments {
         this.populateStats(stats, this.getLPMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, this.getLPMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, this.getLPMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.WaterFall), "wf", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getLPMarketPrices(M, Allocations.MaxBidder), "mb", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
       dbLogger.saveSingleMinded("singleminded_" + distribution, numGoods, numBidders, k, stats);
@@ -128,17 +130,22 @@ public class SingleMinded extends Experiments {
     AllocationAlgo<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> allocAlgo = null;
     switch (whichAllocAlgo) {
     case GreedyWelfare:
-      allocAlgo = new SingleMindedGreedyAllocation<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      allocAlgo = GreedyAllocationFactory.<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>GreedyAllocation();
       break;
     case GreedyEgalitarian:
-      allocAlgo = new SingleMindedGreedyAllocation<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(
-          new BiddersComparatorBy1ToSqrtIRatio<Goods, Bidder<Goods>>());
+      allocAlgo = GreedyAllocationFactory.<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>GreedyEgalitarianAllocation();
       break;
     case OptimalWelfare:
       allocAlgo = new WelfareMaxAllocationILP<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
       break;
     case OptimalEgalitarian:
       allocAlgo = new EgalitarianMaxAllocationILP<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
+      break;
+    case WaterFall:
+      allocAlgo = new Waterfall<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(market);
+      break;
+    case MaxBidder:
+      allocAlgo = GreedyAllocationFactory.<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>GreedyMaxBidderAllocation();
       break;
     }
     long startTime = System.nanoTime();

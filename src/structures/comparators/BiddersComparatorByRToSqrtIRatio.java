@@ -13,10 +13,10 @@ import structures.Goods;
 public class BiddersComparatorByRToSqrtIRatio<G extends Goods, B extends Bidder<G>> implements Comparator<B> {
 
   @Override
-  public int compare(B c1, B c2) {
-    if (c1.getReward() / Math.sqrt(c1.getDemand()) < c2.getReward() / Math.sqrt(c2.getDemand())) {
+  public int compare(B b1, B b2) {
+    if (b1.getReward() / Math.sqrt(b1.getDemand()) < b2.getReward() / Math.sqrt(b2.getDemand())) {
       return 1;
-    } else if (c1.getReward() / Math.sqrt(c1.getDemand()) > c2.getReward() / Math.sqrt(c2.getDemand())) {
+    } else if (b1.getReward() / Math.sqrt(b1.getDemand()) > b2.getReward() / Math.sqrt(b2.getDemand())) {
       return -1;
     }
     return 0;

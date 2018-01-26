@@ -10,13 +10,13 @@ import structures.Goods;
  * 
  * @author Enrique Areyan Viqueira
  */
-public class BiddersComparatorByReward implements Comparator<Bidder<Goods>> {
+public class BiddersComparatorByReward<G extends Goods, B extends Bidder<G>> implements Comparator<B> {
 
   @Override
-  public int compare(Bidder<Goods> c1, Bidder<Goods> c2) {
-    if (c1.getReward() < c2.getReward()) {
+  public int compare(B b1, B b2) {
+    if (b1.getReward() < b2.getReward()) {
       return 1;
-    } else if (c1.getReward() > c2.getReward()) {
+    } else if (b1.getReward() > b2.getReward()) {
       return -1;
     }
     return 0;

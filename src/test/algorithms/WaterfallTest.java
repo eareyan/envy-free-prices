@@ -15,7 +15,6 @@ import test.SizeInterchangeableMarkets;
 import waterfall.Waterfall;
 import waterfall.WaterfallSolution;
 import allocations.error.AllocationAlgoException;
-import allocations.optimal.OptimalAllocILP;
 import allocations.optimal.WelfareMaxAllocationILP;
 
 public class WaterfallTest {

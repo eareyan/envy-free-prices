@@ -26,7 +26,7 @@ public class TAC extends Experiments {
   @Override
   public void runExperiments(SqlDB dbLogger) throws Exception {
     System.out.println("TAC Experiments:");
-    for (int m = 2; m < 101; m++) {
+    for (int m = 2; m < 21; m++) {
       System.out.print("TAC : m = (" + m + ")");
       this.runOneExperiment(-1, m, -1, -1.0, "", dbLogger);
     }
@@ -57,6 +57,8 @@ public class TAC extends Experiments {
         this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.GreedyEgalitarian), "ge", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.WaterFall), "wf", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, SizeInterchangeable.getRevMaxMarketPrices(M, Allocations.MaxBidder), "mb", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
       dbLogger.saveTAC("TAC_", numBidders, stats);

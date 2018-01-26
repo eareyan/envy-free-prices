@@ -11,7 +11,7 @@ import structures.Market;
 import structures.MarketAllocation;
 import structures.factory.RandomMarketFactory;
 import algorithms.pricing.RestrictedEnvyFreePricesLP;
-import allocations.greedy.GreedyAllocation;
+import allocations.greedy.GreedyAllocationFactory;
 
 public class RestrictedEnvyFreePricesLPTest {
 
@@ -21,7 +21,7 @@ public class RestrictedEnvyFreePricesLPTest {
       for (int m = 1; m < 10; m++) {
         for (int p = 1; p <= 4; p++) {
           Market<Goods, Bidder<Goods>> market = RandomMarketFactory.randomUniformRewardMarket(n, m, p * 0.25);
-          MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = new GreedyAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(market);
+          MarketAllocation<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = GreedyAllocationFactory.GreedyAllocation().Solve(market);
           PricesStatistics<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> refp = new RestrictedEnvyFreePricesLP<Market<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(ga).getStatistics();
           if (refp.listOfEnvyBidders() == null) {
             fail("Null list");

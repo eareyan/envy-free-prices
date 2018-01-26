@@ -13,10 +13,10 @@ import structures.Goods;
 public class BiddersComparatorByRewardToImpressionsRatio implements Comparator<Bidder<Goods>> {
 
   @Override
-  public int compare(Bidder<Goods> c1, Bidder<Goods> c2) {
-    if (c1.getReward() / c1.getDemand() < c2.getReward() / c2.getDemand()) {
+  public int compare(Bidder<Goods> b1, Bidder<Goods> b2) {
+    if (b1.getReward() / b1.getDemand() < b2.getReward() / b2.getDemand()) {
       return 1;
-    } else if (c1.getReward() / c1.getDemand() > c2.getReward() / c2.getDemand()) {
+    } else if (b1.getReward() / b1.getDemand() > b2.getReward() / b2.getDemand()) {
       return -1;
     }
     return 0;

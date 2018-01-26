@@ -12,41 +12,44 @@ import structures.Goods;
 public class GoodsComparatorByRemainingSupply<G extends Goods> implements Comparator<G> {
 
   /**
-   * order 1 means ASC and -1 means DESC, any other means no order
+   * Define ordering enum.
    */
-  protected int Order = 0;
+  public static enum Order {
+    ascending, descending
+  }
+
+  /**
+   * The actual ordering used in an instance of this class.
+   */
+  private final Order order;
 
   /**
    * Constructor.
    * 
    * @param Order - the order in which to order goods.
    */
-  public GoodsComparatorByRemainingSupply(int Order) {
-    this.Order = Order;
-  }
-
-  /**
-   * Constructor.
-   */
-  public GoodsComparatorByRemainingSupply() {
-
+  public GoodsComparatorByRemainingSupply(Order order) {
+    this.order = order;
   }
 
   @Override
-  public int compare(G U1, G U2) {
-    if (this.Order == -1) {
-      if (U1.getRemainingSupply() < U2.getRemainingSupply()) {
+  public int compare(G g1, G g2) {
+    // Descending order of remaining supply.
+    if (this.order == Order.descending) {
+      if (g1.getRemainingSupply() < g2.getRemainingSupply()) {
         return 1;
-      } else if (U1.getRemainingSupply() > U2.getRemainingSupply()) {
+      } else if (g1.getRemainingSupply() > g2.getRemainingSupply()) {
         return -1;
       }
-    } else if (this.Order == 1) {
-      if (U1.getRemainingSupply() < U2.getRemainingSupply()) {
+    } else if (this.order == Order.ascending) {
+      // Ascending order of remaining supply.
+      if (g1.getRemainingSupply() < g2.getRemainingSupply()) {
         return -1;
-      } else if (U1.getRemainingSupply() > U2.getRemainingSupply()) {
+      } else if (g1.getRemainingSupply() > g2.getRemainingSupply()) {
         return 1;
       }
     }
+    // Does not order.
     return 0;
   }
 

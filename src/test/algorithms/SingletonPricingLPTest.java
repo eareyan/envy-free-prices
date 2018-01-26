@@ -11,7 +11,7 @@ import structures.Bidder;
 import structures.Goods;
 import structures.MarketAllocation;
 import structures.factory.SingletonMarketFactory;
-import allocations.greedy.GreedyAllocation;
+import allocations.greedy.GreedyAllocationFactory;
 
 public class SingletonPricingLPTest {
 
@@ -22,7 +22,7 @@ public class SingletonPricingLPTest {
         for (int p = 1; p <= 4; p++) {
           try {
             SingletonMarket<Goods, Bidder<Goods>> market = SingletonMarketFactory.elitistRewardSingletonRandomMarket(n, m, p * 0.25);
-            MarketAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = new GreedyAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(market);
+            MarketAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = GreedyAllocationFactory.<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>GreedyAllocation().Solve(market);
             PricesStatistics<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> stat = new SingletonPricingLP<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(ga).getStatistics();
             stat.getSellerRevenue();
           } catch (Exception e) {
@@ -38,7 +38,7 @@ public class SingletonPricingLPTest {
     for (int n = 1; n < 10; n++) {
       for (int m = 1; m < 10; m++) {
         SingletonMarket<Goods, Bidder<Goods>> market = SingletonMarketFactory.uniformRewardSingletonRandomMarket(n, m, 1.0);
-        MarketAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = new GreedyAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>().Solve(market);
+        MarketAllocation<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> ga = GreedyAllocationFactory.<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>GreedyAllocation().Solve(market);
         PricesStatistics<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> stat = new SingletonPricingLP<SingletonMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>(ga).getStatistics();
         double price = stat.getMarketOutcome().getPrice(market.getGoods().get(0));
         for (Goods good : market.getGoods()) {

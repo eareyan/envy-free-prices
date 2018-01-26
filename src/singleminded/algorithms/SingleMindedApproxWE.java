@@ -71,7 +71,7 @@ public class SingleMindedApproxWE {
     this.p = new double[this.market.getNumberGoods()];
     // Make an ArrayList of BidderReward so that we can order the rewards.
     this.listOfBidders = new ArrayList<Bidder<Goods>>(this.market.getBidders());
-    Collections.sort(this.listOfBidders, new BiddersComparatorByReward());
+    Collections.sort(this.listOfBidders, new BiddersComparatorByReward<Goods, Bidder<Goods>>());
   }
 
   /**
