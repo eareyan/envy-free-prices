@@ -80,7 +80,7 @@ public class Singleton extends Experiments {
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalWelfare), "ow", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.OptimalEgalitarian), "oe", optimalWelfare, optimalEgalitarian);
         this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.WaterFall), "wf", optimalWelfare, optimalEgalitarian);
-        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.MaxBidder), "gm", optimalWelfare, optimalEgalitarian);
+        this.populateStats(stats, this.getRevMaxMarketPrices(M, Allocations.MaxBidder), "mb", optimalWelfare, optimalEgalitarian);
       }
       System.out.println("done!");
       dbLogger.saveSingleton("singleton_" + distribution, numGoods, numBidders, p, stats);
