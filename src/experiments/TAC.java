@@ -26,7 +26,7 @@ public class TAC extends Experiments {
   @Override
   public void runExperiments(SqlDB dbLogger) throws Exception {
     System.out.println("TAC Experiments:");
-    for (int m = 2; m < 21; m++) {
+    for (int m = 2; m <= 20; m++) {
       System.out.print("TAC : m = (" + m + ")");
       this.runOneExperiment(-1, m, -1, -1.0, "", dbLogger);
     }

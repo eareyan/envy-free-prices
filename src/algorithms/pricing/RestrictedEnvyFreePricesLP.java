@@ -32,7 +32,7 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
   /**
    * Boolean to control whether or not to output information.
    */
-  protected boolean verbose = false;
+  protected boolean verbose = true;
 
   /**
    * Market Allocation Object. Contains the market and the allocation.

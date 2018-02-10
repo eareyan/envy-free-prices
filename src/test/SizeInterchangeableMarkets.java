@@ -285,5 +285,26 @@ public class SizeInterchangeableMarkets {
     return new Market<Goods, Bidder<Goods>>(goods, bidders);
 
   }
+  
+  public static Market<Goods, Bidder<Goods>> market10() throws GoodsCreationException, BidderCreationException, MarketCreationException {
+    ArrayList<Goods> goods = new ArrayList<Goods>();
+    goods.add(new Goods(2));
+    goods.add(new Goods(2));
+
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
+    HashSet<Goods> b1DemandSet = new HashSet<Goods>();
+    b1DemandSet.add(goods.get(0));
+    b1DemandSet.add(goods.get(1));
+
+    HashSet<Goods> b2DemandSet = new HashSet<Goods>();
+    b2DemandSet.add(goods.get(0));
+    b2DemandSet.add(goods.get(1));
+
+    bidders.add(new Bidder<Goods>(3, 100, b1DemandSet));
+    bidders.add(new Bidder<Goods>(2, 200, b2DemandSet));
+
+    return new Market<Goods, Bidder<Goods>>(goods, bidders);
+
+  }
 
 }
