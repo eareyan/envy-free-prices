@@ -14,8 +14,8 @@ import structures.Bidder;
 import structures.Goods;
 import structures.MarketAllocation;
 import structures.exceptions.MarketAllocationException;
-import structures.factory.RewardsGenerator;
 import structures.factory.SingleMindedMarketFactory;
+import structures.rewardfunctions.UniformRewardFunction;
 import util.Cplex;
 
 import com.google.common.collect.HashBasedTable;
@@ -43,7 +43,7 @@ public class SingleMindedTrueEFTests {
   public static void TrueEF(int n, int m, double p) throws Exception {
 
     // Create a random single minded market
-    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomParametrizedSingleMindedMarket(n, m, p, RewardsGenerator.getRandomUniformRewardFunction());
+    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.createRandomParametrizedSingleMindedMarket(n, m, p, UniformRewardFunction.singletonInstance);
     System.out.println(market);
 
     // Solve for each feasible allocation

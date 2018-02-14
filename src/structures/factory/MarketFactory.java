@@ -2,7 +2,6 @@ package structures.factory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.Callable;
 
 import structures.Bidder;
 import structures.Goods;
@@ -10,6 +9,7 @@ import structures.Market;
 import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsCreationException;
 import structures.exceptions.MarketCreationException;
+import structures.rewardfunctions.RewardsGeneratorInterface;
 
 /**
  * Markets can be created in different ways. This class implements methods to create Market Objects.
@@ -56,9 +56,11 @@ public class MarketFactory {
    * 
    * @param market - a Market object
    * @return a market object with bidders and goods interchanged.
-   * @throws Exception
+   * @throws GoodsCreationException 
+   * @throws BidderCreationException 
+   * @throws MarketCreationException 
    */
-  public static Market<Goods, Bidder<Goods>> transposeMarket(Market<Goods, Bidder<Goods>> market, Callable<Double> rewardFunction) throws Exception {
+  public static Market<Goods, Bidder<Goods>> transposeMarket(Market<Goods, Bidder<Goods>> market, RewardsGeneratorInterface rewardFunction) throws GoodsCreationException, BidderCreationException, MarketCreationException {
     // For each bidder of the input market, create a good.
     ArrayList<Goods> goods = new ArrayList<Goods>();
     for (Bidder<Goods> bidder : market.getBidders()) {
@@ -74,7 +76,7 @@ public class MarketFactory {
           bDemandSet.add(goods.get(j));
         }
       }
-      bidders.add(new Bidder<Goods>(market.getGoods().get(i).getSupply(), rewardFunction.call(), bDemandSet));
+      bidders.add(new Bidder<Goods>(market.getGoods().get(i).getSupply(), rewardFunction.getReward(), bDemandSet));
     }
     return new Market<Goods, Bidder<Goods>>(goods, bidders);
   }

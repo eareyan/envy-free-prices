@@ -1,8 +1,7 @@
 package test.factory;
 
-import static org.junit.Assert.*;
-
-import java.util.concurrent.Callable;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -11,15 +10,16 @@ import structures.Goods;
 import structures.Market;
 import structures.factory.Parameters;
 import structures.factory.RandomMarketFactory;
-import structures.factory.RewardsGenerator;
+import structures.rewardfunctions.ElitistRewardFunction;
+import structures.rewardfunctions.UniformRewardFunction;
 
 public class RandomMarketFactoryTest {
 
   @Test
   public void testRewardGeneration0() throws Exception {
-    Callable<Double> x = RewardsGenerator.getRandomUniformRewardFunction();
+    UniformRewardFunction uniformRewardFunction = UniformRewardFunction.singletonInstance;
     for (int i = 0; i < 1000; i++) {
-      double reward = x.call();
+      double reward = uniformRewardFunction.getReward();
       if (reward < Parameters.defaultMinReward || reward > Parameters.defaultMaxReward) {
         fail("The uniform reward drawn was: " + reward + ", but the reward must be in [" + Parameters.defaultMinReward + "," + Parameters.defaultMaxReward + "]");
       }
@@ -28,9 +28,9 @@ public class RandomMarketFactoryTest {
 
   @Test
   public void testRewardGeneration1() throws Exception {
-    Callable<Double> x = RewardsGenerator.getElitistRewardFunction();
+    ElitistRewardFunction elitistRewardFunction = ElitistRewardFunction.singletonInstance;
     for (int i = 0; i < 1000; i++) {
-      double reward = x.call();
+      double reward = elitistRewardFunction.getReward();
       if (reward < 0) {
         fail("The elitist reward drawn was: " + reward + ", but it cannot be less than zero.");
       }
@@ -58,34 +58,34 @@ public class RandomMarketFactoryTest {
   public void testGenerateUniformOverDemandedMarket() throws Exception {
     for (int i = 0; i < 1000; i++) {
       Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverDemandedMarket(10, 10, 1.0, 3);
-      //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
+      // System.out.println(market + "\n" + market.getSupplyToDemandRatio());
       assertTrue(market.getSupplyToDemandRatio() == 1.0 / 3.0);
     }
   }
-  
+
   @Test
   public void testGenerateUniformUnderDemandedMarket() throws Exception {
     for (int i = 0; i < 1000; i++) {
       Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateUniformRewardOverSuppliedMarket(10, 10, 1.0, 3);
-      //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
+      // System.out.println(market + "\n" + market.getSupplyToDemandRatio());
       assertTrue(market.getSupplyToDemandRatio() == 3.0);
     }
   }
-  
+
   @Test
   public void testGenerateElitistOverDemandedMarket() throws Exception {
     for (int i = 0; i < 1000; i++) {
       Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateElitistRewardOverDemandedMarket(10, 10, 1.0, 3);
-      //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
+      // System.out.println(market + "\n" + market.getSupplyToDemandRatio());
       assertTrue(market.getSupplyToDemandRatio() == 1.0 / 3.0);
     }
   }
-  
+
   @Test
   public void testGenerateElitistUnderDemandedMarket() throws Exception {
     for (int i = 0; i < 1000; i++) {
       Market<Goods, Bidder<Goods>> market = RandomMarketFactory.generateElitistRewardOverSuppliedMarket(10, 10, 1.0, 3);
-      //System.out.println(market + "\n" + market.getSupplyToDemandRatio());
+      // System.out.println(market + "\n" + market.getSupplyToDemandRatio());
       assertTrue(market.getSupplyToDemandRatio() == 3.0);
     }
   }

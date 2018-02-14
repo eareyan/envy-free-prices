@@ -1,5 +1,6 @@
 package singleminded.algorithms.complete;
 
+import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
 import ilog.cplex.IloCplex;
@@ -15,9 +16,23 @@ import util.Cplex;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
+/**
+ * Implements the LP to maximize EFP prices under the assumption of some bidders beign winners. The LP could be infeasible.
+ * 
+ * @author Enrique Areyan Viqueira
+ */
 public class LP {
 
-  public static LPSolution solve(SingleMindedMarket<Goods, Bidder<Goods>> market, HashMap<Bidder<Goods>, Boolean> allocation) throws Exception {
+  /**
+   * Solve the LP.
+   * 
+   * @param market
+   * @param winners - all other bidders outside this set are assumed to be losers.
+   * @return
+   * @throws IloException 
+   * @throws Exception
+   */
+  public static LPSolution solve(SingleMindedMarket<Goods, Bidder<Goods>> market, HashSet<Bidder<Goods>> winners) throws LPException, IloException {
     IloCplex cplex = Cplex.getCplex();
     cplex.setOut(null);
     // Create a map from goods to a numbers. This gives ordering of the goods.
@@ -28,12 +43,12 @@ public class LP {
     IloNumVar[] prices = cplex.numVarArray(market.getNumberGoods(), 0.0, Double.MAX_VALUE);
     // Create constraints
     for (Bidder<Goods> bidder : market.getBidders()) {
-      //System.out.println("bidder " + bidder + " is a winner = " + allocation.get(bidder));
+      // System.out.println("bidder " + bidder + " is a winner = " + winners.contains(bidder));
       IloLinearNumExpr expr = cplex.linearNumExpr();
       for (Goods good : bidder.getDemandSet()) {
         expr.addTerm(1.0, prices[goodToPriceIndex.get(good)]);
       }
-      if (allocation.get(bidder)) {
+      if (winners.contains(bidder)) {
         // If the bidder is a winner, enforce IR.
         cplex.addGe(bidder.getReward(), expr);
       } else {
@@ -51,13 +66,13 @@ public class LP {
     IloLinearNumExpr expr = cplex.linearNumExpr();
     for (Bidder<Goods> bidder : market.getBidders()) {
       // Add the price of only goods that are actually allocated.
-      if (allocation.get(bidder)) {
+      if (winners.contains(bidder)) {
         for (Goods good : bidder.getDemandSet()) {
           if (!coveredGoods.contains(good)) {
             coveredGoods.add(good);
             expr.addTerm(1.0, prices[goodToPriceIndex.get(good)]);
           } else {
-            throw new Exception("There are two bidders that demand the same good and they are both winners!");
+            throw new LPException("There are two bidders that demand the same good and they are both winners!");
           }
         }
       }
@@ -65,8 +80,8 @@ public class LP {
     cplex.addMaximize(expr);
     // Solve the LP.
     if (cplex.solve()) {
-      //System.out.println("Status = " + cplex.getStatus());
-      //System.out.println("ObjValue = " + cplex.getObjValue());
+      // System.out.println("Status = " + cplex.getStatus());
+      // System.out.println("ObjValue = " + cplex.getObjValue());
       double[] LP_Prices = cplex.getValues(prices);
       Builder<Goods, Double> result = ImmutableMap.<Goods, Double> builder();
       for (Goods good : market.getGoods()) {
@@ -79,11 +94,11 @@ public class LP {
       // return new LPSolution(LPSolution.Status.Unbounded, null, Double.NEGATIVE_INFINITY);
       // }
       if (!cplex.isPrimalFeasible()) {
-        System.out.println("Primal is infeasible! - discovered during presolve");
+        // System.out.println("Primal is infeasible! - discovered during presolve");
         return new LPSolution(LPSolution.Status.Infeasible, null, Double.NEGATIVE_INFINITY);
       }
     }
-    throw new Exception("Unclear what the LP is doing.");
+    throw new LPException("Unclear what the LP is doing.");
   }
 
 }
