@@ -113,6 +113,27 @@ public class SqlDB {
   }
   
   /**
+   * Check if a row of the complete search for singleminded exist.
+   * 
+   * @param i
+   * @param n
+   * @param m
+   * @param k
+   * @return
+   * @throws SQLException
+   */
+  public boolean checkIfCompleteSearchRowExists(int i, int n, int m, int k, String distribution) throws SQLException {
+    String sql = "SELECT * FROM complete_search_singleminded WHERE i = ? AND n = ? AND m = ? AND k = ? AND distribution = ?";
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
+    preparedStatement.setInt(1, i);
+    preparedStatement.setInt(2, n);
+    preparedStatement.setInt(3, m);
+    preparedStatement.setInt(4, k);
+    preparedStatement.setString(5, distribution);
+    return ((ResultSet) preparedStatement.executeQuery()).next();
+  }
+  
+  /**
    * Check if a row of the database exists.
    * 
    * @param tablename
@@ -129,6 +150,36 @@ public class SqlDB {
     preparedStatement.setInt(3, k);
     preparedStatement.setDouble(4, p);
     return ((ResultSet) preparedStatement.executeQuery()).next();
+  }
+  
+  /**
+   * Save complete search row.
+   * 
+   * @param i
+   * @param n
+   * @param m
+   * @param k
+   * @param distribution
+   * @param time
+   * @param num_branches
+   * @param num_infeasible
+   * @param num_revbound
+   * @throws SQLException
+   */
+  public void saveCompleteSearchRow(int i, int n, int m, int k, String distribution, double time, int num_explored_states, int num_infeasible, int num_revbound) throws SQLException {
+    String sql = "INSERT INTO complete_search_singleminded (i, n, m, k, distribution, time, num_explored_states, num_infeasible, num_revbound) " + 
+                  "VALUES (?, ? ,?, ?, ?, ?, ?, ?, ?)";
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
+    preparedStatement.setInt(1, i);
+    preparedStatement.setInt(2, n);
+    preparedStatement.setInt(3, m);
+    preparedStatement.setInt(4, k);
+    preparedStatement.setString(5, distribution);
+    preparedStatement.setDouble(6, time);
+    preparedStatement.setInt(7, num_explored_states);
+    preparedStatement.setInt(8, num_infeasible);
+    preparedStatement.setInt(9, num_revbound);
+    preparedStatement.execute();
   }
 
   /**

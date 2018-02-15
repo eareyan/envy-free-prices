@@ -15,9 +15,19 @@ import com.google.common.collect.ImmutableMap;
 public class CompleteSearch {
 
   /**
-   * A variable to keep track of the number of branches explored by the search.
+   * A variable to keep track of the number of states explored by the search.
    */
-  private int numberOfBranches = 0;
+  private int numberOfExploredStates = 0;
+  
+  /**
+   * A variable to keep track of the number of states that were infeasible, i.e., no EFP allocation for them existed.
+   */
+  private int numberOfInfeasibleStates = 0;
+  
+  /**
+   * A variable to keep track of the number of states with revenue at most something less that the global lower bound on revenue.
+   */
+  private int numberOfRevBoundStates = 0;
 
   /**
    * A variable to keep track of the execution time of the algorithm.
@@ -35,12 +45,13 @@ public class CompleteSearch {
   private final SingleMindedMarket<Goods, Bidder<Goods>> market;
 
   /**
-   * Constructor
+   * Constructor. 
    * 
    * @param market
    */
   public CompleteSearch(SingleMindedMarket<Goods, Bidder<Goods>> market) {
     this.market = market;
+    // The initial lower bound is the highest reward, since we know we can at least allocate the highest bidder.
     this.globalRevenueLowerBound = market.getHighestReward();
   }
 
@@ -72,10 +83,9 @@ public class CompleteSearch {
    * @throws LPException 
    */
   private SearchSolution searchProcedure(List<Bidder<Goods>> candidates, HashSet<Bidder<Goods>> winners, HashSet<Bidder<Goods>> losers) throws LPException, IloException  { 
-    // Keep track of the number of branches explored.
-    this.numberOfBranches++;
-    // Create a fresh copy of the decision variables for this recursion level. Perhaps a more efficient strategy would be to change the values and then change
-    // them back before recurring.
+    // Keep track of the number of states explored.
+    this.numberOfExploredStates++;
+    // Create a fresh copy of the decision variables for this recursion level. Perhaps a more efficient strategy would be to change the values and then change them back before recurring.
     List<Bidder<Goods>> candidatesCopy = new ArrayList<Bidder<Goods>>(candidates);
     HashSet<Bidder<Goods>> winnersCopy = new HashSet<Bidder<Goods>>(winners);
     HashSet<Bidder<Goods>> losersCopy = new HashSet<Bidder<Goods>>(losers);
@@ -86,6 +96,7 @@ public class CompleteSearch {
     if (lpSol.getStatus() == LPSolution.Status.Infeasible) {
       // If the LP is infeasible with the current allocation, allocating more bidders is not possible. Prune this branch.
       // System.out.println("An EFP with this allocation DNE, skipping");
+      this.numberOfInfeasibleStates++;
       return new SearchSolution(Double.NEGATIVE_INFINITY, null, null);
     }
     // If there are no more candidates, return the current solution (propagation could have eliminated all possible candidates.
@@ -97,6 +108,7 @@ public class CompleteSearch {
     if (branchUpperBoundRev < this.globalRevenueLowerBound) {
       // System.out.println("This branch promises revenue at most " + branchUpperBoundRev + ", which is lower than our current lower bound " +
       // CompleteSearch.globalRevenueLowerBound + ", skipping.");
+      this.numberOfRevBoundStates++;
       return new SearchSolution(lpSol.getObjValue(), winnersCopy, lpSol.getPrices());
     }
     // If the current solution is a better lower bound than our current global lower bound, update the current global lower bound.
@@ -176,12 +188,12 @@ public class CompleteSearch {
   }
 
   /**
-   * Returns the number of branches explored by the complete search
+   * Returns the number of states explored by the complete search
    * 
    * @return
    */
-  public int getNumberOfBranches() {
-    return this.numberOfBranches;
+  public int getNumberOfExploredStates() {
+    return this.numberOfExploredStates;
   }
 
   /**
@@ -191,5 +203,23 @@ public class CompleteSearch {
    */
   public double getExecutionTime() {
     return this.executionTime;
+  }
+
+  /**
+   * Returns the number of states that were infeasible, i.e., no EFP allocation for them existed.
+   * 
+   * @return
+   */
+  public int getNumberOfInfeasibleStates() {
+    return this.numberOfInfeasibleStates;
+  }
+
+  /**
+   * the number of states with revenue at most something less that the global lower bound on revenue.
+   * 
+   * @return
+   */
+  public int getNumberOfRevBoundStates() {
+    return this.numberOfRevBoundStates;
   }
 }

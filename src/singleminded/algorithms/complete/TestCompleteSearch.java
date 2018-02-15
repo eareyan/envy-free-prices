@@ -9,8 +9,7 @@ import structures.exceptions.GoodsCreationException;
 import structures.exceptions.MarketCreationException;
 import structures.factory.SingleMindedMarketFactory;
 
-public class Experiments {
-  
+public class TestCompleteSearch {
   public static void main(String[] args) throws LPException, IloException, GoodsCreationException, BidderCreationException, MarketCreationException {
     // Testing.
     // SingleMindedMarket<Goods, Bidder<Goods>> market = CompleteSearch.simpleSMMarket();
@@ -25,7 +24,7 @@ public class Experiments {
     // SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarkets.singleMinded2();
     // SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarkets.singleMinded3();
     // SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarkets.singleMinded4();
-    //SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(n, m, k);
+    // SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(n, m, k);
     SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.elitistRewardRandomSingleMindedMarket(n, m, k);
 
     System.out.println(market);
@@ -37,14 +36,8 @@ public class Experiments {
     System.out.println("\n\n *** Optimal revenue = " + OPT.getRevenueOfSolution());
     // Print some statistics.
     System.out.println("Total execution time: " + completeSearch.getExecutionTime());
-    System.out.println("numberOfBranches = " + completeSearch.getNumberOfBranches());
+    System.out.println("numberOfBranches = " + completeSearch.getNumberOfExploredStates());
     System.out.println("total search space = " + (Math.pow(2, m) - 1));
-    System.out.println(completeSearch.getNumberOfBranches() / (Math.pow(2, m) - 1));
+    System.out.println(completeSearch.getNumberOfExploredStates() / (Math.pow(2, m) - 1));
   }
-  
-  public static void runExperiment(int n, int m, int k) throws GoodsCreationException, BidderCreationException, MarketCreationException {
-    SingleMindedMarket<Goods, Bidder<Goods>> market = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(n, m, k);
-    System.out.println(market);
-  }
-
 }
