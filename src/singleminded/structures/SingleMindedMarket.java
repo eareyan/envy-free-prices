@@ -114,6 +114,34 @@ public class SingleMindedMarket<G extends Goods, B extends Bidder<G>> extends Ma
   }
 
   /**
+   * Produces a flat string representation of the bidders' preferences over items, i.e., of the edges in the bipartite graph defining the market.
+   * 
+   * @return the edges string representation
+   */
+  public String getEdgesStringRepresentation() {
+    String edgesRepresentation = "";
+    for (int i = 0; i < this.A.length; i++) {
+      for (int j = 0; j < this.A[i].length; j++) {
+        edgesRepresentation += (this.A[i][j]) ? "1" : "0";
+      }
+    }
+    return edgesRepresentation;
+  }
+  
+  /**
+   * Produces a flat string representation of the bidders' rewards as a list of comma separated values.
+   * 
+   * @return the bidders' rewards string representation
+   */
+  public String getRewardStringRepresentation() {
+    String rewardsRepresentation = "";
+    for (B b : this.bidders) {
+      rewardsRepresentation += b.getReward() + ",";
+    }
+    return rewardsRepresentation.substring(0, rewardsRepresentation.length() - 1);
+  }
+
+  /**
    * Returns the vector of rewards of this market. The length of the vector is equal to the number of bidders.
    * 
    * @return the vector of rewards of this market.

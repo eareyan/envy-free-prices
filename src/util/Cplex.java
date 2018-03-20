@@ -46,8 +46,13 @@ public class Cplex {
       Cplex.cpUniqueObject = new IloCP();
     } else {
       Cplex.cpUniqueObject.clearModel();
+      Cplex.cpUniqueObject.abortSearch();
+      Cplex.cpUniqueObject.startNewSearch();
+      //Cplex.getCplex();
+      //Cplex.cpUniqueObject.end();
     }
     return Cplex.cpUniqueObject;
+    //return new IloCP();
   }
 
 }

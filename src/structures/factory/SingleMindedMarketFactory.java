@@ -2,7 +2,6 @@ package structures.factory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import singleminded.structures.SingleMindedMarket;
@@ -13,7 +12,9 @@ import structures.exceptions.GoodsCreationException;
 import structures.exceptions.MarketCreationException;
 import structures.rewardfunctions.ElitistRewardFunction;
 import structures.rewardfunctions.RewardsGeneratorInterface;
+import structures.rewardfunctions.UniformIntegerRewardFunction;
 import structures.rewardfunctions.UniformRewardFunction;
+import util.MyRandom;
 
 /**
  * This class implements methods to create single-minded markets.
@@ -25,10 +26,10 @@ public class SingleMindedMarketFactory {
   /**
    * Checks the validity of the parameters needed to create a single minded market.
    * 
-   * @param n
-   * @param m
-   * @param k
-   * @param p
+   * @param n - number of items.
+   * @param m - number of bidders.
+   * @param k - size of demand set.
+   * @param p - probability of bidder demanding a good.
    * @throws GoodsCreationException
    * @throws BidderCreationException
    */
@@ -50,8 +51,22 @@ public class SingleMindedMarketFactory {
   /**
    * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn from uniform distribution.
    * 
-   * @param n
-   * @param m
+   * @param n - number of items.
+   * @param m - number of bidders.
+   * @return a Random-k-Single-Minded-Market(n,m,k)
+   * @throws MarketCreationException
+   * @throws BidderCreationException
+   * @throws GoodsCreationException
+   */
+  public static SingleMindedMarket<Goods, Bidder<Goods>> uniformIntegerRewardRandomSingleMindedMarket(int n, int m, int k) throws GoodsCreationException, BidderCreationException, MarketCreationException {
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, UniformIntegerRewardFunction.singletonInstance);
+  }
+  
+  /**
+   * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn from uniform distribution.
+   * 
+   * @param n - number of items.
+   * @param m - number of bidders.
    * @return a Random-k-Single-Minded-Market(n,m,k)
    * @throws MarketCreationException
    * @throws BidderCreationException
@@ -64,8 +79,8 @@ public class SingleMindedMarketFactory {
   /**
    * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn from elitist distribution.
    * 
-   * @param n
-   * @param m
+   * @param n - number of items.
+   * @param m - number of bidders.
    * @return a Random-k-Single-Minded-Market(n,m,k)
    * @throws MarketCreationException
    * @throws BidderCreationException
@@ -80,7 +95,7 @@ public class SingleMindedMarketFactory {
    * 
    * @param n - number of items.
    * @param m - number of bidders.
-   * @param k - bound on size of demand set.
+   * @param k - size of demand set.
    * @return a single minded market.
    * @throws MarketCreationException
    * @throws BidderCreationException
@@ -109,7 +124,7 @@ public class SingleMindedMarketFactory {
     }
     return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
   }
-  
+
   /**
    * Create random single- minded markets.
    * 
@@ -162,10 +177,8 @@ public class SingleMindedMarketFactory {
       }
       return generated;
     } else {
-      // Ideally just create one instance globally.
-      Random rng = new Random();
       while (generated.size() < n) {
-        Integer next = rng.nextInt(max);
+        Integer next = MyRandom.generator.nextInt(max);
         // As we're adding to a set, this will automatically do a containment check
         generated.add(next);
       }

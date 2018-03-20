@@ -3,11 +3,11 @@ package structures.rewardfunctions;
 import structures.factory.Parameters;
 import util.MyRandom;
 
-public class UniformRewardFunction implements RewardsGeneratorInterface {
+public class UniformIntegerRewardFunction implements RewardsGeneratorInterface {
   /**
    * Reward function object
    */
-  public static UniformRewardFunction singletonInstance = new UniformRewardFunction();
+  public static UniformIntegerRewardFunction singletonInstance = new UniformIntegerRewardFunction();
 
   /**
    * Generates a random reward between the bounds.
@@ -16,6 +16,7 @@ public class UniformRewardFunction implements RewardsGeneratorInterface {
    */
   @Override
   public Double getReward() {
-    return MyRandom.generator.nextDouble() * (Parameters.defaultMaxReward - Parameters.defaultMinReward) + Parameters.defaultMinReward;
+    return (double) (MyRandom.generator.nextInt(Parameters.defaultMaxIntegerReward) + Parameters.defaultMinIntegerReward);
   }
+
 }

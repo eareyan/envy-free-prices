@@ -134,6 +134,27 @@ public class SqlDB {
   }
   
   /**
+   * Check if a row of the WE existence for singleminded exists.
+   * @param n
+   * @param m
+   * @param k
+   * @param edges
+   * @param rewards
+   * @return
+   * @throws SQLException
+   */
+  public boolean checkIfWEExistenceRowExists(int n, int m, int k, String edges, String rewards) throws SQLException {
+    String sql = "SELECT n FROM we_existence_singleminded WHERE n = ? AND m = ? AND k = ? AND edges = ? AND rewards = ?";
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
+    preparedStatement.setInt(1, n);
+    preparedStatement.setInt(2, m);
+    preparedStatement.setInt(3, k);
+    preparedStatement.setString(4, edges);
+    preparedStatement.setString(5, rewards);
+    return ((ResultSet) preparedStatement.executeQuery()).next();
+  }
+  
+  /**
    * Check if a row of the database exists.
    * 
    * @param tablename
@@ -179,6 +200,32 @@ public class SqlDB {
     preparedStatement.setInt(7, num_explored_states);
     preparedStatement.setInt(8, num_infeasible);
     preparedStatement.setInt(9, num_revbound);
+    preparedStatement.execute();
+  }
+  
+  /**
+   * Save WE existence row, singleminded.
+   * 
+   * @param n
+   * @param m
+   * @param k
+   * @param edges
+   * @param rewards
+   * @param time
+   * @param we
+   * @throws SQLException
+   */
+  public void saveWEExistenceRow(int n, int m, int k, String edges, String rewards, double time, int we) throws SQLException {
+    String sql = "INSERT INTO we_existence_singleminded (n, m, k, edges, rewards, time, we) " + 
+                  "VALUES (?, ? ,?, ?, ?, ?, ?)";
+    PreparedStatement preparedStatement = (PreparedStatement) this.getConn().prepareStatement(sql);
+    preparedStatement.setInt(1, n);
+    preparedStatement.setInt(2, m);
+    preparedStatement.setInt(3, k);
+    preparedStatement.setString(4, edges);
+    preparedStatement.setString(5, rewards);
+    preparedStatement.setDouble(6, time);
+    preparedStatement.setInt(7, we);
     preparedStatement.execute();
   }
 

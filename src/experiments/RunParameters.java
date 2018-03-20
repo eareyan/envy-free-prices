@@ -1,6 +1,7 @@
 package experiments;
 
 import singleminded.algorithms.complete.CompleteSearchExperiments;
+import singleminded.algorithms.complete.WEExistenceExperiments;
 
 import com.google.common.collect.ImmutableList;
 
@@ -32,6 +33,7 @@ public class RunParameters {
   public String dbPassword;
   public Experiments experimentObject;
   public String experimentName;
+  public static String distribution; // Need to fix this! shouldn't be static
 
   /**
    * Constructor.
@@ -53,6 +55,9 @@ public class RunParameters {
     this.dbName = args[4];
     this.dbUsername = args[5];
     this.dbPassword = args[6];
+    if(args.length >= 8) {
+      RunParameters.distribution = args[7];
+    }
   }
 
   /**
@@ -74,6 +79,8 @@ public class RunParameters {
       return new TAC();
     } else if (type.equals("CompleteSearch")) {
       return new CompleteSearchExperiments();
+    } else if (type.equals("WEExistence")) {
+      return new WEExistenceExperiments();
     } else {
       throw new Exception("Unknown demand type");
     }

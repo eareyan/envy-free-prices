@@ -3,6 +3,7 @@ package structures.rewardfunctions;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 import structures.factory.Parameters;
+import util.MyRandom;
 
 public class ElitistRewardFunction implements RewardsGeneratorInterface {
   /**
@@ -16,7 +17,7 @@ public class ElitistRewardFunction implements RewardsGeneratorInterface {
    */
   @Override
   public Double getReward() {
-    return (RewardsGeneratorInterface.generator.nextDouble() <= Parameters.elitistProbReward) ? new NormalDistribution(Parameters.elitistMeanReward, Parameters.elitistStDevReward).sample() : UniformRewardFunction.singletonInstance.getReward();
+    return (MyRandom.generator.nextDouble() <= Parameters.elitistProbReward) ? new NormalDistribution(Parameters.elitistMeanReward, Parameters.elitistStDevReward).sample() : UniformRewardFunction.singletonInstance.getReward();
   }
 
 }

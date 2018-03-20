@@ -4,7 +4,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 
 import simulator.sampling.MarketSegmentSampler;
@@ -15,6 +14,7 @@ import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsCreationException;
 import structures.exceptions.MarketCreationException;
 import tau.tac.adx.props.AdxQuery;
+import util.MyRandom;
 import adx.exceptions.AdXException;
 import adx.structures.Campaign;
 import adx.structures.MarketSegment;
@@ -54,8 +54,6 @@ public class TACMarketFactory {
     for (int i = 0; i < m; i++) {
       campaigns.add(Sampling.sampleCampaign(0));
     }
-    // System.out.println(campaigns);
-    Random random = new Random();
     ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
     for (int i = 0; i < m; i++) {
       HashSet<Goods> demandSet = new HashSet<Goods>();
@@ -64,7 +62,7 @@ public class TACMarketFactory {
           demandSet.add(good.getValue());
         }
       }
-      bidders.add(new Bidder<Goods>(campaigns.get(i).getReach(), campaigns.get(i).getReach() * random.nextDouble(), demandSet));
+      bidders.add(new Bidder<Goods>(campaigns.get(i).getReach(), campaigns.get(i).getReach() * MyRandom.generator.nextDouble(), demandSet));
     }
     Market<Goods, Bidder<Goods>> market = new Market<Goods, Bidder<Goods>>(goods, bidders);
 

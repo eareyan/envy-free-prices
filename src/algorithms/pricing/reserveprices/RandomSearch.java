@@ -3,7 +3,6 @@ package algorithms.pricing.reserveprices;
 import ilog.concert.IloException;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import structures.Bidder;
 import structures.Goods;
@@ -13,6 +12,7 @@ import structures.exceptions.BidderCreationException;
 import structures.exceptions.GoodsCreationException;
 import structures.exceptions.GoodsException;
 import structures.exceptions.MarketAllocationException;
+import util.MyRandom;
 import algorithms.pricing.error.PrincingAlgoException;
 import allocations.error.AllocationAlgoException;
 import allocations.interfaces.AllocationAlgo;
@@ -84,9 +84,8 @@ public class RandomSearch extends SearchMetaHeuristic{
   @Override
   protected ArrayList<Double> getListOfReservePrices() {
     ArrayList<Double> reservePrices = new ArrayList<Double>();
-    Random random = new Random();
     for(int sample = 0 ; sample < this.numberOfSamples; sample++) {
-      reservePrices.add(random.nextDouble() * this.maxReserve);
+      reservePrices.add(MyRandom.generator.nextDouble() * this.maxReserve);
     }
     return reservePrices;
   }

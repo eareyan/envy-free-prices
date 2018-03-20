@@ -1,0 +1,4 @@
+SELECT * FROM complete_search_singleminded WHERE distribution = 'Uniform' AND n = 100 AND m = 100 ORDER BY m ASC, n ASC, k ASC, i ASC;
+SELECT * FROM complete_search_singleminded WHERE distribution = 'Elitist' AND n = 50 AND m = 50 ORDER BY m ASC, n ASC, k ASC, i ASC;
+
+SELECT * FROM complete_search_singleminded WHERE distribution = 'Uniform' AND n = 25 AND m = 25 AND k > 0 AND  k <= 25 ORDER BY m ASC, n ASC, k ASC, i ASC;

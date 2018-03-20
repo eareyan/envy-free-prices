@@ -10,6 +10,10 @@ public class Parameters {
   public static final double defaultMaxReward = 10.0;
 
   public static final double defaultMinReward = 1.0;
+  
+  public static final int defaultMaxIntegerReward = 10;
+  
+  public static final int defaultMinIntegerReward = 1;
 
   public static final int defaultMinSupplyPerGood = 1;
 
