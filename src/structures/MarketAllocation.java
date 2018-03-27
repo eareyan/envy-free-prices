@@ -1,5 +1,9 @@
 package structures;
 
+
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import structures.exceptions.MarketAllocationException;
 import allocations.objectivefunction.interfaces.ObjectiveFunction;
 
@@ -33,11 +37,21 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
    * Value of the allocation.
    */
   protected double value = -1.0;
-  
+
   /**
    * Number of winners.
    */
   protected int numberOfWinners = -1;
+  
+  /**
+   * Set of winners.
+   */
+  protected HashSet<B> winners;
+
+  /**
+   * In case an allocation algorithm produces multiple allocations.
+   */
+  protected ArrayList<MarketAllocation<M, G, B>> extraAllocations;
 
   /**
    * Constructor. Takes a Market and an allocation.
@@ -54,6 +68,7 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
     }
     this.allocation = allocation;
     this.f = f;
+    this.extraAllocations = new ArrayList<MarketAllocation<M, G, B>>();
   }
 
   /**
@@ -85,8 +100,7 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
    * objective function being used.
    * 
    * @return the value of an allocation, i.e., the sum of rewards of allocated bidders.
-   * @throws MarketAllocationException
-   *           in case there is a null allocation
+   * @throws MarketAllocationException in case there is a null allocation
    */
   public double getValue() throws MarketAllocationException {
     if (this.value == -1.0) {
@@ -106,7 +120,8 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
    * 
    * @param bidder - the bidder object.
    * @return the marginal value of the bidder.
-   * @throws MarketAllocationException in case an objective function was not defined for this MarketAllocation object.
+   * @throws MarketAllocationException
+   *           in case an objective function was not defined for this MarketAllocation object.
    */
   public double marginalValue(B bidder) throws MarketAllocationException {
     // Make sure we have an objective function to be able to compute the value of the allocation.
@@ -123,7 +138,8 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
    * 
    * @param bidder - the bidder object.
    * @return true if bidder was allocated at least one good.
-   * @throws MarketAllocationException in case the bidder is not found.
+   * @throws MarketAllocationException
+   *           in case the bidder is not found.
    */
   public boolean isBidderBundleZero(B bidder) throws MarketAllocationException {
     if (!this.allocation.containsColumn(bidder)) {
@@ -142,7 +158,8 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
    * 
    * @param i - a good index.
    * @return the number of items from good i that were allocated.
-   * @throws MarketAllocationException in case the good is not found.
+   * @throws MarketAllocationException
+   *           in case the good is not found.
    */
   public int allocationFromGood(G good) throws MarketAllocationException {
     if (!this.allocation.containsRow(good)) {
@@ -191,7 +208,56 @@ public class MarketAllocation<M extends Market<G, B>, G extends Goods, B extends
     }
     return this.numberOfWinners;
   }
+  
+  /**
+   * Computes the set of winners.
+   * 
+   * @return the set of winners
+   * @throws MarketAllocationException
+   */
+  public HashSet<B> getWinnerSet() throws MarketAllocationException {
+    if(this.winners == null) {
+      this.winners = new HashSet<B>();
+      for(B bidder: this.market.getBidders()) {
+        if(!this.isBidderBundleZero(bidder)) {
+          this.winners.add(bidder);
+        }
+      }
+    }
+    return this.winners;
+  }
 
+  /**
+   * Add an allocation.
+   * 
+   * @param extraAllocation
+   * @throws MarketAllocationException
+   */
+  public void addAllocation(MarketAllocation<M, G, B> extraAllocation) throws MarketAllocationException {
+    if (extraAllocation.market != this.market) {
+      throw new MarketAllocationException("The extra allocation must refer to the same market object.");
+    }
+    this.extraAllocations.add(extraAllocation);
+  }
+
+  /**
+   * Get the number of allocations.
+   * 
+   * @return an integer with the number of allocations.
+   */
+  public int getNumExtraAllocations() {
+    return this.extraAllocations.size();
+  }
+  
+  /**
+   * Get the extra allocations.
+   * 
+   * @return an array list with all extra allocations.
+   */
+  public ArrayList<MarketAllocation<M, G, B>> getExtraAllocations() {
+    return this.extraAllocations;
+  }
+  
   /**
    * Helper method to print a matrix representation of the allocation.
    * 

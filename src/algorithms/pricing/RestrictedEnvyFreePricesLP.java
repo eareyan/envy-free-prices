@@ -272,8 +272,7 @@ public class RestrictedEnvyFreePricesLP<M extends Market<G, B>, G extends Goods,
         for (G good : this.allocatedMarket.getMarket().getGoods()) {
           result.put(good, LP_Prices[this.goodToPriceIndex.get(good)]);
         }
-        Solution = new RestrictedEnvyFreePricesLPSolution<M, G, B>(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(),
-            this.cplex.getObjValue());
+        Solution = new RestrictedEnvyFreePricesLPSolution<M, G, B>(this.allocatedMarket, result.build(), this.cplex.getStatus().toString(), this.cplex.getObjValue());
       } else {
         Solution = new RestrictedEnvyFreePricesLPSolution<M, G, B>(this.allocatedMarket, null, this.cplex.getStatus().toString(), -1);
       }

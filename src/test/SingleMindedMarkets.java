@@ -260,5 +260,42 @@ public class SingleMindedMarkets {
     return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
     
   }
+  
+  public static SingleMindedMarket<Goods, Bidder<Goods>> singleMindedWithTies() throws GoodsCreationException, BidderCreationException, MarketCreationException {
+    int numberOfGoods = 2;
+    ArrayList<Goods> goods = new ArrayList<Goods>();
+    HashSet<Goods> bDemandSet = new HashSet<Goods>();
+    for(int n = 0 ; n < numberOfGoods; n++) {
+      goods.add(new Goods(1));
+      bDemandSet.add(goods.get(n));
+    }
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
+    for(int m = 0 ; m < numberOfGoods + 1; m++) {
+      bidders.add(new Bidder<Goods>(numberOfGoods, 1, bDemandSet));
+    }
+    return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
+  }
+  
+  public static SingleMindedMarket<Goods, Bidder<Goods>> bigSingleMindedMarket() throws GoodsCreationException, BidderCreationException, MarketCreationException {
+    int numberOfGoods = 5;
+    ArrayList<Goods> goods = new ArrayList<Goods>();
+    for(int n = 0 ; n < numberOfGoods; n++) {
+      goods.add(new Goods(1));
+    }
+    //double[] rewards = new double[numberOfGoods];
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
+    for(int m = 0 ; m < numberOfGoods - 1; m++) {
+      HashSet<Goods> bDemandSet = new HashSet<Goods>();
+      bDemandSet.add(goods.get(m));
+      bDemandSet.add(goods.get(m + 1));
+      if((m+1 % 4) == 0) {
+        bDemandSet.add(goods.get(m-1));
+      }
+      bidders.add(new Bidder<Goods>(2, 2 + m % 4, bDemandSet));
+    }
+    
+    return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
+    
+  }
 
 }

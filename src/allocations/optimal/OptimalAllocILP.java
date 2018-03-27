@@ -8,6 +8,7 @@ import ilog.cplex.IloCplex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import structures.Bidder;
 import structures.Goods;
@@ -24,91 +25,105 @@ import allocations.interfaces.AllocationAlgo;
 import com.google.common.collect.HashBasedTable;
 
 /**
- * This class uses CPLEX to implement and solve a mixed-ILP to find a
- * single-step, welfare-maximizing allocation for an input market.
+ * This class uses CPLEX to implement and solve a mixed-ILP to find a single-step, welfare-maximizing allocation for an input market.
+ * The class implements several parameters to control the search (how many solutions, time limit, etc).
  * 
  * @author Enrique Areyan Viqueira
  */
-public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements AllocationAlgo<M, G, B> {
-  
-  /**
-   * Boolean to control whether or not to output.
-   */
-  protected boolean verbose = false;
-  
-  /**
-   * How many solutions
-   */
-  protected static final int numSolutions = 1;
-  
+public abstract class OptimalAllocILP<M extends Market<G, B>, G extends Goods, B extends Bidder<G>> implements AllocationAlgo<M, G, B> {
+
   /**
    * Cplex object.
    */
   protected IloCplex cplex;
-  
+
+  /**
+   * Boolean to control whether or not to output.
+   */
+  protected boolean verbose = false;
+
+  /**
+   * How many solutions
+   */
+  protected int numSolutions = 1;
+
   /**
    * Maximum time allowable for the algorithm.
    */
-  protected double timeLimit = 0.5;
-  
+  protected double timeLimit = -1.0;
+
   /**
    * Constructor.
    */
   public OptimalAllocILP() {
 
   }
-  
+
   /**
-   * Constructor.
-   * @throws AllocationException 
+   * Set the verbose option.
+   * 
+   * @param verbose
+   *          - a boolean, if true, then output information while running algorithm.
    */
-  public OptimalAllocILP(double timeLimit) throws AllocationException {
-    if(timeLimit < 0) {
+  public void setVerbose(boolean verbose) {
+    this.verbose = verbose;
+  }
+
+  /**
+   * Set number of solutions. A negative or zero value indicates no limit.
+   * 
+   * @param numSolutions
+   */
+  public void setNumSolutions(int numSolutions) {
+    this.numSolutions = numSolutions;
+  }
+
+  /**
+   * Set time limit.
+   * 
+   * @throws AllocationException
+   */
+  public void setTimeLimit(double timeLimit) throws AllocationException {
+    if (timeLimit <= 0) {
       throw new AllocationException("The time limit must be positive.");
     }
     this.timeLimit = timeLimit;
   }
 
   /**
-   * Constructor.
-   * @param verbose - a boolean, if true, then output information while running algorithm.
-   */
-  public OptimalAllocILP(boolean verbose) {
-    this.verbose = verbose;
-  }
-  
-  /**
    * Solve method. Runs the algorithm.
-   * @param market - a Market object.
+   * 
+   * @param market
+   *          - a Market object.
    * @return a MarketAllocation object.
-   * @throws AllocationException 
-   * @throws MarketAllocationException 
+   * @throws AllocationException
+   * @throws MarketAllocationException
    */
   public MarketAllocation<M, G, B> Solve(M market) throws AllocationAlgoException, AllocationException, MarketAllocationException {
     try {
-      // Create Cplex Object
-      //this.cplex = new IloCplex();
       this.cplex = Cplex.getCplex();
-      if (!this.verbose){
+      if (!this.verbose) {
         this.cplex.setOut(null);
       }
       // Set a time limit.
-      if(this.timeLimit >= 0) {
+      if (this.timeLimit > 0) {
         this.cplex.setParam(IloCplex.DoubleParam.TiLim, this.timeLimit);
       }
-      /*
-       * These two next parameters controls how many solutions we want to get.
-       * The first parameter controls how far from the optimal we allow
-       * solutions to be, the second parameter controls how many solutions we
-       * will get in total.
-       */
+      // These two next parameters controls how many solutions we want to get.
+      // The first parameter controls how far from the optimal we allow solutions to be,
+      // the second parameter controls how many solutions we will get in total.
       this.cplex.setParam(IloCplex.DoubleParam.SolnPoolGap, 0.0);
-      this.cplex.setParam(IloCplex.IntParam.PopulateLim, OptimalAllocILP.numSolutions);
+      if (this.numSolutions > 0) {
+        this.cplex.setParam(IloCplex.IntParam.PopulateLim, this.numSolutions);
+        this.cplex.setParam(IloCplex.IntParam.SolnPoolIntensity, 4);
+      }
+      if (this.verbose) {
+        System.out.println("**** Running OptimalAllocILP with the following parameters:");
+        System.out.println("\t numSolutions = " + this.numSolutions);
+        System.out.println("\t timeLimit = " + this.timeLimit);
+      }
 
-      /*
-       * These next two maps point from a good (resp. a bidder) to a positive integer.
-       * These maps are used to point from a bidder to its CPLEX variable.
-       */
+      // These next two maps point from a good (resp. a bidder) to a positive integer. These maps are used to point from a bidder to its CPLEX variable.
       HashMap<G, Integer> goodToCPLEXIndex = new HashMap<G, Integer>();
       HashMap<B, Integer> bidderToCPLEXIndex = new HashMap<B, Integer>();
       for (int i = 0; i < market.getNumberGoods(); i++) {
@@ -123,7 +138,7 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
       for (G good : market.getGoods()) {
         allocationMatrixVariable[goodToCPLEXIndex.get(good)] = this.cplex.intVarArray(market.getNumberBidders(), 0, Integer.MAX_VALUE);
       }
-     
+
       this.cplex.addMaximize(this.getILPObjective(market, indicatorVariable, bidderToCPLEXIndex));
 
       // Constraint (1). Allocation from a good not connected to a bidder is zero.
@@ -141,7 +156,7 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
         this.cplex.addGe(expr, indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
         this.cplex.addLe(expr, indicatorVariable[bidderToCPLEXIndex.get(bidder)]);
       }
- 
+
       // Constrain (3). Allocation from goods can not be more than supply.
       for (G good : market.getGoods()) {
         IloLinearNumExpr expr = this.cplex.linearNumExpr();
@@ -157,36 +172,44 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
         int numsol = this.cplex.getSolnPoolNsolns();
         int numsolreplaced = this.cplex.getSolnPoolNreplaced();
         // Print some information
-        if (verbose) {
-          System.out.println("***********************************Populate");
+        if (this.verbose) {
+          System.out.println("**************** Populate ****************");
           System.out.println("The solution pool contains " + numsol + " solutions.");
           System.out.println(numsolreplaced + " solutions were removed due to the " + "solution pool relative gap parameter.");
           System.out.println("In total, " + (numsol + numsolreplaced) + " solutions were generated.");
           System.out.println("Solution status = " + this.cplex.getStatus());
           System.out.println("Solution value  = " + this.cplex.getObjValue());
         }
-        // Store all the solutions in an ArrayList.
-        ArrayList<int[][]> Solutions = new ArrayList<>();
+        // Weed out sub-optimal solutions.
+        HashSet<Integer> optIndeces = new HashSet<Integer>();
+        double optValue = Double.NEGATIVE_INFINITY;
         for (int l = 0; l < numsol; l++) {
-          /*
-           * The solution should be a matrix of integers. However, CPLEX returns
-           * a matrix of doubles. So we are going to have to cast this into
-           * integers.
-           */
+          double currentOptValue = this.cplex.getObjValue(l);
+          // Note that this assumes a maximization objective!!
+          if (currentOptValue > optValue) {
+            optValue = currentOptValue;
+            optIndeces.clear();
+            optIndeces.add(l);
+          } else if (currentOptValue == optValue) {
+            optIndeces.add(l);
+          }
+        }
+        // Store all the solutions in an ArrayList.
+        ArrayList<int[][]> solutions = new ArrayList<>();
+        for (int l : optIndeces) {
+          // The solution should be a matrix of integers. However, CPLEX returns a matrix of doubles. So we are going to have to cast this into integers.
           int[][] sol = new int[market.getNumberGoods()][market.getNumberBidders()];
           double[][] solDouble = new double[market.getNumberGoods()][market.getNumberBidders()];
           for (G good : market.getGoods()) {
             solDouble[goodToCPLEXIndex.get(good)] = this.cplex.getValues(allocationMatrixVariable[goodToCPLEXIndex.get(good)], l);
-            /*
-             * Unfortunately in Java the only way to cast your array is to
-             * iterate through each element and cast them one by one
-             */
+            // Unfortunately in Java the only way to cast your array is to iterate through each element and cast them one by one
             for (B bidder : market.getBidders()) {
               sol[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = (int) Math.round(solDouble[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
             }
           }
-          Solutions.add(sol);
-          if (verbose) {
+          solutions.add(sol);
+          if (this.verbose) {
+            System.out.println("Solution #" + l);
             Printer.printMatrix(sol);
             System.out.println();
             for (B bidder : market.getBidders()) {
@@ -194,15 +217,18 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
             }
           }
         }
-        //this.cplex.end();
-        
-        HashBasedTable<G, B, Integer> alloc = HashBasedTable.create();
-        for(G good : market.getGoods()){
-          for(B bidder : market.getBidders()){
-            alloc.put(good, bidder , (int) Math.round(Solutions.get(0)[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]));    
+        // First, create a baseSolution. This is the first optimal solution (i.e., at index 0 of array solutions).
+        MarketAllocation<M, G, B> baseSolution = this.createMarketAllocation(market, solutions.get(0), goodToCPLEXIndex, bidderToCPLEXIndex);
+        // If there are more solutions, add all of them (but the base solution itself) to the base solution.
+        if (numsol > 1) {
+          for (int l = 1; l < optIndeces.size(); l++) {
+              baseSolution.addAllocation(this.createMarketAllocation(market, solutions.get(l), goodToCPLEXIndex, bidderToCPLEXIndex));
           }
         }
-        return new MarketAllocation<M, G, B>(market, alloc, this.getObjectiveFunction());
+        if (this.verbose) {
+          System.out.println("**************** End Optimal Alloc ILP ****************");
+        }
+        return baseSolution;
       }
     } catch (IloException e) {
       // Report that CPLEX failed.
@@ -212,12 +238,23 @@ public abstract class OptimalAllocILP <M extends Market<G, B>, G extends Goods, 
     // If we ever do reach this point, then we don't really know what happened.
     throw new AllocationAlgoException(AllocationAlgoErrorCodes.UNKNOWN_ERROR);
   }
-  
+
+  private MarketAllocation<M, G, B> createMarketAllocation(M market, int[][] solution, HashMap<G, Integer> goodToCPLEXIndex,
+      HashMap<B, Integer> bidderToCPLEXIndex) throws MarketAllocationException {
+    HashBasedTable<G, B, Integer> alloc = HashBasedTable.create();
+    for (G good : market.getGoods()) {
+      for (B bidder : market.getBidders()) {
+        alloc.put(good, bidder, (int) Math.round(solution[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]));
+      }
+    }
+    return new MarketAllocation<M, G, B>(market, alloc, this.getObjectiveFunction());
+  }
+
   /**
    * Changes the objective of the ILP.
    * 
    * @return an IloNumExpr with the ILP objective.
-   * @throws IloException 
+   * @throws IloException
    */
   protected abstract IloNumExpr getILPObjective(M market, IloNumVar[] indicatorVariable, HashMap<B, Integer> bidderToCPLEXIndex) throws IloException;
 

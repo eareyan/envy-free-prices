@@ -35,10 +35,16 @@ public class WEExistence {
     // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarkets.singleMinded4();
     // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarkets.singleMinded5();
     // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarkets.singleMinded6();
-    SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(100, 100, 99);
+    SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(25, 25, 15);
+    //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarkets.bigSingleMindedMarket();
     //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(3, 3, 2);
     //System.out.println(singleMindedMarket);
+    final long startTime = System.currentTimeMillis();
     WEExistence.decideWE(singleMindedMarket, false);
+    final long endTime = System.currentTimeMillis();
+    double executionTime = (endTime - startTime);
+    System.out.println("executionTime = " + executionTime);
+
     //System.out.println(singleMindedMarket.getEdgesStringRepresentation());
     //System.out.println(singleMindedMarket.getRewardStringRepresentation());
   }
@@ -51,8 +57,8 @@ public class WEExistence {
    */
   public static boolean decideWE(SingleMindedMarket<Goods, Bidder<Goods>> market, boolean verbose) throws IloException {
     // Initialization structures.
-    IloCplex cp = Cplex.getCplex();
-    cp.setOut(null);
+    IloCplex cplex = Cplex.getCplex();
+    //cp.setOut(null);
 
     HashMap<Goods, Integer> goodToCPLEXIndex = new HashMap<Goods, Integer>();
     HashMap<Bidder<Goods>, Integer> bidderToCPLEXIndex = new HashMap<Bidder<Goods>, Integer>();
@@ -65,30 +71,30 @@ public class WEExistence {
     // Variables
     // If we want the search to be over floats, uncomment the next line.
     // IloNumVar[] prices = cp.numVarArray(market.getNumberGoods(), 0.0, Double.MAX_VALUE);
-    IloIntVar[] prices = cp.intVarArray(market.getNumberGoods(), 0, (int) Math.ceil(market.getHighestReward()));
+    IloIntVar[] prices = cplex.intVarArray(market.getNumberGoods(), 0, (int) Math.ceil(market.getHighestReward()));
     IloIntVar[][] allocationMatrixVariable = new IloIntVar[market.getNumberGoods()][];
     for (Goods good : market.getGoods()) {
-      allocationMatrixVariable[goodToCPLEXIndex.get(good)] = cp.intVarArray(market.getNumberBidders(), 0, 1);
+      allocationMatrixVariable[goodToCPLEXIndex.get(good)] = cplex.intVarArray(market.getNumberBidders(), 0, 1);
     }
     // Create constraints.
     for (Goods g : market.getGoods()) {
-      IloLinearNumExpr allocaSumGoodk = cp.linearNumExpr();
+      IloLinearNumExpr allocaSumGoodk = cplex.linearNumExpr();
       for (Bidder<Goods> b : market.getBidders()) {
         if (!b.demandsGood(g)) {
           // A good not demanded by a bidder has corresponding zero allocation variable.
-          cp.addEq(0, allocationMatrixVariable[goodToCPLEXIndex.get(g)][bidderToCPLEXIndex.get(b)]);
+          cplex.addEq(0, allocationMatrixVariable[goodToCPLEXIndex.get(g)][bidderToCPLEXIndex.get(b)]);
         }
         // cp.addLe(0, allocationMatrixVariable[goodToCPLEXIndex.get(g)][bidderToCPLEXIndex.get(b)]);
         allocaSumGoodk.addTerm(1, allocationMatrixVariable[goodToCPLEXIndex.get(g)][bidderToCPLEXIndex.get(b)]);
       }
       // Capacity constraint: items are assumed to be in unit supply.
-      cp.addGe(1, allocaSumGoodk);
+      cplex.addGe(1, allocaSumGoodk);
       // Walra's law: price of unallocated items is zero.
-      cp.add(cp.ifThen(cp.eq(0, allocaSumGoodk), cp.eq(0, prices[goodToCPLEXIndex.get(g)])));
+      cplex.add(cplex.ifThen(cplex.eq(0, allocaSumGoodk), cplex.eq(0, prices[goodToCPLEXIndex.get(g)])));
     }
     for (Bidder<Goods> b : market.getBidders()) {
-      IloLinearNumExpr allocaSumBidderi = cp.linearNumExpr();
-      IloLinearNumExpr pricesSumBidderi = cp.linearNumExpr();
+      IloLinearNumExpr allocaSumBidderi = cplex.linearNumExpr();
+      IloLinearNumExpr pricesSumBidderi = cplex.linearNumExpr();
       for (Goods g : market.getGoods()) {
         if (b.demandsGood(g)) {
           allocaSumBidderi.addTerm(1, allocationMatrixVariable[goodToCPLEXIndex.get(g)][bidderToCPLEXIndex.get(b)]);
@@ -96,18 +102,25 @@ public class WEExistence {
         }
       }
       // If a bidder is allocated, it must be able to afford its bundle.
-      cp.add(cp.ifThen(cp.eq(b.getDemand(), allocaSumBidderi), cp.ge(b.getReward(), pricesSumBidderi)));
+      cplex.add(cplex.ifThen(cplex.eq(b.getDemand(), allocaSumBidderi), cplex.ge(b.getReward(), pricesSumBidderi)));
       // If a bidder is not allocated, prices must be too expensive.
-      cp.add(cp.ifThen(cp.eq(0, allocaSumBidderi), cp.le(b.getReward(), pricesSumBidderi)));
+      cplex.add(cplex.ifThen(cplex.eq(0, allocaSumBidderi), cplex.le(b.getReward(), pricesSumBidderi)));
       // Helper constraint: allocation is either 0 or a bundle of exactly the demanded size.
-      cp.add(cp.or(cp.eq(0, allocaSumBidderi), cp.eq(b.getDemand(), allocaSumBidderi)));
+      cplex.add(cplex.or(cplex.eq(0, allocaSumBidderi), cplex.eq(b.getDemand(), allocaSumBidderi)));
     }
     // Solve the model
     //if (cp.solve()) {
     //IloSearchPhase[] phases = new IloSearchPhase[1];
     //phases[0] = getMaxDomainMaxValue(cp, allocationMatrixVariable);
     //phases[1] = getMaxDomainMaxValue(cp, prices);
-    if (cp.solve()) {
+    
+    //cplex.setParam(IloCplex.Param.MIP.Strategy.NodeSelect, IloCplex.NodeSelect.DFS);
+    //cplex.setParam(IloCplex.Param.Threads, 1);
+    //cplex.setParam(IloCplex.Param.MIP.Strategy.Search, IloCplex.MIPSearch.Traditional);
+    //cplex.setParam(IloCplex.BooleanParam.PreInd, false);
+    //cplex.setParam(IloCplex.IntParam.Reduce, 0);
+    cplex.use(new Brancher());
+    if (cplex.solve()) {
       System.out.println("Solved");
       if (verbose) {
         int[][] X = new int[market.getNumberGoods()][market.getNumberBidders()];
@@ -115,8 +128,8 @@ public class WEExistence {
         //double[] p = new double[market.getNumberGoods()];
         for (Bidder<Goods> bidder : market.getBidders()) {
           for (Goods good : market.getGoods()) {
-            X[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = (int) cp.getValue(allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
-            p[goodToCPLEXIndex.get(good)] = (int) cp.getValue(prices[goodToCPLEXIndex.get(good)]);
+            X[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)] = (int) cplex.getValue(allocationMatrixVariable[goodToCPLEXIndex.get(good)][bidderToCPLEXIndex.get(bidder)]);
+            p[goodToCPLEXIndex.get(good)] = (int) cplex.getValue(prices[goodToCPLEXIndex.get(good)]);
             //p[goodToCPLEXIndex.get(good)] = cp.getValue(prices[goodToCPLEXIndex.get(good)]);
           }
         }

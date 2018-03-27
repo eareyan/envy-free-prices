@@ -52,8 +52,8 @@ public class WEExistenceExperiments extends Experiments {
 
   @Override
   public void runExperiments(SqlDB dbLogger) throws Exception {
-    for (int n = 1; n < 10; n++) {
-      for (int m = 1; m < 10; m++) {
+    for (int n = 1; n < 30; n++) {
+      for (int m = 1; m < 30; m++) {
         for (int k = 1; k <= n; k++) {
           System.out.println("(n , m , k) = (" + n + ", " + m + ", " + k + ")");
           this.runOneExperiment(n, m, k, -1, "", dbLogger);
