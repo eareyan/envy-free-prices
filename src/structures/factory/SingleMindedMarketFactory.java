@@ -24,6 +24,52 @@ import util.MyRandom;
 public class SingleMindedMarketFactory {
 
   /**
+   * A single instance of this class. Used to instantiate a DemandSetSizeBuilder object.
+   */
+  public static SingleMindedMarketFactory singleMindedMarketFactoryInstance = new SingleMindedMarketFactory();
+
+  /**
+   * An interface to define different ways to construct the size of a demand set.
+   */
+  interface DemandSetSizeBuilder {
+    int getSizeOfDemandSet();
+  }
+
+  /**
+   * All bidders demand the same number of items.
+   */
+  class FixedDemandSetSize implements DemandSetSizeBuilder {
+    int k;
+
+    public FixedDemandSetSize(int k) {
+      this.k = k;
+    }
+
+    @Override
+    public int getSizeOfDemandSet() {
+      return this.k;
+    }
+  }
+
+  /**
+   * Bidders demand a random number of items.
+   */
+  class RandomDemandSetSize implements DemandSetSizeBuilder {
+
+    int n;
+
+    public RandomDemandSetSize(int n) {
+      this.n = n;
+    }
+
+    @Override
+    public int getSizeOfDemandSet() {
+      return MyRandom.generator.nextInt(n) + 1;
+    }
+
+  }
+
+  /**
    * Checks the validity of the parameters needed to create a single minded market.
    * 
    * @param n - number of items.
@@ -59,9 +105,10 @@ public class SingleMindedMarketFactory {
    * @throws GoodsCreationException
    */
   public static SingleMindedMarket<Goods, Bidder<Goods>> uniformIntegerRewardRandomSingleMindedMarket(int n, int m, int k) throws GoodsCreationException, BidderCreationException, MarketCreationException {
-    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, UniformIntegerRewardFunction.singletonInstance);
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m,
+        SingleMindedMarketFactory.singleMindedMarketFactoryInstance.new FixedDemandSetSize(k), UniformIntegerRewardFunction.singletonInstance);
   }
-  
+
   /**
    * Creates and returns Random-k-Single-Minded-Market(n,m,k) with rewards drawn from uniform distribution.
    * 
@@ -73,7 +120,8 @@ public class SingleMindedMarketFactory {
    * @throws GoodsCreationException
    */
   public static SingleMindedMarket<Goods, Bidder<Goods>> uniformRewardRandomSingleMindedMarket(int n, int m, int k) throws GoodsCreationException, BidderCreationException, MarketCreationException {
-    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, UniformRewardFunction.singletonInstance);
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m,
+        SingleMindedMarketFactory.singleMindedMarketFactoryInstance.new FixedDemandSetSize(k), UniformRewardFunction.singletonInstance);
   }
 
   /**
@@ -87,7 +135,23 @@ public class SingleMindedMarketFactory {
    * @throws GoodsCreationException
    */
   public static SingleMindedMarket<Goods, Bidder<Goods>> elitistRewardRandomSingleMindedMarket(int n, int m, int k) throws GoodsCreationException, BidderCreationException, MarketCreationException {
-    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m, k, ElitistRewardFunction.singletonInstance);
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m,
+        SingleMindedMarketFactory.singleMindedMarketFactoryInstance.new FixedDemandSetSize(k), ElitistRewardFunction.singletonInstance);
+  }
+
+  /**
+   * 
+   * @param n
+   * @param m
+   * @param rewardFunction
+   * @return
+   * @throws GoodsCreationException
+   * @throws BidderCreationException
+   * @throws MarketCreationException
+   */
+  public static SingleMindedMarket<Goods, Bidder<Goods>> randomDemandSetSizeSingleMindedMarket(int n, int m) throws GoodsCreationException, BidderCreationException, MarketCreationException {
+    return SingleMindedMarketFactory.createRandomSingleMindedMarket(n, m,
+        SingleMindedMarketFactory.singleMindedMarketFactoryInstance.new RandomDemandSetSize(n), UniformIntegerRewardFunction.singletonInstance);
   }
 
   /**
@@ -102,9 +166,9 @@ public class SingleMindedMarketFactory {
    * @throws GoodsCreationException
    * @throws Exception
    */
-  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m, int k, RewardsGeneratorInterface rewardFunction) throws GoodsCreationException, BidderCreationException, MarketCreationException {
+  public static SingleMindedMarket<Goods, Bidder<Goods>> createRandomSingleMindedMarket(int n, int m, DemandSetSizeBuilder demandSetSizeBuilder, RewardsGeneratorInterface rewardFunction) throws GoodsCreationException, BidderCreationException, MarketCreationException {
     // Check validity of parameters. In this case we don't use p, so we use a default value of 1.0.
-    SingleMindedMarketFactory.checkSingleMindedParameters(n, m, k, 1.0);
+    SingleMindedMarketFactory.checkSingleMindedParameters(n, m, 1, 1.0);
     // Create goods, each with unit supply.
     ArrayList<Goods> goods = new ArrayList<Goods>();
     for (int i = 0; i < n; i++) {
@@ -113,9 +177,9 @@ public class SingleMindedMarketFactory {
     // Create bidders
     ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
     for (int j = 0; j < m; j++) {
+      int k = demandSetSizeBuilder.getSizeOfDemandSet();
       // Each bidder connects exactly with k distinct random goods.
-      Set<Integer> connectTo = SingleMindedMarketFactory.randomNumbers(k, n);
-      // System.out.println("Bidder " + j + " connect to " + connectTo);
+      Set<Integer> connectTo = MyRandom.randomNumbers(k, n);
       HashSet<Goods> bDemandSet = new HashSet<Goods>();
       for (Integer i : connectTo) {
         bDemandSet.add(goods.get(i));
@@ -159,31 +223,6 @@ public class SingleMindedMarketFactory {
       bidders.add(new Bidder<Goods>(bDemandSet.size(), rewardFunction.getReward(), bDemandSet));
     }
     return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
-  }
-
-  /**
-   * Computes a set of n distinct, random integers, between 0 and max. If n>=max, returns the set of integers 0...max
-   *
-   * @param n - the number of integers to produce.
-   * @param max - the maximum value of any integer to be produced.
-   * @return a list of integers.
-   */
-  public static Set<Integer> randomNumbers(int n, int max) {
-    HashSet<Integer> generated = new HashSet<Integer>();
-    if (n >= max) {
-      // If we want more numbers than the max, it means we want all numbers from 1...max.
-      for (int i = 0; i < max; i++) {
-        generated.add(i);
-      }
-      return generated;
-    } else {
-      while (generated.size() < n) {
-        Integer next = MyRandom.generator.nextInt(max);
-        // As we're adding to a set, this will automatically do a containment check
-        generated.add(next);
-      }
-    }
-    return generated;
   }
 
 }

@@ -18,8 +18,8 @@ import structures.exceptions.GoodsCreationException;
 import structures.exceptions.MarketAllocationException;
 import structures.exceptions.MarketCreationException;
 import structures.factory.SingleMindedMarketFactory;
-import test.SingleMindedMarkets;
 import util.Cplex;
+import util.Printer;
 import allocations.error.AllocationAlgoException;
 import allocations.optimal.WelfareMaxAllocationILP;
 
@@ -28,7 +28,9 @@ public class WEExistenceGivenAlloc {
   public static void main2(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, AllocationAlgoException, AllocationException, MarketAllocationException, IloException {
     System.out.println("WEExistenceGivenAlloc");
 
-    SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarkets.singleMindedWithTies();
+    //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarkets.singleMindedWithTies();
+    //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.createRandomParametrizedSingleMindedMarket(3, 3, 0.75, UniformIntegerRewardFunction.singletonInstance);
+    SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.randomDemandSetSizeSingleMindedMarket(3, 3);
     // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(3, 10, 2);
     // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(10, 12, 1);
 
@@ -49,6 +51,11 @@ public class WEExistenceGivenAlloc {
         System.out.println("DOES NOT EXISTS!!!!!!");
       }
     }
+    if(WEExistenceGivenAlloc.checkWelfareMaxButNoWE(singleMindedMarket)){ 
+      System.out.println("Found counter-example");
+    } else {
+      System.out.println("Did not find counter-example");
+    }
   }
 
   public static void main(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, AllocationAlgoException,
@@ -59,7 +66,8 @@ public class WEExistenceGivenAlloc {
           System.out.println("(n, m, k) = (" + n + "," + m + "," + k + ")");
           for (int t = 0; t < 100; t++) {
             //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(n, m, k);
-            SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(n, m, k);
+            // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(n, m, k);
+            SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.randomDemandSetSizeSingleMindedMarket(n, m);
             if (WEExistenceGivenAlloc.checkWelfareMaxButNoWE(singleMindedMarket)) {
               System.out.println("Save this example!");
               System.out.println(singleMindedMarket);
@@ -100,6 +108,7 @@ public class WEExistenceGivenAlloc {
         System.out.println("---");
         x.printAllocation();
       }
+      System.out.println("------");
     }
     //Printer.printVector(allocsSupportWE);
 
@@ -161,8 +170,8 @@ public class WEExistenceGivenAlloc {
       }
     }
     if (cplex.solve()) {
-      // double[] LP_Prices = cplex.getValues(prices);
-      // Printer.printVector(LP_Prices);
+      double[] LP_Prices = cplex.getValues(prices);
+      Printer.printVector(LP_Prices);
       return true;
     } else {
       return false;
