@@ -1,2 +1,6 @@
+.settings/
+bin/
+sats_output/
+.classpath
+.project
 
-/bin/
