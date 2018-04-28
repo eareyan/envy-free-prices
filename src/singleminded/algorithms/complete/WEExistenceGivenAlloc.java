@@ -25,15 +25,16 @@ import allocations.optimal.WelfareMaxAllocationILP;
 
 public class WEExistenceGivenAlloc {
 
-  public static void main2(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, AllocationAlgoException, AllocationException, MarketAllocationException, IloException {
+  public static void main(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, AllocationAlgoException, AllocationException, MarketAllocationException, IloException {
     System.out.println("WEExistenceGivenAlloc");
 
     //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarkets.singleMindedWithTies();
     //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.createRandomParametrizedSingleMindedMarket(3, 3, 0.75, UniformIntegerRewardFunction.singletonInstance);
-    SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.randomDemandSetSizeSingleMindedMarket(3, 3);
+    //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.randomDemandSetSizeSingleMindedMarket(3, 3);
     // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(3, 10, 2);
     // SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(10, 12, 1);
-
+    SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.createAdditiveSingleMindedMarket(3, 3, 2);
+    
     System.out.println(singleMindedMarket);
     WelfareMaxAllocationILP<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>> welfareMax = new WelfareMaxAllocationILP<SingleMindedMarket<Goods, Bidder<Goods>>, Goods, Bidder<Goods>>();
     welfareMax.setNumSolutions(2100000000);
@@ -58,7 +59,7 @@ public class WEExistenceGivenAlloc {
     }
   }
 
-  public static void main(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, AllocationAlgoException,
+  public static void main2(String[] args) throws GoodsCreationException, BidderCreationException, MarketCreationException, AllocationAlgoException,
       AllocationException, MarketAllocationException, IloException {
     for (int n = 1; n < 10; n++) {
       for (int m = 1; m < 10; m++) {

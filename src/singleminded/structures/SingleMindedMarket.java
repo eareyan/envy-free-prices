@@ -2,6 +2,7 @@ package singleminded.structures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import structures.Bidder;
 import structures.Goods;
@@ -40,6 +41,11 @@ public class SingleMindedMarket<G extends Goods, B extends Bidder<G>> extends Ma
   private final HashMap<B, Integer> biddersToIndex;
 
   /**
+   * Set of dummy goods
+   */
+  private Set<G> dummyGoods;
+
+  /**
    * Constructor. Takes in a list of goods, a list of bidders, creates the structures for the single-minded market.
    * 
    * @param goods
@@ -57,7 +63,8 @@ public class SingleMindedMarket<G extends Goods, B extends Bidder<G>> extends Ma
     // Second, check that the reported demand size is actually equal to the number of items this bidder is connected to.
     for (B bidder : bidders) {
       if (bidder.getDemandSet().size() != bidder.getDemand()) {
-        throw new MarketCreationException("The bidder: " + bidder + " reports a demand set size of " + bidder.getDemand() + " but actually demands " + bidder.getDemandSet().size());
+        throw new MarketCreationException("The bidder: " + bidder + " reports a demand set size of " + bidder.getDemand() + " but actually demands "
+            + bidder.getDemandSet().size());
       }
     }
     // Create maps that point from bidders to indices, and from goods to indices.
@@ -78,6 +85,29 @@ public class SingleMindedMarket<G extends Goods, B extends Bidder<G>> extends Ma
         this.A[this.goodsToIndex.get(good)][this.biddersToIndex.get(bidder)] = bidder.demandsGood(good);
       }
     }
+  }
+
+  /**
+   * Setter for dummy goods. Can only be set at most once.
+   * 
+   * @param dummyGoods
+   * @throws MarketCreationException
+   */
+  public void setDummyGoods(Set<G> dummyGoods) throws MarketCreationException {
+    if (this.dummyGoods != null) {
+      throw new MarketCreationException("Dummy goods can be set at most once");
+    }
+    this.dummyGoods = dummyGoods;
+  }
+
+  /**
+   * Checks if a given good is a dummy good.
+   * 
+   * @param good
+   * @return
+   */
+  public boolean isDummyGood(G good) {
+    return this.dummyGoods != null && this.dummyGoods.contains(good);
   }
 
   /**
@@ -127,7 +157,7 @@ public class SingleMindedMarket<G extends Goods, B extends Bidder<G>> extends Ma
     }
     return edgesRepresentation;
   }
-  
+
   /**
    * Produces a flat string representation of the bidders' rewards as a list of comma separated values.
    * 
@@ -148,5 +178,19 @@ public class SingleMindedMarket<G extends Goods, B extends Bidder<G>> extends Ma
    */
   public double[] getR() {
     return this.r;
+  }
+
+  /**
+   * Printer. Representation of objects as strings.
+   * 
+   * @return a string representation of the information of goods in the market
+   */
+  @Override
+  protected String stringGoodsInfo() {
+    String ret = "Goods Supply";
+    for (G good : this.goods) {
+      ret += "\nN = " + good.getSupply() + ((this.dummyGoods != null && this.dummyGoods.contains(good)) ? "\t Dummy" : "");
+    }
+    return ret;
   }
 }

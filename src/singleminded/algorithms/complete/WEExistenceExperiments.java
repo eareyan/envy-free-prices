@@ -29,12 +29,13 @@ public class WEExistenceExperiments extends Experiments {
       AllocationException, MarketCreationException, PrincingAlgoException, Exception {
 
     for (int i = 0; i < RunParameters.numTrials; i++) {
-      SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(numGoods, numBidders, k);
+      //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformIntegerRewardRandomSingleMindedMarket(numGoods, numBidders, k);
       //SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.uniformRewardRandomSingleMindedMarket(numGoods, numBidders, k);
+      SingleMindedMarket<Goods, Bidder<Goods>> singleMindedMarket = SingleMindedMarketFactory.createAdditiveSingleMindedMarket(numGoods, numBidders, k);
+      //System.out.println(singleMindedMarket);
       String edges = singleMindedMarket.getEdgesStringRepresentation();
       String rewards = singleMindedMarket.getRewardStringRepresentation();
       if (!dbLogger.checkIfWEExistenceRowExists(numGoods, numBidders, k, edges, rewards)) {
-        
         final long startTime = System.currentTimeMillis();
         boolean existence = WEExistence.decideWE(singleMindedMarket, false);
         final long endTime = System.currentTimeMillis();
@@ -52,12 +53,12 @@ public class WEExistenceExperiments extends Experiments {
 
   @Override
   public void runExperiments(SqlDB dbLogger) throws Exception {
-    for (int n = 1; n < 30; n++) {
+    for (int n = 1; n < 17; n++) {
       for (int m = 1; m < 30; m++) {
         for (int k = 1; k <= n; k++) {
           System.out.println("(n , m , k) = (" + n + ", " + m + ", " + k + ")");
           this.runOneExperiment(n, m, k, -1, "", dbLogger);
-          //this.runOneExperiment(10, 30, 3, -1, "", dbLogger);
+          //this.runOneExperiment(3, 3, 2, -1, "", dbLogger);
         }
       }
     }

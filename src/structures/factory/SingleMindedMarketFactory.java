@@ -224,5 +224,42 @@ public class SingleMindedMarketFactory {
     }
     return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
   }
+  
+  /**
+   * 
+   * @param n
+   * @param m
+   * @param k
+   * @return
+   * @throws GoodsCreationException
+   * @throws BidderCreationException
+   * @throws MarketCreationException
+   */
+  public static SingleMindedMarket<Goods, Bidder<Goods>> createAdditiveSingleMindedMarket(int n, int m, int k) throws GoodsCreationException, BidderCreationException, MarketCreationException {
+    // Check validity of parameters. In this case we don't use p, so we use a default value of 1.0.
+    SingleMindedMarketFactory.checkSingleMindedParameters(n, m, k, 1.0);
+    // Create goods, each with unit supply. Also, create the random base values.
+    ArrayList<Goods> goods = new ArrayList<Goods>();
+    double[] baseValues = new double[n];
+    for (int i = 0; i < n; i++) {
+      goods.add(new Goods(1));
+      baseValues[i] = (MyRandom.generator.nextDouble() * 10000) + 100;
+    }
+    // Create bidders
+    ArrayList<Bidder<Goods>> bidders = new ArrayList<Bidder<Goods>>();
+    for (int j = 0; j < m; j++) {
+      // Each bidder connects exactly with k distinct random goods.
+      Set<Integer> connectTo = MyRandom.randomNumbers(k, n);
+      HashSet<Goods> bDemandSet = new HashSet<Goods>();
+      double bidderBundleValue = 0;
+      for (Integer i : connectTo) {
+        bDemandSet.add(goods.get(i));
+        bidderBundleValue += baseValues[i];
+      }
+      // These reward model comes from paper: http://www.aaai.org/Papers/AAAI/2000/AAAI00-009.pdf
+      bidders.add(new Bidder<Goods>(k, bidderBundleValue * (1 + 0.1 * MyRandom.generator.nextGaussian()), bDemandSet));
+    }
+    return new SingleMindedMarket<Goods, Bidder<Goods>>(goods, bidders);
+  }
 
 }
